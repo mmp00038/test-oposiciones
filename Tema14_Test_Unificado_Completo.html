@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Multibloque - Tema 14: Incendios Forestales</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 100px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 85px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Question Cards */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Reset Area */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 100px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Ver todo el tema unificado (109 preguntas)</option>
+        <option value="t14_1">Bloque 1: Test 14.1 (15 preguntas)</option>
+        <option value="t14_2">Bloque 2: Test 14.2 (15 preguntas)</option>
+        <option value="t14_3">Bloque 3: Test 14.3 (34 preguntas)</option>
+        <option value="t14_4">Bloque 4: Test 14 Básico (30 preguntas)</option>
+        <option value="t14_5">Bloque 5: Test 1 Bloque Incendios (30 preguntas)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 14: INCENDIOS FORESTALES</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const quizBlocks = {
+      "t14_1": [
+        {
+          "question": "1. La Ley de Prevención y lucha contra los incendios forestales es la:",
+          "options": ["a) Ley 5/1999 de 29 de Junio", "b) Ley 237/2002, de 13 de Noviembre", "c) Ley 5/1999 de 29 de Julio", "d) Ley 237/2001, de 13 de Noviembre"],
+          "correct": 0
+        },
+        {
+          "question": "2. Según el artículo 50.1 de la ley 43/2003 de 21 de Noviembre, de Montes, existen una serie de circunstancia que excepcionan la prohibición de cambio de uso forestal tras un incendio si no han transcurrido 30 años. ¿Cuál de las siguientes afirmaciones acerca de esa posibilidad de excepción NO ES CORRECTA?",
+          "options": ["a) Que estuviera previsto en un planeamiento previamente aprobado", "b) Que concurran razones imperiosas de interés público de primer orden apreciadas mediante ley", "c) Que se prevea en un directriz de política agroforestal que contemple el uso agrario o ganadero intensivo de montes no arbolados en estado de abandono", "d) Todas las afirmaciones anteriores son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "3. El artículo 6 de la ley 5/1999 de 29 de Junio, de prevención y lucha contra los incendios forestales determina las épocas de peligro. De las siguientes afirmaciones sobre las épocas de peligro hay una que es CORRECTA. Indique de cual se trata:",
+          "options": ["a) Se determinan cada año por Orden del titular de la consejería competente en materia forestal", "b) A lo largo del año nos encontramos con épocas de peligro bajo, medio, alto y extremo", "c) Cuando las circunstancias meteorológicas lo aconsejen serán modificadas transitoriamente por el titular de la consejería competente en materia de Protección Civil y Emergencias.", "d) La época de peligro alto es la comprendida entre el 1 de junio y el 30 de septiembre"],
+          "correct": 2
+        },
+        {
+          "question": "4. El artículo 18 del decreto 247/2001 de 13 de noviembre, por el que se aprueba el Reglamento de prevención y lucha contra los incendios forestales de Andalucía, establece el procedimiento común de autorización en las actividades de quema de matorral, pastos y residuos procedentes de tratamientos selvícolas, fitosanitarios y otros trabajos forestales. El procedimiento de obtención de dicha autorización requiere:",
+          "options": ["a) Que la solicitud entre el en Registro Electrónico de la Junta de Andalucía con un antelación mínima de 30 días respecto de la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma. La persona titular de la Delegación del Gobierno de la Junta de Andalucía autorizará o no la quema solicitada mediante resolución motivada, que será notificada al menos con 5 días naturales de antelación al día señalado para la misma, entendiéndose autorizada en defecto de dicha notificación.", "b) Que la solicitud entre el en Registro Electrónico de la Junta de Andalucía con un antelación mínima de 30 días respecto de la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma. La persona titular de la Delegación del Gobierno de la Junta de Andalucía autorizará o no la quema solicitada mediante resolución motivada, que será notificada al menos con 5 días naturales de antelación al día señalado para la misma, entendiéndose no autorizada en defecto de dicha notificación.", "c) Que la solicitud entre el en Registro Electrónico de la Junta de Andalucía con un antelación mínima de 30 días respecto de la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma. La persona titular de la Delegación del Gobierno de la Junta de Andalucía autorizará o no la quema solicitada mediante resolución motivada, que será notificada al menos con 5 días hábiles de antelación al día señalado para la misma, entendiéndose autorizada en defecto de dicha notificación.", "d) Que la solicitud entre el en Registro Electrónico de la Junta de Andalucía con un antelación mínima de 30 días respecto de la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma. La persona titular de la Delegación del Gobierno de la Junta de Andalucía autorizará o no la quema solicitada mediante resolución motivada, que será notificada al menos con 5 días hábiles de antelación al día señalado para la misma, entendiéndose no autorizada en defecto de dicha notificación."],
+          "correct": 0
+        },
+        {
+          "question": "5. Usted quiere realizar una quema agrícola el día 27 de mayo y no tiene claro si necesita algún tipo de trámite para su realización, por lo que llama a la Delegación Territorial competente de su provincia con el fin de obtener respuesta. Allí le preguntan por el término municipal donde se va a llevar a cabo la quema y comprueban que se encuentra en una zona incluida en Zona de Peligro, pero fuera de terreno forestal y su zona de influencia, por lo que en la Delegación Territorial le indican que usted debe:",
+          "options": ["a) Realizar una comunicación previa a la Delegación del Gobierno, al menos 10 días antes de la quema y 48 horas antes a los propietarios colindantes", "b) Realizar una comunicación previa a la Delegación del Gobierno, al menos 10 días antes de la quema, siendo conveniente comunicarlo a los propietarios colindantes 48 horas antes", "c) Realizar una comunicación previa a la Delegación del Gobierno al menos 10 días antes de la quema y 24 horas antes a los propietarios colindantes", "d) Ninguna de las respuestas anteriores es correcta"],
+          "correct": 3
+        },
+        {
+          "question": "6. Usted le comenta a la persona que le atiende amablemente por teléfono que además del terreno objeto de la llamada de la pregunta anterior, dispone de una parcela en otro municipio cercano donde tiene pensado quemar restos de vegetación la semana siguiente. Comprueban que esa parcela se sitúa fuera de zona de peligro por lo que le indican que usted debe:",
+          "options": ["a) Comunicar su actuación porque ya es época de peligro alto de incendios", "b) No requiere ningún tipo de trámite", "c) No requiere trámite alguno, pero le indican que es conveniente realiza un cortafuegos perimetral de 5 metros de anchura mínima para proteger árboles o arbustos que pudieran resultar afectados", "d) No requiere trámite alguno, pero le indican que usted debe realiza un cortafuegos perimetral de 5 metros de anchura mínima para proteger árboles o arbustos que pudieran resultar afectados"],
+          "correct": 3
+        },
+        {
+          "question": "7. El artículo 38 del Reglamento de Prevención y Lucha contra incendios establece la obligación de restaurar las áreas afectadas por un incendio. Esta restauración quedará recogida en un Plan de Restauración para cuya aprobación se requiere:",
+          "options": ["a) Presentación ante la Delegación Provincial correspondiente de la Consejería de Medio Ambiente antes de que transcurran 8 meses a contar desde el día de la extinción del incendio, pudiendo ampliarse este plazo cuando la envergadura o características del incendio lo requieran, por el tiempo que resulte necesario, que no podrá superar los 6 meses.", "b) La aprobación del Plan de Restauración por la Delegación provincial de la Consejería de Medio ambiente, que deberá notificarse en el plazo de 4 meses, transcurridos el cual se entenderá aprobado.", "c) La aprobación del Plan de Restauración por la Delegación provincial de la Consejería de Medio ambiente, que deberá notificarse en el plazo de 6 meses, transcurridos el cual se entenderá aprobado.", "d) Las respuestas a y c son correctas."],
+          "correct": 3
+        },
+        {
+          "question": "8. Según el artículo 32 de la Ley 5/1999 de 29 de Junio, ¿a través de cuántos instrumentos se planifica la lucha contra los incendios forestales?",
+          "options": ["a) 2, Plan de Emergencias por incendios forestales de Andalucía (Plan INFOCA) y Planes Locales de Emergencia por incendios forestales", "b) 3, Plan de Emergencias por incendios forestales de Andalucía (Plan INFOCA), Planes Locales de Emergencia por incendios forestales y Planes de Autoprotección", "c) 4, Plan Estatal de Protección Civil de Emergencias por incendios forestales, Plan de Emergencias por incendios forestales de Andalucía (Plan INFOCA), Planes Locales de Emergencia por incendios forestales y Planes de Autoprotección", "d) 1, Plan de emergencias por incendios forestales de Andalucía (Plan INFOCA)"],
+          "correct": 1
+        },
+        {
+          "question": "9. Usted visita un camping situado en un terreno forestal, con la intención de comprobar que cuenta con el correspondiente Plan de Autoprotección. El propietario le indica que no cuenta con este plan. ¿A qué sanción se enfrentaría?",
+          "options": ["a) Multa de 60,10 a 3005,07 euros", "b) Multa de 3.005,07 a 60.101,21 euros", "c) Multa de 60.101,22 a 450.759,08 euros", "d) Ninguna es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "10. ¿En el plazo de qué tiempo, la no iniciación por parte de la Administración del correspondiente procedimiento sancionador, conllevará la prescripción de una infracción grave?",
+          "options": ["a) Al año", "b) A los 6 meses", "c) A los 2 años", "d) A los 3 años"],
+          "correct": 2
+        },
+        {
+          "question": "11. La realización de una quema de restos de poda en terreno forestal, donde no se han seguido el condicionado de la autorización, ha tenido como consecuencia un incendio donde se han visto afectadas finalmente 3 hectáreas de pinar. ¿A qué sanción se enfrenta el responsable?",
+          "options": ["a) Multa de 60,10 a 3005,07 euros", "b) Multa de 3.005,07 a 60.101,21 euros", "c) Multa de 60.101,22 a 450.759,08 euros", "d) Ninguna es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "12. Según la Orden de 11 de Septiembre de 2002, por la que se aprueban los modelos de determinadas actuaciones de prevención y lucha contra los incendios forestales y se desarrollan medidas de protección, las dimensiones de las áreas cortafuegos en el interior de zonas arbolada serán, señales la INCORRECTA:",
+          "options": ["a) 2 veces la atura dominante de los árboles y, al menos 10 metros", "b) 2 veces la altura dominante de los árboles y, al menos 15 metros", "c) 2 veces y media la altura dominante de los árboles y, al menos 10 metros", "d) Todas las respuestas anteriores son incorrectas"],
+          "correct": 3
+        },
+        {
+          "question": "13. Usted es propietario de un terreno forestal de 327 hectáreas que dispone de un Plan Técnico donde se recoge la gestión de éste, por lo que, en lo referente a los Planes de Prevención de Incendios forestales:",
+          "options": ["a) Usted está obligado a elaborarlo, aun contando el terreno con un Plan Técnico", "b) Usted no está obligado a elaborarlo, ya que el Plan Técnico recogerá la estimación de riesgo y medidas de prevención adecuadas.", "c) Usted no está obligado a elaborarlo, ya que el terreno cuanta con menos de 400 hectáreas", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "14. Si el terreno al que hace referencia la pregunta anterior tuviera que contar con un Plan de Prevención, a quien le correspondería su elaboración y aprobación:",
+          "options": ["a) Se elaboraría por un técnico competente en materia forestal y se aprobaría por la Delegación Provincial correspondiente de la Consejería de medio Ambiente en un plazo de 4 meses entendiéndose aprobado por silencio administrativo", "b) Se elaboraría por un técnico competente en materia forestal y se aprobaría por la Delegación Provincial correspondiente de la Consejería de medio Ambiente en un plazo de 6 meses entendiéndose aprobado por silencio administrativo", "c) Se elaboraría mediante un formulario normalizado y se aprobaría por la Delegación Provincial correspondiente de la Consejería de medio Ambiente en un plazo de 4 meses entendiéndose aprobado por silencio administrativo", "d) Se elaboraría por un formulario normalizado y se aprobaría por la Delegación Provincial correspondiente de la Consejería de medio Ambiente en un plazo de 6 meses entendiéndose aprobado por silencio administrativo"],
+          "correct": 2
+        },
+        {
+          "question": "15. Según la Orden de 21 de Mayo de 2009, por la que se establecen limitaciones de usos y actividades en terrenos forestales y zonas de influencia forestal, ¿cuál de las siguientes actividades no se pueden autorizar, con carácter excepcional, en la época de peligro alto de incendios forestales?:",
+          "options": ["a) Quema de residuos agrícolas o forestales", "b) Uso de barbacoas en restaurantes rurales", "c) Uso de calderas de destilación, y hornos de carbón y piconeo, en zonas donde estas actividades sean tradicionales", "d) Todas estas actividades se pueden autorizar de manera excepcional"],
+          "correct": 0
+        }
+      ],
+      "t14_2": [
+        {
+          "question": "1. Según el Decreto 371/2010, de 14 de septiembre, por el que se aprueba el Plan INFOCA, el nivel de gravedad potencial referido a aquellos incendios para cuya extinción es necesario que, a solicitud de la Dirección del Plan, sean incorporados medios extraordinarios estatales, o puedan comportar situaciones de emergencia que deriven hacia el interés nacional corresponde a:",
+          "options": ["a) Nivel 3", "b) Nivel 2", "c) Nivel 1", "d) Nivel 0"],
+          "correct": 1
+        },
+        {
+          "question": "2. En la clasificación de los incendios, desde un punto de vista operativo, según el Plan INFOCA, indique cual de las siguientes escalas se corresponde con los incendios Grado C, Incendio Medio:",
+          "options": ["a) Intervención en ataque ampliado cuarto nivel. Incendios que por no poder ser controlados en el ataque ampliado a tercer nivel pueda requerir del despliegue máximo del dispositivo provincial, de la intervención de medios aéreos regionales y/o BRICA fuera de su área de actuación prioritaria y del apoyo de más medios del resto de las provincias.", "b) Intervención en ataque ampliado a segundo nivel. Incendios que por no poder ser controlados en el ataque inicial requieren de la incorporación de más medios en ataque ampliado.", "c) Intervención en ataque ampliado tercer nivel. Incendios que por no poder ser controlados en el ataque ampliado a segundo nivel puedan requerir de la intervención de medios aéreos regionales y/o BRICAS en su área de actuación prioritaria y la distribución de los medios terrestres provinciales en sectores de intervención.", "d) Ninguna de las anteriores respuestas es correcta"],
+          "correct": 2
+        },
+        {
+          "question": "3. En riesgo local de incendios se obtiene a partir de dos factores. Indique de que factores se trata:",
+          "options": ["a) Índice de Peligrosidad e Índice de Riesgo Meteorológico", "b) Índice de Peligrosidad e Índice de Riesgo Estructural", "c) Índice de Riesgo Meteorológico e Índice de Riesgo Histórico", "d) Índice de Peligrosidad e Índice de Riesgo Histórico"],
+          "correct": 3
+        },
+        {
+          "question": "4. La Dirección Regional del Plan INFOCA será ejercida por:",
+          "options": ["a) El titular de la Consejería competente en materia de Medio Ambiente", "b) Por un Comité de Dirección Regional, en caso que sea declaredo nivel de gravedad 1 de ámbito regional.", "c) Conjuntamente por el titular de la Consejería en materia de Medio Ambiente y el titular de la Consejería competente en materia de protección civil y emergencias, en caso que sea declarado nivel de gravedad 1 de ámbito regional.", "d) Ninguna respuesta es correcta."],
+          "correct": 3
+        },
+        {
+          "question": "5. La Dirección Operativa Provincial del Plan INFOCA le corresponde a:",
+          "options": ["a) El Delegado del Gobierno de la provincia donde se desarrolle la emergencia", "b) El Delegado Territorial de Desarrollo Sostenible", "c) El Director General competente en materia de Medio Ambiente", "d) Ninguna respuesta es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "6. ¿Con cuántos Centros de Defensa Forestal cuenta actualmente la Comunidad Autónoma?",
+          "options": ["a) 21", "b) 22", "c) 23", "d) 24"],
+          "correct": 2
+        },
+        {
+          "question": "7. La activación del CECOPI (Centro de Coordinación de Operaciones Integrado) se producirá a partir de:",
+          "options": ["a) La activación del nivel 1, ya que es necesario poner en funcionamiento un dispositivo de protección civil", "b) La activación del nivel 3", "c) La activación del nivel 2, cuando lo solicite la dirección regional o provincial del Plan INFOCA", "d) Las respuestas b y c son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "8. Indique cuál de las siguientes afirmaciones acerca de los Planes de Autoprotección, según recoge el Plan INFOCA, NO es correcta.",
+          "options": ["a) Se podrá realizar de forma manuscrita o a través de un procedimiento telemático mediante un formulario normalizado aprobado por la Consejería competente en materia de protección civil y emergencias.", "b) Si las edificaciones o instalaciones que precisan de Plan de Autoprotección se encuentran en terreno forestal o su zona de influencia deberá contar con una faja exterior de protección de 15 metros de anchura mínima libre de residuos, de matorral, y de vegetación herbácea, pudiendo mantener la masa arbolada y arbustiva aclarada", "c) Deben ser presentados en el Municipio o Municipios competentes por razón del territorio afectado, en el plazo de 4 meses desde la obtención de la autorización administrativa de emplazamiento o funcionamiento", "d) Todas las respuestas anteriores son correcta"],
+          "correct": 2
+        },
+        {
+          "question": "9. En cuanto a la recurrencia de incendios, señale la respuesta incorrecta:",
+          "options": ["a) Es un factor que se utiliza para analizar el riesgo local de aparición de incendios forestales en una zona determinada.", "b) Se utiliza para calcular el índice de Riesgo Histórico de una determinada zona.", "c) Mide la frecuencia de repetición de los incendios forestales en una zona concreta y para un período de tiempo determinado.", "d) Todas las respuestas son correctas."],
+          "correct": 3
+        },
+        {
+          "question": "10. La vigencia de los Planes de Emergencia por Incendios Forestales será de:",
+          "options": ["a) Indefinida para el Plan INFOCA y de 4 años para los Planes Locales", "b) Indefinida para el plan INFOCA y Planes Locales", "c) 4 años para el Plan INFOCA y Planes Locales", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "11. ¿Cuál de las siguientes afirmaciones sobre los grupos operativos es CORRECTA?",
+          "options": ["a) Existen 4 grupos operativos, que se irán incorporando a la emergencia según las necesidades", "b) Forman parte de la estructura regional del Plan INFOCA", "c) Las jefaturas de los distintos grupos se designan por la Dirección Operativa Provincial del Plan", "d) Todas las respuestas anteriores son correctas"],
+          "correct": 0
+        },
+        {
+          "question": "12. Según establece la Orden de 19 de mayo de 1999, sobre las funciones y responsabilidades del personal de la Administración que participa en el Plan Infoca y sobre la operatividad de dicho Plan, indique la función que podrán desempeñar los Agentes de Medio Ambiente que, sin desempeñar las funciones de Coordinador de Demarcación, sean requeridos para intervenir en un incendio producido en la misma:",
+          "options": ["a) Asumir, hasta su personación en el incendio, las funciones del Director Técnico de Extinción", "b) Cuando dispongan de conocimientos y experiencia adecuados, dirigir la intervención de los retenes y responsabilizarse de los medios materiales que le sean asignados para participar en la extinción", "c) Controlar el tiempo de participación en el incendio de los medios humanos y materiales", "d) Colaborar en el análisis e investigación de las causas originadoras de los incendios producidos en la demarcación"],
+          "correct": 1
+        },
+        {
+          "question": "13. Con las siglas SMEIF nos referimos a:",
+          "options": ["a) Servicio de meteorología en incendios forestales", "b) Sistema de manejo de emergencias de incendios forestales", "c) Servicio de movilización de recursos en emergencias por incendios forestales", "d) Sistema de movilización de recursos en emergencias por incendios forestales"],
+          "correct": 1
+        },
+        {
+          "question": "14. Según la Orden de 19 de mayo de 1999, sobre las funciones y responsabilidades del personal de la Administración que participa en el Plan Infoca y sobre la operatividad de dicho Plan, NO es una función de la Brigada de Investigación de incendios Forestales (BIIF):",
+          "options": ["a) Determinar e investigar, en caso necesario, las causas de todos los incendios producidos en la provincia a lo largo del año", "b) Colaborar en la identificación de la propiedad de los terrenos forestales afectados por los incendios", "c) Colaborar en la evaluación del grado de afectación de las superficies forestales incendiadas y su posible recuperación.", "d) Todas son funciones encomendadas a la BIIF"],
+          "correct": 3
+        },
+        {
+          "question": "15. ¿En cuál de los siguientes supuestos existirá la figura del Director Técnico de Emergencias en el Puesto de Mando Avanzado?",
+          "options": ["a) En todos los casos.", "b) En los incendios de nivel 0.", "c) En los incendios de nivel 1 y superiores.", "d) En los incendios donde se active el CECOPI."],
+          "correct": 2
+        }
+      ],
+      "t14_3": [
+        {
+          "question": "1.- ¿Quién asume en la Administración de la Junta de Andalucía las competencias en materia de incendios forestales, según el artículo 3 del decreto 247/2001?",
+          "options": ["a) La consejería competente en materia de protección civil y emergencias", "b) La consejería competente en materia de medio ambiente", "c) La consejería competente en materia forestales", "d) Las respuestas a y c son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "2.- ¿Cuál de las siguientes funciones que se describen a continuación son propias de las agrupaciones de defensa forestal?",
+          "options": ["a) Colaboran en la elaboración de los planes locales de emergencia por incendios forestales", "b) Aportar medios para la extinción de incendios, con arreglo a lo previsto en el Plan Local de Emergencia por Incendios Forestales", "c) Participar en las campañas de divulgación e información sobre prevención y lucha contra los incendios forestales.", "d) Todas las funciones descritas son propias de las agrupaciones de defensa forestal"],
+          "correct": 3
+        },
+        {
+          "question": "3.- ¿Cuál de las siguientes afirmaciones acerca de los planes de prevención es CIERTA?",
+          "options": ["a) Para todos los terrenos forestales que carezcan de Proyecto de Ordenación de Monte o Plan Técnico, será potestativa la elaboración de un Plan de Prevención de Incendios Forestales", "b) Los terrenos forestales con superficie inferior a 400 hectáreas deberán cumplimentar un formulario normalizado aprobado por la Consejería de Medio Ambiente", "c) Los terrenos forestales con superficie superior a 400 hectáreas realizarán el plan de prevención que deberá ser elaborado por un técnico competente en materia forestal.", "d) El titular de la Delegación del gobierno es el órgano competente para la resolución del procedimiento de aprobación de los Planes de Prevención de Incendios Forestales"],
+          "correct": 2
+        },
+        {
+          "question": "4.- según el artículo 12, si queremos acampar en un monte privado fuera de una zona habilitada para ello, un 25 de marzo, ¿cómo deberíamos proceder, según el artículo 12 del reglamento?",
+          "options": ["a) El reglamento no permite acampar fuera de lugares habilitados en ninguna circunstancia", "b) Necesitaremos una autorización del titular del terreno", "c) Necesitaremos una autorización del titular del terreno, al menos siete días naturales antes a la realización de la actividad", "d) Necesitaremos una autorización del titular del terreno, la cual deberá ser comunicada a la Delegación Provincial correspondiente de la Consejería de Medio Ambiente con una antelación mínima de siete días naturales"],
+          "correct": 3
+        },
+        {
+          "question": "5.- ¿A quién le corresponde, según el artículo 13 del Reglamento de prevención y lucha contra incendios forestales, emitir autorización para poder realizar un lanzamiento de cohetes?",
+          "options": ["a) Al Alcalde del municipio correspondiente", "b) Al Delegado Territorial de la consejería competente en materia de medio ambiente", "c) Al Director del Centro Operativo Provincial correspondiente", "d) Ninguna respuesta es correcta"],
+          "correct": 3
+        },
+        {
+          "question": "6.- ¿Cuántas tipologías de quemas forestales y de restos agrícolas recoge el Reglamento de prevención y lucha contra incendios forestales?",
+          "options": ["a) 5", "b) 4", "c) 6", "d) 3"],
+          "correct": 1
+        },
+        {
+          "question": "7.- Señale la respuesta correcta con respecto a las quemas prescritas de vegetación en pie?",
+          "options": ["a) Se realizarán por el Servicio Operativo de Extinción de Incendios Forestales del Plan INFOCA, con fines de conservación y regeneración de ecosistemas ligados al uso del fuego, investigación y formación de dicho personal, así como de prevención de incendios forestales. Se podrán realizar con las limitaciones horarias que establezca el Plan de quema, en el que se definirán las condiciones de ejecución de estas y la estructura organizativa del personal encargado de su realización. Podrán realizarse sobre terrenos de titularidad pública o bien sobre terrenos de titularidad privada, previo acuerdo o convenio con los propietarios de los terrenos.", "b) Se realizarán por el Servicio Operativo de Extinción de Incendios Forestales del Plan INFOCA, con fines de conservación y regeneración de ecosistemas ligados al uso del fuego, investigación y formación de dicho personal, así como de prevención de incendios forestales. Se podrán realizar sin limitaciones horarias y durante todo el año, previa aprobación de un Plan de Quema en el que se definirán las condiciones de ejecución de estas y la estructura organizativa del personal encargado de su realización. Este tipo de quemas se realizarán sobre terrenos de titularidad pública.", "c) Se realizarán por el Servicio Operativo de Extinción de Incendios Forestales del Plan INFOCA, con fines de conservación y regeneración de ecosistemas ligados al uso del fuego, investigación y formación de dicho personal, así como de prevención de incendios forestales. Se podrán realizar sin limitaciones horarias y durante todo el año, previa aprobación de un Plan de Quema en el que se definirán las condiciones de ejecución de estas y la estructura organizativa del personal encargado de su realización. Asimismo, podrán realizarse sobre terrenos de titularidad pública o bien sobre terrenos de titularidad privada, previo acuerdo o convenio con los propietarios de los terrenos.", "d) Se realizarán por el Servicio Operativo de Extinción de Incendios Forestales del Plan INFOCA, con fines de conservación y regeneración de ecosistemas ligados al uso del fuego, investigación y formación de dicho personal, así como de prevención de incendios forestales. Se podrán realizar con las limitations horarias que establezca el Plan de quema, en el que se definirán las condiciones de ejecución de estas y la estructura organizativa del personal encargado de su realización. Este tipo de quemas se realizarán sobre terrenos de titularidad pública o bien sobre terrenos de titularidad privada, previo acuerdo o convenio con los propietarios de los terrenos."],
+          "correct": 2
+        },
+        {
+          "question": "8.- Para las explotaciones agrarias que no tengan la consideración de pequeña explotación o de microexplotación, la quema podrá realizarse:",
+          "options": ["a) Por razones de carácter fitosanitario motivando que no sea posible abordar con otro tipo de tratamiento", "b) Con el objeto de prevenir incendios.", "c) Las respuestas a y b son correctas", "d) Ninguna respuesta es correcta"],
+          "correct": 2
+        },
+        {
+          "question": "9.- ¿Cuál de las siguientes afirmaciones acerca de la quema de matorral y pastos es CIERTA?",
+          "options": ["a) Se debe contar con una línea perimetral de defensa, limpia de todo material vegetal hasta suelo mineral, con una anchura de tres veces la altura máxima de la estructura del matorral presente y que como mínimo será de 4 metros.", "b) Los restos vegetales de la limpieza perimetral serán ubicados en la parte interior de la línea perimetral de defensa, nunca en el borde interior.", "c) La parcela de quema deberá quedar fraccionada en unidades de quema de superficie inferior a 4 hectáreas.", "d) La ejecución de la quema deberá comenzar después de la salida del sol y quedar concluida a las 18 horas y podrá realizarse cualquier día de la semana."],
+          "correct": 2
+        },
+        {
+          "question": "10.- ¿Con cuántos días de antelación deberá tener entrada en el Registro Electrónico de la Junta de Andalucía la solicitud de autorización de quema?",
+          "options": ["a) Con una antelación mínima de 30 días respecto a la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma.", "b) Con una antelación mínima de 20 días respecto a la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma.", "c) Con una antelación mínima de 10 días respecto a la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma.", "d) Con una antelación mínima de 5 días respecto a la fecha de ejecución prevista, o cumplir con los criterios definidos mediante orden para el registro de la misma."],
+          "correct": 0
+        },
+        {
+          "question": "11.- ¿En qué casos se podrán realizar quemas mediante la presentación de una declaración responsable?",
+          "options": ["a) Nunca, para poder llevar a cabo quemas en necesaria siempre la obtención de la autorización correspondiente.", "b) En el caso de que se pretenda la quema de restos vegetales por puntos, pilas o montones en terrenos forestales o restos vegetales agrícolas en zonas de influencia forestal, en el caso de pequeñas explotaciones agrarias o microexplotaciones", "c) En el caso de que se pretenda la quema de restos vegetales por puntos, pilas o montones en terrenos forestales o restos vegetales agrícolas en zonas de influencia forestal, en el caso de pequeñas explotaciones agrarias o microexplotaciones, durante la época de peligro bajo y medio de incendios.", "d) En el caso de que se pretenda la quema de restos vegetales por puntos, pilas o montones en terrenos forestales o restos vegetales agrícolas en zonas de influencia forestal, en el caso de pequeñas explotaciones agrarias o microexplotaciones, durante la época de peligro bajo de incendios."],
+          "correct": 3
+        },
+        {
+          "question": "12.- Queremos realizar una quema en nuestra pequeña explotación, donde se van a quemar restos vegetales en diversas pilas dentro de nuestra parcela. La fecha prevista de ejecución de esta quema es el 30 de abril. ¿Podremos realizarla?",
+          "options": ["a) No, la ley 7/2022 de residuos y suelos contaminados prohíbe cualquier tipo de quema", "b) Sí, siempre que contemos con la autorización necesaria para estos casos", "c) Sí, siempre que previamente hayamos presentado una declaración responsable", "d) Sí, siempre que hayamos presentado la preceptiva comunicación previa."],
+          "correct": 2
+        },
+        {
+          "question": "13.- En el caso de que se nos permita realizar una quema mediante la presentación de una declaración responsable, el procedimiento para su presentación sería:",
+          "options": ["a) La declaración responsable habrá de presentarse con una antelación mínima de 10 días naturales a la realización de la actividad, pudiendo ser denegada mediante resolución motivada del órgano competente por razón del territorio en materia de uso del fuego con carácter previo a su realización con una antelación mínima de 24 horas a su ejecución.", "b) La declaración responsable habrá de presentarse con una antelación mínima de 10 días hábiles a la realización de la actividad, pudiendo ser denegada mediante resolución motivada del órgano competente por razón del territorio en materia de uso del fuego con carácter previo a su realización con una antelación mínima de 24 horas a su ejecución.", "c) La declaración responsable habrá de presentarse con una antelación mínima de 10 días hábiles a la realización de la actividad, pudiendo ser denegada mediante resolución motivada del órgano competente por razón del territorio en materia de uso del fuego con carácter previo a su realización con una antelación mínima de 48 horas a su ejecución.", "d) La declaración responsable habrá de presentarse con una antelación mínima de 10 días naturales a la realización de la actividad, pudiendo ser denegada mediante resolución motivada del órgano competente por razón del territorio en materia de uso del fuego con carácter previo a su realización con una antelación mínima de 48 horas a su ejecución."],
+          "correct": 1
+        },
+        {
+          "question": "14.- ¿Cuál de las siguientes precauciones han de observarse cuando se están realizando actuaciones en terrenos y explotaciones forestales, según el artículo 21 del reglamento de prevención y lucha contra incendios forestales?",
+          "options": ["a) Se dispondrá de extintores de agua y reservas de ésta en cantidad no inferior a 50 litros por persona. Cuando existan motores de explosión o eléctricos, será preceptivo disponer además de extintores de espuma o gas carbónico.", "b) Mantener los caminos, pistas o fajas cortafuegos de las explotaciones forestales limpios de residuos o desperdicios y libres de obstáculos que impidan el paso y la maniobra de vehículos.", "c) Los emplazamientos de aparatos de soldadura, grupos electrógenos, motores o equipos fijos de explosión o eléctricos, transformadores eléctricos, así como cualquier otra instalación de similares características, deberá rodearse de un cortafuegos perimetral de una anchura mínima de 5 metros.", "d) Todas las respuestas anteriores son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "15.- Dentro de las precauciones a adoptar recogidas en el artículo al que hace mención la pregunta anterior, se establece la obligación de mantener limpios de vegetación los parques de clasificación, cargaderos y zonas de carga intermedia y que los productos se apilarán debiendo guardar entre sí las pilas de madera, leña, corcho, piña u otros productos forestales una distancia mínima de:",
+          "options": ["a) 10 metros.", "b) 5 metros", "c) 15 metros", "d) 3 metros"],
+          "correct": 0
+        },
+        {
+          "question": "16.- ¿Durante qué épocas de peligro los titulares de carreteras, vías férreas y otras vías de comunicación deberán mantener libres de residuos, matorral y vegetación herbácea, tanto la zona de dominio público como la de servidumbre?",
+          "options": ["a) Estas zonas siempre tienen que estar libres de residuos, matorral y vegetación herbácea.", "b) Épocas de peligro alto", "c) Épocas de peligro medio y alto", "d) Ninguna respuesta es correcta"],
+          "correct": 2
+        },
+        {
+          "question": "17.- ¿Cuál de las siguientes afirmaciones acerca de las conducciones eléctricas en la prevención de incendios, que se recoge en el artículo 23 del reglamento, NO es correcta?",
+          "options": ["a) Las entidades responsables de las líneas eléctricas respetarán las especificaciones de la reglamentación electrotécnica sobre distancia mínima entre los conductores y las copas de los árboles.", "b) Con anterioridad al 31 de mayo de cada año, dichas entidades revisarán los elementos de aislamiento de las líneas y se realizará la limpieza de combustible vegetal bajo las instalaciones y en la zona de corta de arbolado.", "c) De las actuaciones realizadas se dará cuenta a la persona titular de la Delegación del Gobierno de la Junta de Andalucía antes del 1 de junio de cada año y, en todo caso, en el plazo máximo de dos meses desde su realización.", "d) Las respuestas b y c son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "18.- Los campings y zonas de acampada que se encuentren en terrenos forestales y su zona de influencia deberán protegerse con:",
+          "options": ["a) Un cortafuegos perimetral de anchura mínima de 15 metros y dotarse de extintores de agua para sofocar fuegos incipientes y de una reserva de agua de al menos 7.000 litros.", "b) Un cortafuegos perimetral de anchura mínima de 10 metros y dotarse de extintores de agua para sofocar fuegos incipientes y de una reserva de agua de al menos 7.000 litros.", "c) Un cortafuegos perimetral de anchura mínima de 15 metros y dotarse de extintores de agua para sofocar fuegos incipientes y de una reserva de agua de al menos 10.000 litros.", "d) Un cortafuegos perimetral de anchura mínima de 10 metros y dotarse de extintores de agua para sofocar fuegos incipientes y de una reserva de agua de al menos 10.000 litros."],
+          "correct": 0
+        },
+        {
+          "question": "19.- ¿Cuál de las siguientes afirmaciones acerca de las condiciones exigibles a los vertederos de residuos urbanos en terrenos forestales, dentro de su zona de influencia o zonas de peligro es CIERTA?",
+          "options": ["a) Deberán dotarse de un sistema de evacuación de los gases de fermentación.", "b) Contar con una malla perimetral de doble torsión de 2 metros de altura mínima y luz inferior a 5 centímetros.", "c) Contar con un cortafuegos perimetral de, al menos, 20 metros de ancho.", "d) Todas las respuestas anteriores son ciertas"],
+          "correct": 0
+        },
+        {
+          "question": "20.- Cuando hacemos uso del fuego fuera de terrenos forestales, su zona de influencia o fuera de zonas de peligro necesitares contar con:",
+          "options": ["a) Autorización administrativa", "b) Declaración responsable", "c) Comunicación previamente", "d) No se precisará ninguna de las anteriores"],
+          "correct": 3
+        },
+        {
+          "question": "21.- Para el caso de la pregunta anterior se establece que cuando el empleo del fuego pudiese afectar a la vegetación en márgenes de ríos o arroyos, o a plantaciones lineales, por realizarse en zonas próximas, las mismas deberán ser protegidas por un cortafuegos que no podrá realizarse en ningún caso sobre la superficie ocupada por dicha vegetación forestal. Este cortafuegos tendrá que tener una anchura de:",
+          "options": ["a) 2 metros", "b) 3 metros", "c) 4 metros", "d) 5 metros"],
+          "correct": 3
+        },
+        {
+          "question": "22.- ¿A quién le corresponde la elaboración del Plan de Emergencia por Incendios Forestales de Andalucía?",
+          "options": ["a) A la Consejería competente en materia de protección civil y emergencias, debiendo ser sometido a información pública y audiencia de las Corporaciones Locales y entidades sociales, y será aprobado por el Consejo de Gobierno", "b) A la Consejería competente en materia forestal, debiendo ser sometido a información pública y audiencia de las Corporaciones Locales y entidades sociales, y será aprobado por el Consejo de Gobierno", "c) Conjuntamente a la Consejería competente en materia de protección civil y emergencias y a la Consejería en materia forestal, debiendo ser sometido a información pública y audiencia de las Corporaciones Locales y entidades sociales, y será aprobado por el Consejo de Gobierno", "d) A la Consejería competente en materia de medio ambiente, debiendo ser sometido a información pública y audiencia de las Corporaciones Locales y entidades sociales, y será aprobado por el Consejo de Gobierno"],
+          "correct": 0
+        },
+        {
+          "question": "23.- Para la aprobación de los Planes Locales de Emergencia por Incendios forestales se requiere informe preceptivo de la persona titular de la Delegación del Gobierno de la Junta de Andalucía que se emitirá en el plazo de:",
+          "options": ["a) Un mes, transcurrido el cual, sin la evacuación del mismo, el informe se entenderá favorable", "b) Un mes, transcurrido el cual, sin la evacuación del mismo, el informe se entenderá desfavorable", "c) Dos meses, transcurrido el cual, sin la evacuación del mismo, el informe se entenderá favorable", "d) Dos meses, transcurrido el cual, sin la evacuación del mismo, el informe se entenderá desfavorable"],
+          "correct": 0
+        },
+        {
+          "question": "24.- Los propietarios de terrenos forestales que resulten incendiados elaborarán, un Plan de Restauración en el que se contemplen cuantas medidas resulten necesarias para la recuperación de la vegetación preexistente. ¿En qué plazo deberá notificarse la aprobación del Plan de Restauración?",
+          "options": ["a) En el plazo de cuatro meses, transcurrido el cual se entenderá aprobado.", "b) En el plazo de seis meses, transcurrido el cual se entenderá aprobado.", "c) En el plazo de ocho meses, transcurrido el cual se entenderá aprobado.", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "25.- La resolución de aprobación del Plan de Restauración incluirá una serie de determinaciones, como el plazo establecido para iniciar las actuaciones a desarrollar por los titulares. Con respecto a este plazo, señale la respuesta CORRECTA:",
+          "options": ["a) En ningún caso podrá ser superior a un año.", "b) En ningún caso podrá ser superior a un año, salvo que quede justificada la imposibilidad de su ejecución en el plazo indicado.", "c) En ningún caso podrá ser superior a dos años.", "d) En ningún caso podrá ser superior a dos años, salvo que quede justificada la imposibilidad de su ejecución en el plazo indicado."],
+          "correct": 2
+        },
+        {
+          "question": "26.- ¿Cuándo se debe solicitar la autorización para la retirada de ejemplares arbóreos afectados por el fuego, según el artículo 40 del Reglamento?",
+          "options": ["a) Deberá solicitarse previamente a la presentación del Plan de Restauración.", "b) Deberá solicitarse posteriormente a la presentación del Plan de Restauración.", "c) Deberá solicitarse conjuntamente a la presentación del Plan de Restauración.", "d) Ninguna respuesta es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "27.- Para promover el logro de los objetivos de la Ley 5/1999, de 29 de junio, de Prevención y Lucha contra los Incendios Forestales, la Consejería competente en materia forestal y la Consejería competente en materia de protección civil y emergencias, podrán adoptar medidas incentivadoras. Estas medidas pueden consistir en:",
+          "options": ["a) Subvenciones, incluidas las de intereses y primas de seguros, que podrán alcanzar hasta el 75% de la inversión.", "b) Anticipos reintegrables.", "c) Apoyo técnico y aportación de material de extinción de incendios.", "d) Todas las respuestas son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "28.- ¿Cuál es el plazo de prescripción de las sanciones impuestas a infracciones graves?",
+          "options": ["a) Dos años", "b) Un año", "c) Seis meses", "d) Tres años"],
+          "correct": 0
+        },
+        {
+          "question": "29.- ¿Qué norma andaluza aprueba los modelos de determinadas actuaciones de prevención y lucha contra los incendios forestales y desarrolla medidas de protección?",
+          "options": ["a) Orden de 11 de septiembre de 2002", "b) Orden de 21 de mayo de 2009", "c) Decreto 371/2010", "d) Orden de 19 de mayo 1999"],
+          "correct": 0
+        },
+        {
+          "question": "30.- Según la norma a la que hace referencia la pregunta anterior, en la ejecución de podas, desbroces, ruedos, claras, clareos, resalveos o cualquier otro trabajo forestal que genere residuos forestales, deberán tenerse en cuenta las siguientes medidas de prevención; señale la CORRECTA:",
+          "options": ["a) Los residuos generados no podrán ser depositados a menos de 25 metros de un basurero o a menos de 35 metros de una vía de tránsito rodado o peatonal, o de una zona de uso público intensivo.", "b) Los residuos generados no podrán ser depositados a menos de 35 metros de un basurero o a menos de 50 metros de una vía de tránsito rodado o peatonal, o de una zona de uso público intensivo.", "c) Los residuos generados no podrán ser depositados a menos de 50 metros de un basurero o a menos de 25 metros de una vía de tránsito rodado o peatonal, o de una zona de uso público intensivo.", "d) Los residuos generados no podrán ser depositados a menos de 25 metros de un basurero o a menos de 50 metros de una vía de tránsito rodado o peatonal, o de una zona de uso público intensivo."],
+          "correct": 2
+        },
+        {
+          "question": "31.- Las áreas cortafuegos, según esta misma norma:",
+          "options": ["a) Son tratamientos preventivos de defensa contra incendios forestales que consiste en preparar zonas en las que se reduce el volumen del combustible vegetal, fundamentalmente de vegetación arbustiva, de matorral, herbácea y, en ocasiones, de la arbórea, que han de tener unas dimensiones un cuarenta por ciento superior a las señaladas para las líneas cortafuegos.", "b) Son tratamientos preventivos de defensa contra incendios forestales que consiste en preparar zonas en las que se reduce el volumen del combustible vegetal, fundamentalmente de vegetación arbustiva, de matorral, herbácea y, en ocasiones, de la arbórea, que han de tener unas dimensiones un veinte por ciento superior a las señaladas para las líneas cortafuegos.", "c) Son tratamientos preventivos de defensa contra incendios forestales que consiste en preparar zonas en las que se reduce el volumen del combustible vegetal, fundamentalmente de vegetación arbustiva, de matorral, herbácea y, en ocasiones, de la arbórea, que han de tener unas dimensiones un diez por ciento superior a las señaladas para las líneas cortafuegos.", "d) Son tratamientos preventivos de defensa contra incendios forestales que consiste en preparar zonas en las que se reduce el volumen del combustible vegetal, fundamentalmente de vegetación arbustiva, de matorral, herbácea y, en ocasiones, de la arbórea, que han de tener unas dimensiones un treinta por ciento superior a las señaladas para las líneas cortafuegos."],
+          "correct": 3
+        },
+        {
+          "question": "32.- ¿Cuál de las siguientes actividades no está incluida dentro de las excepciones a la prohibición del uso del fuego en terrenos forestales y su zona de influencia recogidas dentro de la Orden de 21 de mayo de 2009?",
+          "options": ["a) Uso de barbacoas en restaurantes rurales", "b) Uso de calderas de destilación, y de hornos de carbón y piconeo, en zonas donde estas actividades sean tradicionales", "c) La quema de residuos agrícolas y forestales.", "d) Preparación de alimentos en acampadas y campamentos juveniles con contenido educativo autorizados"],
+          "correct": 2
+        },
+        {
+          "question": "33.- Para la obtención de la autorización necesaria para poder llevar a cabo alguna de las actuaciones sujetas a ésta, se deberá presentar solicitud, debiendo tener entrada en el Registro correspondiente con una antelación:",
+          "options": ["a) Mínima de 10 días respecto a la fecha de comienzo de la actividad.", "b) Mínima de 20 días respecto a la fecha de comienzo de la actividad.", "c) Mínima de 30 días respecto a la fecha de comienzo de la actividad.", "d) Ninguna respuesta es correcta."],
+          "correct": 2
+        },
+        {
+          "question": "34.- ¿Cuál de las siguientes condiciones se tendrán que tener en cuenta, según la Orden de 21 de mayo, para el empleo de ahumadores en el manejo de colmenas?",
+          "options": ["a) El asentamiento apícola deberá contar con una faja cortafuegos perimetral libre de pastos, de 3 metros de ancho.", "b) Durante el ahumado de las colmenas se deberá contar obligatoriamente con un extintor tipo ABC de 6 kg o una mochila con un depósito lleno de agua de 26 litros de capacidad.", "c) Los titulares de la explotación apícola deberán contar con un seguro de responsabilidad civil obligatorio.", "d) Las respuestas a y b son correctas"],
+          "correct": 2
+        }
+      ],
+      "t14_4": [
+        {
+          "question": "1. ¿Qué normativa andaluza recoge la definición de incendio forestal?",
+          "options": ["a) La ley 43/2003 de 21 de noviembre, de Montes", "b) Ley 5/1999, de 29 de junio, de prevención y lucha contra incendios forestales", "c) El Decreto 247/2001, de 13 de noviembre, por el que se aprueba el Reglamento de prevención y lucha contra incendios forestales", "d) Todas las normativas anteriores recogen la definición de incendio forestal"],
+          "correct": 1
+        },
+        {
+          "question": "2. Según la definición establecida en la normativa andaluza, se considera incendio forestal; Señale la CORRECTA:",
+          "options": ["a) Los que afecten a superficies que tengan la consideración de montes o terrenos forestales de conformidad con la legislación forestal, salvo los enclaves forestales localizados en terrenos agrícolas cualquiera que fuere su extensión.", "b) Los que afecten a superficies que tengan la consideración de montes o terrenos forestales, que afecten a una extensión mínima de terreno de conformidad con lo establecido en la legislación forestal, incluyéndose los enclaves forestales localizados en terrenos agrícolas cualquiera que fuere su extensión, con la sola excepción de los árboles aislados.", "c) Los que afecten a superficies que tengan la consideración de montes o terrenos forestales de conformidad con la legislación forestal, incluyéndose los enclaves forestales localizados en terrenos agrícolas cualquiera que fuere su extensión, con la sola excepción de los árboles aislados.", "d) Ninguna respuesta es correcta."],
+          "correct": 2
+        },
+        {
+          "question": "3. ¿Quién es el órgano competente en materia de incendios forestales de la Administración de la Junta de Andalucía?",
+          "options": ["a) La Consejería competente en materia de protección civil y emergencias", "b) La Consejería competente en materia forestal", "c) La Consejería competente en materia de protección civil y emergencias y la Consejería competente en materia forestal", "d) La Consejería de Sostenibilidad y Medio ambiente"],
+          "correct": 2
+        },
+        {
+          "question": "4. ¿A quién le atribuye el artículo 12 de la Ley 5/1999 la condición de agentes de la autoridad en materia de prevención y lucha contra incendios forestales?",
+          "options": ["a) A los Agentes de Medio Ambiente", "b) A los funcionarios adscritos al Plan de Emergencia por Incendios Forestales de Andalucía", "c) A los alcaldes en aquellos incendios producidos en su término municipal", "d) Las respuestas a y b son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "5. ¿Cómo se canalizará la colaboración de los particulares en la prevención y lucha contra los incendios forestales en Andalucía, según el artículo 15 de la Ley 5/1999",
+          "options": ["a) A través de las Agrupaciones de Defensa Forestal", "b) A través de los Grupos Locales de Pronto Auxilio", "c) A través de organizaciones equivalentes a las Agrupaciones de Defensa Forestal y los Grupos Locales de pronto auxilio", "d) Todas las respuestas son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "6. Señale la respuesta INCORRECTA acerca de los Planes de prevención de incendios forestales:",
+          "options": ["a) Corresponde a la Consejería competente en materia forestal aprobar los Planes de Prevención de Incendios Forestales", "b) deberán incluir las características y distribución de la vegetación, el riesgo de incendios, la situación del terreno respecto a la prevención y las actuaciones previstas en relación a tratamientos selvícolas preventivos de incendios, cortafuegos y construcción de infraestructuras de apoyo", "c) En el supuesto de que el monte cuente con un Proyecto de Ordenación o Plan Técnico, el Plan de prevención se incluirá como anexo del correspondiente instrumento de gestión.", "d) Los propietarios y titulares de derechos reales o personales de uso y disfrute de terrenos o explotaciones forestales colindantes podrán agruparse para la elaboración de Planes de Prevención de Incendios Forestales de forma conjunta"],
+          "correct": 2
+        },
+        {
+          "question": "7. ¿A través de cuantos instrumentos se planificará la lucha contra incendios en Andalucía, según el artículo 32 de la Ley 5/1999?",
+          "options": ["a) 2", "b) 3", "c) 4", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "8. ¿Cuál de los siguientes Planes NO es uno de los instrumentos a los que hace referencia la pregunta anterior?",
+          "options": ["a) Plan de Emergencia por Incendios Forestales de Andalucía.", "b) Planes Provinciales de Emergencia por Incendios Forestales", "c) Planes Locales de Emergencia por Incendios Forestales", "d) Planes de Autoprotección por Incendios Forestales"],
+          "correct": 1
+        },
+        {
+          "question": "9. ¿Qué vigencia tienen los Planes de emergencia por incendios Forestales, según el artículo 34 de la Ley?",
+          "options": ["a) Los Planes Locales de Emergencia por Incendios Forestales tendrán una vigencia cuatrienal", "b) El Plan de Emergencia por Incendios Forestales de Andalucía tendrá una vigencia indefinida", "c) Los Planes de Autoprotección dejarán de surtir efecto cuando lo hagan los planes locales", "d) Las respuestas a y b son correctas"],
+          "correct": 1
+        },
+        {
+          "question": "10. ¿El Plan INFOCA se aprueba?",
+          "options": ["a) Mediante Orden conjunta de las Consejerías en materia de protección y emergencias y la Consejería en materia forestal", "b) Mediante Resolución de la Dirección General en materia forestal", "c) Mediante Ley del Parlamento de Andalucía", "d) Mediante Decreto del Consejo de Gobierno"],
+          "correct": 3
+        },
+        {
+          "question": "11. ¿Dónde es obligatoria la elaboración y aprobación de los Planes Locales de Emergencia por Incendios Forestales?",
+          "options": ["a) En todos los municipios cuyos términos municipales se hallen incluidos total o parcialmente en Zonas de Peligro.", "b) En todos los municipios cuyos términos municipales se hallen incluidos total o parcialmente en terrenos forestales.", "c) En todos los municipios cuyos términos municipales se hallen incluidos total o parcialmente en terrenos forestales o su zona de influencia.", "d) En todos los municipios cuyos términos municipales se hallen incluidos total o parcialmente en zonas de influencia forestal."],
+          "correct": 0
+        },
+        {
+          "question": "12. Si por una actuación negligente realizada dentro de nuestro terreno se ha producido un fuego, donde se han visto afectados 4 hectáreas de vegetación diversa como retamas, aulagas, artemisias, tomillos, cantuesos, coscojas y algunos ejemplares de encina; podríamos haber cometido una infracción:",
+          "options": ["a) Muy grave", "b) Especialmente grave", "c) Grave", "d) Leve"],
+          "correct": 2
+        },
+        {
+          "question": "13. Para la imposición de la correspondiente sanción ligada a la infracción anterior, el procedimiento sancionador se tendrá que resolver en un plazo máximo de:",
+          "options": ["a) 6 meses", "b) 8 meses", "c) 10 meses", "d) Ninguna respuesta es correcta"],
+          "correct": 2
+        },
+        {
+          "question": "14. ¿Cuál de las siguientes quemas NO es, según el artículo 14 del Reglamento de Prevención y Lucha contra incendios forestales, una tipología de quema forestal y de restos agrícolas, a realizar sobre los terrenos forestales y en la zona de influencia forestal?",
+          "options": ["a) Quemas de matorral y pastos a realizar en terrenos forestales", "b) Quemas de restos vegetales procedentes de trabajos forestales y tratamientos preventivos contra incendios forestales", "c) Quemas prescritas de vegetación en pie, a realizar por el Servicio Operativo de Extinción de Incendios Forestales del Plan INFOCA", "d) Todas ellas son quemas forestales y de restos agrícolas contempladas en el Reglamento"],
+          "correct": 3
+        },
+        {
+          "question": "15. Según el artículo 18 del citado Reglamento, la persona titular de la Delegación del Gobierno de la Junta de Andalucía autorizará o no la quema solicitada mediante resolución motivada, que será notificada; señale la CORRECTA:",
+          "options": ["a) Al menos con 5 días hábiles de antelación al día señalado para la misma, entendiéndose no autorizada en defecto de dicha notificación.", "b) Al menos con 5 días naturales de antelación al día señalado para la misma, entendiéndose autorizada en defecto de dicha notificación.", "c) Al menos con 5 días hábiles de antelación al día señalado para la misma, entendiéndose autorizada en defecto de dicha notificación.", "d) Al menos con 5 días naturales de antelación al día señalado para la misma, entendiéndose no autorizada en defecto de dicha notificación."],
+          "correct": 1
+        },
+        {
+          "question": "16. El artículo 24 del Reglamento establece que los núcleos de población, edificaciones, instalaciones de carácter industrial y urbanizaciones, deberán mantener una faja de seguridad, libre de residuos, matorral y vegetación herbácea, con una anchura mínima de:",
+          "options": ["a) 5 metros", "b) 10 metros", "c) 20 metros", "d) Ninguna respuesta es correcta"],
+          "correct": 3
+        },
+        {
+          "question": "17. ¿Qué se requiere para el empleo del fuego para cualquier actividad agraria, fuera de los terrenos forestales y Zona de Influencia y de las Zonas de Peligro",
+          "options": ["a) No precisará autorización administrativa ni comunicación previa", "b) Autorización administrativa", "c) Comunicación previa", "d) Declaración responsable"],
+          "correct": 0
+        },
+        {
+          "question": "18. ¿Quién podrá ordenar, según el artículo 36 del Reglamento, si resulta necesario, la entrada en fincas particulares y la utilización de caminos existentes, así como la apertura de cortafuegos, la quema anticipada de determinadas zonas y la utilización de recursos hidráulicos públicos o privados en la cantidad necesaria para la extinción del incendio?",
+          "options": ["a) El titular de la delegación territorial en materia forestal", "b) El titular de la consejería en materia forestal", "c) El titular de la Dirección General en materia forestal", "d) La dirección de la extinción"],
+          "correct": 3
+        },
+        {
+          "question": "19. ¿Qué sanción le correspondería a una infracción grave en materia de incendios forestales?",
+          "options": ["a) De 3.005,07 a 60.101,21 euros", "b) De 60,10 a 3.005,06 euros", "c) De 60.101,21 a 450.759,08 euros", "d) De 60.101,21 a 150.000,06 euros"],
+          "correct": 0
+        },
+        {
+          "question": "20. Según el artículo 51 del Reglamento, el incumplimiento de las obligaciones de reparación del daño causado o repoblación por parte de los responsables de las infracciones, facultará a la Consejería de Medio Ambiente para proceder a la ejecución forzosa mediante:",
+          "options": ["a) La imposición de multas coercitivas", "b) La ejecución subsidiaria de las medidas ordenadas", "c) El apremio sobre el patrimonio", "d) Las respuestas a y b son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "21. ¿Dónde encontramos recogido en Plan INFOCA?",
+          "options": ["a) Como anexo de la Ley 5/1999 de 29 de Junio, de Prevención y lucha contra Incendios Forestales de Andalucía", "b) Como anexo del Decreto 247/2001, de 13 de noviembre, por el que se aprueba el Reglamento de Prevención y Lucha contra los Incendios Forestales", "c) Como anexo de la Ley 43/2003, de 21 de Noviembre, de Montes", "d) Como anexo del Decreto 371/2010, de 14 de septiembre, por el que se aprueba el Plan de Emergencia por Incendios Forestales de Andalucía"],
+          "correct": 3
+        },
+        {
+          "question": "22. Desde el punto de vista operativo, los incendios forestales se pueden clasificar según:",
+          "options": ["a) El nivel de gravedad potencial y el grado de riesgo", "b) El nivel de gravedad potencial y el grado de evolución", "c) El índice de evolución y el nivel de gravedad potencial", "d) El índice de evolución y el nivel de riesgo"],
+          "correct": 1
+        },
+        {
+          "question": "23. El Nivel 2 de incendio se corresponde con:",
+          "options": ["a) Incendios para cuya extinción es necesario que, a solicitud de la Dirección del Plan, sean incorporados medios extraordinarios estatales", "b) Incendios que pueden ser controlados con los medios de extinción previstos en el Plan INFOCA y que, en su evolución más desfavorable, no suponen peligro para personas no relacionadas con las labores de extinción, ni para bienes distintos a los de naturaleza forestal.", "c) Aquellos que puedan comportar situaciones de emergencia que deriven hacia el interés nacional.", "d) Las respuestas a y c son correctas."],
+          "correct": 3
+        },
+        {
+          "question": "24. ¿Con qué se corresponde un incendio en el que se requiere la intervención en ataque ampliado a segundo nivel, ya que no pueden ser controlados en el ataque inicial, y por ello, hay que incorporar más medios en ataque ampliado?",
+          "options": ["a) Incendio Incipiente", "b) Incendio Bajo", "c) Incendio Medio", "d) Incendio Alto"],
+          "correct": 1
+        },
+        {
+          "question": "25. ¿A quién le corresponde la Dirección Regional del Plan INFOCA?",
+          "options": ["a) Al titular de la Consejería en materia forestal", "b) Al titular de la Consejería en materia de medio ambiente", "c) Al titular de la Consejería en materia de protección civil y emergencias", "d) Las respuestas a y c son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "26. ¿Cuántos representantes aporta la Administración General del estado al Comité Asesor Provincial?",
+          "options": ["a) 3", "b) 5", "c) 7", "d) 9"],
+          "correct": 1
+        },
+        {
+          "question": "27. ¿Quién estará al frente del Centro Operativo Regional?",
+          "options": ["a) Una persona titular de la Dirección y una persona titular de la Subdirección", "b) Una persona titular de la Dirección y una o dos personas titulares de la Subdirección", "c) Una persona titular de la Dirección", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "28. ¿Cuántos Grupos Operativos forman parte de la estructura provincial del Plan INFOCA?",
+          "options": ["a) 3", "b) 4", "c) 5", "d) 6"],
+          "correct": 1
+        },
+        {
+          "question": "29. ¿Cuál de los siguientes NO es un Grupo Operativo de los antes mencionados?",
+          "options": ["a) Grupo de Intervención", "b) Grupo Sanitario", "c) Grupo de Coordinación", "d) Grupo de Apoyo Logístico"],
+          "correct": 2
+        },
+        {
+          "question": "30. ¿En qué fecha tendrán que aprobar los Ayuntamientos la actualización de su Catálogo de Medios y Recurso y presentar la correspondiente copia a la Administración?",
+          "options": ["a) Antes de 1 de Mayo", "b) Antes del 15 de Mayo", "c) Antes del 1 de Junio", "d) Antes del 15 de Junio"],
+          "correct": 0
+        }
+      ],
+      "t14_5": [
+        {
+          "question": "1. ¿Cuál de las siguientes afirmaciones acerca de la Zona de Influencia Forestal, recogido en la Ley 5/1999, de 29 de junio, de Prevención y Lucha contra los incendios forestales, es CORRECTA?",
+          "options": ["a) Se establece una Zona de Influencia Forestal constituida por una franja circundante de los terrenos forestales que tendrá una anchura de 200 metros.", "b) En Consejo de Gobierno podrá adecuar el ancho de la franja a las circunstancias específicas del terreno y de la vegetación.", "c) Se establece una Zona de Influencia Forestal constituida por una franja circundante de los terrenos forestales que tendrá una anchura de 400 metros.", "d) Las respuestas b y c son correctas."],
+          "correct": 3
+        },
+        {
+          "question": "2. En cuanto a la definición de Incendio Forestal que recoge la norma antes mencionada, indique la respuesta CORRECTA:",
+          "options": ["a) Se consideran incendios forestales los que afecten a superficies que tengan consideración de montes o terrenos forestales de conformidad con la legislación forestal, salvo los enclaves forestales localizados en terrenos agrícola.", "b) Se consideran incendios forestales los que afecten a superficies que tengan consideración de montes o terrenos forestales de conformidad con la legislación forestal, incluyéndose los enclaves forestales localizados en terrenos agrícola con la extensión que determine la normativa forestal, con la sola excepción de los árboles aislados.", "c) Se consideran incendios forestales los que afecten a superficies que tengan consideración de montes o terrenos forestales de conformidad con la legislación forestal, incluyéndose los enclaves forestales localizados en terrenos agrícola cualquiera que fuese su extensión, con la sola excepción de los árboles aislados.", "d) Se consideran incendios forestales los que afecten a superficies que tengan consideración de montes o terrenos forestales de conformidad con la legislación forestal, incluyéndose los enclaves forestales localizados en terrenos agrícola cualquiera que fuese su extensión."],
+          "correct": 2
+        },
+        {
+          "question": "3. Las zonas y épocas de peligro quedan recogidas en:",
+          "options": ["a) La ley 5/1999 de 29 de junio, de Prevención y Lucha contra Incendios Forestales", "b) La ley 43/2003, de 21 de noviembre, de Montes", "c) El Decreto 247/2001, de 13 de noviembre, de Prevención y lucha contra Incendios Forestales", "d) El Decreto 371/2010, de 14 de septiembre, por el que se aprueba el plan de emergencia por incendios forestales de Andalucía y se modifica el Reglamento de Prevención y Lucha contra Incendios Forestales."],
+          "correct": 3
+        },
+        {
+          "question": "4. Según el artículo 12 de la Ley 5/1999, ¿a quién se le atribuye condición de autoridad en materia de prevención y lucha contra incendios forestales en el ejercicio de sus funciones?",
+          "options": ["a) A los Agentes de Medio Ambiente y Celadores forestales", "b) A los funcionarios adscritos al Plan de Emergencias por Incendios Forestales de Andalucía", "c) A los Alcaldes, cuando el fuego afecte a su término municipal", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "5. El artículo 16 de la ley 5/1999 nos habla de las Agrupaciones de Defensa Forestal. En materia de incendios forestales, ¿NO es un fin de estas agrupaciones?",
+          "options": ["a) Llevar a cabo obras y actuaciones preventivas establecidas en los instrumentos de planificación previsto en esta ley", "b) Dirigir labores de vigilancia y detección de incendios.", "c) Participar en las labores de extinción de incendios con arreglo a los planes de emergencia y a las instrucciones de la autoridad competente.", "d) Todo lo anterior son fines de las Agrupaciones de Defensa Forestal en materia de incendios forestales."],
+          "correct": 1
+        },
+        {
+          "question": "6. Según el artículo 27 de la citada ley, el incumplimiento de llevar a cabo actuaciones preventivas en materia de incendios forestales podrá dar lugar a:",
+          "options": ["a) La imposición de infracciones", "b) La actuación solidaria de la administración competente con cargo al obligado", "c) La actuación subsidiaria de la administración competente con cargo al obligado, previo apercibimiento al mismo", "d) Las respuestas a y c son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "7. ¿Dónde quedan recogidas los procedimientos de autorización para el uso del fuego en Andalucía?",
+          "options": ["a) En la ley 5/1999, de 29 de junio, de Prevención y lucha contra incendios Forestales", "b) En la Orden de 21 de Mayo de 2009, por la que se establecen limitaciones de usos y actividades en terrenos forestales y zonas de influencia forestales", "c) En el Decreto 247/2001, de 13 de noviembre, de Prevención y lucha contra incendios Forestales", "d) El Decreto 371/2010, de 14 de septiembre, por el que se aprueba el plan de emergencia por incendios forestales de Andalucía y se modifica el Reglamento de Prevención y Lucha contra Incendios Forestales."],
+          "correct": 2
+        },
+        {
+          "question": "8. Los Planes de Emergencia por Incendios Forestales tendrán una vigencia:",
+          "options": ["a) Cuatrienal o en virtud de las circunstancias que en los mismos se señalen", "b) Indefinida y se revisarán con carácter trienal o en virtud de las circunstancias que en los mismos se señalen", "c) Trienal o en virtud de las circunstancias que en los mismos se señalen.", "d) Ninguna respuesta es correcta"],
+          "correct": 3
+        },
+        {
+          "question": "9. En cuanto a la planificación en materia de lucha contra incendios forestales, recogido en la ley 5/1999, señale la respuesta CORRECTA:",
+          "options": ["a) Se lleva a cabo mediante 3 instrumentos", "b) La elaboración del Plan de Emergencias por Incendios Forestales de Andalucía le corresponde a la Consejería en materia forestal y su aprobación al Consejo de Gobierno", "c) La elaboración de los Planes Locales de Emergencia por Incendios Forestales le corresponde a las Entidades Locales y su aprobación a titular de la Consejería competente en materia forestal", "d) Los Planes de autoprotección serán obligatorios en todos aquellos municipios que se encuentre integrados total o parcialmente en Zonas de Peligro."],
+          "correct": 0
+        },
+        {
+          "question": "10. Si como resultado de una quema de restos vegetales se origina un incendio, que tiene como resultado la pérdida de 1 has de matorral, estaremos ante una infracción:",
+          "options": ["a) Leve", "b) Grave", "c) Muy grave", "d) No se considera infracción si no supera las 2 has"],
+          "correct": 0
+        },
+        {
+          "question": "11. ¿Cuál de las siguientes circunstancias NO tendrá consideración de agravante en el procedimiento sancionador en materia de incendios forestales?",
+          "options": ["a) La reincidencia", "b) La ejecución intencionada de la infracción", "c) La concurrencia de varias infracciones", "d) Todas las anteriores con circunstancias agravantes"],
+          "correct": 3
+        },
+        {
+          "question": "12. Según recoge el artículo 78 de la ley 5/99, las infracciones tendrán el siguiente plazo de prescripción:",
+          "options": ["a) Las muy graves a los 3 años, las graves a los 2 años y las leves al año", "b) Las muy graves a los 2 años, las graves al año y las leves los 6 meses", "c) Las muy graves a los 3 años, las graves a los 2 años y los 6 meses", "d) Las muy graves y las graves a los 2 años y las leves al año"],
+          "correct": 2
+        },
+        {
+          "question": "13. ¿Cuál de las siguientes afirmaciones acerca de las quemas de matorral y pastos recogidas en el Decreto 247/2001 NO es CORRECTA?",
+          "options": ["a) Para la ejecución de estas quemas se debe contar con una línea perimetral de defensa, limpia de todo material vegetal hasta suelo mineral, con una anchura de dos veces la altura máxima de la estructura del matorral presente y que como mínimo será de 4 metros.", "b) Las parcelas de quema deberán quedar fraccionadas en unidades de quema de superficie inferior a 2 hectáreas.", "c) La ejecución de la quema deberá comenzar después de la salida el sol y quedar concluida a las 18:00 horas, pudiendo realizarse cualquier día de la semana.", "d) Todas las respuestas anteriores son correctas."],
+          "correct": 3
+        },
+        {
+          "question": "14. Según el artículo 23 del decreto 247/2001, ¿con anterioridad a que fecha, las entidades responsables de las líneas eléctricas deben revisar los elementos de aislamiento de las líneas y realizar la limpieza del combustible vegetal bajo las instalaciones?",
+          "options": ["a) Antes del 1 de mayo de cada año", "b) Antes del 1 de abril de cada año", "c) Antes del 1 de junio de cada año", "d) El Decreto no indica una fecha concreta, se limita a indicar la obligatoriedad de estos trabajos."],
+          "correct": 0
+        },
+        {
+          "question": "15. Según el artículo 29 de la citada norma, ¿con qué anchura mínima debe contar el cortafuegos perimetral que se le exige a los vertederos de residuos urbanos situados en zona de peligro, terreno forestal o su zona de influencia?",
+          "options": ["a) 20 metros", "b) 30 metros", "c) 40 metros", "d) 50 metros"],
+          "correct": 1
+        },
+        {
+          "question": "16. En cuanto al Plan de Restauración contenido en el Decreto 247/2001. Señale la respuesta CORRECTA:",
+          "options": ["a) Se debe presentar en la Delegación Provincial competente de la Consejería de Medio Ambiente antes de que transcurran 8 meses desde el día de la extinción del incendio. Cuando la envergadura o características del incendio lo requieran podrá solicitarse la ampliación de dicho plazo por el tiempo que resulte necesario, que no podrá superar los 4 meses.", "b) El plazo para iniciar las actuaciones en ningún caso podrá superar los dos años.", "c) Corresponde al Delegado del Gobierno la aprobación del Plan de Restauración, que deberá notificarse en el plazo de 6 meses, transcurrido el cual se entenderá aprobado.", "d) Todas las respuestas anteriores son correctas."],
+          "correct": 1
+        },
+        {
+          "question": "17. En cuanto a la obligación de reparar el daño causado por un incendio, los artículos 51 y posteriores del citado Decreto establecen una seria de indicaciones. Indique la respuesta INCORRECTA:",
+          "options": ["a) La determinación de la cuantía de la indemnización a satisfacer por los responsables de las infracciones podrá realizarse en el seno del procedimiento sancionador, especificándose para cada uno de ellos en la Resolución Sancionadora, o bien mediante un procedimiento complementario.", "b) El órgano competente para imponer la sanción podrá ordenar, cuando lo considere necesario ante el incumplimiento de las obligaciones del infractor, la ejecución subsidiaria de las medidas impuestas con cargo al mismo.", "c) Además del cumplimiento de restaurar mediante la ejecución subsidiaria, se podrán imponer multas coercitivas, cuya cuantía se determinará en base a las superficies indicadas en la resolución sancionadora.", "d) Los obligados a la realización de las actuaciones de reparación o repoblación facilitarán el acceso del personal al servicio de la consejería de Medio Ambiente o contratado por ésta."],
+          "correct": 2
+        },
+        {
+          "question": "18. Según la Orden de 11 de septiembre de 2002, los cortafuegos que se realicen en zonas de vegetación herbácea que circundan las zonas a defender, deberán tener una anchura mínima de:",
+          "options": ["a) 15 metros", "b) 10 metros", "c) 5 metros", "d) Esta orden no recoge tal extremo"],
+          "correct": 2
+        },
+        {
+          "question": "19. Según el Decreto 371/2010, de 14 de Septiembre, el ámbito temporal de la operatividad del Plan INFOCA es:",
+          "options": ["a) El dispositivo de extinción del Plan INFOCA permanecerá activado durante todo el año. El Plan se activará de forma automática en nivel de gravedad 1 provincial.", "b) El dispositivo de extinción del Plan INFOCA permanecerá activado durante todo el año. El Plan se activará de forma automática en nivel de gravedad 0 provincial.", "c) El dispositivo de extinción del Plan INFOCA permanecerá activado durante todo el año. El Plan se activará de forma automática en nivel de gravedad 0 regional.", "d) Ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "20. Cuando estamos hablado de SEIF nos estamos refiriendo a:",
+          "options": ["a) Servicio Operativo de Extinción de Incendios Forestales", "b) Sistema Operativo de Extinción de Incendios Forestales", "c) Sistema de Manejo de Emergencias por Incendios Forestales", "d) Sistema de Emergencias por Incendios Forestales"],
+          "correct": 0
+        },
+        {
+          "question": "21. Desde el punto de vista operativo los incendios forestales se clasifican en función de los siguientes parámetros:",
+          "options": ["a) Nivel de gravedad potencial y grados de evolución", "b) Nivel de evolución y grado de potencialidad", "c) Según el nivel de gravedad potencial, que clasifica los incendios en 3 tipos y según el grado de evolución que los clasifica en 5 tipos.", "d) Según el nivel de gravedad potencial, que clasifica los incendios en 4 tipos y según el grado de evolución que los clasifica en 4 tipos."],
+          "correct": 0
+        },
+        {
+          "question": "22. La Dirección Regional de Plan INFOCA le corresponde a:",
+          "options": ["a) A la persona titular de la Consejería competente en materia de medio ambiente", "b) A la persona titular de la Consejería competente en materia forestal", "c) A la persona titular de la Consejería competente en materia de protección civil y emergencias.", "d) A la persona titular de la Consejería competente en materia de protección civil y emergencias y a la persona titular de la Consejería competente en materia forestal"],
+          "correct": 2
+        },
+        {
+          "question": "23. La Dirección del Plan INFOCA en el ámbito provincial corresponde a:",
+          "options": ["a) La persona titular de la Delegación de Gobierno de la provincia donde se desarrolle la emergencia", "b) La persona titular de la Delegación Territorial en materia forestal de la provincia donde se desarrolle la emergencia", "c) La persona titular de la Delegación Territorial de medio ambiente de la provincia donde se desarrolle la emergencia.", "d) Ninguna respuesta es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "24. ¿Cuál de la siguiente lista, referente a los Grupos Operativos, es CORRECTA?",
+          "options": ["a) Grupo de acción, sanitario, seguridad y apoyo logístico.", "b) Grupo de intervención, sanitario, seguridad y apoyo logístico.", "c) Grupo de acción, socorro, seguridad y apoyo logístico.", "d) Grupo de intervención, socorro, seguridad y apoyo logístico."],
+          "correct": 1
+        },
+        {
+          "question": "25. Definimos Área Base como:",
+          "options": ["a) Área en donde se realizan las labores de apoyo logístico, donde se recepcionan y distribuyen los medios y recursos humanos y materiales que hayan sido solicitados y que deben trabajar en las áreas de intervención y socorro.", "b) Centro de recepción de medios, próxima al incendio.", "c) Área sin riesgo para las personas desde la que se realizan las funciones de atención sanitarias y de acción social a los damnificados.", "d) Área que se extiende desde la localización del incendio forestal hasta donde se prevea el alcance del incendio, es la zona de ataque de los equipos de extinción."],
+          "correct": 0
+        },
+        {
+          "question": "26. Los vehículos nodriza tienen una capacidad de carga de agua que oscila entre los:",
+          "options": ["a) 3.000 y 4.000 litros", "b) 4.000 y 5.000 litros", "c) 8.000 y 10.000 litros", "d) 9.000 y 11.000 litros"],
+          "correct": 3
+        },
+        {
+          "question": "27. Según la clasificación de la vegetación ideada por Rothermel, ¿a qué modelo de combustible le corresponde el matorral o plantación joven muy denso, de mas de 2 metros de altura con ramas muertas en su interior?",
+          "options": ["a) Modelo de combustible 2", "b) Modelo de combustible 3", "c) Modelo de combustible 4", "d) Modelo de combustible 5"],
+          "correct": 2
+        },
+        {
+          "question": "28. ¿Cuándo se habla de \"conato\" de incendio?",
+          "options": ["a) Cuando el fuego afecta a una superficie inferior a media hectárea", "b) Cuando el fuego afecta a una superficie inferior a una hectárea", "c) Cuando el fuego afecta a una superficie inferior a 1.000 metros cuadrados", "d) las respuestas b y c son correctas"],
+          "correct": 1
+        },
+        {
+          "question": "29. ¿Con cuántas bases de brigadas especializadas cuenta actualmente Andalucía?",
+          "options": ["a) 2", "b) 3", "c) 4", "d) 5"],
+          "correct": 1
+        },
+        {
+          "question": "30. La base de Granada se denomina:",
+          "options": ["a) Madroñalejo", "b) El Robledal", "c) Los Moralillos", "d) Fuenteagria"],
+          "correct": 2
+        }
+      ]
+    };
+
+    // Crear el bloque unificado completo "all" (109 preguntas)
+    quizBlocks["all"] = [
+      ...quizBlocks["t14_1"], 
+      ...quizBlocks["t14_2"], 
+      ...quizBlocks["t14_3"], 
+      ...quizBlocks["t14_4"]
+    ];
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      if (selected === 'all') {
+        document.getElementById('test-title').textContent = "TEMA 14 UNIFICADO: INCENDIOS FORESTALES (109 PREGUNTAS)";
+      } else if (selected === 't14_1') {
+        document.getElementById('test-title').textContent = "BLOQUE 1: TEST 14.1 (15 PREGUNTAS)";
+      } else if (selected === 't14_2') {
+        document.getElementById('test-title').textContent = "BLOQUE 2: TEST 14.2 (15 PREGUNTAS)";
+      } else if (selected === 't14_3') {
+        document.getElementById('test-title').textContent = "BLOQUE 3: TEST 14.3 (34 PREGUNTAS)";
+      } else if (selected === 't14_4') {
+        document.getElementById('test-title').textContent = "BLOQUE 4: TEST 14 BÁSICO (30 PREGUNTAS)";
+      } else if (selected === 't14_5') {
+        document.getElementById('test-title').textContent = "BLOQUE 5: TEST 1 BLOQUE INCENDIOS (30 PREGUNTAS)";
+      }
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La opción correcta era la ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicialización automática al cargar
+    changeBlock();
+  </script>
+</body>
+</html>

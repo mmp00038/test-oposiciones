@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Multibloque - Tema 18</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 100px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 85px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Question Cards */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Reset Area */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 100px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Ver todo el tema unificado</option>
+        <option value="t18_1">Bloque 1: Test 18-1</option>
+        <option value="t18_2">Bloque 2: Test 18-2</option>
+        <option value="t18_3">Bloque 3: Test 18-3</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 18: PRINCIPALES CONVENIOS INTERNACIONALES DE CONSERVACIÓN DE LA BIODIVERSIDAD.</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const quizBlocks = {
+      "t18_1": [
+        {
+          "question": "1. De acuerdo con el artículo 191 del Tratado de Funcionamiento de la Unión Europea (TFUE) , la política de la Unión en el ámbito del medio ambiente se basará en los siguientes principios (señala la respuesta INCORRECTA):",
+          "options": ["a) Principio de cautela", "b) Quién contamina paga", "c) Principio de protección", "d) Principio de prevención"],
+          "correct": 2
+        },
+        {
+          "question": "2. La Declaración de Río, acordada en la Conferencia de las Naciones Unidas sobre el Medio Ambiente y Desarrollo Sostenible en 1992, consta de:",
+          "options": ["a) 27 principios", "b) 26 principios", "c) 24 principios", "d) 23 principios"],
+          "correct": 0
+        },
+        {
+          "question": "3. ¿Qué Convenio, relativo a la conservación de la vida silvestre y el medio natural de Europa, ha sido considerado como el primer tratado internacional que ofreció un tratamiento general a la gestión la vida silvestre?",
+          "options": ["a) Convenio de Washington", "b) Convenio de Bonn", "c) Convenio de Berna", "d) Convenio de Barcelona"],
+          "correct": 2
+        },
+        {
+          "question": "4. El Convenio de Bonn tiene por objetivo:",
+          "options": ["a) La protección del Mar Mediterráneo contra la contaminación", "b) Regular el comercio internacional de especies amenazadas", "c) Conservación de las especies migratorias de fauna a nivel mundial", "d) Conservación de los humedales de importancia internacional"],
+          "correct": 2
+        },
+        {
+          "question": "5. El nuevo programa de medio ambiente y acción por el clima (Programa LIFE), aprobado mediante el Reglamento (UE) 2021/783, del Parlamento y el Consejo, de 29 de abril de 2021, se divide en dos áreas, que son:",
+          "options": ["a) Biodiversidad y Cambio climático", "b) Naturaleza y Acción por el Clima", "c) Medio Ambiente y Cambio climático", "d) Medio Ambiente y Acción por el Clima"],
+          "correct": 3
+        },
+        {
+          "question": "6. Indique cuál de los siguientes Subprogramas, NO pertenece a la estructura del nuevo Programa LIFE establecida en su Reglamento (UE) 2021/783:",
+          "options": ["a) Resiliencia y Eficiencia energética", "b) Mitigación del cambio climático y Adaptación a éste", "c) Economía circular y calidad de vida", "d) Naturaleza y Biodiversidad"],
+          "correct": 0
+        },
+        {
+          "question": "7. El último proyecto LIFE dedicado al lince ibérico, en el que participa la Consejería con competencias en materia de medio ambiente de Andalucía, ha comenzado en el año 2020, y se denomina:",
+          "options": ["a) Iberlince", "b) Life+ Iberlince", "c) Lynxconnect", "d) Iber-Lynx"],
+          "correct": 2
+        },
+        {
+          "question": "8. Cuando hablamos del acuerdo internacional cuyo objetivo es compartir los beneficios derivados de la utilización de los recursos genéticos de forma justa y equitativa, nos referimos a:",
+          "options": ["a) Conferencia de Estocolmo", "b) Protocolo de Nagoya", "c) Programa 21", "d) Protocolo de Cartagena"],
+          "correct": 1
+        },
+        {
+          "question": "9. De los logros alcanzados en la Conferencia de Naciones Unidas sobre el Medio Ambiente y el Desarrollo, celebrada en 1992, cuál de los siguientes es legalmente vinculante:",
+          "options": ["a) Declaración de Río", "b) Convenio para la Diversidad Biológica", "c) Declaración de Estocolmo", "d) Todos son vinculantes"],
+          "correct": 1
+        },
+        {
+          "question": "10. ¿Cuál de las siguientes normas corresponde con la Directiva Aves?",
+          "options": ["a) Directiva 2009/147/CE, del Parlamento y del Consejo, de 30 de noviembre de 2009", "b) Directiva 79/409/CEE, del Consejo, de 2 de abril de 1979", "c) Directiva 92/43/CEE, del Consejo, de 21 de mayo de 1992", "d) Directiva 97/62/CE, del Consejo, de 27 de octubre de 1997"],
+          "correct": 0
+        },
+        {
+          "question": "11. El ámbito de aplicación (artículo 1) de la Directiva Aves incluirá:",
+          "options": ["a) Las aves del Anexo I que viven en estado salvaje en el territorio de los Estados miembros", "b) Las aves del Anexo I que viven en estado salvaje en el territorio de los Estados miembros, así como sus huevos, nidos y hábitats", "c) Todas las aves que viven en estado salvaje en el territorio europeo de los Estados miembros, así como sus huevos, nidos y hábitats", "d) Todas las aves protegidas en los Estados miembros, así como sus huevos y nidos."],
+          "correct": 2
+        },
+        {
+          "question": "12. El Anexo I de la Directiva Aves incluye las siguientes especies de aves (marcar la INCORRECTA):",
+          "options": ["a) Vulnerables", "b) Raras", "c) Amenazadas de extinción", "d) Objeto de comercialización"],
+          "correct": 3
+        },
+        {
+          "question": "13. Según el artículo 12 de la Directiva Aves, los Estados miembros deberán remitir a la Comisión un informe sobre la aplicación de las disposiciones nacionales adoptadas en virtud de la Directiva. Este informe se remitirá cada:",
+          "options": ["a) 2 años", "b) 6 años", "c) Anualmente", "d) 3 años"],
+          "correct": 1
+        },
+        {
+          "question": "14. La Red Natura 2000 está compuesta por:",
+          "options": ["a) Lugares de Importancia Comunitaria y Zonas Especiales de Conservación", "b) Zonas Especiales de Conservación y Zonas de Especial Protección para las Aves", "c) Lugares de Importancia Comunitaria, Zonas Especiales de Conservación, y Zonas de Especial Protección para las Aves", "d) Lugares de Importancia Comunitaria, que después podrán declararse como Zonas Especiales de Conservación, o como Zonas de Especial Protección para las Aves"],
+          "correct": 2
+        },
+        {
+          "question": "15. La Red Natura fue creada por:",
+          "options": ["a) Directiva 92/43/CEE, del Consejo, de 21 de mayo de 1992", "b) Convenio de Berna", "c) Directiva 79/409/CEE, del Consejo, de 2 de abril de 1979", "d) Conferencia de Naciones Unidas celebrada en Río de Janeiro (1992)"],
+          "correct": 0
+        },
+        {
+          "question": "16. Las especies de interés comunitario, según la Directiva Hábitat, podrán estar incluidas en los siguientes anexos:",
+          "options": ["a) Anexos I y II", "b) Anexo II", "c) Anexo II, IV y V", "d) Anexo II y IV"],
+          "correct": 2
+        },
+        {
+          "question": "17. Las especies incluidas en el Anexo V de la Directiva 92/43/CEE, del Consejo, de 21 de mayo de 1992, son aquellas:",
+          "options": ["a) Especies de interés comunitario que requieren una protección estricta", "b) Especies de interés comunitario cuya explotación puede necesitar medidas de gestión", "c) Especies de interés comunitario prioritarias", "d) No incluye especies, sino medios y métodos de captura prohibidos"],
+          "correct": 1
+        },
+        {
+          "question": "18. Una vez seleccionado un LIC mediante el procedimiento correspondiente, el Estado miembro deberá declararlo como Zona Especial de Conservación en un plazo máximo de:",
+          "options": ["a) 3 años", "b) 6 años", "c) 4 años", "d) 5 años"],
+          "correct": 1
+        },
+        {
+          "question": "19. La Directiva 92/43/CEE, del Consejo, de 21 de mayo de 1992, es relativa a:",
+          "options": ["a) La conservación de los hábitats naturales y la flora y fauna silvestres", "b) La conservación de las especies migratorias de fauna silvestre", "c) La conservación de aves silvestres", "d) La conservación de la vida silvestre y el medio natural en Europa"],
+          "correct": 0
+        },
+        {
+          "question": "20. ¿Cuál de las siguientes circunstancias NO figura en la Directiva Hábitat (art. 16) como motivo de excepción a las prohibiciones establecidas por dicha Directiva para las especies del Anexo IV:",
+          "options": ["a) Con el fin de proteger la fauna y flora silvestres y de conservar los hábitats naturales", "b) Para permitir, en condiciones de riguroso control, con criterio selectivo y de forma limitada, la toma o posesión de un número limitado y especificado por las autoridades nacionales competentes de determinados especímenes de las especies del Anexo IV", "c) En beneficio de la salud y seguridad públicas o por razones imperativas de interés público de primer orden, incluidas las de carácter socioeconómico y consecuencias beneficiosas de importancia primordial para el medio ambiente", "d) En beneficio de la salud y seguridad públicas o por razones de carácter socioeconómico"],
+          "correct": 3
+        },
+        {
+          "question": "21. Según el artículo 17 de la Directiva Hábitat, los Estados miembros deberán remitir a la Comisión un informe sobre la aplicación de las disposiciones nacionales adoptadas en virtud de la Directiva. Este informe se remitirá cada:",
+          "options": ["a) 2 años", "b) 6 años", "c) Anualmente", "d) 3 años"],
+          "correct": 1
+        },
+        {
+          "question": "22. La transposición de las Directivas Aves y Hábitat al ordenamiento jurídico español se ha realizado mediante:",
+          "options": ["a) Las Directivas son normativa europea de carácter universal: se aplican directamente a cada Estado miembro sin necesidad de transposición al ordenamiento jurídico nacional", "b) Ley 33/2015, de transposición de las directivas europeas sobre la conservación de la biodiversidad", "c) Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y de la Biodiversidad", "d) Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y de la Biodiversidad y Ley 4/1989, de 27 de marzo de Conservación de los Espacios Naturales y de la flora y fauna silvestres"],
+          "correct": 2
+        },
+        {
+          "question": "23. ¿Qué Anexo de la Ley 42/2007, de 13 diciembre, recoge las especies animales y vegetales de interés comunitario que requieren una protección estricta?:",
+          "options": ["a) Anexo V", "b) Anexo IV", "c) Anexo II", "d) Anexo VI"],
+          "correct": 0
+        },
+        {
+          "question": "24. Los Lugares de Importancia Comunitaria (LIC) serán espacios que albergan:",
+          "options": ["a) Los hábitats de aves del Anexo I de la Directiva Aves y de las migradoras regulares (no incluidas en Anexo I), en número y superficie adecuados", "b) Los hábitats de las especies de interés comunitario incluidas en el Anexo I de la Directiva Hábitat", "c) Los hábitats de interés comunitario del Anexo I y los hábitats de las especies de interés comunitario del Anexo II de la Directiva Hábitat", "d) A y B son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "25. En relación con la declaración de una Zona Especial de Conservación (ZEC) o de una Zona de Especial Protección para las Aves (ZEPA) en Andalucía, es cierto que:",
+          "options": ["a) Será necesaria la aprobación previa como LIC por parte de la Comunidad Autónoma", "b) Se declaran mediante Orden de la Consejería competente en materia de medio ambiente", "c) Se declaran mediante Decreto del Consejo de Gobierno de la Junta de Andalucía", "d) A y C son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "26. ¿Quién aprueba la propuesta de LIC elaborada por las CCAA o la Administración general del Estado (según el ámbito de sus competencias)?",
+          "options": ["a) La Comisión Europea", "b) El Consejo de Ministros mediante Acuerdo", "c) El Ministerio competente en materia de medio ambiente", "d) La Consejería con competencias en materia de medio ambiente"],
+          "correct": 0
+        },
+        {
+          "question": "27. La competencia para declarar las Zonas Especiales de Conservación o ZEC, le corresponde a:",
+          "options": ["a) La Comisión Europea", "b) El Ministerio competente en materia de medio ambiente mediante Real Decreto", "c) La Consejería con competencias en materia de medio ambiente, en base a la lista de LIC aprobada por el Ministerio", "d) La Comunidad Autónoma, en base a la lista de LIC aprobada por la Comisión"],
+          "correct": 3
+        },
+        {
+          "question": "28. De acuerdo con el art. 44 de la Ley 42/2007, de Patrimonio Natural y Biodiversidad: “Los espacios del territorio nacional y del medio marino, junto con la zona económica exclusiva y la plataforma continental, más adecuados en número y superficie para la conservación de las especies ______ del anexo IV de esta ley, (...) serán declarados como ______:",
+          "options": ["a) de aves; como ZEPA", "b) de fauna y flora de interés comunitario; como ZEC", "c) de interés comunitario; como LIC", "d) de aves; como LIC"],
+          "correct": 0
+        },
+        {
+          "question": "29. Actualmente, ¿qué número de espacios protegidos de la Red Natura 2000 existen en Andalucía?",
+          "options": ["a) 63 Zonas de Especial Protección para las Aves", "b) 190 Zonas Especiales de Conservación, de las que 180 son LIC", "c) 189 Lugares de Importancia Comunitaria, de los que 190 son ZEC", "d) Todas son correctas"],
+          "correct": 0
+        },
+        {
+          "question": "30. La Convención de Ramsar se firmó en la ciudad de Ramsar (Irán), el:",
+          "options": ["a) 17 de febrero de 1973", "b) 2 de febrero de 1971", "c) 2 de mayo de 1975", "d) 2 de febrero de 1972"],
+          "correct": 1
+        },
+        {
+          "question": "31. España ratificó el Convenio de Ramsar en:",
+          "options": ["a) 1980", "b) 1982", "c) 1985", "d) 1986"],
+          "correct": 1
+        },
+        {
+          "question": "32. El/la depositario/a del Convenio de Ramsar es:",
+          "options": ["a) PNUMA (de las Naciones Unidas)", "b) UICN (Unión Internacional para la Conservación de la Naturaleza)", "c) Gobierno Suizo", "d) UNESCO"],
+          "correct": 3
+        },
+        {
+          "question": "33. El artículo 1 de la Convención de Ramsar, define los humedales como ‘extensiones de marismas, pantanos y turberas, o superficies cubiertas de aguas, sean éstas de régimen natural o artificial, permanentes o temporales, estancadas o corrientes, dulces, salobres o saladas, incluidas las extensiones de agua marina cuya profundidad’:",
+          "options": ["a) en marea alta no exceda de cinco metros", "b) en marea alta no exceda de seis metros", "c) en marea baja no exceda de cinco metros", "d) en marea baja no exceda de seis metros"],
+          "correct": 3
+        },
+        {
+          "question": "34. Los Sitios Ramsar serán designados:",
+          "options": ["a) Por el Comité Permanente de la Convención", "b) Por la Autoridad Administrativa Nacional, que en España corresponde a la Dirección General de Biodiversidad, Bosques y Desertificación del MITECO", "c) Por las CCAA donde se encuentre el humedal propuesto como Sitio Ramsar", "d) Ninguna es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "35. Un humedal podrá pertenecer a la Lista Ramsar de humedales de importancia internacional, siempre que:",
+          "options": ["a) Cumpla alguno de los criterios de importancia internacional establecidos por la Convención", "b) Coincida con alguna figura de protección existente en cada país, por ej. una reserva natural", "c) Pertenezca a un Inventario Oficial de Humedales", "d) Todas son correctas"],
+          "correct": 0
+        },
+        {
+          "question": "36. Cuál de los siguientes humedales andaluces NO es un ‘Sitio Ramsar':",
+          "options": ["a) Laguna Honda", "b) Albufera de Adra", "c) Humedales y turberas de Padul", "d) Marismas de Isla Cristina"],
+          "correct": 3
+        },
+        {
+          "question": "37. El Convenio CITES regula:",
+          "options": ["a) La comercialización de especies de flora y fauna silvestre alóctona", "b) El comercio internacional de especies amenazadas de flora y fauna silvestres", "c) El protección internacional de las especies migratorias", "d) Las amenazas al comercio internacional de especies de flora y fauna silvestres"],
+          "correct": 1
+        },
+        {
+          "question": "38. La adhesión de España al Convenio CITES se realizó:",
+          "options": ["a) En 1986 mediante un instrumento de adhesión", "b) Mediante la aprobación del Real Decreto 1739/1997, de 20 de noviembre, sobre medidas de aplicación del Convenio CITES", "c) A través del Reglamento (CE) 338/1997, relativo a la protección de especies de fauna y flora mediante el control de su comercio", "d) Desde que entró el vigor el Convenio CITES en 1975"],
+          "correct": 0
+        },
+        {
+          "question": "39. Para una especie animal incluida en el Apéndice I del Convenio CITES:",
+          "options": ["a) El comercio internacional queda prohibido, en todo caso", "b) El comercio internacional queda prohibido con algunas excepciones", "c) El comercio internacional queda prohibido si se trata del espécimen vivo, no así para un derivado del animal", "d) El comercio está prohibido sólo en los países donde la especies esté en peligro de extinción"],
+          "correct": 1
+        },
+        {
+          "question": "40. En relación con el Convenio CITES, elige la respuesta correcta:",
+          "options": ["a) La aplicación en la UE se realiza mediante el Reglamento (CE) 338/1997 que clasifica las especies en cuatro Anexos (A-D), flexibilizando las medidas de control del Convenio CITES", "b) Las especies del Anexo A del Reglamento de la UE son las mismas especies incluidas en el Apéndice I de CITES", "c) Si una especie está catalogada en peligro de extinción en un Estado “Parte” del Convenio, se incluirá automáticamente en los Apéndices de CITES", "d) Todas las especies del Convenio CITES están incluidas en los Anexos del Reglamento UE"],
+          "correct": 3
+        }
+      ],
+      "t18_2": [
+        {
+          "question": "1. ¿En virtud de qué normativa son declaradas las Zonas de Especial Protección para las Aves o ZEPA?",
+          "options": ["a) Directiva 79/409/CEE, del Consejo, de 2 de abril de 1979", "b) Directiva 2009/147/CE, del Parlamento y del Consejo, de 30 de noviembre de 2009", "c) Directiva 92/43/CEE, del Consejo, de 21 de mayo de 1992", "d) Directiva 97/62/CE, del Consejo, de 27 de octubre de 1997"],
+          "correct": 1
+        },
+        {
+          "question": "2. ¿Cuál(es) de los siguientes métodos de captura se encuentran prohibidos para las aves conforme a la Directiva 2009/147/CE, relativa a la conservación de aves silvestres?",
+          "options": ["a) Fuentes luminosas artificiales", "b) Lazos, ligas y anzuelos", "c) Aparatos grabadores", "d) Todas las anteriores son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "3. El Anexo II de la Directiva Hábitat podrá ser modificado por el Consejo mediante:",
+          "options": ["a) Mayoría cualificada", "b) Mayoría absoluta", "c) Unanimidad", "d) Los Anexos de la Directiva no pueden modificarse, por lo que cada Estado miembro deberá actualizar estos Anexos mediante su normativa nacional"],
+          "correct": 0
+        },
+        {
+          "question": "4. Las directrices de conservación de la Red Natura 2000, elaboradas por el Ministerio competente en materia de medio ambiente, con la participación de las CCAA, en el marco del Plan Estratégico Estatal del Patrimonio Natural y la Biodiversidad, son aprobadas por:",
+          "options": ["a) Acuerdo del Consejo de Ministros", "b) Decreto del Consejo de Gobierno de la Junta de Andalucía", "c) Orden del Ministerio competente en materia de medio ambiente", "d) Acuerdo de la Conferencia Sectorial de Medio Ambiente"],
+          "correct": 3
+        },
+        {
+          "question": "5. La definición de desarrollo sostenible (“aquel que asegura la satisfacción de las necesidades del presente sin comprometer las de las generaciones futuras”) fue acuñada por primera vez en 1987, mediante un Informe titulado “Nuestro futuro común”, elaborado para las Naciones Unidas por la Comisión Mundial sobre Medio Ambiente y Desarrollo. Indique cómo es también conocido dicho informe:",
+          "options": ["a) Informe Brundlant", "b) Informe Meadows", "c) Declaración de Estocolmo", "d) Agenda 21"],
+          "correct": 0
+        },
+        {
+          "question": "6. ¿Cuál de las siguientes afirmaciones sobre el Convenio de Berna NO es correcta?",
+          "options": ["a) Contiene un Anexo con los medios y métodos de caza y otras formas de explotación prohibidos", "b) Fue ratificado por España en 1982", "c) Prohíbe coger, recolectar, cortar o desarraigar intencionadamente las plantas incluidas en su Anexo I", "d) En su Anexo III recoge ‘especies de fauna protegida’, y establece que cualquier explotación de dichas especies deberá ser regulada para que las poblaciones se mantengan fuera de peligro"],
+          "correct": 1
+        },
+        {
+          "question": "7. La Red Esmeralda es una red ecológica formada por áreas de especial interés para la conservación, destinada a ayudar a restaurar, proteger y conse rvar la biodiversidad en Europa , uniendo los hábitats de Europa y su periferia . Su aplicación, en el marco del Convenio de Berna, fue iniciada por:",
+          "options": ["a) Comisión Europea", "b) Programa de las Naciones Unidas sobre el Medio Ambiente (PNUMA)", "c) Convenio de Diversidad Biológica", "d) Consejo de Europa"],
+          "correct": 3
+        },
+        {
+          "question": "8. De acuerdo con lo establecido en el Convenio de Bonn, para las especies incluidas en su Apéndice I, las Partes deberán:",
+          "options": ["a) Fomentar la investigación relacionada con dichas especies migratorias", "b) Concederles protección inmediata y prohibir su captura, además de la respuesta anterior", "c) Celebrar acuerdos que abarquen la gestión de dichas especies", "d) Todas las anteriores son correctas"],
+          "correct": 1
+        },
+        {
+          "question": "9. El Anexo II de la Directiva 2009/147/CE, del Parlamento y del Consejo, de 30 de noviembre de 2009 (Directiva Aves) recoge:",
+          "options": ["a) Especies de aves objeto de comercialización", "b) Medios o métodos de muerte masiva o no selectiva", "c) Especies de aves que podrán ser objeto de caza", "d) Especies de aves amenazadas"],
+          "correct": 2
+        },
+        {
+          "question": "10. A tenor del art. 43 de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, los Lugares de Importancia Comunitaria o LIC, son aquellos espacios del conjunto del territorio nacional o del medio marino, junto con la zona económica exclusiva y la plataforma continental, aprobados como tales, que contribuyen de forma apreciable al mantenimiento, o en su caso, al restablecimiento del estado de conservación favorable de:",
+          "options": ["a) Tipos de hábitats naturales prioritarios del Anexo I, y especies de interés comunitario prioritarias del Anexo II", "b) Tipos de hábitats naturales del Anexo I, y los hábitats de las especies de interés comunitario del Anexo II", "c) Tipos de hábitats naturales del Anexo I que alberguen especies de interés comunitario del Anexo II", "d) Ninguna de las anteriores es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "11. ¿Qué Anexo de la Directiva Hábitat recoge las especies animales y vegetales de interés comunitario cuya recogida en la naturaleza y cuya explotación pueden ser objeto de medidas de gestión?",
+          "options": ["a) Anexo II", "b) Anexo IV", "c) Anexo V", "d) Anexo VI"],
+          "correct": 2
+        },
+        {
+          "question": "12. La lista de espacios propuestos como LIC pasará a tener un régimen de protección preventiva que garantice que no exista una merma de su estado de conservación hasta el momento de su declaración formal. Según establece el art. 43 de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, ¿a partir de qué momento se aplicará este régimen preventivo?",
+          "options": ["a) Desde el envío de la lista de espacios propuestos al Ministerio competente en Medio Ambiente para su traslado a la Comisión Europea", "b) Desde su aprobación como LIC por la Comisión Europea", "c) Desde su designación como LIC por las CCAA", "d) El régimen preventivo se aplicará una vez hayan sido publicadas en al Diario Oficial de la UE"],
+          "correct": 0
+        },
+        {
+          "question": "13. El proyecto LIFE Bonelli, continuado actualmente por el proyecto Aquila a-LIFE, tiene como objetivo la conservación de la especie:",
+          "options": ["a) Aquila pennata", "b) Gypaetus barbatus", "c) Circus pygargus", "d) Aquila fasciata"],
+          "correct": 3
+        },
+        {
+          "question": "14. La Convención de Ramsar cuenta con un Comité Permanente y con 2 órganos asesores. Indica cuál de los siguientes es uno de ellos:",
+          "options": ["a) Grupo de Examen Científico y Técnico", "b) Comité de Seguimiento Científico", "c) Comisión de apoyo del Convenio Ramsar", "d) Ninguna de las anteriores es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "15. ¿Cuál es actualmente la Autoridad administrativa del Convenio CITES en España, se acuerdo con el Real Decreto 986/2021, de 16 de noviembre, por el que se establecen medidas de aplicación del Convenio sobre el Comercio Internacional de Especies Amenazadas de Fauna y Flora Silvestres (CITES), hecho en Washington el 3 de marzo de 1973, y del Reglamento (CE) n.º 338/97, del Consejo, de 9 de diciembre de 1996, relativo a la protección de especies de la fauna y flora silvestres mediante el control de su comercio?:",
+          "options": ["a) Dirección General de Comercio Internacional e Inversiones de la Secretaría de Estado de Comercio del Ministerio de Economía, Industria y Competitividad.", "b) Dirección General de Comercio Exterior del Ministerio competente en Medio Ambiente", "c) Dirección General de Gestión del Medio Natural y Espacios Protegidos del Ministerio competente en Medio Ambiente", "d) Subdirección General de Biodiversidad Terrestre y Marina de la Dirección General de Biodiversidad, Bosques y Desertificación del Ministerio competente en Medio Ambiente"],
+          "correct": 3
+        },
+        {
+          "question": "16. ¿Cuál de los siguientes órganos NO pertenece a la estructura institucional del Convenio CITES?",
+          "options": ["a) Secretaría CITES, con sede en Ginebra", "b) Comité de Nomenclatura", "c) Conferencia de las Partes", "d) Comité Permanente"],
+          "correct": 1
+        },
+        {
+          "question": "17. El permiso o certificado que permite e l movimiento transfronterizo no comercial de instrumentos musicales para propósitos que incluyen el uso personal, la interpretación, la producción (grabaciones), la radiodifusión, la enseñanza, la exhibición o el concurso con el mismo, siempre que sean derivados de especies incluidas en los anexos A, B o C del Reglamento (CE) 338/1997, será el:",
+          "options": ["a) Certificado CITES UE", "b) Certificado de instrumento musical", "c) Certificado de propiedad privada", "d) Notificación de traslado"],
+          "correct": 1
+        },
+        {
+          "question": "18. De acuerdo con el art. 1.2 de la Ley Orgánica 12/1995, de 12 de diciembre, de represión del contrabando, los que realicen operaciones de importación, exportación, comercio, tenencia, circulación de especímenes de fauna y flora silvestres y sus partes y productos, de especi es recogidas en el Convenio de Washington, de 3 de marzo de 1973, o en el Reglamento (CE) 338/1997 del Consejo, de 9 de diciembre de 1996, sin cumplir los req uisitos legalmente establecidos, cometen delito de contrabando, siempre que:",
+          "options": ["a) Se comercie con dichas especies sin la documentación requerida, y el precio de la operación supere los 20.000 €", "b) Sólo si se trata de especies en peligro de extinción", "c) Cuando el valor de los bienes, mercancías, géneros o efectos sea igual o superior a 50.000 €", "d) B y C son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "19. ¿Cuál de los siguientes humedales está designado como Sitio Ramsar en Andalucía?",
+          "options": ["a) Paraje natural Brazo del Este", "b) Marisma del Burro", "c) Laguna del Gosque", "d) Marismas del Río Palmones"],
+          "correct": 0
+        },
+        {
+          "question": "20. De acuerdo con el Reglamento (CE) 338/1997, para la importación en la UE de especies incluidas en CITES, se deberá solicitar un permiso de importación, que requerirá:",
+          "options": ["a) Este permiso será necesario para especímenes del Anexo A o B", "b) Para especies del Anexo A, tanto silvestres como criadas en cautividad, se debe justificar la necesidad de introducción e informar sobre la finalidad a la que se destinan los especímenes", "c) Para especies del Anexo B, se deberá acreditar su legal adquisición", "d) Sólo A y C son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "21. Desde 1973, la UE elabora los llamados Programas de Acción Plurianuales en materia de Medio Ambiente (PMA), que fijan el marco de las acciones futuras en todos los ámbitos de la política medioambiental. El último PMA, aprobado a través de la Decisión (UE) 2022/591, del Parlamento y del Consejo, corresponde con el:",
+          "options": ["a) VI PMA", "b) VII PMA", "c) VIII PMA", "d) El enunciado no es correcto porque esa norma no ha aprobado el último PMA"],
+          "correct": 2
+        },
+        {
+          "question": "22. ¿En qué año entró en vigor el Convenio CITES?",
+          "options": ["a) 1973", "b) 1975", "c) 1982", "d) 1985"],
+          "correct": 1
+        },
+        {
+          "question": "23. ¿Cuál de los siguientes NO corresponde con uno de los Anexos establecidos en el Convenio de Berna?",
+          "options": ["a) Especies de fauna protegida", "b) Especies migratorias amenazadas", "c) Medio y métodos de caza y otras formas de explotación prohibidos", "d) Especie de flora strictly protegidas"],
+          "correct": 1
+        },
+        {
+          "question": "24. El Anexo III de la Directiva Aves incluye las siguientes especies de aves:",
+          "options": ["a) Especies objeto de comercialización", "b) Especies cuya explotación debe ser regulada", "c) Especies amenazas, endémicas y raras", "d) Especies objeto de caza"],
+          "correct": 0
+        },
+        {
+          "question": "25. El Anexo VI de la Directiva Hábitat contiene los medios y métodos de captura y sacrificio prohibidos. El aparatado b) del Anexo incluye los “Modos de transporte”, entre los cuales encontramos…",
+          "options": ["a) Aeronaves", "b) Cañones pateros", "c) Vehículos a motor", "d) Sólo A y C son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "26. El acuerdo internacional que regula la manipulación, transporte y uso seguros de los organismos vivos modificados (OVM), que resultan de la tecnología moderna, que puede tener efectos adversos en la diversidad biológica considerando al mismo tiempo los posibles riesgos para la salud humana, se denomina:",
+          "options": ["a) Convenio para la Diversidad Biológica (CDB)", "b) Convenio de Barcelona", "c) Acuerdo de Nagoya", "d) Protocolo de Cartagena"],
+          "correct": 3
+        },
+        {
+          "question": "27. La Convención de Ramsar cuenta con ________ Partes Contratantes:",
+          "options": ["a) 172", "b) 196", "c) 150", "d) Ninguna de las anteriores es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "28. ¿Cuál de los siguientes humedales andaluces ha sido designado como Sitio Ramsar?",
+          "options": ["a) Laguna de Palos y las Madres", "b) Laguna del Portil", "c) Laguna de la Ratosa", "d) Marismas del río Piedras y Flecha del Rompido"],
+          "correct": 0
+        },
+        {
+          "question": "29. ¿Cuál de los siguientes humedales andaluces NO ha sido designado como Sitio Ramsar?",
+          "options": ["a) Laguna de los Jarales", "b) Punta Entinas Sabinar", "c) Laguna del Gosque", "d) Salinas de Cabo de Gata"],
+          "correct": 2
+        },
+        {
+          "question": "30. Indique cuál de los siguientes Programas LIFE está dedicado a la protección de una especie cuyo hábitat son los humedales y que se encuentra declarada en situación crítica por el Ministerio competente en medio ambiente:",
+          "options": ["a) LIFE Eurokite", "b) LIFE Cerceta pardilla", "c) LIFE Guardianes de la Naturaleza", "d) LIFE Blue Natura"],
+          "correct": 1
+        }
+      ],
+      "t18_3": [
+        {
+          "question": "1. ¿Qué documento, titulado “Los límites del crecimiento” , en el que se plasmó la preocupación por la grave crisis ecológica del planeta fue publicado en 1972?",
+          "options": ["a) Informe Brundtland", "b) Declaración de Estocolmo", "c) Informe Meadows", "d) Declaración del club del Roma"],
+          "correct": 2
+        },
+        {
+          "question": "2. ¿Dónde tuvo lugar la Cumbre Mundial sobre el Desarrollo Sostenible celebrada por las Naciones Unidas en 2002?",
+          "options": ["a) Nueva York", "b) Estocolmo", "c) Río de Janeiro", "d) Johannesburgo"],
+          "correct": 3
+        },
+        {
+          "question": "3. ¿Cuándo entró en vigor el Convenio de Berna?",
+          "options": ["a) 1979", "b) 1982", "c) 1986", "d) 1992"],
+          "correct": 1
+        },
+        {
+          "question": "4. ¿Qué importante acuerdo fue aprobado por 196 países en la Conferencia de las Naciones Unidas sobre la Biodiversidad (COP 15 del Convenio de Diversidad Biológica) celebrada en 2022, para guiar la acción mundial sobre la naturaleza hasta 2030?",
+          "options": ["a) Acuerdo de Nagoya", "b) Marco Global de Biodiversidad Kunming-Montreal", "c) Metas de Aichi", "d) Agenda 2030"],
+          "correct": 1
+        },
+        {
+          "question": "5. De acuerdo con la Estrategia de la UE sobre Biodiversidad para 2030, ¿cuál de los siguientes es uno de los compromisos fundamentales de su pilar “proteger la naturaleza”?",
+          "options": ["a) Proteger al menos el 30 % de la superficie terrestre y marina de la UE", "b) Proteger al menos el 20 % de la superficie terrestre y marina de la UE", "c) Proteger al menos el 40 % de la superficie terrestre y marina de la UE", "d) Proteger un 30% de la superficie terrestre de la UE y al menos un 20% de la marina"],
+          "correct": 0
+        },
+        {
+          "question": "6. El Reglamento (UE) 2024/1991, del Parlamento y el Consejo, de 24 de junio de 2024, relativo a la restauración de la naturaleza y por el que se modifica el Reglamento (UE) 2022/869, tiene como objeto establecer medidas de restauración efectivas que abarquen:",
+          "options": ["a) Al menos el 30 % de las zonas terrestres y marítimas de aquí a 2030", "b) Al menos el 20 % de las zonas terrestres y marítimas de aquí a 2030", "c) Al menos el 20 % de las zonas terrestres y marítimas de aquí a 2050", "d) Al menos el 30 % de las zonas terrestres y marítimas de aquí a 2050"],
+          "correct": 1
+        },
+        {
+          "question": "7. Indique cuál de los siguientes compromisos a 2030 han sido recogidos en el Plan de Recuperación de la Naturaleza, establecido por la UE en el marco de la Estrategia sobre Biodiversidad para 2030:",
+          "options": ["a) Detener la pérdida de polinizadores", "b) Plantar 3.000 millones de árboles en la UE", "c) Devolver el caudal libre al menos a 25.000 km de ríos", "d) Todas las anteriores son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "8. ¿Cuándo entró en vigor el Convenio de Bonn?",
+          "options": ["a) 1979", "b) 1983", "c) 1985", "d) 1993"],
+          "correct": 1
+        },
+        {
+          "question": "9. Indique cuál es el objetivo principal de la Estrategia de la UE sobre Biodiversidad para 2030:",
+          "options": ["a) Incrementar la superficie marina protegida", "b) Revertir la pérdida de biodiversidad y restaurar los ecosistemas", "c) Promover la sostenibilidad en las áreas naturales y urbanas de la UE", "d) Aplicar protección estricta a los ecosistemas y especies del territorio europeo"],
+          "correct": 1
+        },
+        {
+          "question": "10. El art. 6 del Convenio sobre Diversidad Biológica establece que todas las Partes Contratantes desarrollarán estrategias nacionales, planes y programas dedicados a la conservación de la biodiversidad y su uso sostenible. España, en cumplimiento de los compr omisos adquiridos con este Convenio, cuenta actualmente con:",
+          "options": ["a) El Plan Estratégico para la Diversidad Biológica", "b) La Estrategia Española para la Conservación y Uso sostenible de la Diversidad Biológica", "c) El Plan Estratégico para el Patrimonio Natural y la Biodiversidad", "d) El Marco Estratégico Estatal en materia de Biodiversidad"],
+          "correct": 2
+        },
+        {
+          "question": "11. ¿En el marco de qué Convenio regional, se aprueba el Protocolo relativo a la Gestión Integrada de las Zonas Costeras del Mediterráneo (Protocolo GIZC)?",
+          "options": ["a) Convenio de Estambul", "b) Convenio de Barcelona", "c) Convenio OSPAR", "d) Convenio BBNJ"],
+          "correct": 1
+        },
+        {
+          "question": "12. ¿En qué año se firmó dicho Convenio?",
+          "options": ["a) 1971", "b) 1976", "c) 1983", "d) 1992"],
+          "correct": 1
+        },
+        {
+          "question": "13. A tenor del art. 13 de la Ley 42/2007, de 13 de diciembre, el Plan Estratégico para el Patrimonio Natural y la Biodiversidad, será aprobado por:",
+          "options": ["a) Acuerdo del Consejo de Ministros", "b) La Conferencia Sectorial, a propuesta de la Comisión Estatal para el Patrimonio Natural y la Biodiversidad", "c) Resolución de la Secretaría de Estado con competencias en materia de medio ambiente", "d) Real Decreto"],
+          "correct": 3
+        },
+        {
+          "question": "14. ¿Cuál es el período máximo de vigencia para el Plan Estratégico Estatal del Patrimonio Natural y la Biodiversidad conforme al art. 13 de la Ley 42/2007, de 13 de diciembre?",
+          "options": ["a) 5 años", "b) 8 años", "c) 10 años", "d) 15 años"],
+          "correct": 2
+        },
+        {
+          "question": "15. Indique cuántas líneas de actuación prioritarias se han establecido en el Plan Estratégico estatal del Patrimonio Natural y la Biodiversidad a 2030:",
+          "options": ["a) 5", "b) 7", "c) 11", "d) 8"],
+          "correct": 3
+        },
+        {
+          "question": "16. Mediante qué norma fue aprobado el último Plan estratégico estatal del Patrimonio Natural y la Biodiversidad a 2030:",
+          "options": ["a) Real Decreto 1057/2022, de 27 de diciembre", "b) Real Decreto 1037/2020, de 27 de diciembre", "c) Real Decreto 1057/2023, de 27 de marzo", "d) Real Decreto 1037/2021, de 27 de marzo"],
+          "correct": 0
+        },
+        {
+          "question": "17. Cuál de las siguientes medidas, establecidas en el Plan Estratégico estatal del Patrimonio Natural y la Biodiversidad a 2030, forma parte de la Línea de Actuación Prioritaria “ Conocimiento sobre el Patrimonio Natural y la Biodiversidad “:",
+          "options": ["a) Adopción de una Estrategia de Biodiversidad y Ciencia", "b) Implantación de un ‘ Sistema nacional de generación, seguimiento y gobernanza del conocimiento sobre el patrimonio natural y la biodiversidad’", "c) Gestionar e integrar toda la información generada en el Banco de Datos de la Naturaleza", "d) Todas las respuestas anteriores son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "18. Conforme a los objetivos establecidos por la UE en la Estrategia sobre Biodiversidad para 2030, ¿qué proporción de la superficie protegida de la UE debería quedar bajo protección estricta?",
+          "options": ["a) La mitad de la superficie protegida", "b) 20 % de la superficie protegida", "c) 10 % de la superficie protegida", "d) Una tercera parte de la superficie protegida"],
+          "correct": 3
+        },
+        {
+          "question": "19. Una de las medidas establecidas por la Estrategia de la UE sobre Biodiversidad para 2030, dentro del pilar “Habilitar el cambio transformativo” consiste en la creación de:",
+          "options": ["a) La Red de cooperación de Centros de Investigación sobre Biodiversidad de la Unión", "b) El Centro de conocimiento de la Biodiversidad", "c) El Instituto de gestión de la diversidad biológica", "d) El Sistema Integrado de Recuperación de la Naturaleza"],
+          "correct": 1
+        },
+        {
+          "question": "20. Señale qué ecosistemas específicos se mencionan como prioritarios para aplicarles ‘protección estricta’ de acuerdo con la línea de actuación prioritaria Protección y conservación de la naturaleza dentro del Plan Estratégico estatal para el PNB:",
+          "options": ["a) Selvas tropicales y desiertos", "b) Humedales y praderas de fanerógamas marinas", "c) Bosques primarios y maduros", "d) B y C son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "21. De acuerdo con el objeto del Reglamento (UE) 2024/1991, del Parlamento y el Consejo, de 24 de junio de 2024, relativo a la restauración de la naturaleza y por el que se modifica el Reglamento (UE) 2022/869, los Estados miembros deberán establecer medidas de restauración efectivas para:",
+          "options": ["a) Todos los ecosistemas que necesiten restauración de aquí a 2050", "b) El 30 % de los ecosistemas que necesiten restauración de aquí a 2050", "c) Todos los ecosistemas que necesiten restauración de aquí a 2030", "d) Mínimo el 50 % de los ecosistemas degradados de aquí a 2030"],
+          "correct": 0
+        },
+        {
+          "question": "22. Según la Estrategia de Biodiversidad de la UE, ¿qué porcentaje de tierras agrarias debe estar dedicado a la agricultura ecológica para 2030?",
+          "options": ["a) 10%", "b) 20%", "c) 25%", "d) 30%"],
+          "correct": 2
+        },
+        {
+          "question": "23. ¿Qué objetivo general en cuanto a recuperación y restauración de ecosistemas ha establecido el Plan Estratégico estatal para 2030?",
+          "options": ["a) Restaurar un 15% de los ecosistemas degradados", "b) Restaurar un 30% de los ecosistemas degradados", "c) Restaurar un 20% de los ecosistemas degradados", "d) Restaurar un 10% de los ecosistemas degradados"],
+          "correct": 0
+        },
+        {
+          "question": "24. Cuál de las siguientes líneas de actuación prioritarias NO forma parte del Plan Estratégico Estatal para el PNB a 2030?",
+          "options": ["a) Reducción de amenazas para el patrimonio natural y la biodiversidad", "b) Compromisos de cooperación y participación internacional", "c) Economía circular y transición energética", "d) Financiación del patrimonio natural y la biodiversidad"],
+          "correct": 2
+        },
+        {
+          "question": "25. La Estrategia Andaluza de Gestión Integrada de la Biodiversidad (EAGIB) fue aprobada en:",
+          "options": ["a) 2015", "b) 2011", "c) 2018", "d) 2012"],
+          "correct": 1
+        },
+        {
+          "question": "26. ¿Cuál de los siguientes es un objetivo general de la EAGIB:",
+          "options": ["a) Promover sistemas impositivos acordes a la afección medioambiental", "b) Desarrollar instrumentos que faciliten una gestión proactiva y adaptativa al cambio global", "c) Puesta en valor del patrimonio geológico", "d) Restaurar los hábitats degradados"],
+          "correct": 1
+        },
+        {
+          "question": "27. La EAGIB define ‘capital natural’ como aquellos aspectos del mundo natural…",
+          "options": ["a) empleados o potencialmente empleables en el sistema económico y social humano, siendo capaces de generar un flujo de bienes y servicios útiles o renta natural a lo largo del tiempo, ya sea de forma directa o indirecta", "b) que son cuantificables económicamente porque proporcionan al sistema recursos naturales utilizables de forma directa o indirecta por nuestra sociedad", "c) que proporcionan riqueza a las poblaciones rurales en términos económicos y ambientales", "d) Ninguna de las anteriores es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "28. Indique cuál de los siguientes NO es uno de los principios inspiradores de la EAGIB:",
+          "options": ["a) Principio de sostenibilidad energética", "b) Uso sostenible", "c) Conservación dentro y fuera de los EENNPP", "d) Principio de prevención y precaución"],
+          "correct": 0
+        },
+        {
+          "question": "29. La EAGIB ha establecido ____ objetivos generales, que se desarrollan mediante _______ :",
+          "options": ["a) 10 / Actuaciones y objetivos específicos", "b) 8 / Directrices y medidas", "c) 10 / Líneas de actuación", "d) 8 / Líneas estratégicas"],
+          "correct": 3
+        },
+        {
+          "question": "30. El objetivo principal de la EAGIB es frenar la pérdida de la biodiversidad en Andalucía y …",
+          "options": ["a) Desarrollar un marco instrumental para su gestión", "b) Restaurar el medio natural", "c) Luchar contra el cambio climático", "d) Recuperar el adecuado funcionamiento de sus ecosistemas"],
+          "correct": 3
+        },
+        {
+          "question": "31. ¿ Qué periodo de vigencia inicial se estableció para la EAGIB?",
+          "options": ["a) Hasta 2025", "b) Hasta 2020, con una proyección de acciones a largo plazo hasta 2050", "c) Hasta 2030", "d) Hasta 2015, con una posible extensión gasta 2030"],
+          "correct": 1
+        },
+        {
+          "question": "32. Uno de los objetivos del Plan Estratégico estatal para el PNB en la lucha contra la contaminación es reducir la entrada de plásticos y microplásticos en el medio ambiente. En este contexto, el Plan establece que para 2030…",
+          "options": ["a) Se debe reducir su entrada en al menos un 20%", "b) La eliminación solo aplicará a áreas urbanas y costeras", "c) No debe haber ninguna nueva entrada de plásticos en el medio", "d) A y B son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "33. Para evitar la mortalidad de fauna silvestre, el Plan Estratégico estatal para el PNB establece…",
+          "options": ["a) Elaborar unas directrices para evitar el ahogamiento de fauna en balsas y canales", "b) Modificar l a normativa de protección de aves contra electrocuciones y colisiones con tendidos eléctricos", "c) Crear una base de datos de capturas y muertes accidentales", "d) Todas las anteriores son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "34. ¿Cuál es el principal objetivo del Convenio OSPAR?",
+          "options": ["a) Proteger el medio ambiente marino del Atlántico Norte", "b) Creación de áreas marinas protegidas en el Mediterráneo", "c) Eliminar la contaminación de las áreas marinas en España", "d) Restaurar la biodiversidad de las áreas marinas en las zona del Estrecho"],
+          "correct": 0
+        },
+        {
+          "question": "35. ¿Qué instrumento europeo tiene como objetivo transformar la economía de la Unión Europea para lograr la neutralidad climática en 2050?",
+          "options": ["a) Programa LIFE", "b) Convenio de Ámsterdam", "c) Pacto Verde Europeo", "d) Estrategia de la UE sobre la Biodiversidad a 2030"],
+          "correct": 2
+        },
+        {
+          "question": "36. ¿Cuál es el propósito de la Agencia Europea de Medio Ambiente?",
+          "options": ["a) Desarrollar y coordinar la red europea de información y de observación sobre el medio ambiente (Eionet)", "b) Ofrecer información objetiva sobre el estado del medio ambiente en Europa", "c) Ejecutar los Programas de Acción en materia de Medio Ambiente de la Unión Europea", "d) A y B son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "37. ¿Cuál de los siguientes instrumentos forma parte de la implementación de la EAGIB en la gestión de la biodiversidad?",
+          "options": ["a) Programa de fomento de la urbanización sostenible", "b) Estrategia de desarrollo turístico en áreas protegidas", "c) Red de Centros de Conservación, Recuperación y Reintroducción de Fauna Silvestre", "d) Plan de desarrollo de parques periurbanos"],
+          "correct": 2
+        },
+        {
+          "question": "38. La sede de la Agencia Europea de Medio Ambiente se encuentra en…",
+          "options": ["a) Copenhague", "b) Bruselas", "c) Ginebra", "d) París"],
+          "correct": 0
+        },
+        {
+          "question": "39. ¿Con qué frecuencia se realizarán los Informes de Seguimiento de la EAGIB, y cuál es su finalidad principal?",
+          "options": ["a) Cada 5 años, para evaluar el impacto de la Estrategia en las políticas de biodiversidad", "b) Cada 2 años, para analizar los logros, dificultades y necesidades de ajuste de la estrategia", "c) Anualmente, para analizar el grado de implementación de la estrategia", "d) Cada 3 años, para evaluar el reajuste del presupuesto económico"],
+          "correct": 1
+        },
+        {
+          "question": "40. ¿Cuál es el criterio principal para designar un sitio como Ramsar, según lo establecido en la Convención de Ramsar sobre los Humedales de Importancia Internacional?",
+          "options": ["a) Extensión mínima de 100 ha y permanencia a lo largo del año", "b) Importancia internacional para las aves acuáticas en cualquier estación del año", "c) Ubicación en zonas protegidas por convenios internacionales", "d) Nivel de biodiversidad general, independientemente de la especie predominante"],
+          "correct": 1
+        }
+      ]
+    };
+
+    // Crear el bloque unificado completo "all" (110 preguntas)
+    quizBlocks["all"] = [...quizBlocks["t18_1"], ...quizBlocks["t18_2"], ...quizBlocks["t18_3"]];
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      if (selected === 'all') {
+        document.getElementById('test-title').textContent = "TEMA 18 UNIFICADO: CONVENIOS INTERNACIONALES (110 PREGUNTAS)";
+      } else if (selected === 't18_1') {
+        document.getElementById('test-title').textContent = "BLOQUE 1: TEST 18-1 (40 PREGUNTAS)";
+      } else if (selected === 't18_2') {
+        document.getElementById('test-title').textContent = "BLOQUE 2: TEST 18-2 (30 PREGUNTAS)";
+      } else if (selected === 't18_3') {
+        document.getElementById('test-title').textContent = "BLOQUE 3: TEST 18-3 (40 PREGUNTAS)";
+      }
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La opción correcta era la ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicialización automática
+    changeBlock();
+  </script>
+</body>
+</html>

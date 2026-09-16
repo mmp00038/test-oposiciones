@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Multibloque - Tema 17</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 100px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 85px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Question Cards */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Reset Area */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 100px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Ver todo el tema unificado</option>
+        <option value="b1">Bloque 1: Test 17-1</option>
+        <option value="b2">Bloque 2: Test 17-2</option>
+        <option value="b3">Bloque 3: Test 17-3</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 17: RENPA, RED NATURA 2000 Y USO PÚBLICO</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const b1Data = [
+      {
+        id: "1-1",
+        question: "1. Según el artículo 2 del Decreto 95/2003, de 8 de abril, por el que se regula la Red de Espacios Naturales Protegidos de Andalucía y su Registro, ¿cuál de los siguientes NO constituye un objetivo de la RENPA?",
+        options: [
+          "a) La coordinación de los sistemas generales de gestión de los espacios naturales protegidos.",
+          "b) La promoción externa de los espacios naturales protegidos de forma homogénea y conjunta.",
+          "c) La colaboración en programas estatales e internacionales de conservación de espacios naturales y de la vida silvestre.",
+          "d) La unificación de los instrumentos de planificación de todos los espacios naturales protegidos mediante la aprobación de un único plan de gestión para toda la Red."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-2",
+        question: "2. De acuerdo con los principios de la Carta Europea de Turismo Sostenible, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Proteger y promocionar el patrimonio natural y cultural del territorio, evitando un desarrollo turístico excesivo que ponga en peligro su conservación.",
+          "b) Garantizar la mejora de la actividad turística sin que por ello se reduzca la calidad de vida de la población local.",
+          "c) Aumentar los beneficios del turismo para la economía local y controlar los flujos de visitantes para reducir los impactos negativos que pudieran generar.",
+          "d) Favorecer el incremento de visitantes como instrumento prioritario de desarrollo económico, siempre que posteriormente se adopten medidas para corregir los impactos ambientales generados."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-3",
+        question: "3. ¿Cuál de las siguientes secuencias reproduce CORRECTAMENTE las fases del Programa de Fomento del Voluntariado en Espacios Naturales Protegidos de Andalucía?",
+        options: [
+          "a) Diagnóstico participativo → Elaboración del programa → Inventario de entidades y proyectos → Ejecución → Evaluación.",
+          "b) Inventario de entidades y proyectos → Diagnóstico participativo → Elaboración del programa → Evaluación → Ejecución.",
+          "c) Diagnóstico participativo → Inventario de entidades y proyectos → Elaboración del programa → Ejecución → Evaluación.",
+          "d) Diagnóstico participativo → Inventario de entidades y proyectos → Ejecución → Elaboración del programa → Evaluación."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-4",
+        question: "4. De acuerdo con el artículo 46.4 de la Ley 42/2007, de 13 de diciembre, un plan, programa o proyecto que no tenga relación directa con la gestión de un espacio Red Natura 2000 ni sea necesario para ella deberá someterse a una adecuada evaluación de sus repercusiones cuando:",
+        options: [
+          "a) Pueda afectar de forma apreciable a las especies o hábitats del espacio, exclusivamente cuando dicha afección derive individualmente del propio proyecto.",
+          "b) Pueda afectar de forma apreciable al espacio, individualmente o en combinación con otros planes, programas o proyectos, teniendo en cuenta los objetivos de conservación del mismo.",
+          "c) Pueda producir cualquier tipo de afección, aunque esta sea irrelevante respecto de los objetivos de conservación del espacio.",
+          "d) Afecte necesariamente de forma directa a un hábitat o especie prioritaria incluida en los anexos I o II."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-5",
+        question: "5. Conforme al Manual de Señalización de Uso Público, respecto de las señales de IDENTIFICACIÓN Y RECOMENDACIONES, señale la respuesta CORRECTA:",
+        options: [
+          "a) Constituyen un complemento obligatorio de la señal de identificación y ambas deberán coexistir en el acceso principal.",
+          "b) Se utilizarán únicamente cuando no exista ninguna construcción asociada a la instalación.",
+          "c) Pueden servir, entre otras funciones, para reconocer un espacio natural o instalación y conocer sus recomendaciones, describir normas generales de uso o identificar componentes funcionales de determinadas instalaciones.",
+          "d) Solo pueden incorporar la denominación y el nombre propio de la instalación, quedando excluidos croquis, pictogramas y recomendaciones de uso."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-6",
+        question: "6. Según el Portal Ambiental de Andalucía, el programa RECAPACICLA:",
+        options: [
+          "a) Está dirigido exclusivamente a la comunidad educativa y tiene como finalidad principal reducir los residuos generados en los centros escolares.",
+          "b) Se integra en los programas de educación para la sostenibilidad en materia de residuos y economía circular y aborda, entre otros aspectos, prevención y reducción de residuos, recogida selectiva y reciclaje.",
+          "c) Es un programa dirigido principalmente a entidades locales para la implantación de puntos limpios municipales.",
+          "d) Se centra en la reutilización de residuos, sin incluir contenidos relacionados con su prevención, recogida selectiva o tratamiento."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-7",
+        question: "7. De acuerdo con el artículo 57.1 del Estatuto de Autonomía para Andalucía, en relación con los espacios naturales protegidos, señale la respuesta CORRECTA:",
+        options: [
+          "a) La Comunidad Autónoma ostenta competencia compartida para la delimitación y regulación de los espacios naturales protegidos, correspondiendo en todo caso su gestión integral al Estado.",
+          "b) La Comunidad Autónoma tiene competencia exclusiva para la gestión de los espacios naturales protegidos terrestres, pero no respecto de aquellos que afecten a aguas marítimas de su jurisdicción.",
+          "c) La Comunidad Autónoma tiene competencia exclusiva en la delimitación, regulación, ordenación y gestión integral de los espacios naturales protegidos, incluyendo los que afecten a las aguas marítimas de su jurisdicción.",
+          "d) La competencia autonómica comprende la gestión de los espacios protegidos, pero no la declaración de nuevas figuras de protección."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-8",
+        question: "8. Conforme al artículo 23 del Decreto 20/2002 considere las siguientes afirmaciones relativas a los requisitos exigibles a las empresas que organicen actividades de turismo activo en Andalucía:\nI. Deben disponer de un seguro de responsabilidad profesional en permanente vigencia, adecuado a la naturaleza y alcance del riesgo de las actividades que desarrollen.\nII. Dicho seguro tendrá una cobertura mínima de 600.000 euros por siniestro e incluirá, al menos, rescate, traslado y asistencia derivados de accidente.\nIII. Toda empresa de turismo activo deberá disponer necesariamente de autorización de la Consejería competente en materia de medio ambiente, cualquiera que sea la actividad y el lugar en que se desarrolle.\nIV. Deben contar con personal cualificado para el desarrollo de cada actividad.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) I, II y IV.",
+          "b) I, III y IV.",
+          "c) II, III y IV.",
+          "d) Todas son correctas."
+        ],
+        correct: 0
+      },
+      {
+        id: "1-9",
+        question: "9. Según la información recogida en el Portal Ambiental de la Junta de Andalucía, los equipamientos de uso público de los espacios naturales protegidos cuentan con dos elementos imprescindibles. Señale la respuesta CORRECTA:",
+        options: [
+          "a) Un espacio físico dotado necesariamente de infraestructuras permanentes y un programa de educación ambiental.",
+          "b) Un espacio físico con las infraestructuras y recursos humanos y/o materiales necesarios, y un proyecto de comunicación, información, interpretación o educación ambiental, implícito o explícito.",
+          "c) Una instalación fija destinada a los visitantes y un servicio prestado necesariamente por personal especializado.",
+          "d) Una infraestructura de titularidad pública y un proyecto de interpretación ambiental aprobado por la Consejería competente."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-10",
+        question: "10. Según el artículo 42 de la Ley 42/2007, de 13 de diciembre, la Red Ecológica Europea Natura 2000 está compuesta por:",
+        options: [
+          "a) Las Zonas Especiales de Conservación y las Zonas de Especial Protección para las Aves.",
+          "b) Los Lugares de Importancia Comunitaria hasta su transformación en ZEC, las ZEC y las ZEPA.",
+          "c) Los LIC, las ZEC, las ZEPA y cualquier espacio natural protegido declarado por las comunidades autónomas.",
+          "d) Los LIC y las ZEPA, perdiendo los primeros su condición de espacio Red Natura 2000 una vez transformados en ZEC."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-11",
+        question: "11. De acuerdo a la información recogida en el Portal Ambiental de la Junta de Andalucía, valore las siguientes afirmaciones relativas al ejercicio de la acción voluntaria:\nI. Debe desarrollarse dentro de una entidad de voluntariado.\nII. Debe desarrollarse en el marco de un programa organizado y contar con formación, dirección técnica, medios y cobertura aseguradora.\nIII. Una actuación espontánea puede calificarse como acción voluntaria siempre que se realice de forma libre, altruista y sin contraprestación económica.\nIV. La acción voluntaria no debe confundirse con los trabajos profesionales remunerados.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) I y II.",
+          "b) I, II y III.",
+          "c) I, II y IV.",
+          "d) II, III y IV."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-12",
+        question: "12. Conforme a los artículos 12 y 14 de la Orden de 20 de marzo de 2003, señale la afirmación CORRECTA:",
+        options: [
+          "a) El período solicitado para desarrollar una actividad podrá alcanzar hasta tres años, aunque la autorización nunca podrá concederse por más de dos.",
+          "b) El plazo máximo para resolver la autorización será de tres meses y la falta de resolución expresa tendrá efectos desestimatorios.",
+          "c) El período indicado en la solicitud no podrá ser superior a dos años y, salvo petición en contrario, cuando se pretenda realizar actividades durante un período de tiempo, el plazo de validez será de dos años, renovable siempre que no existan informes de los agentes de medio ambiente sobre incumplimientos.",
+          "d) Toda autorización concedida tendrá necesariamente una vigencia de dos años."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-13",
+        question: "13. De acuerdo con el artículo 104 del Decreto 208/1997, de 9 de septiembre, señale la respuesta INCORRECTA:",
+        options: [
+          "a) La circulación de vehículos a motor fuera de las vías expresamente previstas para ellos puede admitirse cuando resulte imprescindible para la guardería forestal.",
+          "b) Las pruebas deportivas fuera de circuitos expresamente previstos podrán realizarse si cuentan con autorización expresa para cada caso concreto, sin perjuicio de otras autorizaciones exigibles.",
+          "c) La Consejería competente podrá establecer limitaciones o prohibiciones sobre actividades o usos públicos cuando exista riesgo de deterioro de los recursos, terrenos forestales, medio natural o ecosistemas.",
+          "d) La velocidad máxima establecida en el Decreto, en pistas y caminos de montes públicos constituye un límite absoluto que no puede modificarse mediante señalización expresa."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-14",
+        question: "14. Conforme al artículo 48 de la Ley 42/2007, sobre vigilancia y seguimiento de la Red Natura 2000, señale la respuesta CORRECTA:",
+        options: [
+          "a) El seguimiento del estado de conservación corresponde exclusivamente a las comunidades autónomas.",
+          "b) La Administración General del Estado y las comunidades autónomas vigilarán, en el ámbito de sus respectivas competencias, el estado de conservación de los hábitats y especies de interés comunitario.",
+          "c) Las comunidades autónomas remitirán directamente a la Comisión Europea los informes nacionales exigidos por las Directivas.",
+          "d) El seguimiento deberá centrarse únicamente en los hábitats naturales prioritarios, quedando excluidas las especies de aves."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-15",
+        question: "15. Según la clasificación funcional recogida en el Portal Ambiental de la Junta de Andalucía, considere las siguientes afirmaciones:\nI. El centro de visitantes y el punto de información son equipamientos de interpretación.\nII. El mirador, el observatorio y el sendero señalizado se incluyen entre los equipamientos de información.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Únicamente la afirmación I es correcta.",
+          "b) Únicamente la afirmación II es correcta.",
+          "c) Ambas afirmaciones son correctas.",
+          "d) Ambas afirmaciones son incorrectas."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-16",
+        question: "16. Según la Estrategia de Acción para la Gestión del Uso Público en la RENPA, respecto de los Programas de Uso Público de los espacios naturales protegidos, señale la respuesta CORRECTA:",
+        options: [
+          "a) Únicamente los Parques Naturales con especial vocación para el uso público deberán contar con un Programa de Uso Público.",
+          "b) Todos los espacios naturales protegidos de Andalucía deberán disponer obligatoriamente de un Programa de Uso Público individual.",
+          "c) Todos los Parques Naturales tendrán un Programa de Uso Público, pudiendo disponer también de él otros espacios protegidos cuando se decida por su especial vocación para el uso público o por la complejidad de su gestión.",
+          "d) Los Programas de Uso Público únicamente podrán elaborarse de manera conjunta para espacios pertenecientes a una misma provincia."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-17",
+        question: "17. Según el Portal Ambiental de Andalucía, en relación con la Red de Ciudades Verdes y Sostenibles de Andalucía (Red REVERSA), señale la respuesta CORRECTA:",
+        options: [
+          "a) Está dirigida fundamentalmente a pequeñas y medianas empresas para asesorarlas en su transición hacia modelos ambientalmente sostenibles.",
+          "b) Es una red dirigida a municipios y entidades locales que funciona como foro de cooperación, intercambio de experiencias y difusión de buenas prácticas ambientales.",
+          "c) Se dirige exclusivamente a municipios incluidos total o parcialmente en espacios naturales protegidos.",
+          "d) Su finalidad principal es financiar proyectos locales relacionados con la economía circular y la transición energética."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-18",
+        question: "18. De acuerdo con el artículo 9 de la Orden de 20 de marzo de 2003, una actividad de turismo activo desarrollada en un espacio natural protegido que, además, tenga la consideración de terreno forestal deberá cumplir:",
+        options: [
+          "a) Únicamente las condiciones establecidas en el Anexo 3.",
+          "b) Las condiciones de los Anexos 1 y 3, pero no las del Anexo 2.",
+          "c) Las condiciones establecidas en los Anexos 1, 2 y 3.",
+          "d) Únicamente las condiciones de los Anexos 2 y 3, puesto que el Anexo 1 se aplica exclusivamente fuera de terrenos forestales y espacios naturales protegidos."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-19",
+        question: "19. Teniendo en cuenta conjuntamente las definiciones y la clasificación funcional de los equipamientos recogidas en el Portal Ambiental de la Junta de Andalucía, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Un sendero señalizado puede discurrir por caminos tradicionales y estar habilitado fundamentalmente para la marcha a pie, aunque también pueda utilizarse en determinados casos en bicicleta o a caballo.",
+          "b) Un área recreativa presta apoyo principalmente a actividades de esparcimiento al aire libre, especialmente comidas en contacto con la naturaleza, y su utilización se vincula a una duración inferior a una jornada.",
+          "c) El refugio y el refugio-vivac se incluyen entre los equipamientos de alojamiento, diferenciándose, entre otros aspectos, en que el segundo está concebido para una estancia breve y/o pernocta durante una noche y no necesariamente ha de estar cerrado.",
+          "d) La zona de acampada controlada se diferencia del refugio-vivac en que aquella permite la instalación de tiendas de campaña por períodos prolongados, mientras que este último está destinado necesariamente a una estancia inferior a una jornada."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-20",
+        question: "20. Según la Estrategia de Acción para la Gestión del Uso Público en la RENPA, aprobada mediante Resolución de 19 de noviembre de 2003, señale cuál de las siguientes afirmaciones constituye uno de sus fines:",
+        options: [
+          "a) Sustituir a los PORN y los PRUG como instrumentos normativos de regulación del uso público.",
+          "b) Insertar la ordenación del uso público en la estrategia de la RENPA, considerando la visión integrada correspondiente a Andalucía como unidad de ordenación.",
+          "c) Limitar la planificación del uso público exclusivamente a los Parques Naturales que cuenten con una elevada afluencia de visitantes.",
+          "d) Transferir progresivamente la gestión del uso público de los espacios protegidos a las entidades locales."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-21",
+        question: "21. De acuerdo con el artículo 18 de la Ley 2/1989, de 18 de julio, por la que se aprueba el Inventario de Espacios Naturales Protegidos de Andalucía y se establecen medidas adicionales para su protección, corresponde la administración y gestión de los espacios naturales protegidos de la Comunidad Autónoma:",
+        options: [
+          "a) A la Administración General del Estado, sin perjuicio de las facultades de ejecución de la Junta de Andalucía.",
+          "b) A la Junta de Andalucía, a través de la Consejería competente en materia de medio ambiente.",
+          "c) A las Diputaciones Provinciales cuando el espacio afecte a más de un municipio.",
+          "d) Al órgano de participación de cada espacio natural protegido, bajo la coordinación de la Junta de Andalucía."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-22",
+        question: "22. De acuerdo con el artículo 104 del Decreto 208/1997, de 9 de septiembre, considere las siguientes afirmaciones:\nI. La realización de pruebas deportivas fuera de los circuitos expresamente previstos podrá admitirse cuando exista autorización expresa del Delegado Provincial de la Consejería de Medio Ambiente para cada caso concreto, sin perjuicio de otras autorizaciones exigibles.\nII. La velocidad de circulación de vehículos de cualquier clase por pistas y caminos que discurran por montes públicos se limita, con carácter general, a 30 km/h, salvo indicación expresa que establezca un límite diferente.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Las afirmaciones I y II son correctas.",
+          "b) Solo la afirmación I es correcta.",
+          "c) Solo la afirmación II es correcta.",
+          "d) Ambas afirmaciones son incorrectas."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-23",
+        question: "23. Según el artículo 9 del Decreto 67/2018, de 20 de mayo, por el que se regulan los senderos de uso deportivo, señale la asociación CORRECTA:",
+        options: [
+          "a) GR: más de 50 km, blanco y rojo / PR: entre 10 y 50 km, blanco y amarillo / SL: menos de 10 km, blanco y verde.",
+          "b) GR: 50 km o más, blanco y rojo / PR: entre 10 y 50 km, blanco y verde / SL: menos de 10 km, blanco y amarillo.",
+          "c) GR: más de 50 km, blanco y amarillo / PR: entre 10 y 50 km, blanco y rojo / SL: menos de 10 km, blanco y verde.",
+          "d) GR: más de 50 km, blanco y rojo / PR: entre 10 y 50 km, blanco y amarillo / SL: 10 km o menos, blanco y verde."
+        ],
+        correct: 0
+      },
+      {
+        id: "1-24",
+        question: "24. De acuerdo con el artículo 47 de la Ley 42/2007 con el fin de mejorar la coherencia ecológica y la conectividad de la Red Natura 2000, las Administraciones fomentarán:",
+        options: [
+          "a) La conservación de corredores ecológicos y la gestión de elementos del paisaje y áreas esenciales para la migración, distribución geográfica e intercambio genético de las especies.",
+          "b) Exclusivamente la creación de nuevas ZEC que conecten físicamente todos los espacios protegidos de la Red.",
+          "c) La adquisición pública de los terrenos situados entre dos espacios Red Natura 2000.",
+          "d) La creación obligatoria de corredores biológicos en todos los municipios que contengan una ZEPA."
+        ],
+        correct: 0
+      },
+      {
+        id: "1-25",
+        question: "25. De acuerdo con la información recogida por la Junta de Andalucía en su portal ambiental en materia de sensibilización y educación ambiental, señale la respuesta CORRECTA:",
+        options: [
+          "a) La sensibilización ambiental y la educación ambiental son conceptos equivalentes, diferenciándose únicamente por los colectivos a los que se dirigen.",
+          "b) La sensibilización pretende despertar el interés y la preocupación ante los problemas ambientales, mientras que la educación ambiental constituye un proceso más amplio y continuado de adquisición de conocimientos, valores, competencias y capacidad crítica.",
+          "c) La educación ambiental tiene como finalidad fundamental transmitir información, mientras que la sensibilización persigue modificar comportamientos.",
+          "d) La sensibilización constituye un proceso formativo continuado, mientras que la educación ambiental se limita a actuaciones puntuales de concienciación."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-26",
+        question: "26. Según la Estrategia de Acción para la Gestión del Uso Público en la RENPA, en relación con el marco de planificación del uso público, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Los PORN y los PRUG son los instrumentos de carácter normativo que establecen el régimen general de intervención administrativa al que quedan sujetas las actividades de uso público.",
+          "b) La Estrategia contempla como meta de gestión el desarrollo de un marco completo de planificación que incluya Programas de Uso Público de cada Parque Natural y Programas de ámbito provincial.",
+          "c) Las limitaciones de acceso o uso y la determinación de lugares, fechas y condiciones para actividades de uso público, turismo activo y ecoturismo pueden establecerse para cada Parque Natural mediante Orden de la persona titular de la Consejería competente en materia de medio ambiente.",
+          "d) Los Programas de Uso Público sustituyen el desarrollo normativo contenido en los PORN y PRUG, pasando a establecer directamente el régimen de intervención administrativa aplicable a cada actividad."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-27",
+        question: "27. De acuerdo con el artículo 67 de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía, señale la respuesta CORRECTA respecto al concepto de uso público del monte:",
+        options: [
+          "a) Comprende exclusivamente las actividades recreativas, deportivas, educativas y culturales desarrolladas en montes públicos.",
+          "b) Comprende las actividades recreativas, sociales, turísticas, deportivas, educativas o culturales realizadas en los montes con finalidad principal de aprovechamiento de sus recursos naturales.",
+          "c) Comprende las actividades recreativas, sociales, turísticas, deportivas, educativas o culturales que puedan realizar las personas en los montes con intención de disfrutar y conocer su patrimonio y mejorar su estado de salud.",
+          "d) Comprende cualquier actividad desarrollada en el monte que no tenga carácter lucrativo ni suponga un aprovechamiento forestal."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-28",
+        question: "28. De acuerdo con el Manual de Señalización de Uso Público, aprobado mediante Orden de 6 de junio de 2005, señale la respuesta INCORRECTA:",
+        options: [
+          "a) La señalización cumple un primer servicio de recepción e información u orientación a los visitantes.",
+          "b) La señalización contribuye a la ordenación y distribución espacial de los visitantes.",
+          "c) Los servicios, las instalaciones y la señalización constituyen tres pilares del modelo de uso público.",
+          "d) La señalización debe procurar la máxima implantación posible de señales, aunque ello produzca cierto impacto visual sobre el paisaje, siempre que facilite la orientación del visitante."
+        ],
+        correct: 3
+      },
+      {
+        id: "1-29",
+        question: "29. De acuerdo con el artículo 49 de la Ley 42/2007, señale la respuesta CORRECTA respecto de la descatalogación total o parcial de un espacio incluido en la Red Natura 2000:",
+        options: [
+          "a) Puede proponerse cuando razones económicas o sociales sobrevenidas hagan inviable el mantenimiento de su categoría de protección, siempre que exista información pública previa.",
+          "b) Solo puede proponerse cuando esté justificada por cambios debidos a la evolución natural, científicamente demostrados y reflejados en los resultados del seguimiento, debiendo incorporarse además un trámite de información pública antes de remitir la propuesta a la Comisión Europea.",
+          "c) La evolución natural científicamente demostrada permite la descatalogación directa por la Administración competente, sin necesidad de intervención de la Comisión Europea.",
+          "d) La descatalogación parcial puede fundamentarse en criterios de gestión, mientras que únicamente la descatalogación total exige cambios derivados de la evolución natural."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-30",
+        question: "30. De acuerdo con lo recogido en el Portal Ambiental de la Junta de Andalucía y con el marco establecido por la Ley 4/2018, de 8 de mayo, Andaluza del Voluntariado, señale la afirmación CORRECTA respecto al voluntariado ambiental:",
+        options: [
+          "a) Constituye una forma de colaboración individual con la Administración ambiental, desarrollada necesariamente al margen de entidades de voluntariado.",
+          "b) Constituye una forma de participación social mediante la cual las personas, de manera libre, solidaria, altruista y sin contraprestación económica, colaboran a través de entidades de voluntariado en actuaciones dirigidas a la protección, conservación y mejora del medio ambiente.",
+          "c) Comprende únicamente aquellas actividades altruistas destinadas directamente a la conservación material de los recursos naturales.",
+          "d) Se caracteriza por su carácter solidario y altruista, pudiendo existir contraprestación económica cuando esta tenga por finalidad compensar la dedicación de la persona voluntaria."
+        ],
+        correct: 1
+      },
+      {
+        id: "1-31",
+        question: "31. De acuerdo con la clasificación de equipamientos recogida en la Estrategia de Acción para la Gestión del Uso Público en la RENPA, señale la respuesta INCORRECTA:",
+        options: [
+          "a) El sendero señalizado tiene la consideración de equipamiento básico de uso público.",
+          "b) El carril cicloturístico se clasifica como equipamiento complementario de uso público.",
+          "c) El ecomuseo y el parque de fauna silvestre se clasifican como equipamientos básicos de uso público.",
+          "d) El refugio-vivac y la zona de acampada controlada tienen la consideración de equipamientos complementarios de uso público."
+        ],
+        correct: 2
+      },
+      {
+        id: "1-32",
+        question: "32. De acuerdo con el artículo 45 de la Ley 42/2007, respecto de la declaración de las ZEC y las ZEPA, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Serán declaradas por la Administración General del Estado y las comunidades autónomas en el ámbito de sus respectivas competencias.",
+          "b) Su declaración requiere un procedimiento previo de información pública.",
+          "c) Si como resultado de la información pública se amplían los límites de la propuesta inicial, deberá realizarse un nuevo trámite de información pública.",
+          "d) La declaración de una ZEPA requiere en todo caso su aprobación previa como LIC por la Comisión Europea."
+        ],
+        correct: 3
+      }
+    ];
+
+    const b2Data = [
+      {
+        id: "2-1",
+        question: "1. Teniendo en cuenta el artículo 45 de la Ley 42/2007 y la regulación específica contenida en el artículo 2.1.d) de la Ley 2/1989 para Andalucía, señale la respuesta CORRECTA en relación con la declaración de ZEC y ZEPA en Andalucía:",
+        options: [
+          "a) Corresponde a la Consejería competente en materia de medio ambiente mediante Orden, previo trámite de información pública.",
+          "b) Se realiza mediante Decreto del Consejo de Gobierno de la Junta de Andalucía y debe garantizarse la participación social mediante los trámites de información pública y audiencia.",
+          "c) Corresponde al Consejo de Gobierno mediante Decreto únicamente para las ZEC, mientras que las ZEPA son declaradas por Resolución de la Consejería competente.",
+          "d) Tanto las ZEC como las ZEPA requieren, además del Decreto del Consejo de Gobierno, aprobación posterior de la Comisión Europea para que la declaración produzca efectos."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-2",
+        question: "2. Conforme al artículo 104 del Decreto 208/1997, de 9 de septiembre, se autoriza con carácter general el uso recreativo de los montes públicos siempre que:",
+        options: [
+          "a) Se realice exclusivamente en instalaciones expresamente habilitadas para uso público.",
+          "b) No produzca ruidos ni actividades susceptibles de perturbar a otros usuarios, ni origine riesgo para la conservación del medio natural o alteración grave de los hábitos de la fauna silvestre.",
+          "c) No implique la utilización de vehículos a motor ni la realización de actividades deportivas.",
+          "d) Se cuente previamente con autorización expresa de la Consejería competente en materia de medio ambiente."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-3",
+        question: "3. Según la información recogida en el Portal Ambiental de la Junta de Andalucía, un OBSERVATORIO se define como:",
+        options: [
+          "a) Un espacio acondicionado para facilitar la contemplación e interpretación de una vista panorámica o de elementos singulares del paisaje.",
+          "b) Una estructura que permite ocultar a los visitantes durante la observación de fauna silvestre para acercarse a los animales sin ahuyentarlos o perturbarlos.",
+          "c) Un itinerario habilitado para la observación de fauna que discurre fundamentalmente por caminos tradicionales.",
+          "d) Una instalación destinada a exponer elementos representativos del patrimonio ambiental de un espacio natural."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-4",
+        question: "4. Conforme al artículo 43 de la Ley 42/2007, de 13 de diciembre, respecto del procedimiento relativo a los Lugares de Importancia Comunitaria, señale la respuesta CORRECTA:",
+        options: [
+          "a) El régimen de protección preventiva comienza desde que la Comisión Europea aprueba el lugar como LIC, debiendo publicarse sus límites y valores protegidos en el plazo máximo de seis meses desde dicha aprobación.",
+          "b) Desde que la lista de espacios propuestos como LIC se envía al Ministerio competente para su traslado a la Comisión Europea, dichos espacios quedan sometidos a un régimen de protección preventiva, debiendo hacerse pública determinada información en el plazo máximo de seis meses.",
+          "c) El régimen de protección preventiva comienza tras finalizar el trámite de información pública de la propuesta autonómica y se mantiene durante un máximo de seis años.",
+          "d) La protección preventiva comienza cuando el Ministerio remite formalmente la propuesta a la Comisión Europea, pero no existe plazo legal para publicar los límites geográficos ni el régimen preventivo aplicable."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-5",
+        question: "5. De acuerdo con la Ley 4/2018, Andaluza del Voluntariado, señale cuál de las siguientes constituye un DEBER de las personas voluntarias:",
+        options: [
+          "a) Obtener certificación de los servicios prestados y de las competencias adquiridas.",
+          "b) Obtener el reembolso de los gastos previamente autorizados.",
+          "c) Cesar libremente en su condición de persona voluntaria.",
+          "d) Comunicar la renuncia con suficiente antelación."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-6",
+        question: "6. Según los artículos 32 a 34 del Decreto 20/2002, de 29 de enero, señale la afirmación CORRECTA:",
+        options: [
+          "a) Los senderos y caminos rurales deberán localizarse íntegramente en el medio rural para poder tener dicha consideración.",
+          "b) Los senderos y caminos rurales se consideran recursos turísticos como medio para facilitar el desarrollo de actividades deportivas, recreativas o culturales, así como de cualesquiera otras actividades de turismo activo.",
+          "c) La Red Andaluza de Itinerarios deberá atravesar necesariamente espacios naturales protegidos, terrenos forestales y vías pecuarias.",
+          "d) La declaración de interés turístico nacional de Andalucía de una ruta o camino únicamente podrá iniciarse de oficio por la Consejería de Turismo y Deporte."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-7",
+        question: "7. Según el artículo 46 de la Ley 42/2007 cuando un espacio albergue un tipo de hábitat natural o una especie prioritaria y exista una evaluación negativa de un plan, programa o proyecto sin soluciones alternativas, podrán alegarse como razones para su realización:",
+        options: [
+          "a) Razones relacionadas con la salud humana y la seguridad pública.",
+          "b) Consecuencias positivas de primordial importancia para el medio ambiente.",
+          "c) Otras razones imperiosas de interés público de primer orden, previa consulta a la Comisión Europea.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-8",
+        question: "8. La Estrategia de Acción para la Gestión del Uso Público en la RENPA establece diversos medios para la gestión del uso público. Señale cuál de los siguientes NO figura entre los diez medios expresamente enumerados en dicha Estrategia:",
+        options: [
+          "a) Investigación.",
+          "b) Coordinación y participación.",
+          "c) Vigilancia y régimen sancionador.",
+          "d) Comunicación y promoción."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-9",
+        question: "9. En relación con el programa de sensibilización para la prevención de incendios en zonas de interfaz urbano-forestal, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Está relacionado con la adaptación y mitigación de los riesgos naturales asociados al cambio climático.",
+          "b) Entre sus destinatarios se encuentran centros educativos y de formación, personal técnico de las administraciones locales, empresas y población residente en zonas de interfaz.",
+          "c) Combina instrumentos como talleres, campañas, foros y recursos digitales y persigue, entre otros objetivos, mejorar la coordinación entre municipios y agentes locales.",
+          "d) Está financiado exclusivamente con fondos propios de la Junta de Andalucía dentro del Plan Andaluz de Formación Ambiental."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-10",
+        question: "10. Conforme al artículo 48 de la Ley 42/2007, respecto de la vigilancia y seguimiento de la Red Natura 2000, ¿cuál de las siguientes afirmaciones es CORRECTA?",
+        options: [
+          "a) Las comunidades autónomas remitirán directamente a la Comisión Europea la información relativa a los cambios en el estado de conservación de los espacios situados en su territorio.",
+          "b) Las comunidades autónomas únicamente comunicarán al Ministerio los cambios negativos en el estado de conservación que requieran nuevas medidas.",
+          "c) Las comunidades autónomas remitirán al Ministerio información sobre los cambios en el estado de conservación, las medidas de conservación adoptadas, la evaluación de sus resultados y las propuestas de nuevas medidas.",
+          "d) La evaluación de los resultados de las medidas de conservación corresponde exclusivamente a la Administración General del Estado."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-11",
+        question: "11. Conforme a los artículos 102 y 103 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, señale la respuesta CORRECTA:",
+        options: [
+          "a) Toda actividad recreativa desarrollada en terreno forestal tiene la consideración de uso público, aunque precise concesión administrativa previa.",
+          "b) Las figuras de uso público previstas en el artículo 103 solo podrán implantarse mediante autorización expresa de la Consejería competente, incluso cuando estén contempladas en instrumentos de ordenación forestal o de espacios naturales protegidos.",
+          "c) El uso público no puede llevar aparejada la realización de aprovechamientos forestales, ni suponer ocupación de terrenos forestales, ni precisar autorización o concesión administrativa previa; no obstante, la implantación de determinadas figuras de uso público puede requerir autorización administrativa.",
+          "d) La consideración de una actividad como uso público excluye que pueda desarrollarse en espacios naturales protegidos."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-12",
+        question: "12. Según el Manual de Señalización de Uso Público, respecto de las SEÑALES TEMÁTICAS y las SEÑALES COMPLEMENTARIAS, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Las señales temáticas tienen un carácter fundamentalmente educativo e interpretativo.",
+          "b) En las señales temáticas se aconseja, para una mejor comprensión, no incluir más de cuatro imágenes.",
+          "c) En las señales complementarias, las imágenes o dibujos no podrán exceder de dos.",
+          "d) Tanto las señales temáticas como las complementarias deberán limitarse, siempre que sea posible, a la reproducción gráfica del elemento interpretado, evitando incorporar esquemas explicativos."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-13",
+        question: "13. Conforme al artículo 5 del Decreto 95/2003, de 8 de abril, relativo a la organización y funcionamiento del Registro de la RENPA, señale la respuesta CORRECTA:",
+        options: [
+          "a) El Registro se organiza exclusivamente mediante un Libro de inscripciones, debiendo conservarse el resto de la documentación en los archivos generales de la Consejería.",
+          "b) El Libro de inscripciones incluirá, entre otros datos, los equipamientos de uso público existentes en el espacio natural protegido.",
+          "c) Los humedales se inscriben exclusivamente en el Inventario Andaluz de Humedales y no disponen de sección propia en el Registro de la RENPA.",
+          "d) El Archivo de documentos únicamente contendrá documentos en formato digital."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-14",
+        question: "14. Según la clasificación de los equipamientos de uso público atendiendo a su función principal recogida en el Portal Ambiental de la Junta de Andalucía, ¿cuál de las siguientes asociaciones es CORRECTA?",
+        options: [
+          "a) Ecomuseo → Equipamiento de interpretación.",
+          "b) Mirador → Equipamiento de recepción.",
+          "c) Punto de información → Equipamiento de recepción.",
+          "d) Aula de la naturaleza → Equipamiento de alojamiento."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-15",
+        question: "15. Conforme al artículo 38 del Reglamento Forestal de Andalucía, considere las siguientes afirmaciones sobre el desarrollo de las actividades de voluntariado ambiental:\nI. Los voluntarios participarán en el diseño, desarrollo y evaluación de las acciones voluntarias.\nII. Las condiciones de lugar y tiempo serán voluntariamente acordadas entre la Administración Forestal y las entidades que agrupen a los voluntarios ambientales.\nIII. Para cada proyecto deberá designarse un coordinador técnico responsable.\nIV. Corresponde a la Consejería de Medio Ambiente establecer las normas relativas, entre otros aspectos, a identificación y distintivos, seguridad e higiene y desarrollo general de las actuaciones.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) I, II y III.",
+          "b) I, II y IV.",
+          "c) II, III y IV.",
+          "d) I, III y IV."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-16",
+        question: "16. En relación con las fases de la Carta Europea de Turismo Sostenible en Espacios Naturales Protegidos (CETS), señale la afirmación CORRECTA:",
+        options: [
+          "a) En la Fase I son las empresas turísticas las que solicitan voluntariamente su adhesión y es el espacio protegido quien recibe finalmente la acreditación.",
+          "b) En la Fase II pueden solicitar voluntariamente su adhesión las empresas turísticas ubicadas en espacios ya acreditados, distinguiéndose aquellas que más y mejor se esfuerzan por hacer sostenible su actividad y colaborar con los gestores del espacio.",
+          "c) La Fase III fue puesta en marcha en 2005 y tiene por objeto la adhesión de las agencias de viajes.",
+          "d) En la Fase I la acreditación se concede conjuntamente al espacio protegido y a los empresarios turísticos que hayan manifestado su compromiso con la CETS."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-17",
+        question: "17. Según el artículo 46 de la Ley 42/2007, de 13 de diciembre, cuando un plan, programa o proyecto que pueda afectar apreciablemente a un espacio Red Natura 2000 haya obtenido conclusiones negativas en la evaluación de sus repercusiones y no existan soluciones alternativas, podrá realizarse por razones imperiosas de interés público de primer orden siempre que:",
+        options: [
+          "a) Se adopten las medidas compensatorias necesarias para garantizar la protección de la coherencia global de Natura 2000.",
+          "b) La concurrencia de dichas razones se declare para cada supuesto concreto en alguna de las formas previstas legalmente.",
+          "c) Tanto a) como b) son correctas.",
+          "d) Su realización sea autorizada exclusivamente por la Comisión Europea."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-18",
+        question: "18. Teniendo en cuenta las actuales líneas de actuación en materia de sensibilización y educación para la sostenibilidad desarrolladas por la Junta de Andalucía, considere las siguientes afirmaciones:\nI. Los programas de educación para la sostenibilidad en el medio natural incluyen actuaciones vinculadas al paisaje forestal andaluz y a la Red Andaluza de Jardines Botánicos y Micológicos.\nII. Los programas desarrollados en espacios naturales protegidos comprenden actuaciones educativas, de sensibilización y voluntariado, así como actividades educativas y de turismo de naturaleza asociadas a la RENPA.\nIII. La Red REVERSA se dirige a municipios y entidades locales, mientras que el Kit Sostenible se dirige a pequeñas y medianas empresas.\nIV. RECAPACICLA y Educa Bus constituyen dos iniciativas destinadas específicamente y de manera exclusiva a los espacios naturales protegidos de Andalucía.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Son correctas I y II.",
+          "b) Son correctas II y III.",
+          "c) Son correctas I, II y III.",
+          "d) Son correctas I, III y IV."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-19",
+        question: "19. Según el artículo 103.3 del Decreto 208/1997 de 9 de septiembre, la implantación de las figuras de uso público previstas en dicho artículo:",
+        options: [
+          "a) Requerirá siempre autorización previa de la Consejería competente en materia de medio ambiente, aunque se encuentre prevista en un instrumento de ordenación.",
+          "b) No requerirá autorización administrativa cuando se implante sobre un monte de titularidad pública.",
+          "c) Precisará autorización de la Consejería de Medio Ambiente, salvo que venga expresamente contemplada en algún instrumento de ordenación forestal o de espacios naturales protegidos aprobado por la misma.",
+          "d) Únicamente precisará autorización cuando implique la construcción de instalaciones permanentes."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-20",
+        question: "20. Conforme al artículo 43 de la Ley 42/2007, respecto de la propuesta de lugares que puedan ser declarados Zonas Especiales de Conservación, señale la respuesta CORRECTA:",
+        options: [
+          "a) La propuesta se elaborará exclusivamente por la Administración General del Estado y se someterá a audiencia de las comunidades autónomas.",
+          "b) La Administración General del Estado y las comunidades autónomas elaborarán, en sus respectivos ámbitos competenciales, una lista basada en los criterios del anexo II y en la información científica pertinente.",
+          "c) La Comisión Europea elaborará directamente las propuestas de lugares a partir de los datos remitidos por los Estados miembros.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3
+      },
+      {
+        id: "2-21",
+        question: "21. Según el artículo 37 del Reglamento Forestal de Andalucía, señale cuál de las siguientes actuaciones NO se corresponde con las tareas previstas para los voluntarios ambientales en el ámbito forestal:",
+        options: [
+          "a) La vigilancia preventiva de áreas forestales, el control de acceso o la vigilancia y control de áreas afectadas por incendios forestales, bajo coordinación y supervisión técnica de la Consejería de Medio Ambiente.",
+          "b) Las actividades de información y sensibilización sobre comportamientos de riesgo, así como la formación de personas cuya actividad se desarrolle en el medio natural.",
+          "c) El mantenimiento, conservación, mejora o restauración de áreas forestales, con especial atención a las de baja incidencia recreativa.",
+          "d) La colaboración en censos, vigilancia de hábitats y especies protegidas, señalización y mantenimiento de espacios naturales o conservación del litoral."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-22",
+        question: "22. De acuerdo con la definición recogida en la Estrategia de Acción para la Gestión del Uso Público en la RENPA, el uso público en un espacio natural protegido se refiere a:",
+        options: [
+          "a) Las actividades recreativas, turísticas y deportivas que se desarrollan exclusivamente en equipamientos gestionados directamente por la Administración ambiental.",
+          "b) El conjunto de actividades y prácticas relacionadas con el recreo, la cultura y la educación, apoyadas por programas, servicios e instalaciones, con independencia de quién los gestione.",
+          "c) Cualquier actividad desarrollada por los visitantes dentro de un espacio protegido, siempre que no implique aprovechamiento de recursos naturales.",
+          "d) Las actividades de información, interpretación y educación ambiental desarrolladas únicamente en centros de visitantes y puntos de información."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-23",
+        question: "23. De acuerdo con el artículo 3 del Decreto 95/2003, de 8 de abril, la Red de Espacios Naturales Protegidos de Andalucía se articula en tres ejes. Señale la combinación CORRECTA:",
+        options: [
+          "a) Aprovechamiento sostenible de los recursos, mejora del conocimiento científico de sus valores naturales y culturales e impulso de nuevas iniciativas de desarrollo.",
+          "b) Conservación estricta de los recursos, promoción turística y participación de las entidades locales.",
+          "c) Aprovechamiento sostenible de los recursos, educación ambiental y coordinación administrativa entre Estado y Comunidad Autónoma.",
+          "d) Investigación científica, restauración de ecosistemas y promoción económica de los municipios incluidos en espacios protegidos."
+        ],
+        correct: 0
+      },
+      {
+        id: "2-24",
+        question: "24. Según la Estrategia de Acción para la Gestión del Uso Público en la RENPA, considere las siguientes asociaciones:\nI. Mirador → equipamiento básico de uso público.\nII. Aula de la naturaleza → equipamiento básico de uso público.\nIII. Vía verde → equipamiento básico de uso público.\nIV. Jardín botánico → equipamiento complementario de uso público.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Son correctas únicamente I y II.",
+          "b) Son correctas únicamente II y III.",
+          "c) Son correctas únicamente I, II y IV.",
+          "d) Son correctas únicamente I, II y III."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-25",
+        question: "25. Según el Portal Ambiental de la Junta de Andalucía, el Programa de Fomento del Voluntariado en Espacios Naturales Protegidos de Andalucía está financiado:",
+        options: [
+          "a) Por el Fondo Europeo de Desarrollo Regional (FEDER), dentro de la línea RSO2.7.A del Programa FEDER de Andalucía 2021-2027.",
+          "b) Por el Fondo Social Europeo Plus (FSE+), dentro de la línea RSO2.7.A del Programa de Andalucía 2021-2027.",
+          "c) Por el Fondo Europeo de Desarrollo Regional (FEDER), dentro de la línea RSO2.7 del Programa FEDER de Andalucía 2021-2025.",
+          "d) Conjuntamente por el FEDER y el Fondo Social Europeo Plus, dentro del Programa de Andalucía 2021-2027."
+        ],
+        correct: 0
+      },
+      {
+        id: "2-26",
+        question: "26. En relación con la Estrategia Andaluza de Educación Ambiental (EAdEA), señale la respuesta INCORRECTA:",
+        options: [
+          "a) Fue concebida como marco general de referencia para el desarrollo de programas y actuaciones dirigidos a los diferentes contextos sociales de la población andaluza.",
+          "b) Su elaboración comenzó en febrero de 2001 mediante un proceso participativo.",
+          "c) Fue incorporada al Plan de Medio Ambiente de Andalucía 2004-2010.",
+          "d) Su finalidad general consistía exclusivamente en mejorar el conocimiento de los recursos naturales, sin comprender objetivos relacionados con la participación ciudadana o la calidad de vida."
+        ],
+        correct: 3
+      },
+      {
+        id: "2-27",
+        question: "27. De acuerdo con el artículo 3 de la Ley 3/2017, de 2 de mayo, de regulación de los senderos de la Comunidad Autónoma de Andalucía, constituye uno de los objetivos que deberán perseguir los poderes públicos andaluces:",
+        options: [
+          "a) Homogeneizar la señalización exclusivamente de los senderos declarados de uso deportivo por la Junta de Andalucía.",
+          "b) Homogeneizar la señalización de todas las vías y caminos aptos para la práctica del senderismo deportivo, armonizándola con la vigente en el resto de las comunidades autónomas.",
+          "c) Establecer un sistema de señalización propio de Andalucía incompatible con los utilizados por otras comunidades autónomas.",
+          "d) Reservar la señalización normalizada únicamente para los senderos incluidos en espacios naturales protegidos."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-28",
+        question: "28. Respecto de la planificación del uso público establecida en la Estrategia de Acción para la Gestión del Uso Público en la RENPA, considere las siguientes afirmaciones:\nI. La planificación, seguimiento, evaluación y ajuste de los Programas deberán basarse en procesos participativos entre los sectores involucrados.\nII. La ordenación del uso público deberá basarse también en la capacidad del territorio para acogerlo, pudiendo ser necesarios estudios específicos sobre sus potencialidades y limitaciones.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Solo la afirmación I es correcta.",
+          "b) Solo la afirmación II es correcta.",
+          "c) Ambas afirmaciones son correctas.",
+          "d) Ambas afirmaciones son incorrectas."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-29",
+        question: "29. Conforme al artículo 6 de la Orden de 20 de marzo de 2003, señale la afirmación CORRECTA:",
+        options: [
+          "a) La relación nominal de directores técnicos y monitores deberá remitirse directamente a la Delegación Provincial de la Consejería de Medio Ambiente.",
+          "b) Las incorporaciones o sustituciones del director técnico o de los monitores podrán comunicarse después de hacerse efectivas, siempre que se haga dentro de los diez días siguientes.",
+          "c) La Delegación Provincial de la Consejería de Turismo y Deporte dará traslado, en el plazo de diez días desde su recepción, a la respectiva Delegación Provincial de la Consejería de Medio Ambiente de la información relativa a la empresa, las actividades y el lugar donde pretendan desarrollarse.",
+          "d) El plazo de diez días previsto en el artículo 6 se refiere a la comunicación por la empresa de cualquier cambio de lugar en que se desarrolle la actividad."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-30",
+        question: "30. Según el artículo 49 de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y de la Biodiversidad, la descatalogación total o parcial de un espacio incluido en la Red Natura 2000:",
+        options: [
+          "a) Podrá proponerse cuando existan razones socioeconómicas de interés público suficientemente justificadas.",
+          "b) Podrá acordarse por la Comunidad Autónoma cuando hayan desaparecido las circunstancias que motivaron su declaración, sin necesidad de intervención de la Comisión Europea.",
+          "c) Solo podrá proponerse cuando la justifiquen cambios provocados por la evolución natural, científicamente demostrada y reflejada en los resultados del seguimiento.",
+          "d) Únicamente podrá efectuarse transcurridos diez años desde su declaración como espacio protegido Red Natura 2000."
+        ],
+        correct: 2
+      },
+      {
+        id: "2-31",
+        question: "31. En relación con las actuaciones sobre los equipamientos de uso público recogidas en el Portal Ambiental de la Junta de Andalucía, señale la respuesta CORRECTA:",
+        options: [
+          "a) La mejora de la red persigue fundamentalmente incrementar el número de visitantes de los espacios protegidos.",
+          "b) Entre las actuaciones desarrolladas se encuentra la supresión de infraestructuras que puedan representar un riesgo para la conservación de la biodiversidad y el paisaje.",
+          "c) Las actuaciones para prevenir la erosión se limitan a la mejora del firme de los senderos.",
+          "d) La adaptación de equipamientos para personas con discapacidad constituye una obligación que debe ejecutarse necesariamente en todas las actuaciones de modernización."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-32",
+        question: "32. Según el Manual de Señalización de Uso Público, aprobado mediante Orden de 6 de junio de 2005, respecto de la SEÑAL DE ENTRADA, señale la respuesta CORRECTA:",
+        options: [
+          "a) Podrá incorporar información sobre equipamientos, normas de uso y principales centros de interés del espacio protegido.",
+          "b) No contendrá información distinta de la identidad corporativa de la Junta de Andalucía y del Espacio Natural.",
+          "c) El formato mayor se utilizará con carácter general para Parques Naturales, Parajes Naturales y Reservas Naturales, independientemente de la vía de acceso.",
+          "d) El formato menor se reserva exclusivamente para espacios protegidos cuya superficie sea inferior a la establecida reglamentariamente."
+        ],
+        correct: 1
+      },
+      {
+        id: "2-33",
+        question: "33. Según la Estrategia de Acción para la Gestión del Uso Público en la RENPA, señale la respuesta CORRECTA en relación con la aprobación de los Programas de Uso Público:",
+        options: [
+          "a) Los Programas de los espacios protegidos son aprobados por Resolución del Director General de la Red de Espacios Naturales Protegidos y Servicios Ambientales, previo informe de la Junta Rectora correspondiente; los de ámbito provincial son aprobados por el Consejo de Dirección de la Consejería de Medio Ambiente.",
+          "b) Tanto los Programas específicos como los provinciales son aprobados mediante Orden de la persona titular de la Consejería competente en materia de medio ambiente.",
+          "c) Los Programas específicos son aprobados por las Juntas Rectoras y los provinciales por el Delegado Provincial correspondiente.",
+          "d) Los Programas específicos y provinciales son aprobados por el Director General competente, aunque los primeros requieren informe previo de la Junta Rectora."
+        ],
+        correct: 0
+      }
+    ];
+
+    const b3Data = [
+      {
+        id: "3-1",
+        question: "1. Conforme al artículo 43 de la Ley 42/2007, desde el momento en que se envía al Ministerio competente la lista de espacios propuestos como LIC para su traslado a la Comisión Europea:",
+        options: [
+          "a) Los espacios quedan automáticamente declarados como ZEC.",
+          "b) Los espacios quedan sujetos a un régimen de protección preventiva que garantice que no se produzca una merma del estado de conservación de sus hábitats y especies.",
+          "c) Se suspende cualquier aprovechamiento de los recursos naturales hasta que la Comisión Europea adopte una decisión.",
+          "d) Los espacios adquieren la condición definitiva de espacio protegido Red Natura 2000 durante un plazo máximo de seis años."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-2",
+        question: "2. Según la información del Portal Ambiental de la Junta de Andalucía, ¿cuál de las siguientes afirmaciones sobre los equipamientos de educación es INCORRECTA?",
+        options: [
+          "a) El aula de la naturaleza está destinada a fines educativos y en ella se desarrollan programas de formación y educación ambiental durante estancias cortas.",
+          "b) El jardín botánico consiste en una colección al aire libre de plantas cultivadas autóctonas, amenazadas y/o de interés etnobotánico.",
+          "c) Los parques de fauna silvestre tienen como finalidad la preservación de la fauna de nuestros montes y la educación y sensibilización ambiental.",
+          "d) Los ecomuseos se clasifican como equipamientos de educación por tener entre sus finalidades mostrar al visitante el patrimonio ambiental y cultural."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-3",
+        question: "3. De acuerdo con el artículo 103 del Decreto 208/1997, de 9 de septiembre, señale la asociación CORRECTA entre figura de uso público y finalidad:",
+        options: [
+          "a) Adecuación recreativa: proporcionar servicios básicos a los usuarios recreativos del monte, pudiendo incluir suministro de agua, servicios higiénicos, mesas, asientos o estacionamiento de vehículos.",
+          "b) Parque forestal: destinado esencialmente a fines educativos y compuesto por instalaciones destinadas a albergar los usos propuestos.",
+          "c) Aula de la naturaleza: espacio destinado principalmente a permitir la instalación temporal de tiendas de campaña.",
+          "d) Sendero: espacio forestal de extensión suficiente para permitir múltiples actividades y dotado necesariamente de infraestructuras recreativas complejas."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-4",
+        question: "4. Según los apartados 5 y 6 del artículo 46 de la Ley 42/2007, cuando la evaluación de repercusiones de un proyecto sobre un espacio Red Natura 2000 resulte negativa, no existan soluciones alternativas y el lugar albergue un hábitat natural o una especie prioritaria, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Podrán alegarse razones relacionadas con la salud humana y la seguridad pública.",
+          "b) Podrán alegarse consecuencias positivas de primordial importancia para el medio ambiente.",
+          "c) Podrán alegarse cualesquiera razones imperiosas de interés público de primer orden de naturaleza económica o social, sin necesidad de intervención de la Comisión Europea.",
+          "d) Podrán alegarse otras razones imperiosas de interés público de primer orden, previa consulta a la Comisión Europea."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-5",
+        question: "5. Según la clasificación establecida en la Estrategia de Acción para la Gestión del Uso Público en la RENPA, ¿cuál de los siguientes grupos está integrado EXCLUSIVAMENTE por equipamientos básicos de uso público?",
+        options: [
+          "a) Centro de visitantes, área recreativa, mirador y sendero señalizado.",
+          "b) Centro de visitantes, punto de información, observatorio de fauna silvestre y aula de la naturaleza.",
+          "c) Punto de información, carril cicloturístico, mirador y observatorio de fauna silvestre.",
+          "d) Centro de visitantes, ecomuseo, sendero señalizado y aula de la naturaleza."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-6",
+        question: "6. Conforme al artículo 10 de la Orden de 20 de marzo de 2003, la realización de una competición deportiva, prueba o exhibición organizada por una empresa de turismo activo en vías pecuarias, terrenos forestales o espacios naturales protegidos:",
+        options: [
+          "a) Será libre siempre que se realice por viales de la red pública de caminos no sometidos a restricción expresa.",
+          "b) Requerirá autorización del titular de la correspondiente Delegación Provincial de la Consejería de Medio Ambiente.",
+          "c) Solo requerirá autorización si se prevé una excesiva afluencia de visitantes.",
+          "d) Requerirá autorización únicamente cuando sea preciso instalar infraestructuras temporales destinadas a participantes o espectadores."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-7",
+        question: "7. De acuerdo con el Portal Ambiental de Andalucía, señale cuál de las siguientes afirmaciones describe correctamente el programa EDUCA BUS:",
+        options: [
+          "a) Es una iniciativa itinerante de sensibilización y educación ambiental destinada a acercar a la población los principios de la sostenibilidad y fomentar comportamientos responsables.",
+          "b) Es un programa permanente desarrollado exclusivamente en centros de visitantes de la RENPA.",
+          "c) Es una iniciativa formativa dirigida específicamente al personal técnico de las entidades locales.",
+          "d) Es un programa de asesoramiento ambiental destinado a pequeñas y medianas empresas."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-8",
+        question: "8. Según el artículo 49 de la Ley 42/2007, respecto del cambio de categoría de un espacio incluido en la Red Natura 2000, señale la respuesta CORRECTA:",
+        options: [
+          "a) La descatalogación podrá justificarse por razones económicas o sociales de interés general apreciadas por la Administración competente.",
+          "b) La descatalogación total solo podrá proponerse por evolución natural científicamente demostrada, pero la parcial podrá acordarse por razones de gestión.",
+          "c) La descatalogación total o parcial únicamente podrá proponerse cuando la justifiquen cambios derivados de la evolución natural, científicamente demostrados y reflejados en los resultados del seguimiento.",
+          "d) Una vez declarada una ZEC o ZEPA, su descatalogación queda prohibida en todo caso."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-9",
+        question: "9. Conforme al artículo 3 del Decreto 20/2002, de 29 de enero, ¿cuál de los siguientes supuestos NO tendrá la consideración de medio rural?",
+        options: [
+          "a) Un terreno situado a más de 1.500 metros de la playa en el que predominantemente se desarrollen actividades agrícolas, forestales o ganaderas.",
+          "b) Un establecimiento situado en diseminado.",
+          "c) Un terreno situado a una distancia igual o inferior a 1.500 metros desde la playa, calculada desde el límite interior de la ribera del mar.",
+          "d) Un espacio o paisaje natural situado en el interior, entendiendo por tal aquel localizado a más de 1.500 metros desde la playa."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-10",
+        question: "10. De acuerdo con la Estrategia de Acción para la Gestión del Uso Público en la RENPA, los Programas de Uso Público de ámbito provincial:",
+        options: [
+          "a) Comprenden exclusivamente los montes públicos no protegidos y las vías pecuarias existentes en la provincia.",
+          "b) Se elaborarán únicamente en aquellas provincias en las que existan espacios naturales protegidos sin Programa de Uso Público específico.",
+          "c) Constituyen la herramienta de ordenación y gestión de los espacios naturales protegidos de la provincia que carezcan de Programa de Uso Público específico, incluyendo además en su ámbito los montes públicos no protegidos y las vías pecuarias.",
+          "d) Sustituyen a los Programas de Uso Público específicos de los Parques Naturales cuando éstos se encuentren íntegramente dentro de una única provincia."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-11",
+        question: "11. Conforme al artículo 43 de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y de la Biodiversidad, una vez que las listas de Lugares de Importancia Comunitaria han sido aprobadas o ampliadas por la Comisión Europea, los LIC deberán ser declarados ZEC:",
+        options: [
+          "a) En el plazo máximo de dos años, previa aprobación del correspondiente PORN.",
+          "b) Lo antes posible y, como máximo, en el plazo de seis años, junto con la aprobación del correspondiente plan o instrumento de gestión.",
+          "c) En el plazo máximo de seis meses desde su aprobación por la Comisión Europea.",
+          "d) Sin sometimiento a plazo alguno, siempre que previamente se haya establecido un régimen de protección preventiva."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-12",
+        question: "12. Según el artículo 104 del Decreto 208/1997 de 9 de septiembre, respecto a la circulación de vehículos a motor en montes públicos, señale la respuesta CORRECTA:",
+        options: [
+          "a) Está permitida por vías pecuarias y cortafuegos siempre que la velocidad no supere los 40 km/h.",
+          "b) Está prohibida fuera de las vías expresamente previstas para dichos vehículos sin excepción alguna.",
+          "c) Se permite campo a través cuando sea necesaria para actividades recreativas autorizadas.",
+          "d) La prohibición general contempla excepciones cuando la circulación resulte imprescindible para el desarrollo de aprovechamientos forestales autorizados, la guardería forestal o la prestación de servicios públicos."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-13",
+        question: "13. Respecto a los objetivos del Programa de Fomento del Voluntariado en Espacios Naturales Protegidos de Andalucía, considere las siguientes afirmaciones:\nI. Fortalecer el tejido asociativo, especialmente las entidades de voluntariado vinculadas a los espacios naturales protegidos.\nII. Mejorar la colaboración entre las entidades sociales y las administraciones responsables de la gestión de los espacios naturales.\nIII. Orientar la acción voluntaria hacia las necesidades de conservación y gestión de los espacios naturales protegidos.\nIV. Apoyar exclusivamente proyectos de carácter ambiental, quedando fuera del programa los de carácter social, educativo o cultural.\nSeñale la opción CORRECTA:",
+        options: [
+          "a) I, II y III son correctas.",
+          "b) I, III y IV son correctas.",
+          "c) II y IV son correctas.",
+          "d) Todas son correctas."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-14",
+        question: "14. De acuerdo con la información de la Junta de Andalucía, ¿qué función se atribuye a la Red de Información Ambiental de Andalucía (REDIAM) en materia de educación y sensibilización?",
+        options: [
+          "a) Gestionar directamente los programas educativos desarrollados en los centros escolares andaluces.",
+          "b) Facilitar el acceso público al conocimiento ambiental mediante, entre otros recursos, el Portal Ambiental, catálogos, visores, estadísticas, indicadores y publicaciones.",
+          "c) Coordinar las actuaciones de educación ambiental que se desarrollan en los espacios naturales protegidos.",
+          "d) Elaborar y aprobar los programas de ámbito local en materia de sensibilización y educación para la sostenibilidad."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-15",
+        question: "15. De acuerdo con el artículo 46 de la Ley 42/2007, las medidas de conservación necesarias respecto de las ZEC y las ZEPA implicarán:",
+        options: [
+          "a) Exclusivamente la aprobación de planes de gestión específicos para cada espacio.",
+          "b) Adecuados planes o instrumentos de gestión y apropiadas medidas reglamentarias, administrativas o contractuales.",
+          "c) Necesariamente un Plan de Ordenación de los Recursos Naturales y un Plan Rector de Uso y Gestión.",
+          "d) Únicamente medidas administrativas y contractuales cuando el espacio afecte a terrenos de titularidad privada."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-16",
+        question: "16. Según el Manual de Señalización de Uso Público, aprobado mediante Orden de 6 de junio de 2005, en relación con las SEÑALES DIRECCIONALES, considere las siguientes afirmaciones:\nI. Como regla general no se situarán a más de 10 kilómetros de la instalación a la que dirigen.\nII. Excepcionalmente, cuando se trate de Centros de Visitantes y Puntos de Información, podrán situarse hasta 25 kilómetros de distancia.\nIII. Podrán disponer de un máximo de dos bandejas que, consideradas conjuntamente, contendrán como máximo tres líneas de información.\nIV. La distancia deberá indicarse siempre, aunque la instalación sea claramente visible desde la propia señal.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Son correctas únicamente I y II.",
+          "b) Son correctas únicamente I, II y III.",
+          "c) Son correctas únicamente II, III y IV.",
+          "d) Son correctas las cuatro afirmaciones."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-17",
+        question: "17. Según el artículo 36 del Reglamento Forestal de Andalucía, aprobado por Decreto 208/1997, de 9 de septiembre, ¿quiénes tienen la consideración de voluntarios ambientales en el ámbito forestal?",
+        options: [
+          "a) Las personas físicas o jurídicas que, individualmente o mediante asociaciones, desarrollen actuaciones de conservación de los recursos naturales sin ánimo de lucro.",
+          "b) Las personas físicas que desarrollen directamente actividades forestales de carácter altruista, con independencia de su integración o no en algún grupo o entidad.",
+          "c) Las personas físicas que, a través de grupos sociales, grupos locales de pronto auxilio o Agrupaciones de Defensa Forestal, desarrollen de forma libre, altruista y sin ánimo de lucro actividades de mejora del medio ambiente y conservación de los recursos naturales de Andalucía.",
+          "d) Las personas físicas integradas exclusivamente en Agrupaciones de Defensa Forestal que colaboren voluntariamente con la Administración Forestal."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-18",
+        question: "18. Conforme a los Anexos de la Orden de 20 de marzo de 2003, señale la afirmación CORRECTA:",
+        options: [
+          "a) Los quads están permitidos en los espacios naturales protegidos cuando circulen por caminos, pistas o carreteras de más de dos metros de ancho, salvo en Zonas de reserva (A).",
+          "b) La bicicleta de montaña está prohibida en todos los senderos existentes dentro de los espacios naturales protegidos.",
+          "c) En los espacios naturales protegidos están prohibidos el heliesquí, la heliexcursión, el paracaidismo y el vuelo con ultraligero, mientras que determinadas actividades de vuelo sin motor están sometidas a autorización.",
+          "d) En terrenos forestales, la escalada se encuentra prohibida con carácter general, salvo autorización expresa para la apertura de nuevas vías."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-19",
+        question: "19. La Estrategia de Acción para la Gestión del Uso Público en los espacios naturales protegidos de Andalucía se fundamenta en cinco principios. ¿Cuál de las siguientes asociaciones es INCORRECTA?",
+        options: [
+          "a) Vinculación a la estrategia de la RENPA → integración del uso público dentro del enfoque sistémico de la Red.",
+          "b) Contribución al turismo rural sostenible → orientación ambiental de su desarrollo y colaboración con los agentes implicados.",
+          "c) Aporte al desarrollo económico local → participación de los grupos locales e incentivos para la acción local.",
+          "d) Interacción con el visitante → priorización de la rentabilidad económica de los equipamientos frente a las funciones educativas y de comunicación."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-20",
+        question: "20. Según el artículo 44 de la Ley 42/2007 de 13 de diciembre, en relación con la declaración de las Zonas de Especial Protección para las Aves, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Se tendrán en cuenta las especies de aves incluidas en el anexo IV de la Ley.",
+          "b) También se considerarán las aves migratorias de presencia regular en España.",
+          "c) Para las especies migratorias se prestará particular importancia a las zonas húmedas y, especialmente, a las de importancia internacional.",
+          "d) Únicamente podrán declararse ZEPA espacios terrestres, quedando excluidos el medio marino, la zona económica exclusiva y la plataforma continental."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-21",
+        question: "21. Conforme al artículo 102 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, ¿cuál de las siguientes actividades tendría la consideración de uso público a los efectos de dicho Reglamento?",
+        options: [
+          "a) Una actividad que lleve aparejada la realización de un aprovechamiento forestal de los previstos en el artículo 94.",
+          "b) Una actividad que suponga la ocupación de terrenos forestales.",
+          "c) Una actividad cuya realización precise previamente de una concesión administrativa.",
+          "d) Una actividad recreativa que no implique aprovechamiento forestal, ocupación del terreno ni precise autorización o concesión administrativa previa."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-22",
+        question: "22. Respecto de la Estrategia Andaluza de Educación Ambiental (EAdEA), considere las siguientes afirmaciones:\nI. Su elaboración comenzó en 2001 y posteriormente fue incorporada al Plan de Medio Ambiente de Andalucía 2004-2010.\nII. La ficha actualmente publicada por la Junta de Andalucía le atribuye un período de vigencia comprendido entre 2004 y 2010.\nIII. Aunque conserva valor como antecedente y documento de referencia publicado en el Catálogo REDIAM, no debe presentarse actualmente como una estrategia temporalmente vigente.\nIV. Los actuales Programas de Educación para la Sostenibilidad de la Consejería constituyen simplemente la prolongación temporal de la EAdEA y, por tanto, forman parte de su período de vigencia.\nSeñale la respuesta CORRECTA:",
+        options: [
+          "a) Son correctas únicamente I y II.",
+          "b) Son correctas únicamente II y III.",
+          "c) Son correctas I, II y III.",
+          "d) Son correctas las cuatro afirmaciones."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-23",
+        question: "23. De acuerdo con la clasificación funcional de los equipamientos recogida en el Portal Ambiental de la Junta de Andalucía, señale la única secuencia en la que TODOS los emparejamientos son correctos:",
+        options: [
+          "a) Ecomuseo-recepción / Carril cicloturista-interpretación / Área recreativa-recreo / Refugio-vivac-alojamiento.",
+          "b) Ecomuseo-interpretación / Carril cicloturista-recreo / Área recreativa-recepción / Refugio-vivac-alojamiento.",
+          "c) Ecomuseo-recepción / Carril cicloturista-interpretación / Área recreativa-alojamiento / Refugio-vivac-recreo.",
+          "d) Ecomuseo-educación / Carril cicloturista-interpretación / Área recreativa-recreo / Refugio-vivac-recepción."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-24",
+        question: "24. Según el artículo 67 de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía, en relación con el desarrollo del uso público, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Las actividades de uso público se realizarán preferentemente en equipamientos especialmente diseñados y acondicionados para tal fin.",
+          "b) La Consejería competente en materia forestal fomentará la compatibilidad del uso público únicamente con los usos recreativos y turísticos del monte.",
+          "c) Se fomentará especialmente la compatibilidad con el ecoturismo atendiendo a su relevancia económica, social y medioambiental.",
+          "d) Los montes que cuenten con una oferta destacable de equipamientos y servicios de uso público podrán integrarse en la Red Muestra."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-25",
+        question: "25. Según el Portal Ambiental de Andalucía, ¿cuál de las siguientes asociaciones entre línea de actuación y programa o iniciativa es CORRECTA?",
+        options: [
+          "a) Residuos y economía circular - Educa Bus.",
+          "b) Empresas y sectores profesionales - Kit Sostenible.",
+          "c) Cambio climático y riesgos naturales - Red REVERSA.",
+          "d) Medio natural - RECAPACICLA."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-26",
+        question: "26. Conforme a la Estrategia de Acción para la Gestión del Uso Público en la RENPA, respecto de la coordinación de la elaboración de los Programas de Uso Público, señale la respuesta CORRECTA:",
+        options: [
+          "a) Los correspondientes a un espacio protegido serán coordinados por el Delegado Provincial, y los conjuntos entre varias provincias por el Director General de la RENPA.",
+          "b) Los correspondientes a espacios protegidos serán coordinados por el Jefe de Servicio de la RENPA de la Delegación Provincial correspondiente; si el Programa conjunto comprende espacios de distintas provincias, la coordinación corresponde al Jefe de Servicio de Equipamiento y Uso Público.",
+          "c) Todos los Programas de Uso Público, cualquiera que sea su ámbito, serán coordinados por el Jefe de Servicio de Equipamiento y Uso Público.",
+          "d) La coordinación corresponde a la Junta Rectora de cada espacio, salvo que se trate de programas provinciales."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-27",
+        question: "27. En relación con el Programa de Fomento del Voluntariado en Espacios Naturales Protegidos de Andalucía, actualmente vigente según el Portal Ambiental, señale la respuesta CORRECTA:",
+        options: [
+          "a) Tiene por objeto promover las acciones de voluntariado que se desarrollen exclusivamente dentro de los límites territoriales de los espacios naturales protegidos.",
+          "b) Está dirigido fundamentalmente a personas voluntarias que actúan de manera individual, aunque puedan colaborar ocasionalmente con entidades sin ánimo de lucro.",
+          "c) Su objeto principal es financiar actuaciones materiales de restauración ambiental desarrolladas por las Administraciones responsables de los espacios naturales.",
+          "d) Tiene por objeto promover y apoyar las acciones de voluntariado realizadas por entidades de voluntariado sin ánimo de lucro en los espacios naturales protegidos de Andalucía y en sus áreas de influencia socioeconómica."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-28",
+        question: "28. De acuerdo con el artículo 42 de la Ley 42/2007, de 13 de diciembre, en la gestión de los espacios integrantes de la Red Natura 2000 se tendrán en cuenta:",
+        options: [
+          "a) Exclusivamente las exigencias ecológicas y las particularidades regionales.",
+          "b) Las exigencias ecológicas, económicas, sociales y culturales, así como las particularidades regionales y locales.",
+          "c) Las exigencias ecológicas y económicas, siempre que resulten compatibles con los correspondientes planes autonómicos.",
+          "d) Las exigencias ecológicas, sociales y territoriales, excluyéndose las consideraciones de carácter económico."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-29",
+        question: "29. Conforme a la información recogida en el Portal Ambiental de la Junta de Andalucía, señale cuál de las siguientes definiciones corresponde a un REFUGIO-VIVAC:",
+        options: [
+          "a) Estructura techada destinada a facilitar el descanso o pernoctación durante uno o varios días, generalmente situada en itinerarios de difícil práctica.",
+          "b) Espacio delimitado y acondicionado para instalar tiendas de campaña durante breves períodos de tiempo.",
+          "c) Refugio muy simple, techado pero no necesariamente cerrado, destinado a posibilitar una estancia breve y/o la pernocta durante una noche en condiciones básicas de confort.",
+          "d) Instalación de alojamiento permanente situada en zonas montañosas o aisladas."
+        ],
+        correct: 2
+      },
+      {
+        id: "3-30",
+        question: "30. Conforme al artículo 9 del Decreto 67/2018, de 20 de mayo, respecto de la señalización de los senderos de uso deportivo, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Una variante es un trazado que se separa de un sendero y retorna posteriormente a él, utilizando la señalización propia del sendero del que parte.",
+          "b) Una derivación es un tramo señalizado que parte de un sendero GR o PR y permite acceder a un elemento cercano de interés, utilizando la misma señalización que el sendero principal o variante de procedencia.",
+          "c) Un enlace es un recorrido señalizado destinado a unir distintos tipos de senderos.",
+          "d) Cuando un sendero de uso deportivo discurra por un espacio natural protegido, prevalecerá la señalización deportiva establecida por la Federación Andaluza de Montañismo, sin que sea necesario adaptarla al Manual de Señalización de Espacios Naturales de Andalucía."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-31",
+        question: "31. De acuerdo con el Manual de Señalización de Uso Público, en relación con la orientación cartográfica del MAPA DE USO PÚBLICO y de la SEÑAL DE INICIO DE ITINERARIO, señale la respuesta CORRECTA:",
+        options: [
+          "a) Tanto el mapa de uso público como el mapa de la señal de inicio de itinerario deberán orientarse siempre hacia el norte geográfico.",
+          "b) El mapa de uso público se orientará siempre hacia el norte, mientras que el de la señal de inicio de itinerario se orientará según el sentido de la marcha, especificándose el norte geográfico y admitiéndose una excepción cuando el trazado tenga dirección general norte-sur y sentido sur.",
+          "c) El mapa de uso público se orientará según la posición del visitante, mientras que el mapa de inicio de itinerario deberá orientarse necesariamente al norte.",
+          "d) Ambos mapas se orientarán según el sentido de avance del visitante, salvo cuando resulte imposible determinarlo."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-32",
+        question: "32. Conforme al artículo 4 del Decreto 95/2003, de 8 de abril, respecto del Registro de la Red de Espacios Naturales Protegidos de Andalucía, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Tiene carácter público y administrativo.",
+          "b) Depende de la Consejería competente en materia de medio ambiente.",
+          "c) Está adscrito a la Dirección General con competencias en materia de la Red de Espacios Naturales Protegidos.",
+          "d) Su finalidad exclusiva es certificar la existencia de datos y documentos contenidos en él."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-33",
+        question: "33. De acuerdo con las funciones atribuidas a los equipamientos de uso público por el Portal Ambiental de la Junta de Andalucía, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Canalizar los flujos de visitantes para mejorar la utilización del espacio y disminuir los impactos sobre el territorio.",
+          "b) Fomentar la participación del público en la planificación y gestión de los espacios naturales.",
+          "c) Facilitar información sobre el patrimonio natural y cultural, la normativa de uso, los recursos disponibles y las actividades que pueden desarrollarse.",
+          "d) Concentrar las actividades de los visitantes principalmente en los equipamientos, limitando el acceso al resto del espacio natural protegido."
+        ],
+        correct: 3
+      },
+      {
+        id: "3-34",
+        question: "34. De acuerdo con la normativa ambiental andaluza, los Planes de Ordenación de Recursos Naturales (PORN) se caracterizan por ser:",
+        options: [
+          "a) Instrumentos exclusivamente informativos sin vigencia vinculante.",
+          "b) Instrumentos de planificación con carácter obligatorio y vinculante para cualquier actuación o aprovechamiento dentro del espacio.",
+          "c) Documentos marco de carácter únicamente promocional.",
+          "d) Planes aplicables únicamente a montes públicos de titularidad municipal."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-35",
+        question: "35. En relación con el régimen de competencias medioambientales, las Comunidades Autónomas pueden dictar normas para:",
+        options: [
+          "a) Reducir el nivel de protección de la legislación básica estatal.",
+          "b) Establecer normas adicionales de protección más estrictas que las estatales.",
+          "c) Omitir las Directivas Comunitarias de aplicación directa.",
+          "d) Modificar unilateralmente acuerdos internacionales ratificados por el Estado."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-36",
+        question: "36. La declaración de un Parque Natural en Andalucía exige la elaboración previa o simultánea de:",
+        options: [
+          "a) Un Plan de Ordenación de los Recursos Naturales (PORN).",
+          "b) Un programa sectorial de transporte público exclusivamente.",
+          "c) Una memoria descriptiva firmada únicamente por el ayuntamiento del municipio con mayor población.",
+          "d) Un censo exclusivo de la flora en peligro de extinción sin contemplar la fauna."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-37",
+        question: "37. El órgano de participación social propio de los Parques Naturales en Andalucía se denomina:",
+        options: [
+          "a) Patronato de Infraestructuras.",
+          "b) Junta Rectora.",
+          "c) Comisión de Explotación Agrícola.",
+          "d) Consejo de Turismo Sostenible."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-38",
+        question: "38. Según la legislación de la Red Natura 2000, un Lugar de Importancia Comunitaria (LIC) pasa a ser definitivamente:",
+        options: [
+          "a) Zona de Reserva Forestal.",
+          "b) Zona Especial de Conservación (ZEC).",
+          "c) Parque Periurbano.",
+          "d) Reserva de Caza."
+        ],
+        correct: 1
+      },
+      {
+        id: "3-39",
+        question: "39. La gestión de las Zonas de Especial Protección para las Aves (ZEPA) requiere garantizar medidas para evitar:",
+        options: [
+          "a) El deterioro de los hábitats de las especies y las perturbaciones significativas a las aves que motivaron su declaración.",
+          "b) La entrada de cualquier persona física sin permiso escrito diario.",
+          "c) Toda actividad ganadera extensiva tradicional.",
+          "d) El paso de aves migratorias fuera de la época estival."
+        ],
+        correct: 0
+      },
+      {
+        id: "3-40",
+        question: "40. Las Áreas Recreativas se caracterizan principalmente dentro de los equipamientos de uso público por:",
+        options: [
+          "a) Ofrecer instalaciones destinadas prioritariamente al descanso y consumo de alimentos en estancia diurna.",
+          "b) Proveer alojamiento continuado durante semanas.",
+          "c) Albergar centros exclusivos para la investigación técnica especializada.",
+          "d) Ser áreas de reserva estricta sin acceso permitido."
+        ],
+        correct: 0
+      }
+    ];
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      if (selected === 'all') {
+        activeData = [...b1Data, ...b2Data, ...b3Data];
+        document.getElementById('test-title').textContent = "TEMA 17 UNIFICADO: RENPA, RED NATURA 2000 Y USO PÚBLICO (105 PREGUNTAS)";
+      } else if (selected === 'b1') {
+        activeData = [...b1Data];
+        document.getElementById('test-title').textContent = "BLOQUE 1: TEST 18-1 (32 PREGUNTAS)";
+      } else if (selected === 'b2') {
+        activeData = [...b2Data];
+        document.getElementById('test-title').textContent = "BLOQUE 2: TEST 18-2 (33 PREGUNTAS)";
+      } else if (selected === 'b3') {
+        activeData = [...b3Data];
+        document.getElementById('test-title').textContent = "BLOQUE 3: TEST 18-3 (40 PREGUNTAS)";
+      }
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La opción correcta era la ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = answeredCount > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar por defecto en Unificado
+    changeBlock();
+  </script>
+</body>
+</html>
