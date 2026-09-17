@@ -255,6 +255,23 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
     }
+
+    /* Botón Reiniciar Progreso */
+    .btn-reset {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-reset:hover, .btn-reset:active {
+      background-color: #dc2626;
+    }
   </style>
 </head>
 <body>
@@ -262,6 +279,9 @@
   <header>
     <div class="box">
         <a href="index.html" class="btn-volver">← Volver</a>
+    </div>
+    <div class="box">
+      <button type="button" onclick="resetTopicStats()" class="btn-reset">🗑️ Reiniciar Progreso</button>
     </div>
     <div class="selector-box">
       <select id="block-select" onchange="changeBlock()">
@@ -296,6 +316,67 @@
       <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
     </div>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  
+    // Configuración de tu proyecto en Firebase
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+  
+    // ⚠️ CAMBIAR ESTE NÚMERO SEGÚN EL TEMA (17, 18, 19, etc.)
+    const CURRENT_TOPIC_ID = 18;
+  
+    // Guardar nota e intentos en Firebase
+    window.saveTestResults = async function(scoreNum) {
+      if (window.testSavedForThisSession) return;
+      window.testSavedForThisSession = true;
+  
+      try {
+        const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+        const snapshot = await get(topicRef);
+        const data = snapshot.val() || {};
+  
+        const newAttempts = (data.attempts || 0) + 1;
+        const currentBest = data.bestScore || 0;
+        const newBest = Math.max(currentBest, parseFloat(scoreNum.toFixed(1)));
+  
+        await set(topicRef, {
+          attempts: newAttempts,
+          bestScore: newBest
+        });
+      } catch (e) {
+        console.error("Error guardando en Firebase:", e);
+      }
+    };
+  
+    // Borrar historial de este tema en la nube
+    window.resetTopicStats = async function() {
+      if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${CURRENT_TOPIC_ID} en la nube?`)) {
+        try {
+          const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+          await remove(topicRef);
+          alert('Progreso borrado en la nube.');
+          location.reload();
+        } catch (e) {
+          alert('Error al intentar borrar el progreso.');
+        }
+      }
+    };
+  </script>
 
   <script>
     const quizBlocks = {
@@ -958,12 +1039,17 @@
 
     function updateStats() {
       document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
-      
+    
       const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
       document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
-
-      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
-      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    
+      const numericScore = activeData.length > 0 ? (correctCount / activeData.length) * 10 : 0;
+      document.getElementById('score').textContent = `⭐ ${numericScore.toFixed(2)}/10`;
+    
+      // Guardar en Firebase cuando se responde la última pregunta
+      if (answeredCount > 0 && answeredCount === activeData.length && typeof window.saveTestResults === 'function') {
+        window.saveTestResults(numericScore);
+      }
     }
 
     function resetQuiz() {
