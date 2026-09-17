@@ -1,0 +1,160 @@
+====================================================================
+ GUÍA DE INTEGRACIÓN DE FUNCIONALIDADES EXTRA PARA TEST (FIREBASE + UI)
+====================================================================
+
+Guarda estos bloques de código en tus archivos de test (ej. tema1.html, tema2.html, etc.).
+
+--------------------------------------------------------------------
+1. CABECERA <header>: Botón Volver + Botón Reiniciar Progreso
+--------------------------------------------------------------------
+Ubicación: Dentro de la etiqueta <header>, justo al principio.
+
+  <header>
+    <div class="box">
+        <a href="index.html" class="btn-volver">← Volver</a>
+    </div>
+    <div class="box">
+      <button type="button" onclick="resetTopicStats()" class="btn-reset">🗑️ Reiniciar Progreso</button>
+    </div>
+
+    <!-- Resto de elementos de tu header original (selectores, temporizador, nota...) -->
+  </header>
+
+
+--------------------------------------------------------------------
+2. ESTILOS CSS
+--------------------------------------------------------------------
+Ubicación: Dentro de la etiqueta <style> del <head>.
+
+    /* Botón Volver */
+    .box, .btn-volver {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #2e7d32;
+      color: #ffffff !important;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1b5e20;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+    
+    .box:hover, .box:active,
+    .btn-volver:hover, .btn-volver:active {
+      background-color: #1b5e20;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
+    }
+
+    /* Botón Reiniciar Progreso */
+    .btn-reset {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-reset:hover, .btn-reset:active {
+      background-color: #dc2626;
+    }
+
+
+--------------------------------------------------------------------
+3. MÓDULO SCRIPT DE FIREBASE
+--------------------------------------------------------------------
+Ubicación: Justo antes del script principal del test, cerca del final del <body>.
+Nota: Asegúrate de ajustar la constante CURRENT_TOPIC_ID al número del tema correspondiente.
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ⚠️ CAMBIAR ESTE NÚMERO SEGÚN EL TEMA (1, 2, 14, 17, etc.)
+    const CURRENT_TOPIC_ID = 17;
+
+    // Guardar nota e intentos en Firebase
+    window.saveTestResults = async function(scoreNum) {
+      if (window.testSavedForThisSession) return;
+      window.testSavedForThisSession = true;
+
+      try {
+        const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+        const snapshot = await get(topicRef);
+        const data = snapshot.val() || {};
+
+        const newAttempts = (data.attempts || 0) + 1;
+        const currentBest = data.bestScore || 0;
+        const newBest = Math.max(currentBest, parseFloat(scoreNum.toFixed(1)));
+
+        await set(topicRef, {
+          attempts: newAttempts,
+          bestScore: newBest
+        });
+      } catch (e) {
+        console.error("Error guardando en Firebase:", e);
+      }
+    };
+
+    // Borrar historial de este tema en la nube
+    window.resetTopicStats = async function() {
+      if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${CURRENT_TOPIC_ID} en la nube?`)) {
+        try {
+          const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+          await remove(topicRef);
+          alert('Progreso borrado en la nube.');
+          location.reload();
+        } catch (e) {
+          alert('Error al intentar borrar el progreso.');
+        }
+      }
+    };
+  </script>
+
+
+--------------------------------------------------------------------
+4. FUNCIÓN updateStats() PARA ENVIAR EL PROGRESO
+--------------------------------------------------------------------
+Ubicación: Dentro de tu <script> principal de lógica de preguntas/respuestas.
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const numericScore = activeData.length > 0 ? (correctCount / activeData.length) * 10 : 0;
+      document.getElementById('score').textContent = `⭐ ${numericScore.toFixed(2)}/10`;
+
+      // Guardar en Firebase automáticamente al responder la última pregunta
+      if (answeredCount > 0 && answeredCount === activeData.length && typeof window.saveTestResults === 'function') {
+        window.saveTestResults(numericScore);
+      }
+    }

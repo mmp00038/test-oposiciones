@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Multibloque - Tema 15: Incendios Forestales</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Header Fijo Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Ver todo el tema 15 (47 preguntas)</option>
+        <option value="t15_1">Bloque 1: Test 15.1 (24 preguntas)</option>
+        <option value="t15_2">Bloque 2: Test 15.2 (23 preguntas)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 15: INCENDIOS FORESTALES</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const quizBlocks = {
+      "t15_1": [
+        {
+          "question": "1. Usted se encuentra en una torre de vigilancia y observa a lo lejos una columna de humo blanco que sale de alguna zona del monte. Usted comunica inmediatamente los hechos indicando que, según su color, la vegetación que está ardiendo será:",
+          "options": ["a) Matorral ligero", "b) Pastos y hierbas", "c) Arbolado joven", "d) Pinares"],
+          "correct": 1
+        },
+        {
+          "question": "2. El director técnico de extinción decide la realización de una quema de ensanche. Indique la respuesta correcta acerca de éstas:",
+          "options": ["a) Se trata de un método de ataque directo", "b) Se trata de un contrafuego de pequeño tamaño", "c) Se crea un frente de llama que avanzará en dirección al incendio", "d) Su finalidad es aumentar la zona sin combustible en una línea de defensa"],
+          "correct": 3
+        },
+        {
+          "question": "3. Según la terminología sobre incendios forestales, hablamos de fuego estabilizado:",
+          "options": ["a) Cuando el incendio no propaga más allá de las líneas de control establecidas", "b) El incendio propaga, pero la evolución es favorable con visos de control próximos", "c) El incendio está apagado, no tiene llama ni humo", "d) Ninguna de las respuestas anteriores es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "4. ¿Cuál de las siguientes afirmaciones sobre los extintores de mochila NO es CORRECTA?",
+          "options": ["a) Se trata de un depósito que puede ser rígido o flexible", "b) Tiene una capacidad aproximada de 17 litros", "c) Se utiliza únicamente en ataque directo sobre frentes débiles, fuegos incipientes o de combustibles ligeros", "d) Todas las respuestas anteriores son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "5. Cuando hablamos de Macleod nos estamos refiriendo a:",
+          "options": ["a) Hacha-azada", "b) Pala forestal, especialmente diseñada para excavar en tierra y posteriormente lanzarla contra llamas bajas y brasas", "c) Rastrillo-azada", "d) Azada que se utiliza en trabajos de apertura y limpieza de líneas de defensa."],
+          "correct": 2
+        },
+        {
+          "question": "6. Los vehículos nodriza abastecen in situ a los vehículos autobomba ligeros y pesados. Para ello cuentan un depósito de almacenamiento de agua de:",
+          "options": ["a) 20.000 litros", "b) 8.000 litros", "c) 11.000 litros", "d) 15.000 litros"],
+          "correct": 2
+        },
+        {
+          "question": "7. Las siglas UMMT se refieren a",
+          "options": ["a) Unidad móvil de meteorología y transmisiones", "b) Unidad de móvil de monitorización de incendios forestales", "c) Unidad de movilización de medios terrestres", "d) Ninguna de las respuestas anteriores es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "8. ¿Con cuántas de estas UMMT cuenta Andalucía actualmente?",
+          "options": ["a) 8, una por provincia", "b) 1, aportada por el Ministerio de Transición ecológica y reto demográfico", "c) 9, una por provincia excepto Jaén que cuenta con 2", "d) 7, una por provincia excepto en Almería, que no cuenta con ninguno"],
+          "correct": 2
+        },
+        {
+          "question": "9. ¿Con cuántos tipos de helicóptero cuenta Andalucía actualmente?",
+          "options": ["a) 5", "b) 4", "c) 6", "d) ninguna respuesta es correcta"],
+          "correct": 1
+        },
+        {
+          "question": "10. ¿Cuál de los siguientes helicópteros NO es un tipo de modelo con el que cuenta el Plan INFOCA en la actualidad?",
+          "options": ["a) Helicóptero ligero de transporte y extinción, que permite el desplazamiento de retenes de especialista (máximo 8 personas) y el lanzamiento de agua 900 litros de capacidad", "b) Helicóptero semipesado de transporte y extinción, que permite el desplazamiento de retenes de especialista (máximo 13 personas) y el lanzamiento de agua con helibalde de 1.300 litros de capacidad", "c) Helicóptero pesado, no habilitado para transporte de personal y con helibalde de 5.500 litros", "d) Las respuestas a y c son correctas"],
+          "correct": 3
+        },
+        {
+          "question": "11. ¿Con cuántos medios aéreos, aportados por la Junta de Andalucía, cuenta el Plan INFOCA, para desempeñar funciones de prevención y extinción de incendios forestales, en la actualidad?",
+          "options": ["a) 41, 14 aviones y 27 helicópteros", "b) 41, 17 aviones y 24 helicópteros", "c) 42, 15 aviones y 27 helicópteros", "d) 42, 13 aviones y 29 helicópteros"],
+          "correct": 1
+        },
+        {
+          "question": "12. La Brigada Especializada en Incendios Forestales cuenta con varias bases desplegadas por el territorio andaluz, ¿en qué provincias se encuentran estas bases?",
+          "options": ["a) Granada, Málaga y Sevilla", "b) Granada, Sevilla y Cádiz", "c) Sevilla, Málaga y Cádiz", "d) Granada, Málaga y Cádiz"],
+          "correct": 0
+        },
+        {
+          "question": "13. Podemos distinguir a los integrantes de la Brigada Especializada en Incendios Forestales por el color de su casco, éste será:",
+          "options": ["a) Blanco", "b) Amarillo", "c) Rojo", "d) Verde"],
+          "correct": 3
+        },
+        {
+          "question": "14. La escala Beaufort se utiliza para estimar la velocidad del viento cuando no contamos con aparatos de medida. ¿Cuántos niveles de viento recoge esta escala?",
+          "options": ["a) 13 niveles, que van del 0 al 12", "b) 12 niveles, que van del 1 al 12", "c) 8 niveles, que van del 1 al 8", "d) 9 niveles que van del 0 al 8"],
+          "correct": 0
+        },
+        {
+          "question": "15. ¿Cuál de las siguientes afirmaciones referentes a las inversiones térmicas en el fondo de valle y su repercusión es los incendios forestales es CORRECTA?",
+          "options": ["a) El fuego que se encuentra ardiendo en el fondo del valle lo hace con mucha intensidad", "b) El fuego que arde en el cinturón térmico lo hace con lentitud", "c) Cuando el sol comienza a incidir sobre las laderas el aire más frio del fondo del valle comienza a calentarse y a ascender, pudiendo provocar la rotura del cinturón térmico y liberando gran cantidad de gases y humo que pueden resultar muy peligrosos", "d) Todas las respuestas anteriores son correctas"],
+          "correct": 2
+        },
+        {
+          "question": "16. Según los modelos de combustible que se establecen en la clasificación de ROTHERMEL, el modelo que se describe como: matorral o plantación joven muy densa; de más de 2 m de altura; con ramas muertas en su interior, se corresponde con el modelo:",
+          "options": ["a) 4", "b) 5", "c) 6", "d) 7"],
+          "correct": 0
+        },
+        {
+          "question": "17. Según la clasificación de la vegetación por su carácter inflamable que realiza el INA, ¿cuál de las siguientes especies es muy inflamable en verano?",
+          "options": ["a) Thymus vulgaris", "b) Quercus ilex", "c) Quercus coccifera", "d) Pinus pinaster"],
+          "correct": 3
+        },
+        {
+          "question": "18. Desde hace unos años se está llevando a cabo un programa de pastoreo controlado aplicado a la mejora de los terrenos forestales. Indique cual de las siguientes afirmaciones acerca de este programa NO es CORRECTA:",
+          "options": ["a) Se puede desarrollar en cualquier monte andaluz que cuente con infraestructuras de prevención contra incendios (áreas cortafuegos)", "b) De le denomina RACPA", "c) Se actúa con mayor intensidad en la época de peligro bajo, que es cuando deben realizarse los trabajos preventivos en los montes", "d) Todas las respuestas anteriores son incorrectas"],
+          "correct": 3
+        },
+        {
+          "question": "19. ¿Cuál de los siguientes índices de riesgo se considera un riesgo estático?",
+          "options": ["a) Índice de riesgo meteorológico", "b) Índice de riesgo por estrés hídrico", "c) Índice de riesgo estructural", "d) Índice de riesgo por frecuencia de incendios"],
+          "correct": 2
+        },
+        {
+          "question": "20. El Índice de Calidad de los Sistemas Forestales se obtiene por la integración de 3 índices, obteniéndose un índice de Calidad Total. De este Índice de Calidad Total obtenemos diferentes rangos de calidad que se agrupan en:",
+          "options": ["a) Calidad total A (muy alta, de 7 a 9), B (alta, de 4 a 6), C (media, de 1 a 3) y D (baja 0)", "b) Calidad total A (alta, de 7 a 9), B (media, de 4 a 6) y C (baja, de 0 a 3)", "c) Calidad total A (alta, de 7 a 9), B (media, de 4 a 6) y C (baja, de 1 a 3) y D (muy baja 0)", "d) Calidad total A (muy alta, de 7 a 9), B (alta, de 4 a 6) y C (media, de 0 a 3)"],
+          "correct": 3
+        },
+        {
+          "question": "21. Con respecto al índice de riesgo meteorológico, indique la respuesta INCORRECTA:",
+          "options": ["a) Se trata de un índice predictivo y categórico", "b) Para la prevención y lucha contra incendios forestales Andalucía se divide en 14 regiones climáticas", "c) EI SIMA proporciona información acerca de la temperatura, humedad relativa y velocidad y dirección del viento a las 12 z", "d) El índice de riesgo meteorológico nos da información sobre la probabilidad de ignición y el índice de riesgo"],
+          "correct": 1
+        },
+        {
+          "question": "22. Dentro del riesgo por combustibilidad de las formaciones vegetales, ¿qué modelo de combustible es el que presenta un riesgo muy alto?",
+          "options": ["a) El modelo 5", "b) El modelo 2", "c) El modelo 4", "d) El modelo 7"],
+          "correct": 2
+        },
+        {
+          "question": "23. ¿Qué porcentaje de superficie forestal en Andalucía tiene una pendiente superior al 30% y por lo tanto presenta un riesgo por pendiente alto o muy alto?",
+          "options": ["a) Aproximadamente el 11%", "b) Aproximadamente el 15%", "c) Aproximadamente el 20%", "d) Aproximadamente el 25%"],
+          "correct": 0
+        },
+        {
+          "question": "24. Cuando nos referimos a grandes incendios nos encontramos ante siniestros que han arrasado una superficie superior a:",
+          "options": ["a) 1000 hectáreas", "b) 500 hectáreas", "c) 250 hectáreas", "d) 1500 hectáreas"],
+          "correct": 1
+        }
+      ],
+      "t15_2": [
+        {
+          "question": "1. De las siguientes causas que originan incendios forestales, ¿cuál es la que se da en un porcentaje más elevado?",
+          "options": ["a) Descuidos o negligencias", "b) Naturales", "c) Intencionadas", "d) Desconocidas"],
+          "correct": 2
+        },
+        {
+          "question": "2. ¿Cuál de las siguientes afirmaciones, acerca del antorcheo, es falsa?",
+          "options": ["a) Es aquel fuego que avanza como consecuencia de la propagación hacia las copas por continuidad vertical de un incendio de superficie.", "b) En el antorcheo la línea más adelantada del frente de llama corresponde a fuego de superficie mientras que la línea más atrasada a fuego de copas", "c) Ocurre de modo puntual y aisladamente, sube a copas y vuelve a bajar a superficie.", "d) La variable clave es la altura basal de la copa (distancia libre entre la rama basal y el suelo) y la altura de llama del fuego de superficie."],
+          "correct": 1
+        },
+        {
+          "question": "3. ¿De cuántas formas puede avanzar un incendio forestal?",
+          "options": ["a) 3", "b) 4", "c) 5", "d) 6"],
+          "correct": 0
+        },
+        {
+          "question": "4. ¿Cuál de las siguientes cuestiones, a la hora de realizar una línea de defensa, NO en cierta?",
+          "options": ["a) La línea no debe tener entrantes y salientes.", "b) La línea debe estar suficientemente separada del frente de fuego, teniendo en cuenta su velocidad", "c) La línea debe apoyarse en las barreras naturales, tales como ríos o embalses, masas de frondosas, rocas, etcétera.", "d) Si el fuego sube por una ladera, debe localizarse inmediatamente antes de la cumbre."],
+          "correct": 3
+        },
+        {
+          "question": "5. ¿Qué afirmación, acerca del Sistema de Predicción Cambell, NO es cierta?",
+          "options": ["a) Se trata de un sistema cuantitativo que no hace referencia a aspectos muy técnicos", "b) Se trabajando con tres factores que afectan a la propagación: la orientación, la pendiente y el viento", "c) De su estudio obtendremos una alineación de fuerzas, siendo ésta el grado de coincidencia favorable o desfavorable respecto del frente de fuego de los tres factores observados", "d) La alineación será nula cuando uno solo de los factores es favorable al avance del fuego"],
+          "correct": 0
+        },
+        {
+          "question": "6. Los agentes de Medio Ambiente que se adscriben al Plan INFOCA lo harán en el siguiente puesto funcional:",
+          "options": ["a) Coordinador de Demarcación", "b) Miembro de la BIIF", "c) Otros puestos", "d) Todos ellos son puestos funcionales a desempeñar por Agentes de Medio Ambiente adscritos a INFOCA"],
+          "correct": 3
+        },
+        {
+          "question": "7. Los vehículo pesados de extinción tienen una capacidad en su depósito para almacenar agua de:",
+          "options": ["a) Entre 3.000 y 5.000 litros", "b) Entre 2.000 y 4.000 litros", "c) Entre 3.500 y 4.500 litros", "d) Entre 3.000 y 4.000 litros"],
+          "correct": 3
+        },
+        {
+          "question": "8. ¿Cuál de las siguientes afirmaciones, acerca del Dronster, es CORRECTA?",
+          "options": ["a) Puede ser helitransportado a áreas remotas a las que no pueden ir las autobombas o vehículos terrestres", "b) Sus dimensiones reducidas permiten su paso entre arbolado de 60 cm", "c) Con él se puede multiplicar por dos el rendimiento de los bomberos forestales", "d) Puede trabajar de forma eficiente en pendientes con más de 30º de inclinación"],
+          "correct": 3
+        },
+        {
+          "question": "9. Cuándo hablamos de un avión AT-802 nos estamos refiriendo a:",
+          "options": ["a) Un avión Anfibio", "b) Un avión de coordinación aérea y vigilancia", "c) Un avión de carga en tierra semipesado", "d) Un avión de carga en tierra ligero"],
+          "correct": 2
+        },
+        {
+          "question": "10. El A119-MKII es:",
+          "options": ["a) Un helicóptero ligero, de transporte y extinción, que permite el desplazamiento de retenes de especialistas (máximo 7 personas) y el lanzamiento de agua con 900 litros de capacidad.", "b) Un helicóptero semipesado, de transporte y extinción, que permite el desplazamiento de retenes de especialistas (máximo 13 personas) y el lanzamiento de agua con 2.500 litros de capacidad.", "c) Un helicóptero de transporte y extinción, que permite el desplazamiento de retenes de especialistas (máximo 19 personas) y el lanzamiento de agua con 1.300 litros de capacidad.", "d) Un helicóptero ligero, de transporte y extinción, que permite el desplazamiento de retenes de especialistas (máximo 7 personas) y el lanzamiento de agua con 1.200 litros de capacidad."],
+          "correct": 0
+        },
+        {
+          "question": "11. ¿Qué ocurre con los fuegos que arden en los fondos de valle cuando se da un proceso de inversión térmica?",
+          "options": ["a) Arden con dificultad, pues la temperatura es menor y la humedad relativa es más alta. Son fuegos que arden lentamente.", "b) Evolucionan de forma normal", "c) Arden con mayor virulencia, pues su temperatura es mayor y la humedad relativa es menor", "d) Ninguna respuesta es correcta"],
+          "correct": 0
+        },
+        {
+          "question": "12. ¿Qué modelo de combustible encontramos en un terreno que presenta grandes acumulaciones de combustible, formado por restos gruesos y pesados que cubren todo el suelo, según los modelos de combustible de Rothermel?",
+          "options": ["a) 10", "b) 11", "c) 12", "d) 13"],
+          "correct": 3
+        },
+        {
+          "question": "13. Los modelos 8 y 9, de combustible de Rothermel, pertenecen al grupo:",
+          "options": ["a) Restos de corta y operaciones selvícolas", "b) Matorral", "c) Hojarasca bajo arbolado", "d) Pastos"],
+          "correct": 2
+        },
+        {
+          "question": "14. Desde el punto de vista de la inflamabilidad, la coscoja es una especia:",
+          "options": ["a) Muy inflamable en verano", "b) Muy inflamable durante todo el año", "c) Poco inflamable", "d) Moderadamente inflamable"],
+          "correct": 2
+        },
+        {
+          "question": "15. Tras un incendio forestal, suplementar la alimentación de la fauna silvestre y cinegética sería una medida de tipo:",
+          "options": ["a) Reconstructiva", "b) Cautelar", "c) De mejora", "d) Disuasoria"],
+          "correct": 1
+        },
+        {
+          "question": "16. En todas las actuaciones de selvicultura preventiva se han de tener en cuenta una serie de directrices de carácter ecológico, ¿cuál de las siguientes NO sería una de ellas?",
+          "options": ["a) Se prestará especial atención a la conservación y regeneración del matorral mediterráneo noble", "b) Los tratamientos selvícolas se ejecutarán de forma que se evite la mezcla de especies en las masas sobre las que se actúa", "c) En la programación de las actuaciones se tendrán en cuenta los periodos de nidificación de las especies protegidas.", "d) Se tendrá en cuenta el impacto paisajístico que pueda producir el trazado de líneas cortafuegos"],
+          "correct": 1
+        },
+        {
+          "question": "17. Cuándo estamos hablando de un riesgo alto de incendio forestal por pendiente, nos estaremos moviendo en porcentajes de pendiente de:",
+          "options": ["a) 20-30%", "b) 30-40%", "c) 40-50%", "d) 30-50%"],
+          "correct": 3
+        },
+        {
+          "question": "18. Los modelos de combustible 8 y 5 presentan un riesgo por combustibilidad:",
+          "options": ["a) Bajo", "b) Moderado", "c) Alto", "d) Muy alto"],
+          "correct": 0
+        },
+        {
+          "question": "19. ¿Cuál de las siguientes afirmaciones acerca del Índice de calidad de los sistemas forestales es CORRECTA?",
+          "options": ["a) Para su cálculo se tienen en cuenta 4 índices de calidad", "b) En el índice de calidad de las formaciones vegetales se toman valores que van del 0 al 5", "c) Se agrupa en 3 rangos de calidad total: A (muy alta, de 7 a 9), B (alta, de 4 a 6) y C (baja, de 0 a 3).", "d) Uno de los índices de calidad que lo integran es el índice de calidad por superficie forestal continua, ya que las masas forestales que presentan una continuidad en cuanto a su área de distribución, proporcionan mayor protección al suelo y posibilitan el enriquecimiento de los ecosistemas que albergan."],
+          "correct": 3
+        },
+        {
+          "question": "20. El Índice de Frecuencia de Incendios Forestales a Corto Plazo se define como:",
+          "options": ["a) El número de incendios acaecidos en un intervalo de 10 días anteriores al considerado para realizar el cálculo", "b) El número de incendios acaecidos en un intervalo de 20 días anteriores al considerado para realizar el cálculo", "c) El número de incendios acaecidos en un intervalo de 30 días anteriores al considerado para realizar el cálculo", "d) El número de incendios acaecidos en un intervalo de 40 días anteriores al considerado para realizar el cálculo"],
+          "correct": 2
+        },
+        {
+          "question": "21. ¿Qué distancia mínima al helicóptero habrá de dejar al subir al él, mientras los rotores estén girando?",
+          "options": ["a) 20 metros", "b) 30 metros", "c) 40 metros", "d) 50 metros"],
+          "correct": 2
+        },
+        {
+          "question": "22. ¿Qué precauciones habrá que adoptar cuando, en el incendio, están actuando medios aéreos que realizan descargas en la zona?",
+          "options": ["a) Hay que intentar resguardarse debajo de árboles secos, ramas muertas y rocas sueltas", "b) Si una persona no se puede retirar antes de la descarga debe tenderse en el suelo, boca abajo, con el casco puesto y la cabeza en dirección del avión, protegiéndose detrás de algún árbol o alguna roca y agarrándose a algún punto fijo para evitar que el agua pueda arrastrarla.", "c) Las herramientas deben colocarse cerca de los operarios y éstos ladera abajo.", "d) Todas las respuestas son correctas"],
+          "correct": 1
+        },
+        {
+          "question": "23. A la hora de utilizar la motosierra; Señale la INCORRECTA:",
+          "options": ["a) Cuando dos operarios utilizan motosierras, la distancia de seguridad entre ambos debe ser, al menos, igual a la altura de los árboles que están apeando", "b) Al usarla, deben mantenerse las piernas separadas asentando firmemente los pies, así como manejarla con las dos manos", "c) En los desplazamientos se debe llevar con el motor parado y con la espada colocada hacia delante", "d) Las respuestas a y c son correctas"],
+          "correct": 3
+        }
+      ]
+    };
+
+    // Crear la combinación total unificada
+    quizBlocks["all"] = [
+      ...quizBlocks["t15_1"], 
+      ...quizBlocks["t15_2"]
+    ];
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      if (selected === 'all') {
+        document.getElementById('test-title').textContent = "TEMA 15 UNIFICADO: INCENDIOS FORESTALES (47 PREGUNTAS)";
+      } else if (selected === 't15_1') {
+        document.getElementById('test-title').textContent = "BLOQUE 1: TEST 15.1 (24 PREGUNTAS)";
+      } else if (selected === 't15_2') {
+        document.getElementById('test-title').textContent = "BLOQUE 2: TEST 15.2 (23 PREGUNTAS)";
+      }
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar la aplicación
+    changeBlock();
+  </script>
+</body>
+</html>
