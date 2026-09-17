@@ -217,12 +217,52 @@
         padding-top: 110px;
       }
     }
+
+    /* Botón orgánico inspirado en la naturaleza */
+    .box, .btn-volver {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      
+      /* Colores */
+      background-color: #2e7d32; /* Verde bosque principal */
+      color: #ffffff !important;   /* Texto blanco */
+      
+      /* Formas y bordes */
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;     /* Esquinas suavemente redondeadas */
+      border: 1px solid #1b5e20;
+      
+      /* Tipografía y formato */
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none !important; /* Elimina el subrayado azul */
+      
+      /* Sombras y transiciones */
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+    
+    /* Estado al pasar el cursor o pulsar en la tablet */
+    .box:hover, .box:active,
+    .btn-volver:hover, .btn-volver:active {
+      background-color: #1b5e20; /* Verde más profundo */
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="index.html" class="btn-volver">← Volver</a>
+    <div class="box">
+        <a href="index.html" class="btn-volver">← Volver</a>
+    </div>
     <div class="selector-box">
       <select id="block-select" onchange="changeBlock()">
         <option value="all">Ver todo el tema unificado (109 preguntas)</option>
