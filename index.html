@@ -9,9 +9,11 @@
       --primary-color: #2e7d32;      /* Verde bosque principal */
       --primary-hover: #1b5e20;      /* Verde bosque oscuro */
       --bg-color: #f4f6f0;           /* Fondo suave naturaleza */
+      --card-bg: #ffffff;
       --text-main: #1c2a1e;          /* Verde muy oscuro casi negro */
       --text-muted: #52634f;         /* Tono verde hoja seco */
-      --accent-bg: #e8f5e9;          /* Verde claro suave para botones */
+      --accent-bg: #e8f5e9;          /* Verde claro suave */
+      --border-color: #dcdfd8;
     }
 
     * {
@@ -32,7 +34,7 @@
     }
 
     header {
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
       text-align: center;
     }
 
@@ -50,55 +52,96 @@
     }
 
     .grid-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
       width: 100%;
       max-width: 900px;
     }
 
     .card {
+      background-color: var(--card-bg);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1rem;
       text-decoration: none;
+      color: var(--text-main);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-color);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem;
-      border-radius: 9999px;
+      gap: 1rem;
       transition: all 0.2s ease-in-out;
       -webkit-tap-highlight-color: transparent;
     }
 
     .card:hover, .card:active {
-      transform: translateY(-3px) scale(1.03);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .card-icon {
-      width: 75px;
-      height: 75px;
+      width: 55px;
+      height: 55px;
       background-color: var(--accent-bg);
       color: var(--primary-color);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      border: 1px solid #dcdfd8;
+      border: 1px solid var(--border-color);
       transition: all 0.2s ease-in-out;
     }
 
     .card:hover .card-icon {
       background-color: var(--primary-color);
       color: #ffffff;
-      box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
     }
 
     .nature-emoji {
-      font-size: 2rem;
+      font-size: 1.75rem;
       line-height: 1;
       user-select: none;
+    }
+
+    /* Sección inferior con estadísticas */
+    .card-stats {
+      width: 100%;
+      background-color: #f8faf7;
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 0.85rem;
+      border: 1px dashed var(--border-color);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      color: var(--primary-hover);
     }
   </style>
 </head>
@@ -110,31 +153,78 @@
   </header>
 
   <main class="grid-container">
-    <!-- Solo necesitas añadir las etiquetas <a> sin preocuparte por el emoji -->
-    <a href="Tema14_Test_Unificado_Completo.html" class="card">
-      <div class="card-icon">14</div>
-      <span class="nature-emoji"></span>
+    <!-- Tema 14 -->
+    <a href="Tema14_Test_Unificado_Completo.html" class="card" data-topic="14">
+      <div class="card-header">
+        <div class="card-icon">14</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-14">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-14">-</span>
+        </div>
+      </div>
     </a>
 
-    <a href="Tema17_Test_Unificado_Completo.html" class="card">
-      <div class="card-icon">17</div>
-      <span class="nature-emoji"></span>
+    <!-- Tema 17 -->
+    <a href="Tema17_Test_Unificado_Completo.html" class="card" data-topic="17">
+      <div class="card-header">
+        <div class="card-icon">17</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-17">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-17">-</span>
+        </div>
+      </div>
     </a>
 
-    <a href="Tema18_Test_Unificado_Bloques.html" class="card">
-      <div class="card-icon">18</div>
-      <span class="nature-emoji"></span>
+    <!-- Tema 18 -->
+    <a href="Tema18_Test_Unificado_Bloques.html" class="card" data-topic="18">
+      <div class="card-header">
+        <div class="card-icon">18</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-18">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-18">-</span>
+        </div>
+      </div>
     </a>
   </main>
 
   <script>
-    // Colección de emojis inspirados en la naturaleza
+    // Asignación aleatoria de emojis de naturaleza
     const natureEmojis = ['🌿', '🌳', '🌻', '🌱', '🌲', '🍃', '🌴', '🌵', '🌾', '🪻', '🌷', '🍁', '🪵', '🍄', '🐝', '🦋', '🦉', '🦊', '🐿️', '⛰️'];
 
-    // Asignación aleatoria al cargar la página
     document.querySelectorAll('.nature-emoji').forEach(span => {
       const randomEmoji = natureEmojis[Math.floor(Math.random() * natureEmojis.length)];
       span.textContent = randomEmoji;
+    });
+
+    // Carga de progresos desde localStorage
+    document.querySelectorAll('.card').forEach(card => {
+      const topicId = card.getAttribute('data-topic');
+      const attempts = localStorage.getItem(`test_attempts_${topicId}`) || 0;
+      const bestScore = localStorage.getItem(`test_best_${topicId}`);
+
+      document.getElementById(`attempts-${topicId}`).textContent = attempts;
+      document.getElementById(`best-${topicId}`).textContent = bestScore ? `${bestScore}/10` : '-';
     });
   </script>
 
