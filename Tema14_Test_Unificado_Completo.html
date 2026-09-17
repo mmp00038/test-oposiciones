@@ -1063,26 +1063,38 @@
 
     function updateStats() {
       document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
-      
+    
       const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
       document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
-
-      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
-      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    
+      // Calcular la nota numérica (de 0 a 10)
+      const numericScore = activeData.length > 0 ? (correctCount / activeData.length) * 10 : 0;
+      document.getElementById('score').textContent = `⭐ ${numericScore.toFixed(2)}/10`;
+    
+      // Guardar en el índice SOLO si has completado todas las preguntas del test
+      if (answeredCount > 0 && answeredCount === activeData.length) {
+        saveTestResults(numericScore);
+      }
     }
-
-    // Variable con el número de tema correspondiente a este archivo
+    
+    // Variable con el número de tema
     const CURRENT_TOPIC_ID = 14;
     
-    // Guardar nota e intentos al corregir
-    function saveTestResults(finalScore) {
+    // Guardar nota e intentos al corregir/completar el test
+    function saveTestResults(scoreNum) {
+      // Evitar guardar múltiples veces seguidas si el usuario vuelve a hacer click
+      if (window.testSavedForThisSession) return;
+      window.testSavedForThisSession = true;
+    
+      // 1. Incrementar contador de intentos
       let attempts = parseInt(localStorage.getItem(`test_attempts_${CURRENT_TOPIC_ID}`) || 0);
       attempts++;
       localStorage.setItem(`test_attempts_${CURRENT_TOPIC_ID}`, attempts);
     
+      // 2. Guardar mejor nota
       let bestScore = parseFloat(localStorage.getItem(`test_best_${CURRENT_TOPIC_ID}`) || 0);
-      if (finalScore > bestScore) {
-        localStorage.setItem(`test_best_${CURRENT_TOPIC_ID}`, finalScore.toFixed(1));
+      if (scoreNum > bestScore) {
+        localStorage.setItem(`test_best_${CURRENT_TOPIC_ID}`, scoreNum.toFixed(1));
       }
     }
     
@@ -1101,6 +1113,7 @@
       answeredCount = 0;
       correctCount = 0;
       secondsElapsed = 0;
+      window.testSavedForThisSession = false; // Permitir guardar en el nuevo intento
     
       startTimer();
       renderQuiz();
