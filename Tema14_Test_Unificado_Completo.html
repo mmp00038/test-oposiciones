@@ -319,7 +319,7 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
     const quizBlocks = {
       "t14_1": [
         {
@@ -1061,66 +1061,87 @@
       updateStats();
     }
 
-    function updateStats() {
+    <!-- Asegúrate de que la etiqueta script tenga type="module" -->
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  
+    // ⚠️ REEMPLAZA ESTE BLOQUE CON TU CONFIGURACIÓN REAL DE FIREBASE
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+  
+    // Cambiar este número en cada archivo de test (14, 17, 18, etc.)
+    const CURRENT_TOPIC_ID = 14;
+  
+    // Actualización de estadísticas y guardado en la nube
+    window.updateStats = function() {
       document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
-    
+  
       const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
       document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
-    
-      // Calcular la nota numérica (de 0 a 10)
+  
       const numericScore = activeData.length > 0 ? (correctCount / activeData.length) * 10 : 0;
       document.getElementById('score').textContent = `⭐ ${numericScore.toFixed(2)}/10`;
-    
-      // Guardar en el índice SOLO si has completado todas las preguntas del test
+  
+      // Si ha completado todas las preguntas, envía el resultado a Firebase
       if (answeredCount > 0 && answeredCount === activeData.length) {
-        saveTestResults(numericScore);
+        saveTestResultsFirebase(numericScore);
       }
-    }
-    
-    // Variable con el número de tema
-    const CURRENT_TOPIC_ID = 14;
-    
-    // Guardar nota e intentos al corregir/completar el test
-    function saveTestResults(scoreNum) {
-      // Evitar guardar múltiples veces seguidas si el usuario vuelve a hacer click
+    };
+  
+    // Guardar en la base de datos de Firebase
+    async function saveTestResultsFirebase(scoreNum) {
       if (window.testSavedForThisSession) return;
       window.testSavedForThisSession = true;
-    
-      // 1. Incrementar contador de intentos
-      let attempts = parseInt(localStorage.getItem(`test_attempts_${CURRENT_TOPIC_ID}`) || 0);
-      attempts++;
-      localStorage.setItem(`test_attempts_${CURRENT_TOPIC_ID}`, attempts);
-    
-      // 2. Guardar mejor nota
-      let bestScore = parseFloat(localStorage.getItem(`test_best_${CURRENT_TOPIC_ID}`) || 0);
-      if (scoreNum > bestScore) {
-        localStorage.setItem(`test_best_${CURRENT_TOPIC_ID}`, scoreNum.toFixed(1));
-      }
+  
+      const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+      const snapshot = await get(topicRef);
+      const data = snapshot.val() || {};
+  
+      const newAttempts = (data.attempts || 0) + 1;
+      const currentBest = data.bestScore || 0;
+      const newBest = Math.max(currentBest, parseFloat(scoreNum.toFixed(1)));
+  
+      await set(topicRef, {
+        attempts: newAttempts,
+        bestScore: newBest
+      });
     }
-    
-    // Borrar historial guardado en la memoria
-    function resetTopicStats() {
-      if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${CURRENT_TOPIC_ID}?`)) {
-        localStorage.removeItem(`test_attempts_${CURRENT_TOPIC_ID}`);
-        localStorage.removeItem(`test_best_${CURRENT_TOPIC_ID}`);
-        alert('Progreso reiniciado.');
+  
+    // Reiniciar estadísticas del tema en la nube
+    window.resetTopicStats = async function() {
+      if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${CURRENT_TOPIC_ID} en la nube?`)) {
+        const topicRef = ref(db, `progress/${CURRENT_TOPIC_ID}`);
+        await remove(topicRef);
+        alert('Progreso borrado en la nube.');
         location.reload();
       }
-    }
-    
-    // Lógica de reinicio del test en pantalla
-    function resetQuiz() {
+    };
+  
+    // Reiniciar test en pantalla
+    window.resetQuiz = function() {
       answeredCount = 0;
       correctCount = 0;
       secondsElapsed = 0;
-      window.testSavedForThisSession = false; // Permitir guardar en el nuevo intento
-    
+      window.testSavedForThisSession = false;
+  
       startTimer();
       renderQuiz();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    // Inicialización automática al cargar
+    };
+  
+    // Inicialización
     changeBlock();
   </script>
 </body>
