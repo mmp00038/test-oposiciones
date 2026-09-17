@@ -1642,13 +1642,13 @@
 
     function updateStats() {
       document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
-      
+    
       const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
       document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
-
-      const finalScore = answeredCount > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
-      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
-
+    
+      const numericScore = activeData.length > 0 ? (correctCount / activeData.length) * 10 : 0;
+      document.getElementById('score').textContent = `⭐ ${numericScore.toFixed(2)}/10`;
+    
       // Guardar en Firebase cuando se responde la última pregunta
       if (answeredCount > 0 && answeredCount === activeData.length && typeof window.saveTestResults === 'function') {
         window.saveTestResults(numericScore);
