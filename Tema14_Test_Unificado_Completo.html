@@ -255,6 +255,23 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
     }
+
+    /* Estilo del botón Reiniciar */
+    .btn-reset {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+  
+    .btn-reset:hover, .btn-reset:active {
+      background-color: #dc2626;
+    }
   </style>
 </head>
 <body>
@@ -262,6 +279,9 @@
   <header>
     <div class="box">
         <a href="index.html" class="btn-volver">← Volver</a>
+    </div>
+    <div class="box">
+        <button type="button" onclick="resetTopicStats(14)" class="btn-reset">🗑️ Reiniciar Progreso</button>
     </div>
     <div class="selector-box">
       <select id="block-select" onchange="changeBlock()">
@@ -1051,16 +1071,42 @@
       document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
     }
 
+    // Variable con el número de tema correspondiente a este archivo
+    const CURRENT_TOPIC_ID = 14;
+    
+    // Guardar nota e intentos al corregir
+    function saveTestResults(finalScore) {
+      let attempts = parseInt(localStorage.getItem(`test_attempts_${CURRENT_TOPIC_ID}`) || 0);
+      attempts++;
+      localStorage.setItem(`test_attempts_${CURRENT_TOPIC_ID}`, attempts);
+    
+      let bestScore = parseFloat(localStorage.getItem(`test_best_${CURRENT_TOPIC_ID}`) || 0);
+      if (finalScore > bestScore) {
+        localStorage.setItem(`test_best_${CURRENT_TOPIC_ID}`, finalScore.toFixed(1));
+      }
+    }
+    
+    // Borrar historial guardado en la memoria
+    function resetTopicStats() {
+      if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${CURRENT_TOPIC_ID}?`)) {
+        localStorage.removeItem(`test_attempts_${CURRENT_TOPIC_ID}`);
+        localStorage.removeItem(`test_best_${CURRENT_TOPIC_ID}`);
+        alert('Progreso reiniciado.');
+        location.reload();
+      }
+    }
+    
+    // Lógica de reinicio del test en pantalla
     function resetQuiz() {
       answeredCount = 0;
       correctCount = 0;
       secondsElapsed = 0;
-      
+    
       startTimer();
       renderQuiz();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
+    
     // Inicialización automática al cargar
     changeBlock();
   </script>
