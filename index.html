@@ -6,12 +6,13 @@
   <title>Tests de Oposiciones</title>
   <style>
     :root {
-      --primary-color: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg-color: #f8fafc;
+      --primary-color: #2e7d32;      /* Verde bosque principal */
+      --primary-hover: #1b5e20;      /* Verde bosque oscuro */
+      --bg-color: #f4f6f0;           /* Fondo suave tono naturaleza */
       --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
+      --text-main: #1c2a1e;          /* Verde muy oscuro casi negro */
+      --text-muted: #52634f;         /* Tono verde hoja seco */
+      --accent-bg: #e8f5e9;          /* Verde claro suave */
     }
 
     * {
@@ -25,21 +26,21 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 1.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
     header {
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
       text-align: center;
     }
 
     h1 {
       font-size: 2.25rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--primary-hover);
       letter-spacing: -0.025em;
     }
 
@@ -51,22 +52,20 @@
 
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 1.5rem;
       width: 100%;
-      max-width: 900px;
+      max-width: 800px;
     }
 
     .card {
       background-color: var(--card-bg);
-      border-radius: 1rem;
-      padding: 1.75rem 1.5rem;
+      border-radius: 1.25rem;
+      padding: 2rem 1.5rem;
       text-decoration: none;
-      color: var(--text-main);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      border: 1px solid #dcdfd8;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease-in-out;
@@ -75,32 +74,28 @@
 
     .card:hover, .card:active {
       transform: translateY(-4px);
-      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -4px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 10px 20px rgba(46, 125, 50, 0.15);
       border-color: var(--primary-color);
+      background-color: #ffffff;
     }
 
     .card-icon {
-      width: 48px;
-      height: 48px;
-      background-color: #eff6ff;
+      width: 70px;
+      height: 70px;
+      background-color: var(--accent-bg);
       color: var(--primary-color);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1rem;
-      font-size: 1.25rem;
-      font-weight: bold;
+      font-size: 1.75rem;
+      font-weight: 700;
+      transition: all 0.2s ease-in-out;
     }
 
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .card:hover .card-title {
-      color: var(--primary-color);
+    .card:hover .card-icon {
+      background-color: var(--primary-color);
+      color: #ffffff;
     }
   </style>
 </head>
@@ -114,17 +109,14 @@
   <main class="grid-container">
     <a href="Tema14_Test_Unificado_Completo.html" class="card">
       <div class="card-icon">14</div>
-      <span class="card-title">Tema 14</span>
     </a>
 
     <a href="Tema17_Test_Unificado_Completo.html" class="card">
       <div class="card-icon">17</div>
-      <span class="card-title">Tema 17</span>
     </a>
 
     <a href="Tema18_Test_Unificado_Bloques.html" class="card">
       <div class="card-icon">18</div>
-      <span class="card-title">Tema 18</span>
     </a>
   </main>
 
