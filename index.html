@@ -12,7 +12,6 @@
       --card-bg: #ffffff;
       --text-main: #1c2a1e;
       --text-muted: #52634f;
-      --accent-bg: #e8f5e9;
       --border-color: #dcdfd8;
     }
 
@@ -34,7 +33,7 @@
     }
 
     header {
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
       text-align: center;
     }
 
@@ -51,230 +50,68 @@
       font-size: 1rem;
     }
 
-    .grid-container {
+    .main-sections-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
       width: 100%;
-      max-width: 900px;
+      max-width: 800px;
     }
 
-    .card {
+    .section-card {
       background-color: var(--card-bg);
-      border-radius: 1.25rem;
-      padding: 1.25rem 1rem;
+      border-radius: 1.5rem;
+      padding: 3rem 1.5rem;
       text-decoration: none;
       color: var(--text-main);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      border: 1px solid var(--border-color);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--border-color);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
-      transition: all 0.2s ease-in-out;
+      justify-content: center;
+      gap: 1.25rem;
+      transition: all 0.25s ease-in-out;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .card:hover, .card:active {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+    .section-card:hover, .section-card:active {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(46, 125, 50, 0.18);
       border-color: var(--primary-color);
     }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .card-icon {
-      width: 55px;
-      height: 55px;
-      background-color: var(--accent-bg);
-      color: var(--primary-color);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      font-weight: 700;
-      border: 1px solid var(--border-color);
-      transition: all 0.2s ease-in-out;
-    }
-
-    .card:hover .card-icon {
-      background-color: var(--primary-color);
-      color: #ffffff;
-    }
-
-    .nature-emoji {
-      font-size: 1.75rem;
+    .section-icon {
+      font-size: 3.5rem;
       line-height: 1;
-      user-select: none;
     }
 
-    .card-stats {
-      width: 100%;
-      background-color: #f8faf7;
-      border-radius: 0.75rem;
-      padding: 0.5rem 0.75rem;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      font-size: 0.85rem;
-      border: 1px dashed var(--border-color);
-    }
-
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .stat-label {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .stat-value {
+    .section-title {
+      font-size: 1.5rem;
       font-weight: 700;
       color: var(--primary-hover);
+      text-align: center;
     }
   </style>
-
-  <!-- Módulos de Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    // ⚠️ COPIA Y PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    const firebaseConfig = {
-      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
-      authDomain: "oposiciones-tests.firebaseapp.com",
-      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "oposiciones-tests",
-      storageBucket: "oposiciones-tests.firebasestorage.app",
-      messagingSenderId: "334815991038",
-      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
-      measurementId: "G-55K6MR5WKS"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // Escuchar cambios en la base de datos en tiempo real
-    const progressRef = ref(db, 'progress');
-    onValue(progressRef, (snapshot) => {
-      const data = snapshot.val() || {};
-
-      document.querySelectorAll('.card').forEach(card => {
-        const topicId = card.getAttribute('data-topic');
-        const topicData = data[topicId] || {};
-
-        const attempts = topicData.attempts || 0;
-        const bestScore = topicData.bestScore;
-
-        const attemptsEl = document.getElementById(`attempts-${topicId}`);
-        const bestEl = document.getElementById(`best-${topicId}`);
-
-        if (attemptsEl) attemptsEl.textContent = attempts;
-        if (bestEl) bestEl.textContent = (bestScore !== undefined && bestScore !== null) ? `${bestScore}/10` : '-';
-      });
-    });
-  </script>
 </head>
 <body>
 
   <header>
     <h1>Tests de Oposiciones</h1>
-    <p class="subtitle">Selecciona un tema para comenzar la práctica</p>
+    <p class="subtitle">Selecciona una sección para acceder a sus temas</p>
   </header>
 
-  <main class="grid-container">
-    <!-- Tema 14 -->
-    <a href="Tema14_Test_Unificado_Completo.html" class="card" data-topic="14">
-      <div class="card-header">
-        <div class="card-icon">14</div>
-        <span class="nature-emoji"></span>
-      </div>
-      <div class="card-stats">
-        <div class="stat-item">
-          <span class="stat-label">Intentos</span>
-          <span class="stat-value" id="attempts-14">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Nota Max</span>
-          <span class="stat-value" id="best-14">-</span>
-        </div>
-      </div>
+  <main class="main-sections-grid">
+    <a href="comun.html" class="section-card">
+      <div class="section-icon">📚</div>
+      <div class="section-title">Parte Común</div>
     </a>
 
-    <!-- Tema 15 -->
-    <a href="Tema15_Test_Unificado_Completo.html" class="card" data-topic="15">
-      <div class="card-header">
-        <div class="card-icon">15</div>
-        <span class="nature-emoji"></span>
-      </div>
-      <div class="card-stats">
-        <div class="stat-item">
-          <span class="stat-label">Intentos</span>
-          <span class="stat-value" id="attempts-15">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Nota Max</span>
-          <span class="stat-value" id="best-15">-</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- Tema 17 -->
-    <a href="Tema17_Test_Unificado_Completo.html" class="card" data-topic="17">
-      <div class="card-header">
-        <div class="card-icon">17</div>
-        <span class="nature-emoji"></span>
-      </div>
-      <div class="card-stats">
-        <div class="stat-item">
-          <span class="stat-label">Intentos</span>
-          <span class="stat-value" id="attempts-17">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Nota Max</span>
-          <span class="stat-value" id="best-17">-</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- Tema 18 -->
-    <a href="Tema18_Test_Unificado_Bloques.html" class="card" data-topic="18">
-      <div class="card-header">
-        <div class="card-icon">18</div>
-        <span class="nature-emoji"></span>
-      </div>
-      <div class="card-stats">
-        <div class="stat-item">
-          <span class="stat-label">Intentos</span>
-          <span class="stat-value" id="attempts-18">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Nota Max</span>
-          <span class="stat-value" id="best-18">-</span>
-        </div>
-      </div>
+    <a href="especifica.html" class="section-card">
+      <div class="section-icon">🌲</div>
+      <div class="section-title">Parte Específica</div>
     </a>
   </main>
-
-  <script>
-    const natureEmojis = ['🌿', '🌳', '🌻', '🌱', '🌲', '🍃', '🌴', '🌵', '🌾', '🪻', '🌷', '🍁', '🪵', '🍄', '🐝', '🦋', '🦉', '🦊', '🐿️', '⛰️'];
-
-    document.querySelectorAll('.nature-emoji').forEach(span => {
-      const randomEmoji = natureEmojis[Math.floor(Math.random() * natureEmojis.length)];
-      span.textContent = randomEmoji;
-    });
-  </script>
 
 </body>
 </html>
