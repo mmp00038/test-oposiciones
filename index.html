@@ -103,6 +103,18 @@
       color: var(--primary-hover);
       text-align: center;
     }
+
+    /* Evita el rebote de desplazamiento típico de las webs ESTO ES PARA EL MODO APP*/
+    html, body {
+      overscroll-behavior-y: none;
+      -webkit-user-select: none; /* Evita seleccionar texto al mantener pulsado */
+      user-select: none;
+    }
+    
+    /* Mejora la velocidad de respuesta al pulsar botones en pantallas táctiles */
+    button, a, .card, .option-btn {
+      touch-action: manipulation;
+    }
   </style>
 </head>
 <body>
