@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parte Específica - Tests de Oposiciones</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --bg-color: #f4f6f0;
+      --card-bg: #ffffff;
+      --text-main: #1c2a1e;
+      --text-muted: #52634f;
+      --accent-bg: #e8f5e9;
+      --border-color: #dcdfd8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--primary-hover);
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .btn-back-main {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #2e7d32;
+      color: #ffffff !important;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1b5e20;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-back-main:hover, .btn-back-main:active {
+      background-color: #1b5e20;
+      transform: translateY(-2px);
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1rem;
+      text-decoration: none;
+      color: var(--text-main);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s ease-in-out;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card:hover, .card:active {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-icon {
+      width: 55px;
+      height: 55px;
+      background-color: var(--accent-bg);
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .card:hover .card-icon {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .nature-emoji {
+      font-size: 1.75rem;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .card-stats {
+      width: 100%;
+      background-color: #f8faf7;
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 0.85rem;
+      border: 1px dashed var(--border-color);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      color: var(--primary-hover);
+    }
+
+    @media (max-width: 600px) {
+      header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .btn-back-main {
+        position: static;
+        align-self: flex-start;
+      }
+    }
+  </style>
+
+  <!-- Módulos de Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const progressRef = ref(db, 'progress');
+    onValue(progressRef, (snapshot) => {
+      const data = snapshot.val() || {};
+
+      document.querySelectorAll('.card').forEach(card => {
+        const topicId = card.getAttribute('data-topic');
+        if (!topicId) return;
+
+        const topicData = data[topicId] || {};
+
+        const attempts = topicData.attempts || 0;
+        const bestScore = topicData.bestScore;
+
+        const attemptsEl = document.getElementById(`attempts-${topicId}`);
+        const bestEl = document.getElementById(`best-${topicId}`);
+
+        if (attemptsEl) attemptsEl.textContent = attempts;
+        if (bestEl) bestEl.textContent = (bestScore !== undefined && bestScore !== null) ? `${bestScore}/10` : '-';
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="btn-back-main">← Inicio</a>
+    <h1>Parte Específica</h1>
+    <p class="subtitle">Selecciona un tema para comenzar la práctica</p>
+  </header>
+
+  <main class="grid-container">
+    <!-- Tema X (Apunta a la subcarpeta parte_comun/) -->
+    <a href="parte_especifica/prueba.html" class="card" data-topic="X">
+      <div class="card-header">
+        <div class="card-icon">X</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-X">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-X">-</span>
+        </div>
+      </div>
+    </a>
+
+  <script>
+    const natureEmojis = ['🌿', '🌳', '🌻', '🌱', '🌲', '🍃', '🌴', '🌵', '🌾', '🪻', '🌷', '🍁', '🪵', '🍄', '🐝', '🦋', '🦉', '🦊', '🐿️', '⛰️'];
+    document.querySelectorAll('.nature-emoji').forEach(span => {
+      const randomEmoji = natureEmojis[Math.floor(Math.random() * natureEmojis.length)];
+      span.textContent = randomEmoji;
+    });
+  </script>
+
+</body>
+</html>
