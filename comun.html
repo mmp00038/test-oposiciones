@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parte Común - Tests de Oposiciones</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --bg-color: #f4f6f0;
+      --card-bg: #ffffff;
+      --text-main: #1c2a1e;
+      --text-muted: #52634f;
+      --border-color: #dcdfd8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--primary-hover);
+      letter-spacing: -0.025em;
+    }
+
+    /* Botón Volver al Índice */
+    .btn-back-main {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #2e7d32;
+      color: #ffffff !important;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1b5e20;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-back-main:hover, .btn-back-main:active {
+      background-color: #1b5e20;
+      transform: translateY(-2px);
+    }
+
+    /* Tarjeta de Contenido en Construcción */
+    .construction-card {
+      background-color: var(--card-bg);
+      border-radius: 1.5rem;
+      padding: 3.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 600px;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .construction-icon {
+      font-size: 4.5rem;
+      line-height: 1;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .construction-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-hover);
+    }
+
+    .construction-text {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .btn-back-main {
+        position: static;
+        align-self: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="btn-back-main">← Inicio</a>
+    <h1>Parte Común</h1>
+  </header>
+
+  <main class="construction-card">
+    <div class="construction-icon">🚧</div>
+    <h2 class="construction-title">Sección en Construcción</h2>
+    <p class="construction-text">
+      Actualmente estamos preparando los test correspondientes a la Parte Común. ¡Estarán disponibles muy pronto!
+    </p>
+  </main>
+
+</body>
+</html>
