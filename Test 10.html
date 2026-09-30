@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 16.04.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (50 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (16.04.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. En el marco de un procedimiento administrativo complejo relativo a la autorización de una actividad industrial con significativa incidencia ambiental, una asociación ecologista pretende personarse una vez iniciado el expediente, aportando informes técnicos que evidencian una posible afección a un espacio protegido. El órgano instructor rechaza su intervención alegando que no ostenta un derecho subjetivo directo ni ha iniciado el procedimiento, afirmando que admitir a terceros supondría una dilación indebida y comprometería la eficacia administrativa. La asociación sostiene que sus fines estatutarios se ven directamente afectados por la decisión administrativa y que la normativa reconoce una legitimación más amplia que la estrictamente subjetiva. Además, argumenta que la exclusión limita la participación pública en asuntos ambientales.",
+        options: [
+          "A) Puede intervenir si acredita interés legítimo",
+          "B) Solo pueden intervenir quienes inician el procedimiento",
+          "C) Solo cabe intervención con derecho subjetivo",
+          "D) Depende de la discrecionalidad del órgano"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. El concepto de interesado no se limita a los titulares de derechos subjetivos directos o a quienes inician el expediente; abarca a quienes ostenten intereses legítimos individuales o colectivos que puedan resultar afectados por la resolución (art. 4 Ley 39/2015)."
+      },
+      {
+        question: "2. Una persona física presenta una solicitud administrativa indicando expresamente que desea recibir notificaciones en papel, dado que no está obligada a relacionarse electrónicamente. La Administración, sin motivación específica, decide practicar las notificaciones mediante sede electrónica, alegando criterios de modernización y eficiencia. El interesado no accede a la notificación y posteriormente se le tiene por notificado, iniciándose el cómputo de plazos. El ciudadano impugna alegando vulneración de sus derechos procedimentales, al no haberse respetado su opción ni haberse justificado la imposición del medio electrónico.",
+        options: [
+          "A) Es válida por eficiencia",
+          "B) Es inválida por vulnerar elección del medio",
+          "C) Es válida si hay aviso previo",
+          "D) Solo inválida si hay perjuicio económico"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Los ciudadanos no obligados legalmente a relacionarse electrónicamente tienen derecho a elegir y modificar en cualquier momento el medio por el cual desean comunicarse con la Administración (art. 14 y 41 Ley 39/2015)."
+      },
+      {
+        question: "3. Un grupo parlamentario andaluz aprueba una norma interna por la cual cualquier diputado que vote en contra de la disciplina de partido perderá automáticamente su condición de parlamentario, siendo sustituido por el siguiente en la lista electoral. La medida se justifica en la necesidad de garantizar coherencia política. Un diputado afectado recurre alegando vulneración de principios constitucionales.",
+        options: [
+          "A) Es válida por autonomía parlamentaria",
+          "B) Es válida si hay acuerdo previo",
+          "C) Vulnera el mandato imperativo",
+          "D) Es solo una cuestión política"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Los miembros de las Asambleas Legislativas representan a la totalidad de la ciudadanía y no están sujetos a mandato imperativo (art. 67.2 CE)."
+      },
+      {
+        question: "4. Durante la tramitación de un expediente administrativo, se exige a un ciudadano aportar un documento ya emitido por la propia Administración en un procedimiento anterior y que consta en sus archivos electrónicos. El órgano justifica la exigencia en la necesidad de garantizar la integridad documental de cada expediente.",
+        options: [
+          "A) Siempre puede exigirse",
+          "B) Solo si no está digitalizado",
+          "C) Solo en procedimientos sancionadores",
+          "D) No debe exigirse si ya obra en poder de la Administración"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Los interesados tienen derecho a no aportar documentos que ya obren en poder de la Administración actuante o hayan sido elaborados por cualquier otra Administración (art. 28.2 y 28.3 Ley 39/2015)."
+      },
+      {
+        question: "5. La Administración dicta una resolución desfavorable en materia ambiental limitándose a señalar que no concurren razones de interés público suficientes, sin analizar los informes técnicos ni responder a las alegaciones presentadas por el interesado, quien sostiene que no puede comprender las razones reales de la decisión.",
+        options: [
+          "A) Falta motivación exigible",
+          "B) Es un defecto leve",
+          "C) Es nulidad automática",
+          "D) Es error material"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. Los actos que desestimen solicitudes o limiten derechos deben ser motivados con sucinta referencia de hechos y fundamentos de derecho (art. 35 Ley 39/2015)."
+      },
+      {
+        question: "6. Tras la disolución del Parlamento de Andalucía por convocatoria electoral, surge una situación de urgencia institucional relacionada con el control de determinadas actuaciones del Ejecutivo autonómico que podrían afectar al equilibrio de poderes. Un alumno sostiene que, al estar disuelto el Parlamento, no existe órgano alguno que pueda ejercer funciones de control o representación institucional hasta la constitución de la nueva Cámara. Otros defienden que el sistema prevé mecanismos de continuidad institucional para evitar vacíos de poder. Analiza la cuestión teniendo en cuenta la finalidad del sistema parlamentario y la organización institucional autonómica.",
+        options: [
+          "A) No existe órgano con funciones durante la disolución",
+          "B) La Diputación Permanente garantiza la continuidad",
+          "C) Solo la Presidencia asume funciones",
+          "D) La Junta de Portavoces sustituye al Parlamento"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. La Diputación Permanente asume la velación de los poderes de la Cámara y garantiza la continuidad institucional cuando el Parlamento está disuelto o ha expirado su mandato (Estatuto de Autonomía de Andalucía)."
+      },
+      {
+        question: "7. Una sociedad mercantil presenta una solicitud en soporte papel ante una Administración pública, pese a estar obligada legalmente a relacionarse por medios electrónicos. El órgano administrativo inadmite directamente la solicitud sin requerir subsanación, alegando que la entidad conoce sus obligaciones legales y que admitir la solicitud perjudicaría la eficacia administrativa. La empresa recurre invocando vulneración de garantías procedimentales y derecho a la subsanación, defendiendo que el defecto es formal y corregible. Valora la corrección de la actuación administrativa a la luz de los principios de procedimiento y de los derechos de los interesados.",
+        options: [
+          "A) Inadmisión directa correcta",
+          "B) Tramitación válida en papel",
+          "C) Debe requerirse subsanación electrónica",
+          "D) Debe archivarse sin más trámite"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Si un sujeto obligado legalmente a la relación electrónica presenta su solicitud en papel, la Administración debe requerir la subsanación mediante su presentación electrónica (art. 68.4 Ley 39/2015)."
+      },
+      {
+        question: "8. Una ley autonómica atribuye a un órgano consultivo la facultad de dejar sin efecto reglamentos por razones de oportunidad política, sin intervención judicial. La medida se justifica en la necesidad de dotar de agilidad a la Administración para corregir normas inadecuadas. Sin embargo, varios juristas plantean dudas sobre su compatibilidad con el sistema de fuentes y el control jurisdiccional. Analiza si dicha atribución respeta la distribución de funciones entre poderes y el principio de legalidad.",
+        options: [
+          "A) Es válida por autonomía normativa",
+          "B) Es válida con informe previo",
+          "C) Es una cuestión de técnica normativa",
+          "D) Invade funciones propias del control jurisdiccional"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. El control de legalidad sobre las disposiciones reglamentarias y su anulación con efectos generales es competencia exclusiva de los tribunales de la jurisdicción contencioso-administrativa (art. 106.1 CE)."
+      },
+      {
+        question: "9. Un ciudadano presenta un escrito en el registro electrónico a las 23:59 horas del último día de plazo. La Administración rechaza su validez alegando que el horario de oficina ya había finalizado y que no se pudo tramitar materialmente hasta el día siguiente. El interesado sostiene que el registro electrónico opera de forma continua y que su presentación es válida en plazo. Analiza el régimen jurídico de los registros electrónicos y el cómputo de plazos en procedimientos administrativos.",
+        options: [
+          "A) Es válido por funcionamiento continuo del registro",
+          "B) Es extemporáneo",
+          "C) Depende de la apertura del asiento",
+          "D) Requiere validación presencial posterior"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. El registro electrónico permite la presentación de documentos todos los días del año durante las 24 horas. Las entradas realizadas en días u horas inhábiles se computan como presentadas en el momento fijado según las reglas legales (art. 31 Ley 39/2015)."
+      },
+      {
+        question: "10. Una ley ordinaria introduce limitaciones sustantivas en el ejercicio de un derecho fundamental, regulando aspectos esenciales del mismo sin rango de ley orgánica. La Administración aplica dicha norma en un procedimiento administrativo, y el interesado impugna alegando vulneración del sistema constitucional de fuentes. Examina la adecuación de la norma a la Constitución y las consecuencias de su aplicación por la Administración.",
+        options: [
+          "A) Es válida si no contradice la Constitución expresamente",
+          "B) Vulnera la reserva de ley orgánica",
+          "C) Es válida por rango legal suficiente",
+          "D) Es una cuestión de oportunidad política"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. El desarrollo directo y la regulación esencial de los derechos fundamentales de la Sección 1ª del Capítulo II del Título I exige Ley Orgánica (art. 81.1 CE)."
+      },
+      {
+        question: "11. En un procedimiento sancionador ambiental, el acuerdo de inicio se limita a mencionar la existencia de posibles irregularidades sin concretar hechos, infracciones ni responsables. El interesado alega indefensión por falta de precisión para articular su defensa. La Administración sostiene que los detalles se concretarán en fases posteriores. Valora la exigencia de determinación en el inicio del procedimiento y su incidencia en el derecho de defensa.",
+        options: [
+          "A) Es válido al poder concretarse después",
+          "B) Es defecto leve",
+          "C) Es inválido por falta de determinación mínima",
+          "D) Solo afecta si hay sanción final"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. El acuerdo de iniciación de un procedimiento sancionador debe contener una identificación suficiente de los hechos, su calificación provisional y las posibles sanciones para evitar la indefensión del expedientado (art. 64 Ley 39/2015)."
+      },
+      {
+        question: "12. Una Consejería dicta una instrucción interna que, en la práctica, añade requisitos no previstos en un reglamento vigente para acceder a una autorización. La Administración defiende que se trata de una medida organizativa para mejorar la gestión. Los ciudadanos afectados impugnan alegando que se les imponen cargas no previstas normativamente. Analiza la validez de la instrucción en relación con la jerarquía normativa.",
+        options: [
+          "A) Es válida como organización interna",
+          "B) Es válida si mejora la eficacia",
+          "C) Solo es inválida si no se publica",
+          "D) Vulnera la jerarquía normativa"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Las instrucciones y órdenes de servicio organizan el trabajo interno pero no pueden alterar, limitar ni adicionar cargas a los derechos reconocidos por normas de rango reglamentario o legal (art. 6 Ley 40/2015)."
+      },
+      {
+        question: "13. Un diputado es demandado penalmente por manifestaciones realizadas en sede parlamentaria tras haber cesado en su cargo. El querellante sostiene que ya no goza de prerrogativas. El afectado invoca la inviolabilidad parlamentaria. Examina el alcance temporal y material de dicha prerrogativa.",
+        options: [
+          "A) Se mantiene respecto a actos parlamentarios",
+          "B) Desaparece al cesar",
+          "C) Solo protege durante el mandato",
+          "D) Depende del tipo penal"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. La inviolabilidad por las opiniones manifestadas y los votos emitidos en el ejercicio del cargo parlamentario produce efectos permanentes y subsiste aun después de haber cesado el mandato."
+      },
+      {
+        question: "14. Un ciudadano solicita copia auténtica de un documento administrativo electrónico válido. La Administración se niega alegando que el documento es accesible digitalmente y que no es necesario emitir copia. El interesado necesita efectos frente a terceros. Analiza el derecho a obtener copias auténticas.",
+        options: [
+          "A) Puede negarse libremente",
+          "B) Existe derecho a copia auténtica",
+          "C) Solo procede en documentos judiciales",
+          "D) Solo en soporte papel"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Los interesados tienen derecho a obtener copia auténtica de los documentos públicos administrativos que hayan sido emitidos por las Administraciones Públicas (art. 27 Ley 39/2015)."
+      },
+      {
+        question: "15. El Parlamento de Andalucía reforma su Reglamento por mayoría simple alegando que la modificación es técnica. Diputados impugnan por no respetar el procedimiento reforzado. Analiza la exigencia de mayoría para la aprobación y reforma del Reglamento.",
+        options: [
+          "A) Válida por autonomía",
+          "B) Válida si no afecta derechos",
+          "C) Inválida por no respetar mayoría reforzada",
+          "D) No es controlable"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. La aprobación y reforma del Reglamento del Parlamento de Andalucía requiere la votación favorable de la mayoría absoluta de la Cámara en una votación final sobre el conjunto del texto."
+      },
+      {
+        question: "16. Una Administración no resuelve en plazo una solicitud de autorización. El interesado invoca silencio positivo; la Administración defiende silencio negativo como regla general. Examina el régimen del silencio administrativo en procedimientos iniciados a solicitud del interesado.",
+        options: [
+          "A) Silencio negativo es siempre la regla",
+          "B) No produce efectos en autorizaciones",
+          "C) Siempre es silencio positivo sin excepción",
+          "D) Silencio positivo es la regla general salvo excepciones"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. En los procedimientos iniciados a solicitud del interesado, el vencimiento del plazo sin haberse notificado resolución expresa legitima al interesado para entenderla estimada por silencio positivo, salvo las excepciones previstas en la ley (art. 24.1 Ley 39/2015)."
+      },
+      {
+        question: "17. Un menor actúa en un procedimiento defendiendo un derecho propio sin representante. La Administración niega su capacidad por falta de plena capacidad civil. Analiza la capacidad de obrar en el procedimiento administrativo.",
+        options: [
+          "A) Puede tener capacidad administrativa",
+          "B) Nunca puede actuar",
+          "C) Solo con representante",
+          "D) Solo en vía judicial"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. Tienen capacidad de obrar ante las AAPP los menores de edad para el ejercicio y defensa de sus derechos cuya actuación esté permitida por el ordenamiento jurídico sin la asistencia de la persona que ejerza la patria potestad (art. 3 Ley 39/2015)."
+      },
+      {
+        question: "18. Un reglamento autonómico limita un derecho fundamental sin cobertura legal suficiente. La Administración lo aplica en un expediente. Analiza la validez del reglamento en relación con la reserva de ley.",
+        options: [
+          "A) Es válido por potestad reglamentaria",
+          "B) Vulnera la reserva de ley",
+          "C) Es solo anulable",
+          "D) Es válido si está motivado"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Los reglamentos no pueden regular materias reservadas a la ley ni establecer restricciones a derechos fundamentales sin una habilitación legal suficiente."
+      },
+      {
+        question: "19. Un escrito se presenta en un registro distinto del competente y se inadmite sin más trámite. Analiza la actuación correcta conforme al régimen de registros y cooperación administrativa.",
+        options: [
+          "A) Inadmitirlo",
+          "B) Archivarlo",
+          "C) Remitirlo al órgano competente",
+          "D) Exigir nueva presentación"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Los documentos presentados en los registros administrativos deben ser remitidos sin dilación a los órganos competentes para su tramitación (art. 16 Ley 39/2015)."
+      },
+      {
+        question: "20. Se dicta un acto discrecional sin motivación alguna. Analiza la incidencia de la motivación en el control de la discrecionalidad.",
+        options: [
+          "A) No es necesaria",
+          "B) Es un defecto formal",
+          "C) Es irrelevante",
+          "D) Vulnera el control jurídico"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. La motivación de los actos discrecionales es un requisito indispensable para permitir el control judicial e impedir la arbitrariedad de la Administración (art. 35 Ley 39/2015 y art. 9.3 CE)."
+      },
+      {
+        question: "21. En un procedimiento administrativo de autorización ambiental integrada, concurren varios interesados con intereses contrapuestos: el promotor de la instalación, una asociación vecinal y una ONG ambiental. Tras la incorporación de informes técnicos desfavorables en fase avanzada de instrucción, la Administración decide no otorgar trámite de audiencia a la asociación vecinal alegando que ya presentó alegaciones al inicio y que reiterarlas no aportaría valor. La asociación alega indefensión, pues los nuevos informes introducen elementos fácticos y valoraciones no conocidas previamente que afectan directamente a su posición jurídica. Analiza la naturaleza del trámite de audiencia y su carácter en relación con el derecho de defensa.",
+        options: [
+          "A) Vulnera una garantía esencial",
+          "B) Es correcto si ya alegó antes",
+          "C) Es un defecto leve",
+          "D) Solo afecta si prueba perjuicio"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. Omite el trámite de audiencia cuando en el expediente constan o se introducen hechos e informes nuevos vulnera una garantía esencial del procedimiento y causa indefensión (art. 82 Ley 39/2015)."
+      },
+      {
+        question: "22. Durante la tramitación de un expediente de responsabilidad patrimonial, el órgano instructor acuerda suspender el plazo máximo para resolver alegando sobrecarga de trabajo y falta de personal, sin identificar causa legal concreta ni notificar formalmente a los interesados. Meses después, se reanuda el procedimiento computando la suspensión. El reclamante impugna por entender que la suspensión no se ajusta a las causas tasadas y que vulnera su derecho a una resolución en plazo razonable. Examina la validez de la suspensión conforme a la normativa procedimental.",
+        options: [
+          "A) Válida por razones organizativas",
+          "B) Inválida por no ser causa legal",
+          "C) Válida si no excede cierto tiempo",
+          "D) Depende de la complejidad"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. El plazo máximo para resolver y notificar solo puede suspenderse por las causas tasadas legalmente (art. 22 Ley 39/2015); la sobrecarga de trabajo no constituye un supuesto legal habilitante de suspensión."
+      },
+      {
+        question: "23. Una Comunidad Autónoma regula mediante ley propia el procedimiento de evaluación ambiental omitiendo reglas básicas del procedimiento común estatal relativas a notificaciones, cómputo de plazos y derechos de los interesados. La Administración autonómica aplica dicha ley en un expediente concreto. Un interesado recurre alegando vulneración del marco competencial y de garantías básicas. Analiza la compatibilidad de la norma autonómica con las bases estatales en materia de procedimiento administrativo común.",
+        options: [
+          "A) Válida por competencia autonómica",
+          "B) Válida si mejora garantías",
+          "C) Vulnera bases estatales",
+          "D) Solo si hay perjuicio"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. La regulación del procedimiento administrativo común corresponde en exclusiva al Estado (art. 149.1.18ª CE), debiendo las CCAA respetar las garantías y reglas básicas estatales."
+      },
+      {
+        question: "24. En un procedimiento de subvenciones, el órgano gestor exige la comparecencia personal del solicitante para ratificar documentación presentada electrónicamente, sin acreditar incidencias en la identificación o integridad de los documentos. El interesado alega que la exigencia le impone cargas innecesarias y retrasa el procedimiento. Analiza la exigencia a la luz de los principios de buena administración, proporcionalidad y uso de medios electrónicos.",
+        options: [
+          "A) Correcta por control",
+          "B) Es indiferente",
+          "C) Solo si hay norma expresa",
+          "D) Vulnera proporcionalidad"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. La comparecencia personal de los ciudadanos solo es obligatoria cuando esté prevista expresamente en una ley; exigir presencia física sin motivo justificado ni cobertura legal vulnera la proporcionalidad y las garantías digitales (art. 19 Ley 39/2015)."
+      },
+      {
+        question: "25. Se dicta resolución sancionadora por un órgano distinto del legalmente competente en razón de la materia, perteneciente a la misma Administración. El sancionado impugna alegando la gravedad del vicio y solicita la nulidad del acto. Examina la consecuencia jurídica del vicio de incompetencia material manifiesta.",
+        options: [
+          "A) Nulidad de pleno derecho",
+          "B) Anulabilidad",
+          "C) Irregularidad no invalidante",
+          "D) Subsanación por el superior"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. Son nulos de pleno derecho los actos dictados por órgano manifiestamente incompetente por razón de la materia o del territorio (art. 47.1.b Ley 39/2015)."
+      },
+      {
+        question: "26. En un procedimiento sancionador iniciado por denuncia, el denunciante solicita ser considerado interesado para acceder al expediente y formular alegaciones. La Administración lo rechaza automáticamente por su condición de denunciante. Este acredita que el resultado del procedimiento puede incidir en su esfera jurídica por la afección directa a su actividad económica. Analiza si procede reconocerle la condición de interesado.",
+        options: [
+          "A) Nunca es interesado",
+          "B) Depende de interés legítimo",
+          "C) Siempre es interesado",
+          "D) Solo en sancionadores"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. La mera presentación de una denuncia no confiere por sí sola la condición de interesado; sin embargo, si el denunciante ostenta además un interés legítimo personal y directo en el resultado del expediente, debe reconocérsele dicha condición (art. 4 y 62 Ley 39/2015)."
+      },
+      {
+        question: "27. Un reglamento autonómico introduce requisitos adicionales a los previstos en una ley estatal aplicable, restringiendo el acceso a una autorización ambiental. La Administración aplica el reglamento en un caso concreto. El solicitante recurre invocando vulneración del principio de jerarquía normativa. Analiza la validez del reglamento y del acto dictado en su aplicación.",
+        options: [
+          "A) Válido por especialidad",
+          "B) Anulable",
+          "C) Nulo por contradecir la ley",
+          "D) Subsanable"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Las disposiciones administrativas reglamentarias que vulneren o contradigan normas con rango de ley son nulas de pleno derecho (art. 47.2 Ley 39/2015)."
+      },
+      {
+        question: "28. La Administración obliga a un ciudadano a realizar presencialmente un trámite que puede efectuarse por medios electrónicos, sin motivación específica. El ciudadano impugna por considerar que se le imponen cargas innecesarias contrarias a la normativa de administración electrónica y a los principios de eficacia y servicio al ciudadano. Examina qué principio resulta principalmente vulnerado.",
+        options: [
+          "A) Legalidad",
+          "B) Seguridad jurídica",
+          "C) Publicidad",
+          "D) Proporcionalidad"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Imponer trabas, desplazamientos físicos o trámites presenciales innecesarios vulnera la eficacia y el principio de proporcionalidad en la actuación administrativa."
+      },
+      {
+        question: "29. El Parlamento de Andalucía adopta una decisión organizativa que excede lo previsto en el Estatuto de Autonomía, amparándose en su autonomía institucional. Se plantea si dicha actuación puede ser controlada y cuáles son sus límites. Analiza la relación entre autonomía parlamentaria y sujeción al bloque de constitucionalidad.",
+        options: [
+          "A) Limitada por CE y Estatuto",
+          "B) Es válida por autonomía",
+          "C) No es revisable",
+          "D) Es solo política"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. La autonomía parlamentaria no sitúa a la Cámara por encima del ordenamiento; sus actos y normas están plenamente sujetos a la Constitución y al Estatuto de Autonomía."
+      },
+      {
+        question: "30. La Administración dicta un acto administrativo sin haber seguido ningún procedimiento previo, omitiendo trámites esenciales como audiencia e instrucción. El interesado recurre alegando la gravedad de la infracción procedimental. Analiza la consecuencia jurídica de la omisión total del procedimiento.",
+        options: [
+          "A) Anulabilidad",
+          "B) Nulidad de pleno derecho",
+          "C) Irregularidad",
+          "D) Subsanación"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Los actos dictados prescindiendo total y absolutamente del procedimiento legalmente establecido son nulos de pleno derecho (art. 47.1.e Ley 39/2015)."
+      },
+      {
+        question: "31. Una persona física, no obligada a relacionarse electrónicamente, opta voluntariamente por comunicarse con la Administración por medios electrónicos. Durante el procedimiento decide cambiar a notificaciones en papel. El órgano gestor deniega el cambio alegando seguridad del sistema. Analiza el derecho del interesado a elegir y modificar el canal de relación.",
+        options: [
+          "A) No puede cambiar",
+          "B) Solo con autorización",
+          "C) Puede cambiar libremente",
+          "D) Solo una vez"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Quienes no estén obligados a relacionarse por medios electrónicos pueden ejercitar y modificar voluntariamente la elección del medio en cualquier momento (art. 14.1 Ley 39/2015)."
+      },
+      {
+        question: "32. Un órgano administrativo dicta una resolución fuera de su ámbito territorial competencial, afectando a un ciudadano domiciliado en otra provincia donde existe órgano competente específico. El afectado recurre alegando vicio de competencia territorial. Analiza la consecuencia jurídica del defecto.",
+        options: [
+          "A) Nulidad",
+          "B) Inexistencia",
+          "C) Irregularidad",
+          "D) Anulabilidad"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Salvo que la incompetencia territorial sea manifiesta e insubsanable generando indefensión radical, la incompetencia jerárquica o territorial ordinaria constituye vicio de anulabilidad (art. 48 y 52 Ley 39/2015)."
+      },
+      {
+        question: "33. En un procedimiento iniciado de oficio para el restablecimiento de la legalidad ambiental, la Administración no resuelve en plazo. El interesado pretende derivar efectos favorables del silencio. Analiza el régimen del silencio en procedimientos de oficio.",
+        options: [
+          "A) No produce efectos favorables",
+          "B) Silencio positivo",
+          "C) Silencio negativo",
+          "D) Depende"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. En los procedimientos iniciados de oficio de los que se deriven efectos desfavorables o de gravamen, el vencimiento del plazo produce la caducidad del expediente, no la adquisición de derechos o efectos favorables por silencio."
+      },
+      {
+        question: "34. Se dicta un acto discrecional sin motivación, pese a existir informes contradictorios en el expediente. El interesado alega que no puede conocer las razones de la decisión ni combatirlas eficazmente. Analiza la exigencia de motivación en la discrecionalidad administrativa.",
+        options: [
+          "A) No es necesaria",
+          "B) Es necesaria para control",
+          "C) Solo formal",
+          "D) Irrelevante"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Los actos que se dicten en el ejercicio de potestades discrecionales exigen motivación formal para posibilitar su fiscalización jurídica y evitar arbitrariedades (art. 35.1.i Ley 39/2015)."
+      },
+      {
+        question: "35. Un ciudadano presenta documentos en castellano ante una Administración autonómica con lengua cooficial. El órgano le exige traducción a la lengua cooficial para continuar el procedimiento. El interesado impugna la exigencia. Analiza el régimen lingüístico aplicable en el procedimiento administrativo.",
+        options: [
+          "A) Siempre exigible",
+          "B) Depende del órgano",
+          "C) Vulnera derecho a usar castellano",
+          "D) Solo a extranjeros"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. El castellano es la lengua oficial del Estado y todos los españoles tienen el derecho a usarla (art. 3 CE); las AAPP autonómicas no pueden exigir traducciones a la lengua cooficial cuando los documentos se presentan en castellano (art. 15 Ley 39/2015)."
+      },
+      {
+        question: "36. Un órgano superior decide asumir la resolución de un expediente concreto atribuido a un órgano inferior, mediante acuerdo motivado y por razones de interés público. Identifica la técnica utilizada y sus requisitos.",
+        options: [
+          "A) Delegación",
+          "B) Encomienda",
+          "C) Suplencia",
+          "D) Avocación"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. La avocación permite a los órganos superiores avocar para sí el conocimiento de uno o varios asuntos cuya resolución corresponda a sus órganos dependientes cuando circunstancias de índole técnica, económica, social, jurídica o territorial lo hagan conveniente (art. 10 Ley 40/2015)."
+      },
+      {
+        question: "37. Un reglamento limita el ejercicio de un derecho sin cobertura legal suficiente. La Administración lo aplica en un caso concreto. El interesado recurre invocando la reserva de ley. Analiza la consecuencia.",
+        options: [
+          "A) Nulo por falta de ley",
+          "B) Válido",
+          "C) Vulnera jerarquía",
+          "D) Correcto si motivado"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. El reglamento que vulnera la reserva de ley incurre en nulidad de pleno derecho por vulnerar la jerarquía y el ordenamiento constitucional (art. 47.2 Ley 39/2015)."
+      },
+      {
+        question: "38. Se practica una notificación electrónica que no es accedida por el interesado dentro del plazo establecido. La Administración la da por rechazada y continúa el procedimiento. El interesado alega desconocimiento. Analiza el efecto jurídico de la falta de acceso.",
+        options: [
+          "A) No válida",
+          "B) Se entiende rechazada",
+          "C) Debe repetirse",
+          "D) Es nula"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Transcurridos diez días naturales desde la puesta a disposición de la notificación electrónica sin que se acceda a su contenido, se entenderá rechazada y se tendrá por efectuado el trámite siguiéndose el procedimiento (art. 43.2 Ley 39/2015)."
+      },
+      {
+        question: "39. Un representante actúa en nombre de un interesado sin acreditar formalmente la representación en el momento de la presentación. El órgano detecta el defecto. Analiza la actuación procedente.",
+        options: [
+          "A) Rechazo",
+          "B) Archivo",
+          "C) Requerir subsanación",
+          "D) Resolver sin más"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. La falta o insuficiente acreditación de la representación no impedirá que se tenga por realizado el acto de que se trate, siempre que se subsane en el plazo de diez días que deberá conceder el órgano administrativo (art. 5.6 Ley 39/2015)."
+      },
+      {
+        question: "40. El último día de un plazo administrativo coincide con un día inhábil. El interesado presenta el escrito el siguiente día hábil. La Administración lo considera extemporáneo. Analiza la regla de cómputo.",
+        options: [
+          "A) Vence el inhábil",
+          "B) Se pierde el plazo",
+          "C) Depende del órgano",
+          "D) Se prorroga al siguiente hábil"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Si el último día del plazo fuera inhábil, se entenderá prorrogado al primer día hábil siguiente (art. 30.5 Ley 39/2015)."
+      },
+      {
+        question: "41. El interesado manifiesta su voluntad de desistir de su solicitud en un procedimiento en curso. La Administración valora la existencia de intereses generales afectados. Analiza la procedencia del desistimiento.",
+        options: [
+          "A) Puede no aceptarse por interés general",
+          "B) Siempre procede",
+          "C) Nunca procede",
+          "D) Solo judicial"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. La Administración aceptará el desistimiento pero podrá limitar sus efectos o continuar el procedimiento si la cuestión entrañase un interés general o fuera conveniente esclarecerla (art. 94.4 Ley 39/2015)."
+      },
+      {
+        question: "42. Un interesado renuncia a un derecho reconocido en un procedimiento administrativo. Analiza la validez.",
+        options: [
+          "A) Siempre válida",
+          "B) Válida si no lo prohíbe el ordenamiento",
+          "C) Nunca válida",
+          "D) Solo en vía judicial"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. Todo interesado podrá renunciar a sus derechos cuando ello no esté prohibido por el ordenamiento jurídico ni sea contrario al interés general o a terceros (art. 94.1 Ley 39/2015)."
+      },
+      {
+        question: "43. Antes de iniciar formalmente un procedimiento, la Administración realiza actuaciones previas de investigación para determinar si concurren circunstancias que justifiquen su apertura. Un afectado cuestiona su legalidad. Analiza la licitud de dichas actuaciones.",
+        options: [
+          "A) Prohibidas",
+          "B) Solo judiciales",
+          "C) Permitidas",
+          "D) Irrelevantes"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. Con anterioridad al inicio del procedimiento, el órgano competente podrá abrir un período de información o actuaciones previas con el fin de conocer las circunstancias del caso concreto y la conveniencia o no de iniciar el procedimiento (art. 55 Ley 39/2015)."
+      },
+      {
+        question: "44. En un procedimiento con posible incidencia general, se plantea la apertura de un trámite de información pública. Analiza cuándo procede y su finalidad.",
+        options: [
+          "A) Siempre obligatorio",
+          "B) Nunca necesario",
+          "C) Solo ambiental",
+          "D) Cuando proceda por la naturaleza del asunto"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. El órgano al que corresponda la resolución podrá acordar un período de información pública cuando la naturaleza del procedimiento lo requiera para dar voz a cualquier persona física o jurídica (art. 83 Ley 39/2015)."
+      },
+      {
+        question: "45. Se omite el trámite de audiencia al interesado antes de dictar resolución desfavorable. Este recurre alegando indefensión. Analiza la naturaleza del trámite.",
+        options: [
+          "A) Esencial",
+          "B) Prescindible",
+          "C) Formal",
+          "D) Solo sancionador"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. El trámite de audiencia es una garantía fundamental del procedimiento administrativo cuya omisión produce la indefensión del interesado (art. 82 Ley 39/2015 y art. 48.2 Ley 39/2015)."
+      },
+      {
+        question: "46. La resolución administrativa no responde a las pretensiones planteadas por el interesado ni a las cuestiones suscitadas en el procedimiento. Analiza el vicio.",
+        options: [
+          "A) Válida",
+          "B) Defecto grave por incongruencia",
+          "C) Irrelevante",
+          "D) Subsanable"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. La resolución de los procedimientos debe responder a todas las cuestiones planteadas por los interesados y las derivadas del mismo, incurriendo en incongruencia en caso contrario (art. 88.1 Ley 39/2015)."
+      },
+      {
+        question: "47. Se acuerda la acumulación de dos procedimientos con identidad sustancial de objeto y sujetos para su tramitación conjunta. Un interesado se opone. Analiza la procedencia.",
+        options: [
+          "A) Prohibida",
+          "B) Obligatoria",
+          "C) Permitida",
+          "D) Solo judicial"
+        ],
+        correct: 2,
+        justification: "Respuesta oficial C. El órgano administrativo que inicie o tramite un procedimiento podrá disponer su acumulación a otros con los que guarde íntima conexión o identidad sustancial (art. 57 Ley 39/2015)."
+      },
+      {
+        question: "48. Durante la instrucción se propone la práctica de diversos medios de prueba por las partes. El órgano limita su admisión sin motivación. Analiza el régimen de prueba.",
+        options: [
+          "A) Limitada",
+          "B) Solo documental",
+          "C) Solo pericial",
+          "D) Amplia con motivación"
+        ],
+        correct: 3,
+        justification: "Respuesta oficial D. Los hechos relevantes para la decisión de un procedimiento podrán acreditarse por cualquier medio de prueba admisible en Derecho, y su rechazo solo procederá cuando sean manifiestamente improcedentes o innecesarios, mediante resolución motivada (art. 77 Ley 39/2015)."
+      },
+      {
+        question: "49. Se emiten informes en el procedimiento por distintos órganos. La resolución se aparta de ellos sin motivación. Analiza el valor de los informes.",
+        options: [
+          "A) No vinculantes salvo norma",
+          "B) Siempre vinculantes",
+          "C) Obligatorios siempre",
+          "D) Decisivos siempre"
+        ],
+        correct: 0,
+        justification: "Respuesta oficial A. Salvo disposición legal en contrario, los informes serán facultativos y no vinculantes (art. 80.1 Ley 39/2015), aunque apartarse del criterio técnico exige fundamentación expresa."
+      },
+      {
+        question: "50. La Administración dicta resolución expresa fuera de plazo en un procedimiento iniciado a instancia de parte. El interesado alega su invalidez por extemporaneidad. Analiza la validez de la resolución tardía.",
+        options: [
+          "A) Nula",
+          "B) Válida, aunque extemporánea",
+          "C) Irrelevante",
+          "D) Depende"
+        ],
+        correct: 1,
+        justification: "Respuesta oficial B. La Administración está obligada a resolver de forma expresa en todos los procedimientos; la resolución expresa posterior al vencimiento del plazo es válida, teniendo en cuenta los efectos del silencio producido (art. 21 y 24.3 Ley 39/2015)."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 16.04.2026 (50 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = `${qIndex + 1}. ${q.question}`;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 23.04.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (23.04.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una Administración autonómica invoca el Preámbulo constitucional para justificar una restricción singular del acceso a información pública ambiental, afirmando que la defensa del interés general permite modular cualquier expectativa individual. ¿Cuál es el razonamiento más sólido frente a esa tesis?",
+        options: [
+          "A) El Preámbulo orienta, pero no sustituye las garantías normativas del bloque de constitucionalidad ni habilita por sí mismo restricciones singulares.",
+          "B) El Preámbulo tiene siempre valor normativo superior al articulado.",
+          "C) Toda restricción basada en el interés general queda excluida del control judicial.",
+          "D) El Preámbulo puede desplazar cualquier ley ordinaria cuando la Administración motive la medida."
+        ],
+        correct: 0,
+        justification: "El Preámbulo tiene valor interpretativo y político, pero no habilita por sí mismo restricciones administrativas al margen del articulado constitucional y legal[cite: 340]."
+      },
+      {
+        question: "2. En un debate parlamentario andaluz se sostiene que, al residir la soberanía en el pueblo español, el Parlamento de Andalucía no puede ejercer control político efectivo sobre el Consejo de Gobierno. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) Es cierta, porque todo control político corresponde exclusivamente a las Cortes Generales.",
+          "B) Es incorrecta: la soberanía nacional no impide que los órganos de autogobierno ejerzan las funciones de control previstas en la Constitución y en el Estatuto.",
+          "C) Solo sería correcta si el control se refiere a materias estatales.",
+          "D) La afirmación depende de que el Parlamento actúe por mayoría absoluta."
+        ],
+        correct: 1,
+        justification: "La soberanía nacional no excluye la autonomía política de las comunidades autónomas ni sus instituciones de control[cite: 340]."
+      },
+      {
+        question: "3. Una ley ordinaria estatal regula de forma completa el régimen electoral general y añade una cláusula que permite al Gobierno alterar por reglamento elementos esenciales del sistema de sufragio. ¿Dónde se sitúa el problema principal?",
+        options: [
+          "A) En la prohibición de la costumbre constitucional.",
+          "B) En la libre configuración reglamentaria del Ejecutivo.",
+          "C) En la reserva de ley orgánica para el régimen electoral general y en los límites del reglamento sobre sus elementos esenciales.",
+          "D) En la imposibilidad de que el Estado legisle en materia electoral."
+        ],
+        correct: 2,
+        justification: "El régimen electoral general está reservado a ley orgánica y sus elementos esenciales no pueden quedar remitidos sin límites al reglamento[cite: 340]."
+      },
+      {
+        question: "4. Durante una visita institucional, el Rey expresa una opinión política no refrendada y un órgano administrativo pretende otorgarle efectos ejecutivos inmediatos. ¿Cuál es la calificación más precisa?",
+        options: [
+          "A) La opinión regia produce efectos directos por la inviolabilidad de la Corona.",
+          "B) Solo produciría efectos si se publica en el BOE como real comunicación.",
+          "C) La ausencia de refrendo carece de toda relevancia si existe interés general.",
+          "D) La actuación es jurídicamente inviable: los actos del Rey requieren refrendo en los casos constitucionalmente previstos y la inviolabilidad no convierte una opinión en decisión ejecutiva."
+        ],
+        correct: 3,
+        justification: "La inviolabilidad del Rey no sustituye las exigencias constitucionales de refrendo ni convierte manifestaciones políticas en actos con eficacia jurídica directa[cite: 340]."
+      },
+      {
+        question: "5. En una comisión parlamentaria se afirma que la libertad ideológica protege únicamente convicciones íntimas y nunca la negativa del ciudadano a declarar sobre ellas en un procedimiento administrativo. ¿Qué valoración es más ajustada?",
+        options: [
+          "A) Es incorrecta: la libertad ideológica incluye la prohibición de obligar a declarar sobre la propia ideología, religión o creencias, salvo los límites constitucionales del orden público.",
+          "B) Es correcta, porque la dimensión externa de la libertad ideológica no existe en la Constitución.",
+          "C) Solo sería falsa respecto de los extranjeros.",
+          "D) Depende de que el procedimiento sea sancionador."
+        ],
+        correct: 0,
+        justification: "La Constitución reconoce la libertad ideológica y prohíbe imponer la declaración sobre ideología, religión o creencias[cite: 341]."
+      },
+      {
+        question: "6. Un reglamento prevé que los detenidos por infracciones administrativas graves puedan permanecer privados de libertad cuatro días para practicar comprobaciones documentales. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Es válida si la medida se motiva por la complejidad del expediente.",
+          "B) Vulnera la garantía constitucional de la libertad personal y el límite máximo de la detención preventiva, que solo cabe en el marco y por las causas legalmente previstas.",
+          "C) Solo sería inválida si faltara control parlamentario posterior.",
+          "D) Es correcta respecto de extranjeros."
+        ],
+        correct: 1,
+        justification: "Un reglamento no puede crear supuestos de privación de libertad ni superar los límites constitucionalmente previstos[cite: 341]."
+      },
+      {
+        question: "7. Un órgano administrativo autoriza la entrada en un domicilio particular para inspección ambiental por mera conveniencia probatoria, sin consentimiento del titular ni resolución judicial. ¿Cuál es la valoración correcta?",
+        options: [
+          "A) Es admisible cuando exista interés público intenso.",
+          "B) Solo sería legítimo si lo acuerda la policía autonómica.",
+          "C) Vulnera la inviolabilidad domiciliaria, salvo consentimiento o resolución judicial, además de los supuestos constitucionales excepcionales.",
+          "D) Queda cubierto por la autotutela administrativa."
+        ],
+        correct: 2,
+        justification: "La entrada en domicilio exige consentimiento o resolución judicial, salvo los casos constitucionales excepcionales como flagrante delito[cite: 341]."
+      },
+      {
+        question: "8. Una Administración intenta interceptar comunicaciones electrónicas de una empresa para verificar el cumplimiento de obligaciones ambientales, con una simple autorización administrativa interna fundada en razones de urgencia. ¿Cuál es la respuesta más precisa?",
+        options: [
+          "A) Es válida si el fin perseguido es ambiental.",
+          "B) Es válida respecto de personas jurídicas, porque el secreto de las comunicaciones solo protege a las personas físicas.",
+          "C) No existe problema si la medida es temporal.",
+          "D) La medida desconoce la garantía constitucional del secreto de las comunicaciones, que solo puede limitarse con las garantías legalmente exigibles y control jurisdiccional cuando proceda."
+        ],
+        correct: 3,
+        justification: "El secreto de las comunicaciones exige autorización judicial previa para su intervención y no puede basarse en una simple medida administrativa[cite: 341]."
+      },
+      {
+        question: "9. En un procedimiento disciplinario se rechaza toda prueba propuesta por el expedientado con la fórmula estereotipada de que 'la Administración ya dispone de convicción suficiente'. ¿Qué perspectiva constitucional resulta más exigente?",
+        options: [
+          "A) La denegación inmotivada puede comprometer el derecho de defensa y las garantías procedimentales cuando impide la contradicción sobre hechos relevantes.",
+          "B) Solo se afecta la eficacia administrativa.",
+          "C) No existe problema fuera del proceso judicial.",
+          "D) La Administración puede prescindir de la prueba de descargo si actúa en vía interna."
+        ],
+        correct: 0,
+        justification: "La denegación inmotivada de prueba pertinente puede vulnerar el derecho de defensa e impedir la contradicción adecuada[cite: 341, 342]."
+      },
+      {
+        question: "10. Un órgano administrativo andaluz niega el acceso a un cargo público a una aspirante porque durante una entrevista manifestó opiniones críticas con la política ambiental del Gobierno. La decisión no se apoya en méritos ni capacidad. ¿Qué enfoque es el más correcto?",
+        options: [
+          "A) Se vulneran la igualdad en el acceso a funciones públicas según mérito y capacidad y la prohibición de discriminación por opinión.",
+          "B) Solo se vulnera la libertad de expresión.",
+          "C) La decisión es inmune al control por ser un puesto de confianza técnica.",
+          "D) La objeción solo existe si el puesto depende del Estado."
+        ],
+        correct: 0,
+        justification: "El acceso a funciones públicas debe ajustarse a mérito y capacidad, sin que quepan discriminaciones por razón de opinión[cite: 342]."
+      },
+      {
+        question: "11. Se convoca una manifestación ante una sede administrativa y la autoridad gubernativa la prohíbe de plano alegando que el contenido de los lemas resulta hostil hacia el Ejecutivo autonómico. No consta riesgo concreto para personas o bienes. ¿Cuál es la respuesta más sólida?",
+        options: [
+          "A) La prohibición es válida por razón de neutralidad institucional.",
+          "B) Solo sería dudosa si la convocatoria fuera sindical.",
+          "C) La prohibición es dudosa porque el derecho de reunión no puede limitarse por el contenido crítico del mensaje, sino por riesgos ciertos para el orden público con peligro para personas o bienes.",
+          "D) Es correcta si la sede pertenece a la Junta de Andalucía."
+        ],
+        correct: 2,
+        justification: "Las limitaciones al derecho de reunión exigen razones probadas de alteración del orden público con peligro para personas o bienes, no discrepancias políticas[cite: 342]."
+      },
+      {
+        question: "12. Un alumno sostiene que el derecho de asociación no protege a entidades que persiguen fines de defensa ambiental porque la Constitución solo ampara asociaciones de interés económico o profesional. ¿Qué contestación es correcta?",
+        options: [
+          "A) Es correcto salvo que exista subvención pública.",
+          "B) Depende de que la asociación tenga ánimo de lucro.",
+          "C) Solo las asociaciones inscritas antes de 1978 quedan protegidas.",
+          "D) Es incorrecto: la libertad de asociación ampara asociaciones con fines lícitos de muy diversa naturaleza, también cívica o ambiental."
+        ],
+        correct: 3,
+        justification: "La libertad de asociación ampara la creación de entidades lícitas para fines cívicos, sociales o ambientales[cite: 342]."
+      },
+      {
+        question: "13. Una Administración autonómica publica datos personales especialmente sensibles de un denunciante ambiental para ilustrar la trazabilidad del expediente. ¿Qué parámetro constitucional es más directamente afectado?",
+        options: [
+          "A) La protección constitucional del honor, la intimidad y el mandato de limitar el uso de la informática para garantizar derechos.",
+          "B) El derecho de propiedad del afectado.",
+          "C) La libertad sindical.",
+          "D) Solo la publicidad activa administrativa."
+        ],
+        correct: 0,
+        justification: "La difusión de datos personales sensibles afecta directamente a la intimidad y al mandato de limitar el uso de la informática[cite: 342]."
+      },
+      {
+        question: "14. Un reglamento crea una sanción pecuniaria de cuantía desproporcionada y una privación de derechos no prevista en ninguna ley previa, invocando razones de emergencia ambiental. ¿Qué análisis constitucional es más acertado?",
+        options: [
+          "A) Es válido si lo firma el Consejo de Gobierno.",
+          "B) Se comprometen la legalidad sancionadora y las garantías procedimentales, además del derecho de propiedad en su dimensión constitucional.",
+          "C) Solo plantea un problema de técnica reglamentaria.",
+          "D) Las sanciones ambientales no exigen norma con rango de ley."
+        ],
+        correct: 1,
+        justification: "Las sanciones administrativas exigen cobertura legal previa y no pueden ser tipificadas ex novo por un reglamento[cite: 343]."
+      },
+      {
+        question: "15. En un seminario se afirma que todas las leyes que regulan materias incluidas en el Título I de la Constitución son automáticamente leyes orgánicas. ¿Qué respuesta es más precisa?",
+        options: [
+          "A) Es correcta porque todo el Título I exige ley orgánica.",
+          "B) Solo son orgánicas si regulan deberes ciudadanos.",
+          "C) Es inexacta: la reserva de ley orgánica se refiere, entre otros supuestos, al desarrollo de los derechos fundamentales y libertades públicas en el ámbito constitucionalmente previsto, no a todo el Título I indistintamente.",
+          "D) La cuestión carece de relevancia porque todas las leyes tienen el mismo rango."
+        ],
+        correct: 2,
+        justification: "La reserva de ley orgánica concierne a la Sección 1ª del Capítulo II del Título I, no a la totalidad del Título I de la CE[cite: 343]."
+      },
+      {
+        question: "16. En el Parlamento andaluz se plantea que la inviolabilidad de la Cámara permite sustraer del control jurisdiccional cualquier acuerdo administrativo interno sobre personal, contratación o presupuesto. ¿Cuál es la mejor respuesta?",
+        options: [
+          "A) Es correcta por la separación de poderes.",
+          "B) Solo el Tribunal Constitucional podría revisar esos actos.",
+          "C) La afirmación es válida respecto de cualquier contrato parlamentario.",
+          "D) La inviolabilidad institucional no convierte en inmunes al control todos los actos internos de naturaleza administrativa."
+        ],
+        correct: 3,
+        justification: "Los actos administrativos y de gestión interna del Parlamento están plenamente sometidos al control de los tribunales ordinarios[cite: 343]."
+      },
+      {
+        question: "17. En una sesión de investidura andaluza se defiende que, al no obtenerse mayoría absoluta en primera votación, el candidato queda automáticamente descartado y debe abrirse un procedimiento nuevo de propuesta. ¿Qué juicio es más ajustado?",
+        options: [
+          "A) No es correcto: el sistema prevé una segunda votación con umbral distinto, precisamente para facilitar la formación de gobierno sin vaciar la legitimación parlamentaria.",
+          "B) Es correcto, porque la segunda votación solo existe para el Congreso de los Diputados.",
+          "C) Solo sería correcto si hubiera varios candidatos.",
+          "D) Depende del reglamento interno del grupo mayoritario."
+        ],
+        correct: 0,
+        justification: "De no obtenerse mayoría absoluta en la primera votación, se celebra una nueva votación 48 horas después requiriéndose solo mayoría simple[cite: 343]."
+      },
+      {
+        question: "18. La Presidencia de la Junta nombra dos Vicepresidencias y, meses después, cesa a una de sus titulares. Se sostiene que la Vicepresidencia subsiste vacante hasta nueva designación. Según el esquema legal aplicable, ¿qué interpretación es más correcta?",
+        options: [
+          "A) La Vicepresidencia subsiste siempre como órgano estable.",
+          "B) El cese lleva aparejada la supresión del órgano cuando así lo prevé la normativa específica de la Vicepresidencia.",
+          "C) El cese del titular no tiene efecto orgánico alguno.",
+          "D) Solo desaparece si lo acuerda el Parlamento."
+        ],
+        correct: 1,
+        justification: "La Ley del Gobierno de Andalucía prevé que el cese del titular de una Vicepresidencia supone la supresión del órgano salvo reestructuración[cite: 343, 344]."
+      },
+      {
+        question: "19. Una norma autonómica atribuye al Presidente de la Junta un poder unilateral para impedir comparecencias de miembros del Consejo de Gobierno ante el Parlamento cuando considere que las preguntas son 'inoportunas'. ¿Qué objeción institucional es más sólida?",
+        options: [
+          "A) Es válida por la posición prevalente del Presidente.",
+          "B) Solo sería objetable si afectara al presupuesto.",
+          "C) Desnaturaliza la función de control parlamentario sobre el Ejecutivo y altera el equilibrio institucional previsto en el Estatuto.",
+          "D) Queda amparada en la autonomía organizativa de la Junta."
+        ],
+        correct: 2,
+        justification: "Un veto unilateral del Presidente a las comparecencias parlamentarias atenta contra la función estatutaria de control del Parlamento sobre el Gobierno[cite: 344]."
+      },
+      {
+        question: "20. Una menor de 16 años presenta una solicitud en un procedimiento administrativo de juventud sin representante y el instructor la inadmite directamente por carecer de plena capacidad civil. ¿Qué valoración es más correcta?",
+        options: [
+          "A) Es correcta porque la capacidad administrativa coincide siempre con la civil plena.",
+          "B) Solo podría actuar si estuviera emancipada.",
+          "C) Es válida si el acto es desfavorable.",
+          "D) La exigencia es excesiva: en vía administrativa puede reconocerse capacidad de obrar a menores cuando el ordenamiento les habilita para la defensa de sus intereses."
+        ],
+        correct: 3,
+        justification: "Los menores tienen capacidad de obrar para actuar en vía administrativa sin asistencia cuando el ordenamiento les habilite (art. 3 LPAC)[cite: 344]."
+      },
+      {
+        question: "21. En un procedimiento concurren varios copropietarios afectados por una misma resolución. Todos presentan escritos separados, pero el órgano decide notificar solo al primero porque no designaron representante común. ¿Cuál es la solución legal más ajustada?",
+        options: [
+          "A) Debe notificar a todos siempre, sin excepción.",
+          "B) La Administración puede considerar representante al que figure en primer término, salvo manifestación en contrario o designación expresa de otro.",
+          "C) Debe suspender el procedimiento hasta que nombren representante formal ante notario.",
+          "D) Solo puede actuar frente a quien inició el expediente."
+        ],
+        correct: 1,
+        justification: "Si varios interesados formulan una solicitud o comparecen sin designar representante, la actuación se entenderá con el que figure en primer término (art. 5 LPAC)[cite: 344]."
+      },
+      {
+        question: "22. Una empresa aporta un apoderamiento inscrito en un registro electrónico de apoderamientos distinto del de la Administración actuante. El instructor lo rechaza porque no fue otorgado ante su propia sede electrónica. ¿Qué respuesta es más precisa?",
+        options: [
+          "A) El rechazo es correcto, porque cada Administración solo reconoce sus propios registros.",
+          "B) El sistema legal admite registros electrónicos de apoderamientos interoperables en los términos previstos, por lo que el rechazo automático es incorrecto.",
+          "C) La representación solo se acredita mediante poder notarial en papel.",
+          "D) Solo cabe representación apud acta presencial."
+        ],
+        correct: 1,
+        justification: "Los registros electrónicos de apoderamientos son interoperables entre sí conforme al art. 6 LPAC, por lo que su rechazo directo es ilegal[cite: 344]."
+      },
+      {
+        question: "23. Una asociación comparece en un procedimiento por medio de representante y el órgano admite todos sus escritos, pero al dictarse una resolución desfavorable declara retroactivamente inválida toda la actuación por defectos menores de acreditación del poder que nunca pidió subsanar. ¿Qué valoración procede?",
+        options: [
+          "A) La Administración actuó correctamente al revisar de oficio toda la representación al final.",
+          "B) La consecuencia correcta habría sido la nulidad radical del procedimiento desde el inicio.",
+          "C) Debió requerir la acreditación o subsanación cuando dudó de la representación; no es ajustado aprovechar un defecto no subsanado para vaciar actuaciones ya admitidas.",
+          "D) La Administración puede declarar la invalidez total en cualquier momento, sin trámite previo."
+        ],
+        correct: 2,
+        justification: "Si la acreditación del poder presenta deficiencias, la Administración debe conceder un plazo de diez días para la subsanación (art. 5.6 LPAC)[cite: 345]."
+      },
+      {
+        question: "24. Un ciudadano utiliza un sistema de identificación admitido por la Administración para acceder a su expediente electrónico. El órgano le exige adicionalmente firma electrónica avanzada para una mera consulta. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Toda actuación electrónica exige firma avanzada.",
+          "B) Solo sería objetable si la consulta se refiere a datos ambientales.",
+          "C) La exigencia es libre por razones de ciberseguridad.",
+          "D) Identificación y firma no son categorías equivalentes: para una simple consulta no puede exigirse firma si basta la identificación legalmente admitida."
+        ],
+        correct: 3,
+        justification: "Para realizar simples consultas o accesos informativos basta la identificación, sin que pueda exigirse firma electrónica (arts. 9 y 10 LPAC)[cite: 345]."
+      },
+      {
+        question: "25. Una persona física no obligada electrónicamente acude a una oficina de asistencia en materia de registros para presentar una solicitud compleja y pide ayuda para identificarse y firmar. El empleado se niega alegando que la asistencia solo se presta a sujetos obligados al canal electrónico. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) Es incorrecta: la Administración debe prestar asistencia en el uso de medios electrónicos a quienes lo necesiten en los términos legales.",
+          "B) Es correcta, porque la oficina solo apoya a personas jurídicas.",
+          "C) Solo habría deber de ayuda si la solicitud fuera sancionadora.",
+          "D) La asistencia depende de que exista cita previa."
+        ],
+        correct: 0,
+        justification: "Las AAPP están obligadas a prestar asistencia en el uso de medios electrónicos a las personas físicas no obligadas que lo requieran (art. 12 LPAC)[cite: 345]."
+      },
+      {
+        question: "26. Un procedimiento administrativo se tramita íntegramente en castellano, pese a que el interesado había solicitado motivadamente el uso de la lengua cooficial propia del territorio en sus relaciones con la Administración competente. El órgano descarta la petición por razones de comodidad organizativa. ¿Qué solución es más correcta?",
+        options: [
+          "A) La Administración puede elegir siempre la lengua por razones de eficacia interna.",
+          "B) El régimen lingüístico del procedimiento no puede resolverse por mera conveniencia administrativa cuando la normativa reconoce opciones al interesado.",
+          "C) Solo cabe usar la lengua cooficial en procedimientos sancionadores.",
+          "D) La petición carece de relevancia si el funcionario entiende ambas lenguas."
+        ],
+        correct: 1,
+        justification: "El régimen lingüístico garantiza el derecho del interesado a elegir la lengua oficial en los términos legales (art. 15 LPAC)[cite: 345]."
+      },
+      {
+        question: "27. Un escrito se presenta en una oficina de asistencia en materia de registros de una Administración distinta de la competente, pero el funcionario se niega a admitirlo alegando que solo puede recibir documentos propios. ¿Qué respuesta es la más ajustada?",
+        options: [
+          "A) La negativa es correcta salvo convenio expreso entre administraciones.",
+          "B) El escrito solo puede presentarse por correo administrativo.",
+          "C) Las oficinas de asistencia y registros habilitados forman parte del sistema legal de presentación, por lo que la negativa automática no es ajustada.",
+          "D) La admisión depende de que el ciudadano pague tasa de remisión."
+        ],
+        correct: 2,
+        justification: "Las oficinas de asistencia integran el registro público general e interoperable, debiendo admitirse escritos para cualquier Administración (art. 16 LPAC)[cite: 345, 346]."
+      },
+      {
+        question: "28. Una Administración destruye documentos electrónicos de procedimientos finalizados porque considera suficiente conservar una ficha-resumen en una base de datos interna. ¿Qué objeción legal es más sólida?",
+        options: [
+          "A) Ninguna, si la ficha resume el contenido esencial.",
+          "B) Solo existiría problema respecto de expedientes sancionadores.",
+          "C) El archivo electrónico es una opción organizativa, no una obligación.",
+          "D) La exigencia de archivo electrónico y conservación de documentos no se satisface con una mera reseña carente de integridad y autenticidad documental."
+        ],
+        correct: 3,
+        justification: "Las Administraciones están obligadas a mantener un archivo electrónico único de todos los documentos auténticos e íntegros (art. 17 LPAC)[cite: 346]."
+      },
+      {
+        question: "29. Un órgano impone a un ciudadano comparecencias presenciales sucesivas sin justificar la necesidad concreta de cada una, pese a disponer ya de toda la documentación relevante. ¿Qué juicio es más ajustado?",
+        options: [
+          "A) Las comparecencias exigen previsión y justificación; no pueden convertirse en cargas arbitrarias o innecesarias para el interesado.",
+          "B) La comparecencia puede imponerse libremente por el instructor.",
+          "C) Solo en procedimientos tributarios debe motivarse.",
+          "D) La falta de motivación no tiene trascendencia si el ciudadano acude."
+        ],
+        correct: 0,
+        justification: "La comparecencia personal solo es obligatoria cuando esté prevista expresamente en una ley y responda a un fin indispensable (art. 19 LPAC)[cite: 346]."
+      },
+      {
+        question: "30. Una unidad administrativa reconoce que tiene cientos de expedientes paralizados, pero decide no resolver ni adoptar medidas porque entiende que el silencio administrativo 'ya resolverá por sí solo'. ¿Cuál es la objeción más sólida?",
+        options: [
+          "A) No existe problema, porque el silencio es una forma ordinaria de resolución expresa.",
+          "B) La Administración incumple la obligación de resolver expresamente y la responsabilidad de la tramitación, que no queda sustituida por el silencio.",
+          "C) Solo habría incumplimiento si el interesado formula queja.",
+          "D) La obligación de resolver solo rige en procedimientos iniciados de oficio."
+        ],
+        correct: 1,
+        justification: "La Administración está obligada a dictar resolución expresa en todos los procedimientos (art. 21 LPAC); el silencio no exime de dicho deber[cite: 346]."
+      },
+      {
+        question: "31. Un órgano suspende el plazo máximo para resolver porque su personal está de vacaciones y existe acumulación de trabajo. No identifica causa legal específica ni notifica la suspensión a los interesados. ¿Qué respuesta es más correcta?",
+        options: [
+          "A) La suspensión es válida si la unidad tiene mucha carga de trabajo.",
+          "B) Es irrelevante mientras no venza el plazo máximo.",
+          "C) La suspensión no es ajustada: solo procede por causas legales tasadas y debe formalizarse conforme a la ley.",
+          "D) Basta una anotación interna del jefe de servicio."
+        ],
+        correct: 2,
+        justification: "La suspensión del plazo máximo para resolver está tasada por ley (art. 22 LPAC) y no cabe por motivos organizativos internos[cite: 346]."
+      },
+      {
+        question: "32. La Administración acuerda ampliar el plazo máximo para resolver cuando ya había vencido el plazo originario sin resolución. ¿Qué valoración procede?",
+        options: [
+          "A) Es admisible si el interesado no se opone.",
+          "B) Solo es posible en procedimientos iniciados de oficio.",
+          "C) Es correcta si la acordó un órgano superior jerárquico.",
+          "D) La ampliación extemporánea no es válida, porque no puede rescatar un plazo máximo ya consumido."
+        ],
+        correct: 3,
+        justification: "La ampliación de plazos solo es válida si se acuerda de forma motivada antes de la expiración del plazo originario (art. 32 LPAC)[cite: 346, 347]."
+      },
+      {
+        question: "33. En un procedimiento iniciado a solicitud del interesado, el órgano sostiene que el silencio siempre es desestimatorio porque así se garantiza mejor el interés público. ¿Qué respuesta es la más ajustada?",
+        options: [
+          "A) Es incorrecta: en procedimientos iniciados a solicitud del interesado rige, con carácter general, el silencio estimatorio, salvo excepciones legales o derivadas del Derecho de la Unión o internacional aplicable.",
+          "B) Es correcta, porque el silencio administrativo es siempre negativo.",
+          "C) La regla general es el silencio desestimatorio salvo en subvenciones.",
+          "D) La Administración puede elegir caso por caso el sentido del silencio."
+        ],
+        correct: 0,
+        justification: "En procedimientos a instancia de parte la regla general es el silencio positivo, salvo las excepciones legales explícitas (art. 24 LPAC)[cite: 347]."
+      },
+      {
+        question: "34. En un procedimiento iniciado de oficio del que pueden derivarse efectos desfavorables para un particular, transcurre el plazo máximo sin resolución. El órgano pretende seguir tramitando como si nada hubiera ocurrido. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) La Administración puede seguir indefinidamente mientras no haya caducidad expresa.",
+          "B) La falta de resolución en plazo produce efectos específicos que impiden ignorar el régimen legal aplicable a los procedimientos iniciados de oficio con efectos desfavorables.",
+          "C) El procedimiento se entiende siempre estimado.",
+          "D) Solo debe archivarse si lo pide el denunciado."
+        ],
+        correct: 1,
+        justification: "En procedimientos desfavorables de oficio, el vencimiento del plazo sin resolución produce la caducidad y el archivo (art. 25 LPAC)[cite: 347]."
+      },
+      {
+        question: "35. Un ciudadano aporta una copia digitalizada simple de un documento privado y la Administración la rechaza porque no fue compulsada por notario. El documento no presenta signos de manipulación. ¿Qué solución es más correcta?",
+        options: [
+          "A) El rechazo es automático en todo caso.",
+          "B) Solo las copias auténticas sirven en vía administrativa.",
+          "C) La ley permite con carácter general la aportación de copias, sin perjuicio de las facultades de comprobación de la Administración cuando existan dudas fundadas.",
+          "D) La Administración debe exigir siempre el original en papel."
+        ],
+        correct: 2,
+        justification: "Los interesados pueden presentar copias simples de los documentos, reservándose la Administración la facultad de cotejo de forma motivada (art. 28 LPAC)[cite: 347]."
+      },
+      {
+        question: "36. Un órgano exige a un administrado aportar un original en papel de un documento expedido electrónicamente por otra Administración, pese a poder verificar su autenticidad por código seguro. ¿Qué crítica es más sólida?",
+        options: [
+          "A) Es correcto porque el original en papel prevalece siempre.",
+          "B) Solo sería objetable si el documento procediera de la misma Administración.",
+          "C) La Administración puede exigir cualquier soporte por prudencia.",
+          "D) El requerimiento es excesivo y contrario a las reglas sobre validez de copias y documentos emitidos electrónicamente por las Administraciones."
+        ],
+        correct: 3,
+        justification: "Los documentos emitidos electrónicamente con código seguro de verificación son válidos y plenamente eficaces sin necesidad de cotejo en papel[cite: 347]."
+      },
+      {
+        question: "37. Un plazo se fija por días y la Administración empieza a contarlo el mismo día de la notificación. El interesado alega que el cómputo se ha adelantado indebidamente. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) La regla legal excluye el día de la notificación o publicación del cómputo de plazos fijados por días.",
+          "B) La Administración acierta, porque el dies a quo coincide con la notificación.",
+          "C) Solo depende de si el plazo es para alegaciones o recursos.",
+          "D) El criterio administrativo es válido si el acto lo prevé expresamente."
+        ],
+        correct: 0,
+        justification: "Los plazos fijados por días se cuentan a partir del día siguiente a aquel en que tenga lugar la notificación (art. 30.2 LPAC)[cite: 348]."
+      },
+      {
+        question: "38. El último día de un plazo administrativo es inhábil en el municipio del interesado pero hábil en la sede del órgano. El instructor decide tenerlo por vencido. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) El criterio del órgano es correcto si la sede administrativa estaba abierta.",
+          "B) La ley contiene reglas específicas de cómputo y de calendario aplicables a estas situaciones; no cabe decidirlo arbitrariamente por conveniencia del instructor.",
+          "C) Solo cuenta la habilitación del lugar donde se dicta el acto.",
+          "D) Siempre prevalece el calendario del domicilio del funcionario tramitador."
+        ],
+        correct: 1,
+        justification: "Si un día es inhábil en el municipio del interesado se considera inhábil a todos los efectos para el cómputo del plazo (art. 30.6 LPAC)[cite: 348]."
+      },
+      {
+        question: "39. Un órgano acuerda la tramitación de urgencia y, acto seguido, suprime el trámite de audiencia porque entiende que la urgencia autoriza a eliminar garantías no esenciales. ¿Qué valoración es la más precisa?",
+        options: [
+          "A) Es correcta porque la urgencia prevalece siempre sobre la audiencia.",
+          "B) Solo es incorrecta en procedimientos sancionadores.",
+          "C) La urgencia reduce plazos, pero no permite suprimir libremente trámites esenciales o garantías básicas cuando la ley no lo autoriza.",
+          "D) Depende del número de interesados."
+        ],
+        correct: 2,
+        justification: "La tramitación de urgencia reduce a la mitad los plazos pero en ningún caso autoriza a prescindir de trámites esenciales como la audiencia (art. 33 LPAC)[cite: 348]."
+      },
+      {
+        question: "40. La Administración dicta un acto favorable verbal en una reunión técnica y meses después pretende negarlo porque nunca se plasmó por escrito ni consta expediente. ¿Qué problema aparece con mayor claridad?",
+        options: [
+          "A) Ninguno, porque los actos orales tienen siempre la misma eficacia que los escritos.",
+          "B) Solo se afecta la prueba, no la validez.",
+          "C) El interesado debe presumir que toda declaración verbal es acto firme.",
+          "D) La forma de los actos administrativos sigue reglas legales y, cuando procede su documentación, no puede suplirse por una mera conversación informal."
+        ],
+        correct: 3,
+        justification: "Los actos administrativos se producen por escrito salvo que su naturaleza exija otra forma, debiendo quedar constancia documental del acto verbal emitido (art. 36 LPAC)[cite: 348]."
+      },
+      {
+        question: "41. Un acto administrativo discrecional de gravamen se limita a transcribir la norma habilitante sin conectar su contenido con los hechos del caso ni con las alegaciones del interesado. ¿Qué juicio es más ajustado?",
+        options: [
+          "A) La motivación es insuficiente, pues no permite conocer por qué se aplica la consecuencia jurídica al caso concreto.",
+          "B) La motivación es suficiente porque reproduce la base legal.",
+          "C) Solo habría problema si el acto fuera favorable.",
+          "D) La carencia carece de trascendencia cuando existe potestad discrecional."
+        ],
+        correct: 0,
+        justification: "La motivación de actos discrecionales y desfavorables exige exponer sucintamente las razones de hecho y de derecho aplicables al caso concreto (art. 35 LPAC)[cite: 348]."
+      },
+      {
+        question: "42. Una Administración pretende dispensar a una empresa concreta del cumplimiento de un reglamento ambiental vigente por su peso económico en la provincia. ¿Qué principio de la Ley 39/2015 resulta más directamente comprometido en el régimen de actos administrativos?",
+        options: [
+          "A) La ejecutividad de los actos.",
+          "B) La inderogabilidad singular de los reglamentos.",
+          "C) La publicación oficial de las disposiciones.",
+          "D) La potestad de autotutela declarativa."
+        ],
+        correct: 1,
+        justification: "Las resoluciones particulares no pueden excepcionar o dispensar lo establecido en un reglamento general (art. 37 LPAC)[cite: 349]."
+      },
+      {
+        question: "43. Un acto administrativo desfavorable pretende desplegar efectos retroactivos para cubrir una omisión previa de la Administración, aunque perjudica al interesado. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) La retroactividad es libre cuando beneficia al interés público.",
+          "B) Es válida si se motiva someramente.",
+          "C) La retroactividad de los actos está sujeta a límites estrictos y no puede imponerse en perjuicio del interesado al margen de los supuestos legales.",
+          "D) Solo es válida en materia sancionadora."
+        ],
+        correct: 2,
+        justification: "Los actos administrativos solo tienen eficacia retroactiva cuando se dicten en sustitución de actos anulados o produzcan efectos favorables sin lesionar derechos (art. 39 LPAC)[cite: 349]."
+      },
+      {
+        question: "44. La Administración notifica una resolución omitiendo pie de recursos y datos esenciales para reaccionar frente a ella, pero sostiene que el interesado 'ya sabrá lo que tiene que hacer'. ¿Qué juicio es más sólido?",
+        options: [
+          "A) La omisión carece siempre de relevancia.",
+          "B) Solo importa si el interesado es persona jurídica.",
+          "C) La falta de pie de recursos convierte automáticamente el acto en estimatorio.",
+          "D) La notificación es defectuosa porque debe contener el texto íntegro y la indicación de recursos u otros extremos legalmente exigidos."
+        ],
+        correct: 3,
+        justification: "Las notificaciones defectuosas por omitir el texto íntegro o la indicación de recursos no surten efecto hasta que el interesado se dé por enterado (art. 40 LPAC)[cite: 349]."
+      },
+      {
+        question: "45. Un primer intento de notificación en papel resulta fallido y el órgano, sin practicar nuevo intento ni acudir a las vías legales previstas, publica directamente el acto en un tablón interno de la Consejería. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) No es ajustado: la notificación infructuosa exige seguir el cauce legalmente previsto, no una publicación improvisada en un tablón interno.",
+          "B) Es correcto si el tablón se encuentra en lugar visible.",
+          "C) Solo sería incorrecto si el acto fuera sancionador.",
+          "D) La publicación interna sustituye siempre a la notificación personal."
+        ],
+        correct: 0,
+        justification: "Para acudir a la notificación edictal en el BOE se requiere agotar los dos intentos de notificación personal o acreditar la imposibilidad de la misma (arts. 42 y 44 LPAC)[cite: 349]."
+      },
+      {
+        question: "46. Un acto administrativo contiene un defecto formal no esencial que no ha generado indefensión ni alteración del sentido de la decisión. El interesado pretende su nulidad radical. ¿Qué valoración procede?",
+        options: [
+          "A) Todo defecto formal produce nulidad de pleno derecho.",
+          "B) El defecto encaja, en principio, en el régimen de anulabilidad o incluso de irregularidad no invalidante si no se cumplen los requisitos legales de invalidez.",
+          "C) La nulidad solo se evita en actos favorables.",
+          "D) La Administración debe siempre retrotraer al inicio."
+        ],
+        correct: 1,
+        justification: "El defecto de forma solo determina la anulabilidad cuando el acto carezca de los requisitos formales indispensables para alcanzar su fin o produzca indefensión (art. 48.2 LPAC)[cite: 349]."
+      },
+      {
+        question: "47. Una resolución se dicta por órgano manifiestamente incompetente por razón de la materia, y el superior intenta 'confirmarla' sin rehacer el procedimiento. ¿Qué respuesta es más correcta?",
+        options: [
+          "A) La convalidación siempre sana cualquier incompetencia.",
+          "B) Solo puede confirmarse si el interesado no recurrió.",
+          "C) Es válida por economía procedimental.",
+          "D) La convalidación no opera frente a todos los vicios y no puede usarse indiscriminadamente para salvar incompetencias de la máxima gravedad."
+        ],
+        correct: 3,
+        justification: "Los actos nulos de pleno derecho por incompetencia manifiesta en razón de la materia no son susceptibles de convalidación (arts. 47 y 52 LPAC)[cite: 350]."
+      },
+      {
+        question: "48. Al revisar un expediente, el órgano aprecia que parte del procedimiento es inválido pero otra parte puede conservar utilidad probatoria y jurídica autónoma. ¿Qué técnica prevé la Ley 39/2015 para evitar la destrucción innecesaria de lo válido?",
+        options: [
+          "A) La revocación automática total.",
+          "B) La publicación complementaria.",
+          "C) La inadmisión retroactiva del procedimiento.",
+          "D) La conservación de actos y trámites cuyo contenido se hubiera mantenido igual de no haberse cometido la infracción."
+        ],
+        correct: 3,
+        justification: "El principio de conservación impone mantener los actos y trámites cuyo contenido no habría variado tras la infracción (art. 51 LPAC)[cite: 350]."
+      },
+      {
+        question: "49. Un órgano califica como 'simple error material' lo que en realidad supone alterar el contenido decisorio del acto en perjuicio de derechos económicos. ¿Qué juicio es más ajustado?",
+        options: [
+          "A) No cabe reconducir a rectificación material lo que en realidad supone alterar el contenido sustantivo del acto.",
+          "B) Puede corregirse por error material en cualquier momento por el propio órgano.",
+          "C) La corrección es libre si el órgano acredita falta de presupuesto.",
+          "D) Si la Administración lo llama error material, así debe aceptarse."
+        ],
+        correct: 0,
+        justification: "La rectificación de errores materiales o aritméticos no permite alterar o modificar el fondo de los actos jurídicos dictados (art. 109.2 LPAC)[cite: 350]."
+      },
+      {
+        question: "50. En una resolución ambiental de gran complejidad se omite por completo la identificación ordenada de documentos, informes y antecedentes que sirven de fundamento a la decisión. Al remitirse el expediente al órgano revisor, resulta imposible reconstruir su trazabilidad. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Solo se afecta al archivo histórico.",
+          "B) Se desdibuja la noción legal de expediente administrativo como conjunto ordenado de documentos y actuaciones que sirven de antecedente y fundamento a la resolución.",
+          "C) No existe problema si el instructor recuerda verbalmente el contenido.",
+          "D) La trazabilidad del expediente es irrelevante mientras el acto esté firmado."
+        ],
+        correct: 1,
+        justification: "El expediente administrativo es el conjunto ordenado de documentos y actuaciones que sirven de fundamento a la resolución (art. 70 LPAC)[cite: 350]."
+      },
+      {
+        question: "51. El instructor decide no impulsar el procedimiento porque considera que la iniciativa corresponde exclusivamente al interesado una vez presentada su solicitud inicial. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) Es correcta, porque el principio dispositivo rige plenamente en la vía administrativa.",
+          "B) Solo es incorrecta en procedimientos sancionadores.",
+          "C) Es incorrecta: el procedimiento se impulsa de oficio en todos sus trámites, sin perjuicio de las cargas que incumban a los interesados.",
+          "D) Depende de que el expediente sea electrónico."
+        ],
+        correct: 2,
+        justification: "El procedimiento administrativo se impulsará de oficio en todos sus trámites (art. 71 LPAC)[cite: 350, 351]."
+      },
+      {
+        question: "52. Un órgano fracciona artificialmente trámites sucesivos que podían concentrarse en un mismo acto de instrucción, multiplicando comparecencias y escritos sin necesidad objetiva. ¿Qué principio procedimental se ve más directamente afectado?",
+        options: [
+          "A) El de inderogabilidad singular.",
+          "B) El de territorialidad lingüística.",
+          "C) El de prevalencia del fuero judicial.",
+          "D) El de concentración de trámites."
+        ],
+        correct: 3,
+        justification: "El principio de concentración de trámites exige acordar en un solo acto todos los trámites que por su naturaleza admitan impulsión simultánea (art. 72 LPAC)[cite: 351]."
+      },
+      {
+        question: "53. En el curso del procedimiento surge una cuestión incidental y el órgano decide paralizar sine die toda la tramitación principal hasta que se resuelva un debate accesorio de escasa entidad. ¿Qué valoración es más correcta?",
+        options: [
+          "A) La ley permite tratar las cuestiones incidentales, pero no convertirlas sin más en una suspensión ilimitada de la tramitación.",
+          "B) Es lo normal: toda cuestión incidental suspende automáticamente el procedimiento principal.",
+          "C) Solo en procedimientos de oficio pueden resolverse incidentalmente.",
+          "D) La cuestión incidental desplaza siempre a la principal."
+        ],
+        correct: 0,
+        justification: "Las cuestiones incidentales no suspenden la tramitación del procedimiento salvo en los supuestos expresamente previstos en la ley (art. 74 LPAC)[cite: 351]."
+      },
+      {
+        question: "54. En un procedimiento iniciado de oficio a raíz de denuncia, el instructor sostiene que el denunciante adquiere siempre condición de interesado y derecho a intervenir en todas las fases. ¿Qué respuesta es la más exacta?",
+        options: [
+          "A) Es correcta sin excepción.",
+          "B) Es incorrecta: la denuncia no atribuye por sí sola la condición de interesado, que dependerá de la concurrencia de un derecho o interés legítimo afectado.",
+          "C) Solo es correcta en materia ambiental.",
+          "D) Depende de que la denuncia sea anónima."
+        ],
+        correct: 1,
+        justification: "La denuncia es un simple acto de puesta en conocimiento y no confiere por sí misma la condición de interesado (art. 62 LPAC)[cite: 351]."
+      },
+      {
+        question: "55. Antes de iniciar formalmente un procedimiento sancionador, la Administración practica actuaciones previas muy intensas y adopta de hecho medidas limitativas estables sin acuerdo formal. ¿Qué juicio es más sólido?",
+        options: [
+          "A) No existe problema si la Administración actúa con prudencia.",
+          "B) La fase previa equivale siempre al inicio formal.",
+          "C) Las actuaciones previas no pueden sustituir indefinidamente al procedimiento ni servir para imponer de hecho medidas materiales sin el soporte legal adecuado.",
+          "D) Solo sería objetable respecto de personas físicas."
+        ],
+        correct: 2,
+        justification: "Las actuaciones previas tienen por único objeto orientar la oportunidad o no de incoar el expediente, sin sustituir al procedimiento formal (art. 55 LPAC)[cite: 351]."
+      },
+      {
+        question: "56. En el acuerdo de inicio de un procedimiento sancionador no se identifica provisionalmente al presunto responsable ni los hechos imputados, aplazándolo todo a la propuesta de resolución. ¿Qué valoración procede?",
+        options: [
+          "A) Es correcto porque la identificación puede diferirse hasta el final.",
+          "B) Solo sería problema si existiera denuncia previa.",
+          "C) Depende del importe de la eventual sanción.",
+          "D) No es correcto: el inicio de los procedimientos sancionadores tiene especialidades y garantías reinforced que exigen una mínima determinación inicial de hechos y responsables."
+        ],
+        correct: 3,
+        justification: "El acuerdo de inicio de un expediente sancionador debe fijar los hechos, la persona presuntamente responsable y las posibles sanciones (art. 64 LPAC)[cite: 351, 352]."
+      },
+      {
+        question: "57. Un procedimiento de responsabilidad patrimonial se inicia a solicitud del lesionado, pero el órgano pretende reconducirlo sin más a un expediente genérico y prescinde de la identificación del daño, la evaluación económica y la fecha del hecho lesivo. ¿Qué objeción es más precisa?",
+        options: [
+          "A) Solo importaría la cuantía económica.",
+          "B) Ninguna, porque toda solicitud se completa al final.",
+          "C) En responsabilidad patrimonial la solicitud inicial tiene requisitos específicos y su omisión debe tratarse conforme al régimen legal de iniciación y subsanación.",
+          "D) La fecha del hecho lesivo es irrelevante si el daño persiste."
+        ],
+        correct: 2,
+        justification: "Las solicitudes de responsabilidad patrimonial deben especificar las lesiones, la relación de causalidad y la evaluación económica (art. 67 LPAC)[cite: 352]."
+      },
+      {
+        question: "58. La Administración recibe una solicitud incompleta y, sin requerir subsanación, la inadmite de plano porque 'el ciudadano debió presentarla perfectamente desde el principio'. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) La inadmisión es correcta en todo caso.",
+          "B) La ley impone, con carácter general, el trámite de subsanación y mejora de la solicitud antes de adoptar decisiones desfavorables por defectos formales subsanables.",
+          "C) Solo se subsana en procedimientos sancionadores.",
+          "D) La subsanación es una facultad puramente discrecional."
+        ],
+        correct: 1,
+        justification: "Frente a solicitudes defectuosas o incompletas la Administración viene obligada a conceder un plazo de diez días de subsanación (art. 68 LPAC)[cite: 352]."
+      },
+      {
+        question: "59. Una empresa presenta una declaración responsable para iniciar una actividad y la Administración sostiene que, desde su presentación, no puede comprobar nada hasta que concluya la actividad. ¿Qué respuesta es más ajustada?",
+        options: [
+          "A) La declaración responsable desplaza por completo toda facultad de comprobación administrativa.",
+          "B) La Administración conserva potestades de comprobación, verificación e inspección sobre el cumplimiento de los requisitos declarados.",
+          "C) La comprobación exige autorización judicial previa.",
+          "D) Solo puede comprobar si recibe denuncia."
+        ],
+        correct: 1,
+        justification: "La presentación de una declaración responsable habilita el inicio de la actividad sin perjuicio de las facultades de inspección y control de la Administración (art. 69 LPAC)[cite: 352]."
+      },
+      {
+        question: "60. El órgano instructor rechaza todas las alegaciones presentadas durante la tramitación alegando que solo se pueden formular al inicio y al final del procedimiento. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) Es correcto, porque las alegaciones intermedias ralentizan el expediente.",
+          "B) Solo se admiten en audiencia.",
+          "C) Depende del tipo de procedimiento, pero nunca durante la instrucción.",
+          "D) Las alegaciones pueden formularse en distintos momentos del procedimiento en los términos legales; no se reducen a dos ventanas cerradas arbitrariamente."
+        ],
+        correct: 3,
+        justification: "Los interesados tienen derecho a formular alegaciones en cualquier momento del procedimiento anterior al trámite de audiencia (art. 76 LPAC)[cite: 352]."
+      },
+      {
+        question: "61. Un órgano deniega una prueba pertinente propuesta por el interesado con el argumento de que 'ya tiene criterio formado'. ¿Qué juicio es más ajustado?",
+        options: [
+          "A) La práctica de prueba debe responder a criterios de pertinencia y utilidad; no puede rechazarse por mera convicción anticipada del órgano.",
+          "B) La denegación es siempre válida si la formula el instructor.",
+          "C) Solo importa la prueba propuesta por la Administración.",
+          "D) La denegación solo es revisable al final del procedimiento judicial."
+        ],
+        correct: 0,
+        justification: "Solo se pueden rechazar las pruebas propuestas por los interesados cuando resulten manifiestamente improcedentes o innecesarias mediante resolución motivada (art. 77 LPAC)[cite: 353]."
+      },
+      {
+        question: "62. En un expediente técnico complejo se solicita un informe preceptivo y el órgano resolutor decide prescindir de él porque ya dispone de criterio político suficiente. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Puede prescindirse siempre de los informes, incluso de los preceptivos.",
+          "B) La omisión de un informe preceptivo puede viciar la tramitación por prescindir de un trámite legalmente exigido.",
+          "C) Solo sería problema si el informe fuera vinculante.",
+          "D) Los informes nunca forman parte del expediente."
+        ],
+        correct: 1,
+        justification: "La omisión inmotivada de un informe calificado como preceptivo constituye un vicio procedimental que afecta a la validez del acto final[cite: 353]."
+      },
+      {
+        question: "63. En un procedimiento que afecta directamente a un administrado, la Administración resuelve sin darle traslado previo del expediente ni ocasión de formular observaciones finales sobre documentos decisivos incorporados en la fase de instrucción. ¿Qué valoración procede?",
+        options: [
+          "A) No hay problema si la resolución está motivada.",
+          "B) Solo sería relevante en procedimientos sancionadores penales.",
+          "C) Se compromete el trámite de audiencia cuando era legalmente exigible, con posible indefensión material.",
+          "D) La audiencia solo existe si la pide el interesado."
+        ],
+        correct: 2,
+        justification: "Omite la audiencia cuando constan nuevos documentos o informes en el expediente vulnera las garantías del procedimiento e induce indefensión (art. 82 LPAC)[cite: 353]."
+      },
+      {
+        question: "64. En un procedimiento con relevante incidencia general, el órgano instructor abre información pública, pero rechaza incorporar al expediente las observaciones recibidas por personas no personadas formalmente. ¿Qué criterio es el más correcto?",
+        options: [
+          "A) Las alegaciones en información pública carecen de valor si quien las formula no es interesado formal.",
+          "B) Solo cuentan las presentadas por administraciones públicas.",
+          "C) La información pública es meramente decorativa.",
+          "D) La información pública permite la participación de terceros y sus observaciones deben ser consideradas en el expediente en los términos legales."
+        ],
+        correct: 3,
+        justification: "Cualquier persona puede presentar alegaciones durante la información pública, estando obligada la Administración a dar respuesta razonada en el expediente (art. 83 LPAC)[cite: 353]."
+      },
+      {
+        question: "65. Un órgano afirma que la única forma de terminación del procedimiento es la resolución expresa, por lo que rechaza toda posibilidad de desistimiento, renuncia o caducidad. ¿Qué respuesta es más ajustada?",
+        options: [
+          "A) La ley prevé diversas formas de terminación, además de la resolución, como desistimiento, renuncia, caducidad o terminación convencional en los casos legalmente admisibles.",
+          "B) Es correcta: toda terminación distinta de la resolución vulnera la legalidad.",
+          "C) Solo existe la caducidad en procedimientos sancionadores.",
+          "D) Desistimiento y renuncia son instituciones exclusivas del proceso judicial."
+        ],
+        correct: 0,
+        justification: "Ponen fin al procedimiento la resolución, el desistimiento, la renuncia y la declaración de caducidad, así como los convenios (art. 84 LPAC)[cite: 353]."
+      },
+      {
+        question: "66. Durante un procedimiento sancionador, el presunto infractor reconoce su responsabilidad y abona la multa con reducciones legalmente previstas. El instructor sostiene que ello carece de efectos sobre la terminación porque debe dictarse resolución ordinaria completa. ¿Qué valoración procede?",
+        options: [
+          "A) Es correcta porque las especialidades de terminación en procedimientos sancionadores no existen.",
+          "B) Solo puede terminarse convencionalmente.",
+          "C) La ley prevé especialidades de terminación en procedimientos sancionadores que pueden producir efectos propios si concurren los requisitos legales.",
+          "D) La reducción solo es posible en responsabilidad patrimonial."
+        ],
+        correct: 2,
+        justification: "El pago voluntario o el reconocimiento de responsabilidad producen la terminación del procedimiento sancionador con la aplicación de las deducciones correspondientes (art. 85 LPAC)[cite: 354]."
+      },
+      {
+        question: "67. En un procedimiento bilateral, la Administración y el interesado alcanzan un acuerdo sobre medidas reparadoras compatibles con el interés público y con el marco legal sectorial. El instructor rechaza siquiera examinarlo porque 'la Administración nunca puede terminar convencionalmente'. ¿Qué respuesta es más precisa?",
+        options: [
+          "A) Nunca cabe acuerdo alguno en vía administrativa.",
+          "B) Solo cabe en materia tributaria.",
+          "C) La terminación convencional está legalmente contemplada cuando el ordenamiento la permita y no sea contraria al interés público ni al ordenamiento.",
+          "D) Solo puede aceptarse si media homologación judicial."
+        ],
+        correct: 2,
+        justification: "Las Administraciones Públicas podrán celebrar acuerdos, pactos o convenios que pongan fin al procedimiento siempre que no sean contrarios al ordenamiento (art. 86 LPAC)[cite: 354]."
+      },
+      {
+        question: "68. Antes de resolver, el órgano aprecia lagunas relevantes en la instrucción y decide recabar actuaciones complementarias, pero no da traslado de su resultado a quienes puedan verse afectados. ¿Qué problema aparece?",
+        options: [
+          "A) Ninguno, porque las actuaciones complementarias pertenecen al ámbito interno del órgano resolutor.",
+          "B) Solo habría problema si el expediente fuera sancionador.",
+          "C) Las actuaciones complementarias sustituyen a la audiencia.",
+          "D) Cuando las actuaciones complementarias incorporan elementos relevantes para decidir, deben respetarse las garantías de contradicción en los términos legales."
+        ],
+        correct: 3,
+        justification: "Las actuaciones complementarias exigen dar trámite de audiencia a los interesados sobre los nuevos elementos resultantes (art. 87 LPAC)[cite: 354]."
+      },
+      {
+        question: "69. En una resolución de responsabilidad patrimonial, la Administración fija una indemnización sin razonar causalidad, antijuridicidad del daño ni criterios de cuantificación. ¿Qué objeción es la más sólida?",
+        options: [
+          "A) Basta con mencionar una cifra final.",
+          "B) La resolución desconoce las especialidades de este tipo de procedimientos y carece de contenido suficiente para su control.",
+          "C) Solo se afecta la tesorería pública.",
+          "D) La motivación es irrelevante en responsabilidad patrimonial."
+        ],
+        correct: 1,
+        justification: "La resolución de procedimientos de responsabilidad patrimonial exige motivar de forma completa la existencia de la relación de causalidad y los criterios de valoración (art. 91 LPAC)[cite: 354]."
+      },
+      {
+        question: "70. Un interesado manifiesta expresamente que desiste de su solicitud, pero el órgano continúa el procedimiento hasta resolver en el fondo sin razonar ninguna razón de interés general o de terceros. ¿Qué valoración procede?",
+        options: [
+          "A) La Administración puede continuar siempre, por principio de oficialidad.",
+          "B) El desistimiento del interesado tiene efectos propios y la Administración no puede ignorarlo sin una razón legalmente relevante.",
+          "C) Solo el juez puede apreciar desistimiento.",
+          "D) El desistimiento solo existe en recursos administrativos."
+        ],
+        correct: 1,
+        justification: "El desistimiento produce la terminación del expediente salvo que concurra un motivo de interés general o de terceros debidamente motivado (art. 94 LPAC)[cite: 355]."
+      },
+      {
+        question: "71. En un procedimiento iniciado a solicitud del interesado, esta renuncia a un derecho indisponible según la normativa sectorial. El instructor archiva automáticamente. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) La renuncia es siempre eficaz si el interesado la expresa libremente.",
+          "B) Solo depende de que la renuncia se firme electrónicamente.",
+          "C) La renuncia no produce efectos cuando el ordenamiento la prohíbe o se trata de derechos indisponibles.",
+          "D) La Administración debe aceptar toda renuncia por seguridad jurídica."
+        ],
+        correct: 2,
+        justification: "La renuncia de derechos no produce efectos cuando esté expresamente prohibida por el ordenamiento o verse sobre derechos indisponibles (art. 94 LPAC)[cite: 355]."
+      },
+      {
+        question: "72. La Administración declara caducado un procedimiento iniciado a solicitud del interesado sin requerir previamente la realización del trámite omitido ni advertir de las consecuencias de la inactividad. ¿Qué problema se plantea?",
+        options: [
+          "A) Ninguno, porque la caducidad opera automáticamente por mero transcurso del tiempo.",
+          "B) La caducidad exige los presupuestos y advertencias legalmente previstas; no cabe acordarla omitiendo esos requisitos.",
+          "C) La caducidad no existe en la Ley 39/2015.",
+          "D) Solo puede declararse si el interesado lo pide."
+        ],
+        correct: 1,
+        justification: "Para acordar la caducidad por paralización imputable al interesado se requiere advertencia previa de tres meses concedida por la Administración (art. 95 LPAC)[cite: 355]."
+      },
+      {
+        question: "73. Un órgano decide tramitar de forma simplificada un procedimiento especialmente complejo, con abundante prueba técnica y múltiples interesados, sin motivar por qué concurren las condiciones legales para ello. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) La tramitación simplificada exige presupuesto legal y motivación suficiente; no puede usarse para vaciar garantías en asuntos complejos.",
+          "B) La tramitación simplificada es libre y discrecional en todo caso.",
+          "C) Solo es revisable si la medida ahorra presupuesto.",
+          "D) Es correcta si la Administración gana rapidez."
+        ],
+        correct: 0,
+        justification: "La tramitación simplificada procede únicamente cuando concurran motivos de falta de complejidad y lo acuerde de forma motivada el órgano competente (art. 96 LPAC)[cite: 355]."
+      },
+      {
+        question: "74. Una Administración intenta justificar la ejecución material inmediata de un acto alegando que todo procedimiento administrativo incluye implícitamente facultades de compulsión. Sin embargo, el supuesto planteado se refiere a un examen centrado en la Ley 39/2015 excluyendo el título de ejecución. ¿Qué enfoque de estudio es el correcto?",
+        options: [
+          "A) Hay que aplicar íntegramente los arts. 97 a 105.",
+          "B) No deben formularse respuestas apoyadas en el régimen de ejecución, porque el bloque temático solicitado lo excluye expresamente.",
+          "C) La ejecución se estudia dentro de la revisión de oficio.",
+          "D) El título de ejecución sustituye a la eficacia del acto."
+        ],
+        correct: 1,
+        justification: "La materia sobre la ejecución forzosa de los actos ha quedado expresamente excluida del programa de examen analizado[cite: 355]."
+      },
+      {
+        question: "75. Un órgano pretende declarar la nulidad de pleno derecho de una resolución favorable de hace años por mera discrepancia interpretativa actual, sin apoyarse en ninguna causa tasada. ¿Qué objeción es más sólida a la luz de la revisión de oficio?",
+        options: [
+          "A) La revisión de oficio de actos nulos exige causas tasadas y no puede convertirse en un mecanismo general de replanteamiento interpretativo.",
+          "B) Solo el Parlamento puede revisar actos firmes.",
+          "C) La Administración puede anular libremente todos sus actos favorables.",
+          "D) La revisión de oficio sustituye a los recursos administrativos ordinarios sin límites."
+        ],
+        correct: 0,
+        justification: "La revisión de oficio de actos favorables firmes del art. 106 LPAC solo procede cuando concurra alguna causa de nulidad de pleno derecho debidamente motivada[cite: 355, 356]."
+      },
+      {
+        question: "76. Una comunidad autónoma aprueba una ley según la cual el Parlamento puede privar al Presidente de la Junta de su inmunidad procesal por simple mayoría en una comisión interna. ¿Qué valoración resulta más precisa?",
+        options: [
+          "A) Es válida por autonomía parlamentaria plena.",
+          "B) Solo sería inválida si la comisión no fuese permanente.",
+          "C) Depende de que el asunto sea penal o civil.",
+          "D) La prerrogativa procesal del Presidente se rige por el bloque estatutario y no puede quedar sometida a un mecanismo parlamentario ordinario no previsto en él."
+        ],
+        correct: 3,
+        justification: "El estatuto del Presidente y sus garantías o aforamientos están fijados en el Estatuto de Autonomía y no pueden modificarse por una ley o norma reglamentaria[cite: 356]."
+      },
+      {
+        question: "77. El Tribunal Superior de Justicia de Andalucía dicta una sentencia en un asunto propio de la jurisdicción ordinaria y una parte sostiene que, por dictarse en la comunidad autónoma, esa resolución tiene valor equivalente a una interpretación constitucional definitiva. ¿Qué respuesta es correcta?",
+        options: [
+          "A) No lo es: el TSJA culmina la organización judicial ordinaria en el territorio en los términos legales, pero el control e interpretación constitucional corresponden al Tribunal Constitucional.",
+          "B) Es correcta porque el TSJA es el intérprete supremo de la Constitución en Andalucía.",
+          "C) Solo sería correcto en lo contencioso-administrativo.",
+          "D) Depende de que no exista recurso de casación."
+        ],
+        correct: 0,
+        justification: "El TSJA es la cúspide del Poder Judicial en el territorio autonómico pero la interpretación constitucional definitiva pertenece en exclusiva al Tribunal Constitucional[cite: 356]."
+      },
+      {
+        question: "78. Se afirma que el Defensor del Pueblo Andaluz puede anular actos administrativos lesivos de derechos fundamentales por ser comisionado del Parlamento. ¿Qué juicio es el más ajustado?",
+        options: [
+          "A) Es correcto, porque sus resoluciones tienen fuerza ejecutiva anulatoria.",
+          "B) Solo puede anular sanciones administrativas leves.",
+          "C) No es correcto: supervisa, investiga, recomienda y da cuenta al Parlamento, pero no ejerce potestad jurisdiccional anulatoria.",
+          "D) Depende de que el acto proceda de una entidad local."
+        ],
+        correct: 2,
+        justification: "El Defensor del Pueblo Andaluz ostenta facultades de investigación, persuasión y recomendación, pero no facultades ejecutivas o anulatorias[cite: 356]."
+      },
+      {
+        question: "79. La Cámara de Cuentas solicita a una entidad del sector público andaluz documentación económica y esta la niega por hallarse sometida también al control del Tribunal de Cuentas estatal. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) La coexistencia de controles no elimina, por sí sola, las potestades fiscalizadoras de la Cámara de Cuentas en su ámbito propio.",
+          "B) La negativa es correcta porque solo puede haber un control externo.",
+          "C) La entidad puede elegir libremente a qué órgano rendir cuentas.",
+          "D) El control estatal excluye siempre el autonómico."
+        ],
+        correct: 0,
+        justification: "El control ejercido por la Cámara de Cuentas sobre el sector público andaluz es plenamente compatible con las atribuciones del Tribunal de Cuentas[cite: 356, 357]."
+      },
+      {
+        question: "80. La Oficina Andaluza contra el Fraude y la Corrupción decide investigar unos mismos hechos que ya son objeto de diligencias penales abiertas, pretendiendo practicar interrogatorios paralelos sobre el núcleo de la imputación. ¿Qué límite es más claro según su regulación?",
+        options: [
+          "A) Puede hacerlo libremente por su autonomía funcional.",
+          "B) Solo necesita comunicarlo al Parlamento.",
+          "C) Su competencia prevalece cuando hay fondos europeos.",
+          "D) No puede invadir funciones propias de la autoridad judicial, del Ministerio Fiscal o de la policía judicial investigando los mismos hechos en paralelo."
+        ],
+        correct: 3,
+        justification: "La Oficina se abstendrá de investigar aquellos hechos que constituyan objeto de procedimiento judicial penal en curso[cite: 357]."
+      },
+      {
+        question: "81. Una diputada andaluza proclamada electa no presenta en plazo las declaraciones exigidas ni presta promesa o juramento tras varias sesiones plenarias, y pretende votar alegando que su elección popular basta. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) La condición plena y el ejercicio efectivo de derechos parlamentarios exigen cumplir los requisitos reglamentarios; de no hacerlo, pueden suspenderse sus prerrogativas en los términos previstos.",
+          "B) La proclamación electoral basta siempre para ejercer todas las funciones.",
+          "C) Solo la Mesa del partido puede exigir esos trámites.",
+          "D) La Cámara no puede controlar incompatibilidades."
+        ],
+        correct: 0,
+        justification: "Para la adquisición de la condición plena de diputado se requiere la presentación de credenciales y acatamiento constitucional según el Reglamento del Parlamento[cite: 357]."
+      },
+      {
+        question: "82. Una persona elegible al Parlamento andaluz es nombrada, tras la presentación de candidaturas y antes de la votación, alto cargo incluido entre las causas legales de inelegibilidad. ¿Qué consecuencia es la más ajustada?",
+        options: [
+          "A) La inelegibilidad solo se aprecia en la fecha de presentación de candidaturas.",
+          "B) La calificación de inelegibilidad puede apreciarse también cuando la causa sobreviene antes de la celebración de las elecciones, conforme a la normativa aplicable.",
+          "C) La nueva situación es irrelevante si el candidato mantiene apoyo político.",
+          "D) Solo afectaría a una eventual incompatibilidad posterior, nunca a la candidatura."
+        ],
+        correct: 1,
+        justification: "Las causas de inelegibilidad apreciadas o sobrevenidas antes del día de la votación inhabilitan al candidato designado[cite: 357]."
+      },
+      {
+        question: "83. Se afirma que un diputado andaluz puede compatibilizar libremente su escaño con la dirección retribuida de una empresa contratista del sector público autonómico si renuncia a cobrar del Parlamento. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) Es correcto siempre que no perciba dietas parlamentarias.",
+          "B) La incompatibilidad desaparece si existe autorización del grupo parlamentario.",
+          "C) No es correcto: el régimen legal de incompatibilidades atiende a la función y a los riesgos para la independencia, no solo a la percepción retributiva parlamentaria.",
+          "D) Depende de que la empresa no contrate con ayuntamientos."
+        ],
+        correct: 2,
+        justification: "El régimen de incompatibilidades busca garantizar la independencia y neutralidad en el ejercicio de la función parlamentaria, con independencia de las dietas o sueldos[cite: 357]."
+      },
+      {
+        question: "84. El Consejo de Gobierno aprueba una reestructuración de consejerías que incrementa sustancialmente el gasto y altera de forma intensa el mapa departamental. Se pretende hacerlo por simple decreto presidencial. ¿Qué objeción es la más fuerte según el material de estudio?",
+        options: [
+          "A) Siempre puede hacerse por decreto del Presidente.",
+          "B) Solo sería necesaria ley si se crea una Vicepresidencia.",
+          "C) Depende de la autorización del Parlamento por mayoría simple.",
+          "D) No toda modificación puede hacerse por decreto presidencial; cuando supone aumento del gasto o excede los supuestos previstos, la norma aplicable exige ley."
+        ],
+        correct: 3,
+        justification: "Las reestructuraciones orgánicas que lleven aparejado incremento directo del gasto público requieren la correspondiente habilitación presupuestaria y legal[cite: 358]."
+      },
+      {
+        question: "85. Una delegación territorial dicta un acto que no agota la vía administrativa y el interesado interpone directamente recurso potestativo de reposición ante la propia delegación. ¿Qué respuesta es más ajustada conforme al esquema organizativo estudiado?",
+        options: [
+          "A) Cuando el acto no agota la vía administrativa, el cauce ordinario es el recurso de alzada ante el órgano competente superior en la materia.",
+          "B) Es correcto porque toda resolución admite reposición previa.",
+          "C) Solo cabría reclamación económico-administrativa.",
+          "D) No existe recurso alguno en la organización territorial andaluza."
+        ],
+        correct: 0,
+        justification: "Los actos que no agotan la vía administrativa solo son susceptibles de recurso de alzada ante el órgano jerárquicamente superior[cite: 358]."
+      },
+      {
+        question: "86. La Administración de la Junta aprueba una planificación interdepartamental vinculante para varios centros directivos, pero una consejería sostiene que el principio de coordinación equivale a jerarquía sobre todos ellos por parte del órgano que aprobó el plan. ¿Qué respuesta es más correcta?",
+        options: [
+          "A) La coordinación no se identifica sin más con jerarquía; articula criterios y acción conjunta dentro del sistema integrado de órganos y entidades en los términos legales.",
+          "B) Jerarquía y coordinación son conceptos equivalentes en la LAJA.",
+          "C) La coordinación siempre crea subordinación jerárquica plena.",
+          "D) Solo existe coordinación con otras administraciones, nunca dentro de la Junta."
+        ],
+        correct: 0,
+        justification: "La coordinación administrativa permite armonizar actuaciones sin implicar subordinación jerárquica directa entre órganos independientes[cite: 358]."
+      },
+      {
+        question: "87. Una persona invoca el principio de buena administración frente a la Junta porque su expediente fue resuelto fuera de plazo, sin motivación individualizada y con trato desigual respecto de casos similares. ¿Qué núcleo de pretensiones encaja mejor con ese principio en la LAJA?",
+        options: [
+          "A) Se limita a exigir cortesía administrativa.",
+          "B) Comprende, entre otros, trato equitativo, imparcial y objetivo, resolución en plazo razonable, proporcionalidad y acceso a la información y documentación en los términos legales.",
+          "C) Sustituye al régimen de recursos administrativos.",
+          "D) Impone siempre la estimación de la solicitud."
+        ],
+        correct: 1,
+        justification: "El derecho a una buena administración engloba el trato imparcial, la motivación de los actos, el respeto a los plazos y el acceso a los archivos (art. 31 Estatuto)[cite: 358]."
+      },
+      {
+        question: "88. Un reglamento autonómico prohíbe con carácter general toda actividad sindical del personal al servicio de la Administración de la Junta durante periodos electorales, sin distinguir funciones ni justificar riesgo alguno. ¿Qué parámetro constitucional resulta más directamente comprometido?",
+        options: [
+          "A) Solo la libertad ideológica.",
+          "B) La exclusividad presupuestaria del Parlamento.",
+          "C) El principio de eficacia administrativa.",
+          "D) La libertad sindical, cuya restricción no puede establecerse indiscriminadamente por reglamento al margen de la ley y de la proporcionalidad."
+        ],
+        correct: 3,
+        justification: "Cualquier restricción del derecho fundamental de libertad sindical está sujeta a reserva de ley y al juicio de proporcionalidad[cite: 359]."
+      },
+      {
+        question: "89. En un procedimiento administrativo, el órgano insiste en que un informe técnico interno basta para destruir la presunción de inocencia del expedientado, aunque no exista prueba de cargo suficientemente contrastada. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) No lo es: en el ámbito sancionador la presunción de inocencia exige prueba de cargo suficiente y obtenida con respeto a las garantías.",
+          "B) Es correcta si el informe lo firma un funcionario.",
+          "C) Solo importa que el informe sea posterior a la denuncia.",
+          "D) La presunción de inocencia solo rige en el proceso penal judicial."
+        ],
+        correct: 0,
+        justification: "El principio de presunción de inocencia exige la existencia de prueba de cargo válida y suficiente aportada al expediente sancionador[cite: 359]."
+      },
+      {
+        question: "90. Se sostiene en clase que, por representar al pueblo andaluz, el Parlamento puede ejercer funciones jurisdiccionales propias sobre conflictos entre particulares si así lo prevé su Reglamento. ¿Qué objeción constitucional es más sólida?",
+        options: [
+          "A) Sería válido si las partes lo consienten.",
+          "B) La potestad jurisdiccional corresponde a jueces y tribunales; la representación política parlamentaria no autoriza a asumir funciones jurisdiccionales propias.",
+          "C) Solo sería inválido fuera del territorio andaluz.",
+          "D) Depende de autorización del CGPJ."
+        ],
+        correct: 1,
+        justification: "El ejercicio de la potestad jurisdiccional juzgando y haciendo ejecutar lo juzgado corresponde en exclusiva a los juzgados y tribunales (art. 117 CE)[cite: 359]."
+      },
+      {
+        question: "91. En un procedimiento administrativo, la Administración decide no practicar notificación personal porque considera que el interesado pudo conocer la resolución al haberse comentado en una rueda de prensa institucional. ¿Qué respuesta es más ajustada?",
+        options: [
+          "A) La publicidad mediática puede sustituir siempre a la notificación.",
+          "B) Solo importa si el interesado reconoce haber visto la noticia.",
+          "C) La notificación debe seguir los cauces legales; el conocimiento extraprocedimental o mediático no reemplaza por sí mismo la práctica formal exigida.",
+          "D) La rueda de prensa equivale a publicación oficial."
+        ],
+        correct: 2,
+        justification: "El conocimiento informal o a través de medios de comunicación no surte los efectos legales de una notificación individualizada[cite: 359]."
+      },
+      {
+        question: "92. Un órgano pretende declarar nulo un acto porque discrepa de su oportunidad, aunque reconoce que fue dictado por órgano competente, con procedimiento y contenido ajustados a ley. ¿Cuál es la respuesta correcta?",
+        options: [
+          "A) La oportunidad es causa autónoma de nulidad de pleno derecho.",
+          "B) Todo acto administrativo puede anularse por cambio de criterio político.",
+          "C) Basta con una motivación reinforced del nuevo órgano.",
+          "D) La nulidad no puede fundarse en una mera reconsideración de oportunidad cuando no concurre causa legal de invalidez."
+        ],
+        correct: 3,
+        justification: "Los motivos de invalidez están tasados legalmente por lo que un simple desacuerdo sobre la oportunidad no justifica la nulidad del acto[cite: 359]."
+      },
+      {
+        question: "93. Una universidad pública andaluza niega toda colaboración a la Oficina Andaluza contra el Fraude alegando autonomía universitaria absoluta frente a cualquier requerimiento. ¿Qué solución es más ajustada según el material subido?",
+        options: [
+          "A) La Oficina puede ejercer determinadas funciones también respecto de universidades públicas andaluzas, precisamente respetando la autonomía universitaria en los términos legales.",
+          "B) La autonomía universitaria elimina toda posibilidad de actuación de la Oficina.",
+          "C) La universidad solo debe colaborar con el Tribunal de Cuentas.",
+          "D) La Oficina solo puede actuar en ayuntamientos y diputaciones."
+        ],
+        correct: 0,
+        justification: "La Oficina Antifraude extiende su ámbito competencial sobre el sector público autonómico respetando las prerrogativas constitucionales de cada institución[cite: 360]."
+      },
+      {
+        question: "94. Una persona jurídica obligada a relacionarse electrónicamente presenta recurso en papel el último día de plazo en una oficina de asistencia. La Administración lo digitaliza y, sin requerir subsanación, lo tramita como si se hubiera presentado correctamente desde el inicio. ¿Qué análisis es más fino?",
+        options: [
+          "A) Es correcto porque toda oficina puede convertir en válida cualquier presentación en papel de sujetos obligados.",
+          "B) Solo sería incorrecto en recursos sancionadores.",
+          "C) La ley prevé para los obligados la exigencia de subsanación mediante presentación electrónica, con efectos que deben manejarse conforme al régimen legal, no por simple convalidación automática.",
+          "D) La digitalización siempre sana el defecto retroactivamente sin más."
+        ],
+        correct: 2,
+        justification: "Frente a solicitudes o recursos presentados en papel por sujetos obligados debe requerirse subsanación electrónica (art. 68.4 LPAC)[cite: 360]."
+      },
+      {
+        question: "95. El Consejo de Gobierno defiende que puede negarse a facilitar al Parlamento andaluz la información necesaria para una comisión de estudio sobre una política pública porque 'la colaboración entre poderes es solo una cortesía política'. ¿Qué respuesta es la más ajustada?",
+        options: [
+          "A) Es correcta por la separación de poderes.",
+          "B) Solo debe colaborar si el Parlamento lo solicita por unanimidad.",
+          "C) La relación con el Parlamento no se agota en la cortesía: el Ejecutivo tiene deberes de comparecencia, información y auxilio en los términos estatutarios y reglamentarios.",
+          "D) La información solo puede entregarse a los grupos del Gobierno."
+        ],
+        correct: 2,
+        justification: "El Gobierno está legalmente obligado a remitir al Parlamento las informaciones y documentos que la Cámara le requiera en ejercicio de sus competencias[cite: 360]."
+      },
+      {
+        question: "96. Una Administración decide resolver un procedimiento sin incorporar al expediente un informe técnico que sí tuvo en cuenta materialmente para decidir, a fin de evitar que el interesado lo discuta. ¿Qué objeción es la más sólida?",
+        options: [
+          "A) Puede hacerlo si el informe es interno.",
+          "B) Solo sería grave en procedimientos judiciales.",
+          "C) No existe problema si el acto final está firmado.",
+          "D) La ocultación de un antecedente materialmente utilizado desnaturaliza el expediente y compromete contradicción, motivación y defensa."
+        ],
+        correct: 3,
+        justification: "Ocultar o sustraer informes o antecedentes tenidos en cuenta para resolver vulnera el principio de contradicción y menoscaba el derecho de defensa[cite: 360]."
+      },
+      {
+        question: "97. Se aprueba un acto administrativo cuya parte dispositiva es compatible con la ley, pero su órgano emisor persigue realmente un fin ajeno al previsto por la norma habilitante. ¿Qué categoría clásica describe mejor el vicio?",
+        options: [
+          "A) Desviación de poder.",
+          "B) Error material.",
+          "C) Caducidad.",
+          "D) Suspensión del procedimiento."
+        ],
+        correct: 0,
+        justification: "La desviación de poder se define como el ejercicio de potestades administrativas para fines distintos de los fijados en el ordenamiento (art. 48.1 LPAC)[cite: 360, 361]."
+      },
+      {
+        question: "98. Un alumno afirma que la Constitución solo vincula a jueces y parlamentos, pero no a la Administración ordinaria, que puede moverse con mayor flexibilidad mientras no haya ley que la contradiga. ¿Qué respuesta es correcta?",
+        options: [
+          "A) Es correcto porque la Administración se rige por la oportunidad.",
+          "B) Es falso: la Administración sirve con objetividad al interés general y actúa con sometimiento pleno a la Constitución, a la ley y al Derecho.",
+          "C) Solo se aplica esa vinculación a la Administración General del Estado.",
+          "D) La sujeción plena solo aparece en la Ley 39/2015, no en la Constitución."
+        ],
+        correct: 1,
+        justification: "La Administración actúa con sometimiento pleno a la CE, a la ley y al Derecho (art. 103 CE)[cite: 361]."
+      },
+      {
+        question: "99. En un procedimiento donde concurren múltiples interesados, la Administración decide resolver sin identificar adecuadamente a varios de ellos porque entiende que, al no haber comparecido todos desde el inicio, ya no deben ser tenidos en cuenta. ¿Qué análisis es más preciso?",
+        options: [
+          "A) Es correcto, porque la condición de interesado solo se adquiere al inicio del procedimiento.",
+          "B) No lo es: la Ley 39/2015 contempla la aparición de nuevos interesados durante la tramitación cuando acreditan la posición jurídica correspondiente.",
+          "C) Solo sería incorrecto en procedimientos urbanísticos.",
+          "D) La identificación de nuevos interesados solo procede por orden judicial."
+        ],
+        correct: 1,
+        justification: "Quienes acrediten titularidad de derechos e intereses legítimos pueden personarse e intervenir en cualquier fase previa del procedimiento (art. 4 LPAC)[cite: 361]."
+      },
+      {
+        question: "100. Una resolución denegatoria firme pretende ser revisada de oficio años después, pero la Administración fundamenta la revisión exclusivamente en que hoy resolvería de manera distinta por un cambio de criterio técnico no ligado a causa de nulidad. ¿Qué respuesta es la más ajustada?",
+        options: [
+          "A) La revisión de oficio no es cauce para rectificar libremente actos firmes válidos por simple cambio de criterio; exige causa legal de nulidad.",
+          "B) Todo cambio técnico autoriza revisión de oficio.",
+          "C) Basta con invocar interés general.",
+          "D) El transcurso del tiempo fortalece la libertad de revisión administrativa."
+        ],
+        correct: 0,
+        justification: "La revisión de oficio no procede por meras reconsideraciones o cambios de criterio salvo que concurran causas de nulidad tasadas (art. 106 LPAC)[cite: 361]."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 23.04.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

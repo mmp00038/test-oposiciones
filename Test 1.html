@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Temas IV, V y Bloque Constitucional</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TEMAS IV, V Y BLOQUE CONSTITUCIONAL</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. El Parlamento de Andalucía acuerda tramitar una iniciativa que afecta a la organización básica de una institución estatutaria, pero pretende hacerlo mediante un \"procedimiento abreviado\" sin debate sustancial en Pleno. ¿Qué objeción técnico-jurídica es más sólida?",
+        options: [
+          "A) La validez del procedimiento abreviado depende exclusivamente de la Mesa, sin control posterior.",
+          "B) En materias estructurales, la exigencia de deliberación parlamentaria no puede vaciarse por un atajo procedimental que comprometa garantías del ius in officium.",
+          "C) El procedimiento abreviado es obligatorio cuando la iniciativa proviene del Consejo de Gobierno.",
+          "D) El procedimiento abreviado solo está prohibido para reformas constitucionales."
+        ],
+        correct: 1
+      },
+      {
+        question: "2. Una ley autonómica impone a los diputados votar conforme a instrucciones escritas del partido, bajo sanción de pérdida automática del escaño. La tacha más directa es que vulnera:",
+        options: [
+          "A) La prohibición de mandato imperativo y el principio de representación política.",
+          "B) El principio de jerarquía normativa, exclusivamente.",
+          "C) La potestad reglamentaria del Gobierno.",
+          "D) La institución del referéndum consultivo."
+        ],
+        correct: 0
+      },
+      {
+        question: "3. El Consejo de Gobierno dicta una norma reglamentaria que reorganiza órganos administrativos periféricos con impacto en competencias internas de una Consejería. Para justificar la técnica normativa correcta, lo más ajustado es:",
+        options: [
+          "A) La reordenación orgánica interna se realiza necesariamente por ley formal.",
+          "B) Puede realizarse por decreto u orden, según el rango exigido por la norma de creación y la reserva material existente.",
+          "C) Toda reorganización administrativa exige decreto-ley.",
+          "D) Solo puede realizarse por resolución del titular de la Consejería."
+        ],
+        correct: 1
+      },
+      {
+        question: "4. En la investidura del Presidente de la Junta, tras una primera votación fallida, se celebra una segunda votación con umbral inferior. La lógica constitucional-parlamentaria que inspira este diseño busca:",
+        options: [
+          "A) Bloquear la formación de gobierno para reforzar el control parlamentario.",
+          "B) Facilitar la formación de mayoría de gobierno sin eliminar el requisito de legitimación parlamentaria.",
+          "C) Asegurar siempre gobiernos de coalición.",
+          "D) Sustituir el principio democrático por el principio de eficacia."
+        ],
+        correct: 1
+      },
+      {
+        question: "5. El Gobierno dicta un decreto-ley que regula el régimen electoral general. El problema principal es:",
+        options: [
+          "A) El decreto-ley solo puede dictarse con autorización previa del Congreso.",
+          "B) La materia está vedada al decreto-ley por sus límites materiales (afectación al régimen de instituciones básicas/derechos y, además, reserva de ley).",
+          "C) El decreto-ley es inválido solo si no se publica en el BOE.",
+          "D) El decreto-ley no requiere convalidación parlamentaria."
+        ],
+        correct: 1
+      },
+      {
+        question: "6. Un ciudadano invoca el \"derecho a la buena administración\" frente a la Junta, alegando retrasos reiterados y ausencia de motivación. Desde la perspectiva del bloque estatutario/organizativo andaluz, el núcleo exigible es:",
+        options: [
+          "A) Solo un principio programático sin consecuencias jurídicas.",
+          "B) Exigencias de motivación, imparcialidad, plazo razonable y respuesta adecuada como estándar de actuación administrativa.",
+          "C) Únicamente el derecho a recibir copia gratuita de todo expediente.",
+          "D) La obligación de estimar siempre las solicitudes cuando haya silencio."
+        ],
+        correct: 1
+      },
+      {
+        question: "7. La Cámara de Cuentas fiscaliza la gestión económico-financiera del sector público andaluz. ¿Qué combinación de controles es más correcta?",
+        options: [
+          "A) Solo control interno: la fiscalización externa está prohibida.",
+          "B) Control externo autonómico (Cámara de Cuentas) + control externo estatal (Tribunal de Cuentas) en sus respectivos ámbitos, sin anular el control interno (Intervención).",
+          "C) La Cámara de Cuentas sustituye por completo a la Intervención General.",
+          "D) La fiscalización externa es exclusiva del Parlamento, no de órganos técnicos."
+        ],
+        correct: 1
+      },
+      {
+        question: "8. Se limita por norma reglamentaria la libertad de expresión imponiendo autorización previa para organizar una charla crítica con el Gobierno. La vulneración constitucional más directa es:",
+        options: [
+          "A) Art. 20 CE: prohibición de censura previa y garantía de la libertad de expresión/información.",
+          "B) Art. 33 CE: propiedad privada.",
+          "C) Art. 38 CE: libertad de empresa.",
+          "D) Art. 128 CE: intervención de empresas."
+        ],
+        correct: 0
+      },
+      {
+        question: "9. Una Consejería crea una \"entidad instrumental\" para ejecutar políticas públicas con autonomía de gestión, pero con financiación mayoritariamente pública y sujeción a controles. La calificación más precisa (según el esquema LAJA-sector público) es:",
+        options: [
+          "A) Siempre sociedad mercantil, por definición.",
+          "B) Puede ser agencia (administrativa/empresarial/régimen especial) u otra entidad del sector público, según funciones, potestades y régimen jurídico aplicable.",
+          "C) Es siempre una fundación, porque tiene fines de interés general.",
+          "D) Es necesariamente un consorcio, porque coopera con ayuntamientos."
+        ],
+        correct: 1
+      },
+      {
+        question: "10. El Parlamento de Andalucía ejerce control político ordinario del Consejo de Gobierno. ¿Qué instrumento encaja mejor cuando se pretende exigir responsabilidad política global?",
+        options: [
+          "A) Comparecencia informativa.",
+          "B) Interpelación sectorial sin votación.",
+          "C) Moción de censura (o mecanismo estatutariamente previsto).",
+          "D) Pregunta oral en comisión."
+        ],
+        correct: 2
+      },
+      {
+        question: "11. Si una Administración deniega acceso a un archivo administrativo sin motivación suficiente, el primer estándar constitucional afectado (además del de legalidad) se asienta en:",
+        options: [
+          "A) Principios y sometimiento pleno a la ley y al Derecho.",
+          "B) Libertad ideológica.",
+          "C) Derecho al honor.",
+          "D) Derecho de huelga."
+        ],
+        correct: 0
+      },
+      {
+        question: "12. El Defensor del Pueblo Andaluz inicia actuaciones por quejas masivas relativas a una Consejería. ¿Cuál es el encuadre correcto de su función?",
+        options: [
+          "A) Órgano jurisdiccional con potestad sancionadora.",
+          "B) Comisionado parlamentario para la defensa de derechos y supervisión de la actividad administrativa, con potestades de investigación y recomendación.",
+          "C) Órgano ejecutivo que sustituye al Consejero en caso de crisis.",
+          "D) Delegación territorial del Ministerio Fiscal."
+        ],
+        correct: 1
+      },
+      {
+        question: "13. Una ley andaluza crea un órgano consultivo autonómico y pretende que sus dictámenes sean vinculantes en todos los procedimientos. ¿Qué afirmación es más sólida?",
+        options: [
+          "A) La consultividad suele ser preceptiva en supuestos tasados, pero la vinculación generalizada vaciaría la competencia decisoria del órgano competente y alteraría el sistema de responsabilidad.",
+          "B) Todo dictamen consultivo es constitucionalmente vinculante.",
+          "C) Los dictámenes solo pueden ser vinculantes si los emite el Parlamento.",
+          "D) Solo pueden ser vinculantes en procedimientos sancionadores."
+        ],
+        correct: 0
+      },
+      {
+        question: "14. En un recurso contencioso, la parte alega que la Administración actuó arbitrariamente. El soporte constitucional de esta prohibición se asienta, de modo más directo, en:",
+        options: [
+          "A) Principio de legalidad y prohibición de arbitrariedad de los poderes públicos.",
+          "B) Principio de autonomía municipal.",
+          "C) Principio de unidad de mercado.",
+          "D) Principio de reserva de ley orgánica."
+        ],
+        correct: 0
+      },
+      {
+        question: "15. El Consejo Audiovisual de Andalucía adopta un acuerdo que afecta a operadores privados. ¿Qué idea es más compatible con un modelo estatutario de autoridad administrativa independiente?",
+        options: [
+          "A) Actúa como órgano político sin motivación, por ser \"independiente\".",
+          "B) Debe sujetarse a legalidad, motivación y control jurisdiccional, aunque su diseño busque neutralidad y tecnicidad.",
+          "C) Sus decisiones no pueden ser impugnadas.",
+          "D) Solo puede emitir recomendaciones no vinculantes."
+        ],
+        correct: 1
+      },
+      {
+        question: "16. La Junta dicta una disposición que denomina \"instrucción\" pero contiene normas generales obligatorias para terceros. La consecuencia más probable es:",
+        options: [
+          "A) Es válida por el nombre del acto.",
+          "B) Puede ser anulable/nula por infringir el principio de jerarquía y el régimen de disposiciones generales: el contenido manda sobre la etiqueta.",
+          "C) Queda convalidada automáticamente si se publica.",
+          "D) Se convierte en ley si la firma el Presidente."
+        ],
+        correct: 1
+      },
+      {
+        question: "17. Un ciudadano es sancionado por hechos que no estaban tipificados cuando se cometieron. El principio constitucional lesionado es:",
+        options: [
+          "A) Irretroactividad de disposiciones sancionadoras no favorables y principio de legalidad sancionadora.",
+          "B) Principio de eficacia administrativa.",
+          "C) Principio de cooperación.",
+          "D) Principio de subsidiariedad."
+        ],
+        correct: 0
+      },
+      {
+        question: "18. En el diseño institucional andaluz, ¿qué rasgo define mejor la relación Parlamento-Presidente-Consejo de Gobierno?",
+        options: [
+          "A) Separación rígida sin dependencia recíproca.",
+          "B) Modelo parlamentario: el Gobierno nace de la confianza parlamentaria y está sujeto a control político continuado.",
+          "C) Presidencialismo: el Parlamento no controla al Ejecutivo.",
+          "D) Directorio: el Presidente es elegido por sufragio directo."
+        ],
+        correct: 1
+      },
+      {
+        question: "19. Se debate si una Delegación Territorial puede dictar actos que agoten la vía administrativa en nombre de una Consejería. La respuesta correcta depende principalmente de:",
+        options: [
+          "A) La atribución normativa expresa de competencias, desconcentración o delegación según el régimen de organización administrativa.",
+          "B) La voluntad exclusiva del Delegado.",
+          "C) La costumbre administrativa.",
+          "D) La petición del interesado."
+        ],
+        correct: 0
+      },
+      {
+        question: "20. Una norma restringe el derecho de reunión imponiendo autorización previa por \"razones de orden público\" sin control. La doctrina constitucional más asentada exige que:",
+        options: [
+          "A) Toda reunión requiere autorización previa administrativa.",
+          "B) El orden público justifica prohibir cualquier reunión en espacio público.",
+          "C) La regla sea comunicación previa y solo caben prohibición/modificación motivadas por razones tasadas y proporcionales.",
+          "D) La reunión esté prohibida en edificios públicos en todo caso."
+        ],
+        correct: 2
+      },
+      {
+        question: "21. El Parlamento de Andalucía aprueba una ley y el Consejo de Gobierno retrasa su publicación para condicionar su eficacia. ¿Qué estándar es más exigible?",
+        options: [
+          "A) La publicación oficial es presupuesto de eficacia y no puede manipularse arbitrariamente por el Ejecutivo.",
+          "B) La publicación es facultativa.",
+          "C) El Ejecutivo puede suspender leyes por oportunidad política.",
+          "D) La publicación solo es exigible si hay sanciones."
+        ],
+        correct: 0
+      },
+      {
+        question: "22. En la estructura del sector público andaluz, ¿qué criterio distingue con mayor precisión una sociedad mercantil pública de una agencia administrativa?",
+        options: [
+          "A) La sociedad mercantil ejerce típicamente potestades administrativas intensas; la agencia administrativa nunca gestiona servicios públicos.",
+          "B) La sociedad mercantil se rige por Derecho privado (con sujeción a controles públicos), mientras la agencia administrativa se integra en el Derecho público y puede ejercer potestades administrativas.",
+          "C) La sociedad mercantil siempre depende del Parlamento; la agencia siempre del TSJA.",
+          "D) No existe distinción, son sinónimos."
+        ],
+        correct: 1
+      },
+      {
+        question: "23. El Defensor del Pueblo (estatal) puede promover recurso de inconstitucionalidad. En cambio, ¿quiénes están legitimados constitucionalmente para interponerlo (entre otros)?",
+        options: [
+          "A) Solo ciudadanos afectados.",
+          "B) Gobierno, 50 diputados, 50 senadores, órganos colegiados ejecutivos autonómicos y asambleas autonómicas en su ámbito, además del Defensor del Pueblo.",
+          "C) Cualquier juez sin trámite.",
+          "D) Únicamente los Consejos Consultivos."
+        ],
+        correct: 1
+      },
+      {
+        question: "24. Un órgano colegiado administrativo adopta acuerdo sin incluir en acta la identidad de los asistentes ni el sentido de la votación. Para un estándar robusto de validez y control, lo esencial es:",
+        options: [
+          "A) El acta es irrelevante si el acuerdo \"es bueno\".",
+          "B) La constancia formal de constitución, deliberación y voto es garantía de regularidad, motivación y control posterior.",
+          "C) Solo importa el sello.",
+          "D) Basta la comunicación por WhatsApp."
+        ],
+        correct: 1
+      },
+      {
+        question: "25. La Presidencia de la Junta y el Consejo de Gobierno aprueban un plan estratégico que condiciona a varias Consejerías. ¿Qué principio organizativo debe gobernar su ejecución interdepartamental?",
+        options: [
+          "A) Independencia absoluta de cada Consejería.",
+          "B) Coordinación y dirección política unitaria del Ejecutivo, con distribución competencial interna.",
+          "C) Sustitución automática por el Parlamento.",
+          "D) Competencia exclusiva de las Delegaciones Provinciales."
+        ],
+        correct: 1
+      },
+      {
+        question: "26. Se cuestiona la constitucionalidad de una norma por vulnerar el contenido esencial de un derecho fundamental. El concepto \"contenido esencial\" opera como:",
+        options: [
+          "A) Un límite absoluto a cualquier regulación legislativa.",
+          "B) Un criterio para que la ley no vacíe el derecho, preservando su núcleo indisponible frente al legislador.",
+          "C) Una facultad discrecional del Gobierno.",
+          "D) Un criterio solo aplicable a derechos patrimoniales."
+        ],
+        correct: 1
+      },
+      {
+        question: "27. El Consejo Consultivo emite dictamen preceptivo en un procedimiento. ¿Qué efecto es el más correcto?",
+        options: [
+          "A) Vincula siempre el sentido de la decisión.",
+          "B) Obliga a solicitarlo en los casos previstos; su ausencia puede viciar el procedimiento, pero el órgano decisor mantiene competencia y responsabilidad.",
+          "C) Sustituye la motivación del acto final.",
+          "D) Impide el control judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "28. Se pretende aprobar un decreto-ley autonómico para regular el régimen interno del Parlamento. ¿Qué objeción estructural es más sólida?",
+        options: [
+          "A) Es posible siempre que sea urgente.",
+          "B) El régimen interno parlamentario se integra en la autonomía parlamentaria y, en su caso, exige norma del Parlamento, no del Ejecutivo.",
+          "C) Solo se prohíbe si afecta a derechos fundamentales.",
+          "D) Es válido si lo ratifica el Consejo Consultivo."
+        ],
+        correct: 1
+      },
+      {
+        question: "29. Una ley establece que los jueces deben pedir autorización al Gobierno para dictar sentencia en asuntos \"sensibles\". La lesión constitucional es:",
+        options: [
+          "A) Independencia judicial y sometimiento exclusivo a la ley.",
+          "B) Derecho a la propiedad.",
+          "C) Derecho a la libertad de empresa.",
+          "D) Principio de cooperación."
+        ],
+        correct: 0
+      },
+      {
+        question: "30. En Andalucía, la función legislativa corresponde al Parlamento. ¿Qué supuesto describe mejor una colaboración legítima Ejecutivo-Legislativo sin invadir competencias?",
+        options: [
+          "A) El Consejo de Gobierno aprueba leyes sin Parlamento.",
+          "B) El Consejo de Gobierno presenta proyectos de ley y ejerce iniciativa legislativa en los términos estatutarios y reglamentarios.",
+          "C) El Parlamento dicta reglamentos internos de Consejerías.",
+          "D) La Cámara de Cuentas aprueba presupuestos."
+        ],
+        correct: 1
+      },
+      {
+        question: "31. Una Consejería dicta una circular interna y pretende sancionar a ciudadanos por incumplirla. ¿Qué conclusión es correcta?",
+        options: [
+          "A) Es posible si la circular está publicada en la web.",
+          "B) Una circular/instrucción interna no puede crear obligaciones sancionables para terceros sin cobertura normativa adecuada (reserva de ley/tipicidad).",
+          "C) Es posible si lo autoriza el Director General.",
+          "D) Es posible solo en materia tributaria."
+        ],
+        correct: 1
+      },
+      {
+        question: "32. El Senado veta un proyecto aprobado por el Congreso. ¿Qué regla constitucional describe mejor el desenlace ordinario?",
+        options: [
+          "A) El veto del Senado es absoluto.",
+          "B) El Congreso puede levantar el veto por mayoría absoluta (o simple tras plazo) según el art. 90 CE.",
+          "C) El veto convierte el proyecto en ley orgánica.",
+          "D) El Gobierno decide en última instancia."
+        ],
+        correct: 1
+      },
+      {
+        question: "33. Un órgano administrativo periférico actúa fuera del ámbito territorial asignado y sin habilitación. El vicio más característico será:",
+        options: [
+          "A) Inexistencia del acto por falta de firma.",
+          "B) Incompetencia territorial con consecuencias de anulabilidad o nulidad según la entidad del defecto y el régimen aplicable.",
+          "C) Error material subsanable siempre.",
+          "D) Irregularidad no invalidante en todo caso."
+        ],
+        correct: 1
+      },
+      {
+        question: "34. La Cámara de Cuentas detecta un incumplimiento grave de reglas de gestión económico-financiera en una entidad instrumental. ¿Cuál es el itinerario institucional más correcto?",
+        options: [
+          "A) La Cámara sanciona directamente al gestor.",
+          "B) Emite informe/actuación fiscalizadora, da traslado y permite exigencia de responsabilidades por vías competentes (Parlamento/control interno/jurisdiccional).",
+          "C) Sustituye al Consejo de Gobierno.",
+          "D) Archiva por ser \"entidad instrumental\"."
+        ],
+        correct: 1
+      },
+      {
+        question: "35. La aprobación de una ley orgánica exige:",
+        options: [
+          "A) Mayoría simple del Congreso en una votación.",
+          "B) Mayoría absoluta del Congreso en una votación final sobre el conjunto.",
+          "C) Mayoría absoluta del Senado exclusivamente.",
+          "D) Referéndum obligatorio."
+        ],
+        correct: 1
+      },
+      {
+        question: "36. El Defensor del Pueblo Andaluz recibe una queja contra una actuación judicial. ¿Qué respuesta institucional es más correcta?",
+        options: [
+          "A) Puede revocar sentencias.",
+          "B) No puede interferir en la función jurisdiccional; puede orientar al ciudadano sobre vías de recurso/queja y supervisar, en su caso, actuación administrativa relacionada, sin invadir independencia judicial.",
+          "C) Puede ordenar diligencias al TSJA.",
+          "D) Puede suspender procedimientos."
+        ],
+        correct: 1
+      },
+      {
+        question: "37. El Consejo Económico y Social de Andalucía informa un anteproyecto con fuerte impacto socioeconómico. ¿Qué valor tiene típicamente su intervención?",
+        options: [
+          "A) Sustituye el debate parlamentario.",
+          "B) Función consultiva y de participación institucional: aporta criterio técnico/social, sin vincular el sentido de la decisión final.",
+          "C) Actúa como órgano de control jurisdiccional.",
+          "D) Su informe convierte el texto en ley."
+        ],
+        correct: 1
+      },
+      {
+        question: "38. En materia de derechos fundamentales, el régimen constitucional de garantías implica que:",
+        options: [
+          "A) Cualquier derecho puede ser restringido por reglamento sin límites.",
+          "B) Su regulación debe respetar reserva de ley, contenido esencial y control jurisdiccional, con especial intensidad en los derechos de la Sección 1.ª del Capítulo II.",
+          "C) Solo se controlan por órganos administrativos.",
+          "D) No existe tutela judicial efectiva en derechos."
+        ],
+        correct: 1
+      },
+      {
+        question: "39. El Parlamento de Andalucía solicita información al Consejo de Gobierno y este se niega por \"razones políticas\" sin motivación. ¿Qué principio es el más directamente comprometido?",
+        options: [
+          "A) Autonomía local.",
+          "B) Control parlamentario y responsabilidad política, que exige deber reforzado de rendición de cuentas en un sistema parlamentario.",
+          "C) Libre competencia.",
+          "D) Derecho de asilo."
+        ],
+        correct: 1
+      },
+      {
+        question: "40. Una agencia pública empresarial presta un servicio público y pretende dictar actos administrativos sancionadores. ¿Qué cuestión es decisiva?",
+        options: [
+          "A) Ninguna: todas las entidades instrumentales sancionan libremente.",
+          "B) Si está habilitada normativamente para ejercer potestad sancionadora y bajo qué régimen (legalidad, tipicidad, garantías).",
+          "C) Basta con una decisión del gerente.",
+          "D) Basta con un convenio."
+        ],
+        correct: 1
+      },
+      {
+        question: "41. El principio de \"tutela judicial efectiva\" implica, como mínimo:",
+        options: [
+          "A) Derecho a obtener una resolución motivada sobre el fondo o sobre la inadmisión, sin indefensión.",
+          "B) Derecho a ganar siempre el pleito.",
+          "C) Derecho a elegir juez.",
+          "D) Derecho a que el proceso sea secreto."
+        ],
+        correct: 0
+      },
+      {
+        question: "42. El Presidente de la Junta cesa por pérdida de confianza parlamentaria. ¿Qué efecto político-institucional es coherente con un modelo parlamentario?",
+        options: [
+          "A) El Consejo de Gobierno permanece indefinidamente sin control.",
+          "B) Se articula sustitución/investidura conforme al procedimiento estatutario y, si hay bloqueo, disolución/elecciones.",
+          "C) Asume la presidencia el juez decano.",
+          "D) El parlamento queda disuelto automáticamente sin plazo."
+        ],
+        correct: 1
+      },
+      {
+        question: "43. En la estructura organizativa andaluza, la desconcentración implica:",
+        options: [
+          "A) Crear un municipio independiente.",
+          "B) Trasladar la titularidad o ejercicio de competencias entre órganos de una misma personalidad jurídica para aproximar la gestión.",
+          "C) Privatizar la gestión de servicios públicos.",
+          "D) Suprimir controles administrativos."
+        ],
+        correct: 1
+      },
+      {
+        question: "44. Un conflicto entre el Estado y la Junta de Andalucía por invasión de competencias se encauza constitucionalmente mediante:",
+        options: [
+          "A) Juicio ordinario ante un juzgado de primera instancia.",
+          "B) Control de constitucionalidad por el Tribunal Constitucional.",
+          "C) Control de oportunidad por el Senado.",
+          "D) Control por referéndum local."
+        ],
+        correct: 1
+      },
+      {
+        question: "45. La autonomía parlamentaria incluye, entre otros, ¿qué contenido funcional?",
+        options: [
+          "A) Capacidad de dictar actos administrativos de cualquier Consejería.",
+          "B) Potestad de autoorganización (Reglamento, disciplina interna, presupuesto y funcionamiento) sin injerencias indebidas del Ejecutivo.",
+          "C) Potestad jurisdiccional plena.",
+          "D) Potestad de nombrar jueces."
+        ],
+        correct: 1
+      },
+      {
+        question: "46. Se crea una fundación del sector público andaluz para gestionar ayudas ambientales. ¿Qué rasgo es más determinante para su régimen?",
+        options: [
+          "A) El tipo societario mercantil.",
+          "B) La finalidad de interés general y la integración en el sector público (financiación/control), con sujeción a normas de transparencia, control y, en su caso, contratación pública.",
+          "C) La ausencia total de controles.",
+          "D) La elección por sufragio."
+        ],
+        correct: 1
+      },
+      {
+        question: "47. El Rey sanciona y promulga leyes. ¿Qué significa, en términos constitucionales?",
+        options: [
+          "A) Decide el contenido final de la ley.",
+          "B) Realiza un acto debido/formal de perfeccionamiento y publicación conforme al procedimiento, sin veto político.",
+          "C) Puede devolver leyes sin motivación.",
+          "D) Puede legislar por decreto sin control."
+        ],
+        correct: 1
+      },
+      {
+        question: "48. En un procedimiento administrativo autonómico, la falta de motivación en una resolución discrecional tiene como consecuencia más típica:",
+        options: [
+          "A) Inmunidad frente al control judicial.",
+          "B) Incrementa el riesgo de anulabilidad por impedir control de razonabilidad y por infracción de exigencias de motivación.",
+          "C) Convalida el acto.",
+          "D) Convierte el acto en reglamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "49. El Tribunal Superior de Justicia de Andalucía se sitúa como:",
+        options: [
+          "A) Órgano administrativo superior del Parlamento.",
+          "B) Órgano jurisdiccional superior en el ámbito territorial autonómico, sin perjuicio de la jurisdicción del Tribunal Supremo.",
+          "C) Sustituto del Tribunal Constitucional.",
+          "D) Órgano consultivo del Consejo de Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "50. La iniciativa legislativa popular en la Constitución:",
+        options: [
+          "A) Permite proponer reformas constitucionales libremente.",
+          "B) Está prevista con requisitos y límites materiales; no procede en materias vedadas (p. ej., orgánicas, tributarias, internacionales, prerrogativa de gracia).",
+          "C) No existe en España.",
+          "D) Solo puede ejercerse por partidos políticos."
+        ],
+        correct: 1
+      },
+      {
+        question: "51. Una Orden de Consejería regula aspectos esenciales de un derecho estatutario de ciudadanía sin cobertura legal suficiente. El problema principal es:",
+        options: [
+          "A) Falta de publicación.",
+          "B) Infracción de reserva de ley y jerarquía normativa, con riesgo de nulidad del reglamento.",
+          "C) Exceso de motivación.",
+          "D) Incompetencia del Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "52. El Consejo de Gobierno aprueba un decreto-ley autonómico y el Parlamento lo convalida, pero se plantea su tramitación como proyecto de ley. ¿Qué ventaja técnica ofrece esta segunda vía?",
+        options: [
+          "A) Ninguna, es redundante.",
+          "B) Permite introducir enmiendas y mejorar el texto, reforzando deliberación parlamentaria, manteniendo eficacia inmediata inicial del decreto-ley.",
+          "C) Permite eludir el control del TC.",
+          "D) Convierte automáticamente el texto en orgánico."
+        ],
+        correct: 1
+      },
+      {
+        question: "53. La regla constitucional sobre \"publicidad de las normas\" conecta de manera más directa con:",
+        options: [
+          "A) Principio de seguridad jurídica.",
+          "B) Derecho a la vida.",
+          "C) Derecho al asilo.",
+          "D) Unidad de la Nación."
+        ],
+        correct: 0
+      },
+      {
+        question: "54. Una entidad instrumental pretende contratar personal laboral indefinido sin respetar principios de igualdad, mérito y capacidad cuando actúa como sector público. La objeción más sólida es:",
+        options: [
+          "A) Las entidades instrumentales no contratan personal nunca.",
+          "B) Debe respetar, en su ámbito, los principios constitucionales y legales aplicables al empleo público y al acceso, con las modulaciones del régimen laboral, evitando arbitrariedad.",
+          "C) Puede contratar libremente por ser Derecho privado puro.",
+          "D) Solo rige el principio de confianza política."
+        ],
+        correct: 1
+      },
+      {
+        question: "55. El Parlamento de Andalucía designa al Defensor del Pueblo Andaluz. ¿Qué exigencia de legitimación es más coherente con su independencia?",
+        options: [
+          "A) Nombramiento por decisión unilateral del Presidente.",
+          "B) Mayorías cualificadas/parlamentarias reforzadas que incentiven consenso y neutralidad institucional.",
+          "C) Sorteo entre candidatos.",
+          "D) Nombramiento por el TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "56. Una norma restringe el derecho de asociación exigiendo autorización administrativa para constituir asociaciones. El núcleo constitucional aplicable es:",
+        options: [
+          "A) La asociación es un derecho de concesión administrativa.",
+          "B) La asociación es un derecho fundamental; su ejercicio no está sujeto a autorización previa, sino a límites legales proporcionados y controlables.",
+          "C) Solo existe para sindicatos.",
+          "D) Solo existe para partidos políticos."
+        ],
+        correct: 1
+      },
+      {
+        question: "57. Una Consejería dicta un reglamento que contradice un decreto del Consejo de Gobierno de rango superior. ¿Qué regla decide el conflicto?",
+        options: [
+          "A) Principio de competencia exclusiva de la Consejería.",
+          "B) Jerarquía normativa interna: la norma inferior no puede contradecir la superior.",
+          "C) Principio de oportunidad política.",
+          "D) Principio de igualdad."
+        ],
+        correct: 1
+      },
+      {
+        question: "58. Si el Parlamento aprueba una comisión de investigación sobre gestión administrativa, ¿qué límite debe respetar con especial cautela?",
+        options: [
+          "A) Puede enjuiciar penalmente y condenar.",
+          "B) No puede invadir la función jurisdiccional ni vulnerar derechos fundamentales (honor, presunción de inocencia), aunque pueda depurar responsabilidades políticas.",
+          "C) Puede sustituir al Ministerio Fiscal.",
+          "D) Puede dictar sentencias firmes."
+        ],
+        correct: 1
+      },
+      {
+        question: "59. En la Constitución, la regla general de aprobación de un tratado internacional que atribuya competencias derivadas exige:",
+        options: [
+          "A) Decreto del Gobierno sin control.",
+          "B) Autorización mediante ley orgánica en los términos del art. 93 CE.",
+          "C) Mayoría simple del Senado únicamente.",
+          "D) Referéndum obligatorio en todo caso."
+        ],
+        correct: 1
+      },
+      {
+        question: "60. Una Delegación del Gobierno en Andalucía dicta instrucciones generales a órganos dependientes. ¿Qué técnica de dirección es más típica?",
+        options: [
+          "A) Potestad jurisdiccional.",
+          "B) Potestad de dirección/jerarquía administrativa sobre órganos subordinados, respetando competencia y legalidad.",
+          "C) Potestad legislativa.",
+          "D) Potestad constituyente."
+        ],
+        correct: 1
+      },
+      {
+        question: "61. La reforma del Estatuto andaluz se tramita con participación de las Cortes Generales. ¿Qué razón estructural lo explica?",
+        options: [
+          "A) El Estatuto es un reglamento autonómico.",
+          "B) El Estatuto tiene naturaleza de ley orgánica estatal y forma parte del bloque de constitucionalidad.",
+          "C) El Estatuto es una orden ministerial.",
+          "D) El Estatuto es un decreto-ley."
+        ],
+        correct: 1
+      },
+      {
+        question: "62. El principio de igualdad (art. 14 CE) impide, como regla, que:",
+        options: [
+          "A) Existan diferencias si están objetivamente justificadas y son proporcionales.",
+          "B) Se establezcan discriminaciones por razón de nacimiento, raza, sexo, religión, opinión o cualquier otra condición o circunstancia personal o social.",
+          "C) Se regulen tributos progresivos.",
+          "D) Se creen becas por rendimiento."
+        ],
+        correct: 1
+      },
+      {
+        question: "63. La Administración andaluza crea una \"agencia de régimen especial\" para ejercer potestades públicas intensas y gestionar recursos. ¿Qué exigencia básica es más correcta?",
+        options: [
+          "A) Puede crearse por simple instrucción interna.",
+          "B) Requiere norma de creación con determinación de fines, potestades, adscripción y controles, por su impacto en garantías y en el sector público.",
+          "C) Se crea por acuerdo verbal.",
+          "D) Se crea por circular no publicada."
+        ],
+        correct: 1
+      },
+      {
+        question: "64. El Consejo de Gobierno se apoya en Viceconsejerías y Secretarías Generales. La función típica de estos órganos (nivel central) es:",
+        options: [
+          "A) Dictar sentencias.",
+          "B) Dirección y coordinación interna superior, impulso de políticas y gestión administrativa bajo la dependencia jerárquica del titular de la Consejería.",
+          "C) Función notarial.",
+          "D) Control constitucional."
+        ],
+        correct: 1
+      },
+      {
+        question: "65. En la Constitución, la moción de censura se caracteriza por:",
+        options: [
+          "A) Ser \"destructiva\": solo derriba al Gobierno sin alternativa.",
+          "B) Ser \"constructiva\": exige proponer un candidato alternativo.",
+          "C) Ser competencia exclusiva del Senado.",
+          "D) No producir efectos jurídicos."
+        ],
+        correct: 1
+      },
+      {
+        question: "66. Si un órgano administrativo autonómico dicta una resolución sancionadora sin audiencia del interesado, el vicio más relevante es:",
+        options: [
+          "A) Irrelevante si la sanción es pequeña.",
+          "B) Vulneración del derecho de defensa en el procedimiento y garantías del procedimiento sancionador, con alta probabilidad de anulabilidad.",
+          "C) Solo un defecto estético.",
+          "D) Convalidación automática por el superior."
+        ],
+        correct: 1
+      },
+      {
+        question: "67. El Parlamento andaluz aprueba su Reglamento. ¿Qué afirmación es más correcta?",
+        options: [
+          "A) Es una norma subordinada al Decreto del Gobierno.",
+          "B) Es la norma clave de autoorganización del Parlamento, aprobada por la Cámara con rango y posición especial.",
+          "C) Solo obliga a los funcionarios, no a los parlamentarios.",
+          "D) No puede ser controlado nunca."
+        ],
+        correct: 1
+      },
+      {
+        question: "68. El recurso de amparo ante el Tribunal Constitucional sirve principalmente para:",
+        options: [
+          "A) Revisar cualquier infracción legal ordinaria.",
+          "B) Proteger derechos fundamentales sustantivos vulnerados cuando se agote la vía judicial previa.",
+          "C) Sustituir al TSJA.",
+          "D) Anular leyes de presupuestos sin más."
+        ],
+        correct: 1
+      },
+      {
+        question: "69. Una norma autonómica regula un aspecto ambiental, pero afecta a bases estatales. ¿Qué técnica permite, en su caso, compatibilizar?",
+        options: [
+          "A) Ignorar las bases estatales.",
+          "B) Desarrollar y ejecutar dentro del marco básico estatal, respetando bases y títulos competenciales.",
+          "C) Anular la norma estatal por decreto autonómico.",
+          "D) Sustituir el TC por comisión mixta."
+        ],
+        correct: 1
+      },
+      {
+        question: "70. El Presidente de la Junta representa a Andalucía. ¿Qué acto refleja mejor la naturaleza institucional de esa representación?",
+        options: [
+          "A) Nombrar jueces.",
+          "B) Promulgar leyes estatales.",
+          "C) Dirigir la acción del Consejo de Gobierno y ostentar la más alta representación de la Comunidad en el marco estatutario.",
+          "D) Aprobar presupuestos por sí solo."
+        ],
+        correct: 2
+      },
+      {
+        question: "71. El estado de alarma, excepción y sitio se regula constitucionalmente para:",
+        options: [
+          "A) Suprimir derechos sin control.",
+          "B) Articular respuestas extraordinarias con límites, control parlamentario y garantías, permitiendo suspensión o restricción en los términos tasados.",
+          "C) Sustituir al Poder Judicial.",
+          "D) Evitar elecciones indefinidamente."
+        ],
+        correct: 1
+      },
+      {
+        question: "72. El Parlamento de Andalucía aprueba el presupuesto. ¿Qué consecuencia institucional se sigue si el Ejecutivo ejecuta gasto fuera de crédito suficiente y sin habilitación?",
+        options: [
+          "A) Ninguna, por discrecionalidad política.",
+          "B) Posibles responsabilidades (políticas, contables, disciplinarias o penales) y reproche por infracción de legalidad presupuestaria.",
+          "C) Convalidación automática por la Cámara de Cuentas.",
+          "D) Solo una advertencia sin efectos."
+        ],
+        correct: 1
+      },
+      {
+        question: "73. En LAJA, la descentralización y la desconcentración se diferencian porque:",
+        options: [
+          "A) Son idénticas.",
+          "B) La descentralización transfiere competencias a otra persona jurídica; la desconcentración distribuye competencias dentro de la misma organización administrativa.",
+          "C) La desconcentración crea municipios nuevos.",
+          "D) La descentralización elimina todo control."
+        ],
+        correct: 1
+      },
+      {
+        question: "74. La reforma constitucional ordinaria (art. 167 CE) exige, como regla general:",
+        options: [
+          "A) Mayoría simple en una Cámara.",
+          "B) 3/5 de cada Cámara, comisión mixta si hay discrepancias y posibilidad de referéndum si lo solicita una décima parte de miembros de una Cámara.",
+          "C) Referéndum obligatorio siempre.",
+          "D) Aprobación por decreto-ley."
+        ],
+        correct: 1
+      },
+      {
+        question: "75. Un órgano administrativo autonómico dicta un acto que invade competencia del Parlamento (materia reservada a ley). ¿Qué diagnóstico es más correcto?",
+        options: [
+          "A) Vicio de incompetencia por razón de materia, con posible nulidad si se vulnera reserva legal.",
+          "B) Acto válido si es urgente.",
+          "C) Vicio irrelevante si es motivado.",
+          "D) Convalidación automática por publicación."
+        ],
+        correct: 0
+      },
+      {
+        question: "76. La figura del \"Consejo de Gobierno\" se caracteriza, en términos funcionales, por:",
+        options: [
+          "A) Ser un órgano judicial.",
+          "B) Ser el órgano colegiado que ejerce la función ejecutiva y la potestad reglamentaria, bajo dirección política del Presidente.",
+          "C) Ser una comisión del Parlamento.",
+          "D) Ser un órgano consultivo."
+        ],
+        correct: 1
+      },
+      {
+        question: "77. El principio de legalidad tributaria en la Constitución implica esencialmente:",
+        options: [
+          "A) Los tributos se crean por reglamento.",
+          "B) La creación y elementos esenciales del tributo requieren ley, con límites a la potestad reglamentaria.",
+          "C) Los tributos se crean por orden ministerial sin ley.",
+          "D) Los tributos se fijan por sentencia."
+        ],
+        correct: 1
+      },
+      {
+        question: "78. Una agencia administrativa andaluza dicta resoluciones en materia de subvenciones. ¿Qué pauta garantiza mejor la regularidad?",
+        options: [
+          "A) Actuar sin procedimiento por ser \"agencia\".",
+          "B) Respetar procedimiento, motivación, competencia y controles (interno/externo), y, en su caso, régimen de recursos y control jurisdiccional.",
+          "C) Decidir por criterios políticos sin expediente.",
+          "D) Resolver por consenso informal."
+        ],
+        correct: 1
+      },
+      {
+        question: "79. El Parlamento solicita al Consejo Consultivo dictamen sobre un anteproyecto. El Ejecutivo lo omite pese a ser preceptivo. ¿Qué efecto es más plausible?",
+        options: [
+          "A) Ninguno, el dictamen es irrelevante.",
+          "B) Vicia el procedimiento por omisión de trámite esencial, con riesgo de nulidad/anulabilidad del acto o disposición resultante.",
+          "C) Solo genera una multa.",
+          "D) Se subsana con una nota de prensa."
+        ],
+        correct: 1
+      },
+      {
+        question: "80. El art. 49 CE (reformado) reconfigura el enfoque constitucional hacia las personas con discapacidad priorizando:",
+        options: [
+          "A) Terminología peyorativa.",
+          "B) Un enfoque de derechos, inclusión y accesibilidad, con mandato a poderes públicos de garantizar autonomía e igualdad real.",
+          "C) Exclusión educativa.",
+          "D) Sustitución de la tutela judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "81. En Andalucía, el control político del Ejecutivo por el Parlamento se expresa también mediante preguntas e interpelaciones. ¿Qué diferencia es conceptualmente más correcta?",
+        options: [
+          "A) No hay diferencia.",
+          "B) La pregunta busca información puntual; la interpelación se dirige a una política general y puede dar lugar a moción.",
+          "C) La pregunta siempre exige votación; la interpelación nunca.",
+          "D) La interpelación solo puede hacerla el Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "82. En el marco de la gestión pública andaluza, el principio de \"eficacia\" se orienta a:",
+        options: [
+          "A) Sustituir el control jurisdiccional.",
+          "B) Lograr los objetivos fijados optimizando recursos y garantizando cumplimiento del servicio público conforme a Derecho.",
+          "C) Evitar el control parlamentario.",
+          "D) Actuar sin expediente previo."
+        ],
+        correct: 1
+      },
+      {
+        question: "83. En la CE, la interdicción de la arbitrariedad (art. 9.3) impone a la Administración:",
+        options: [
+          "A) Poder actuar según criterios puramente subjetivos.",
+          "B) Actuar con razonabilidad, motivación e idoneidad objetiva, sujeta a control judicial.",
+          "C) Dictar leyes sin debate.",
+          "D) Sancionar sin procedimiento."
+        ],
+        correct: 1
+      },
+      {
+        question: "84. Una norma reglamentaria suprime el turno de réplica en un debate parlamentario alterando el Reglamento de la Cámara. El vicio principal es:",
+        options: [
+          "A) Infracción de normas tributarias.",
+          "B) Lesión del ius in officium y del derecho de participación política en condiciones de igualdad conforme a reglas parlamentarias.",
+          "C) Lesión del derecho a la propiedad.",
+          "D) Lesión del derecho de huelga."
+        ],
+        correct: 1
+      },
+      {
+        question: "85. La Oficina Andaluza contra el Fraude y la Corrupción (si actúa conforme al marco autonómico) encaja mejor como:",
+        options: [
+          "A) Órgano judicial.",
+          "B) Órgano administrativo de prevención/investigación administrativa y apoyo institucional, sometido a legalidad y control, sin sustituir a Fiscalía ni tribunales.",
+          "C) Órgano legislativo.",
+          "D) Órgano militar."
+        ],
+        correct: 1
+      },
+      {
+        question: "86. La Constitución reconoce el derecho a la educación y la libertad de enseñanza. Un estándar clásico es que:",
+        options: [
+          "A) La educación es solo una actividad privada sin intervención pública.",
+          "B) Se garantiza el derecho, con programación general de la enseñanza y participación de la comunidad educativa en los términos legales.",
+          "C) Está prohibida la enseñanza concertada.",
+          "D) No existe derecho a la educación."
+        ],
+        correct: 1
+      },
+      {
+        question: "87. Una Consejería dicta una orden que crea un órgano colegiado nuevo con funciones permanentes y estructura estable. Para minimizar riesgo de invalidez, lo determinante es:",
+        options: [
+          "A) Que lo firme el Secretario General.",
+          "B) Que exista habilitación normativa suficiente sobre creación y rango, respetando reserva organizativa y jerarquía.",
+          "C) Que sea urgente.",
+          "D) Que se publique en redes sociales."
+        ],
+        correct: 1
+      },
+      {
+        question: "88. En el sector público andaluz, cuando una entidad instrumental gestiona fondos públicos, un riesgo de invalidez/irregularidad surge si:",
+        options: [
+          "A) Aplica la ley de contratos del sector público.",
+          "B) Se eluden reglas de contratación, subvenciones o transparencia bajo la excusa de utilizar una personalidad jurídica privada.",
+          "C) Se somete a la Cámara de Cuentas.",
+          "D) Rinde cuentas al Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "89. En la Constitución, el principio de autonomía local se refleja especialmente en:",
+        options: [
+          "A) La disolución de ayuntamientos por decreto sin control.",
+          "B) Garantía de autonomía municipal y elección de concejales por sufragio, con personalidad jurídica plena.",
+          "C) Supresión de provincias.",
+          "D) Designación de alcaldes por el Rey."
+        ],
+        correct: 1
+      },
+      {
+        question: "90. El TSJA conoce, entre otros, de recursos contencioso-administrativos en su ámbito. ¿Qué idea es correcta?",
+        options: [
+          "A) El TSJA sustituye al Tribunal Supremo.",
+          "B) El TSJA es culminación jurisdiccional en la Comunidad, pero cabe recurso/competencia del Tribunal Supremo según leyes procesales y materia.",
+          "C) El TSJA dicta reglamentos.",
+          "D) El TSJA aprueba presupuestos."
+        ],
+        correct: 1
+      },
+      {
+        question: "91. En un sistema estatutario, ¿qué justifica que ciertas instituciones (Defensor, Cámara de Cuentas, Consejo Consultivo) se configuren con garantías de independencia?",
+        options: [
+          "A) Para que no rindan cuentas.",
+          "B) Para asegurar control técnico, neutralidad y protección de derechos/finanzas frente a vaivenes partidistas, manteniendo control parlamentario/jurisdiccional.",
+          "C) Para sustituir al Parlamento.",
+          "D) Para legislar."
+        ],
+        correct: 1
+      },
+      {
+        question: "92. El principio de \"unidad de la Nación\" convive con el \"derecho a la autonomía\" porque:",
+        options: [
+          "A) Son incompatibles.",
+          "B) La Constitución articula un Estado autonómico: unidad política + autonomía para nacionalidades y regiones dentro del marco constitucional.",
+          "C) La autonomía elimina la unidad.",
+          "D) La unidad elimina toda autonomía."
+        ],
+        correct: 1
+      },
+      {
+        question: "93. Si un decreto autonómico regula materias propias de reserva de ley y además contradice una ley autonómica previa, el vicio más robusto es:",
+        options: [
+          "A) Simple irregularidad.",
+          "B) Nulidad por infracción de jerarquía normativa y reserva de ley.",
+          "C) Validez por ser posterior.",
+          "D) Convalidación por la Cámara de Cuentas."
+        ],
+        correct: 1
+      },
+      {
+        question: "94. El Congreso autoriza al Gobierno para dictar normas con rango de ley en una materia. La técnica constitucional es:",
+        options: [
+          "A) Referéndum consultivo.",
+          "B) Delegación legislativa (ley de bases o ley ordinaria de delegación), con límites y control.",
+          "C) Ley orgánica automática.",
+          "D) Moción de censura."
+        ],
+        correct: 1
+      },
+      {
+        question: "95. Un órgano administrativo autonómico deniega una subvención por \"criterios políticos\" sin aplicar bases reguladoras. ¿Qué reproche es más fuerte?",
+        options: [
+          "A) Ninguno.",
+          "B) Infracción de legalidad, igualdad y prohibición de arbitrariedad: desviación de poder y falta de motivación/aplicación de criterios objetivos.",
+          "C) Solo un defecto formal subsanable siempre.",
+          "D) Convalidación si hay crédito."
+        ],
+        correct: 1
+      },
+      {
+        question: "96. En la Constitución, el control judicial de la actuación administrativa se expresa especialmente en:",
+        options: [
+          "A) Prohibición de recursos.",
+          "B) Sometimiento de la Administración a la ley y control por los tribunales (incluida la potestad reglamentaria y la legalidad de la actuación).",
+          "C) Control exclusivo del Parlamento.",
+          "D) Control exclusivo del Rey."
+        ],
+        correct: 1
+      },
+      {
+        question: "97. En Andalucía, la organización territorial administrativa busca acercar servicios. ¿Qué instrumento expresa mejor esa finalidad sin crear nueva persona jurídica?",
+        options: [
+          "A) Desconcentración territorial mediante delegaciones/servicios periféricos.",
+          "B) Privatización.",
+          "C) Derogación del Estatuto.",
+          "D) Suspensión de la autonomía."
+        ],
+        correct: 0
+      },
+      {
+        question: "98. Un proyecto de reforma constitucional por la vía agravada (art. 168 CE) se caracteriza por:",
+        options: [
+          "A) Tramitación idéntica a la ordinaria.",
+          "B) Aprobación por 2/3, disolución de Cortes, nueva aprobación por 2/3 y referéndum obligatorio.",
+          "C) Aprobación por mayoría simple.",
+          "D) Aprobación por decreto-ley."
+        ],
+        correct: 1
+      },
+      {
+        question: "99. Una agencia andaluza adopta un plan de inspección ambiental. ¿Qué garantía es decisiva para evitar arbitrariedad?",
+        options: [
+          "A) Secreto absoluto.",
+          "B) Criterios objetivos, publicidad adecuada cuando proceda, motivación y sujeción a legalidad, con control interno/externo y jurisdiccional.",
+          "C) Decisión discrecional sin expediente.",
+          "D) Selección por afinidad política."
+        ],
+        correct: 1
+      },
+      {
+        question: "100. La Constitución define a España como Estado social y democrático de Derecho. Una consecuencia práctica nuclear es que:",
+        options: [
+          "A) El Gobierno está por encima de la ley.",
+          "B) Todos los poderes públicos están sometidos a la Constitución y al resto del ordenamiento, con garantía de derechos y control jurisdiccional.",
+          "C) No existe separación de poderes.",
+          "D) La ley no necesita publicarse."
+        ],
+        correct: 1
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TEMAS IV, V Y BLOQUE CONSTITUCIONAL (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

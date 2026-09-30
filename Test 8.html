@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 26.03.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (26.03.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una Consejería dicta una instrucción interna que obliga a los ciudadanos a aportar documentación adicional no prevista en ninguna norma. ¿Qué calificación jurídica es correcta?",
+        options: [
+          "A) Es válida por tratarse de organización interna",
+          "B) Vulnera el principio de legalidad",
+          "C) Solo afecta a la eficacia",
+          "D) Es un defecto subsanable"
+        ],
+        correct: 1,
+        justification: "Vulnera legalidad (art. 9.3 CE): una instrucción no puede crear obligaciones."
+      },
+      {
+        question: "2. Una persona solicita intervenir en un procedimiento administrativo alegando que podría verse afectada en el futuro, pero sin acreditar relación concreta con el asunto. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Admitirla siempre",
+          "B) Rechazarla automáticamente",
+          "C) Analizar si existe interés legítimo suficiente",
+          "D) Admitirla solo si lo pide el órgano"
+        ],
+        correct: 2,
+        justification: "Interés legítimo (art. 4.1 Ley 39/2015)."
+      },
+      {
+        question: "3. El Parlamento de Andalucía aprueba su Reglamento con mayoría simple. ¿Qué consecuencia jurídica tiene?",
+        options: [
+          "A) Es válido por autonomía",
+          "B) Es anulable",
+          "C) Es inválido por falta de mayoría requerida",
+          "D) Es un defecto formal"
+        ],
+        correct: 2,
+        justification: "Mayoría absoluta exigida (EAA)."
+      },
+      {
+        question: "4. Una sociedad mercantil presenta una solicitud en papel ante la Administración. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Admitirla siempre",
+          "B) Rechazarla directamente",
+          "C) Tramitarla sin más",
+          "D) Exigir presentación electrónica"
+        ],
+        correct: 3,
+        justification: "Personas jurídicas obligadas a medios electrónicos (art. 14)."
+      },
+      {
+        question: "5. La Administración dicta un acto discrecional que perjudica al interesado, sin explicar las razones de su decisión. ¿Qué problema presenta?",
+        options: [
+          "A) Ninguno",
+          "B) Error material",
+          "C) Falta de motivación",
+          "D) Defecto leve"
+        ],
+        correct: 2,
+        justification: "Falta de motivación (art. 35)."
+      },
+      {
+        question: "6. El Gobierno en funciones aprueba un plan estratégico que condiciona la actuación del siguiente gobierno durante varios años. ¿Qué valoración es correcta?",
+        options: [
+          "A) Es válido",
+          "B) Es discrecional",
+          "C) Vulnera las limitaciones de un gobierno en funciones",
+          "D) Solo tiene efectos políticos"
+        ],
+        correct: 2,
+        justification: "Gobierno en funciones limitado (art. 9.3 CE + doctrina)."
+      },
+      {
+        question: "7. Un menor de edad actúa en un procedimiento administrativo defendiendo un derecho reconocido por una norma. ¿Qué es correcto?",
+        options: [
+          "A) No puede actuar",
+          "B) Puede tener capacidad de obrar",
+          "C) Solo con abogado",
+          "D) Solo con autorización judicial"
+        ],
+        correct: 1,
+        justification: "Capacidad de obrar administrativa (art. 3)."
+      },
+      {
+        question: "8. Un órgano consultivo autonómico decide dejar sin efecto un reglamento por considerarlo inoportuno. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es una función política",
+          "C) No tiene competencia para ello",
+          "D) Depende del reglamento"
+        ],
+        correct: 2,
+        justification: "Solo tribunales controlan reglamentos (art. 106 CE)."
+      },
+      {
+        question: "9. Un ciudadano presenta una solicitud electrónica a las 23:50 del último día de plazo. ¿Qué ocurre?",
+        options: [
+          "A) Está fuera de plazo",
+          "B) Es válida y en plazo",
+          "C) Debe repetirse",
+          "D) Es irregular"
+        ],
+        correct: 1,
+        justification: "Registro electrónico 24h (arts. 16 y 31)."
+      },
+      {
+        question: "10. La Administración toma una decisión dentro de su discrecionalidad, pero sin justificarla. ¿Qué principio se ve afectado?",
+        options: [
+          "A) Jerarquía",
+          "B) Interdicción de la arbitrariedad",
+          "C) Seguridad jurídica",
+          "D) Publicidad"
+        ],
+        correct: 1,
+        justification: "Interdicción de arbitrariedad (art. 9.3 CE)."
+      },
+      {
+        question: "11. La Administración exige a un ciudadano un certificado que ya consta en sus archivos. ¿Qué principio se vulnera?",
+        options: [
+          "A) Legalidad",
+          "B) Proporcionalidad",
+          "C) No aportación de documentos",
+          "D) Seguridad jurídica"
+        ],
+        correct: 2,
+        justification: "No aportación de documentos (art. 28)."
+      },
+      {
+        question: "12. Un diputado es perseguido judicialmente por opiniones expresadas en el Parlamento tras haber dejado el cargo. ¿Qué ocurre?",
+        options: [
+          "A) Pierde protección",
+          "B) Solo se protege durante el mandato",
+          "C) Mantiene inviolabilidad",
+          "D) Depende del delito"
+        ],
+        correct: 2,
+        justification: "Inviolabilidad permanente (EAA)."
+      },
+      {
+        question: "13. Una notificación electrónica no es abierta por el interesado en el plazo legal. ¿Qué efecto produce?",
+        options: [
+          "A) No se entiende notificada",
+          "B) Debe repetirse",
+          "C) Se entiende rechazada",
+          "D) Se anula"
+        ],
+        correct: 2,
+        justification: "Rechazo de notificación electrónica (art. 43)."
+      },
+      {
+        question: "14. Una convocatoria pública exige requisitos innecesarios y desproporcionados para acceder a un puesto público. ¿Qué vulnera?",
+        options: [
+          "A) Legalidad",
+          "B) Igualdad, mérito y capacidad",
+          "C) Seguridad jurídica",
+          "D) Eficacia"
+        ],
+        correct: 1,
+        justification: "Igualdad, mérito y capacidad (art. 23 CE)."
+      },
+      {
+        question: "15. Un acto administrativo es dictado por un órgano que no tiene competencia material. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Anulabilidad",
+          "B) Irregularidad",
+          "C) Nulidad de pleno derecho",
+          "D) Subsanación"
+        ],
+        correct: 2,
+        justification: "Nulidad por incompetencia material (art. 47)."
+      },
+      {
+        question: "16. Una entidad pública actúa imponiendo sanciones sin que una ley le atribuya esa potestad. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es discrecional",
+          "C) Es anulable",
+          "D) Es inválido"
+        ],
+        correct: 3,
+        justification: "Acto inválido por falta de cobertura legal (principio legalidad)."
+      },
+      {
+        question: "17. Un grupo parlamentario obliga jurídicamente a sus diputados a votar en un determinado sentido. ¿Qué se vulnera?",
+        options: [
+          "A) Legalidad",
+          "B) Prohibición de mandato imperativo",
+          "C) Autonomía parlamentaria",
+          "D) Jerarquía"
+        ],
+        correct: 1,
+        justification: "Prohibición mandato imperativo (art. 67 CE)."
+      },
+      {
+        question: "18. Un escrito se presenta en un registro administrativo distinto al órgano competente. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Inadmitirlo",
+          "B) Archivarlo",
+          "C) Remitirlo al órgano competente",
+          "D) Ignorarlo"
+        ],
+        correct: 2,
+        justification: "Remisión a órgano competente (art. 16)."
+      },
+      {
+        question: "19. El principio de seguridad jurídica implica:",
+        options: [
+          "A) Rigidez absoluta",
+          "B) Previsibilidad del ordenamiento",
+          "C) Eliminación de discrecionalidad",
+          "D) Control político"
+        ],
+        correct: 1,
+        justification: "Previsibilidad normativa (art. 9.3 CE)."
+      },
+      {
+        question: "20. Una Administración no resuelve en plazo una solicitud del interesado. ¿Qué regla general se aplica?",
+        options: [
+          "A) Silencio negativo",
+          "B) Silencio positivo",
+          "C) Archivo",
+          "D) Suspensión"
+        ],
+        correct: 1,
+        justification: "Silencio positivo (art. 24)."
+      },
+      {
+        question: "21. El Parlamento de Andalucía representa:",
+        options: [
+          "A) Al Gobierno",
+          "B) A las provincias",
+          "C) Al pueblo andaluz",
+          "D) Al Estado"
+        ],
+        correct: 2,
+        justification: "Representa al pueblo andaluz."
+      },
+      {
+        question: "22. La Administración detecta que un interesado no ha acreditado correctamente su representación. ¿Qué debe hacer?",
+        options: [
+          "A) Rechazar la solicitud",
+          "B) Permitir subsanación",
+          "C) Archivar",
+          "D) Resolver"
+        ],
+        correct: 1,
+        justification: "Subsanación representación (arts. 5 y 68)."
+      },
+      {
+        question: "23. Un reglamento regula materias reservadas a ley. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es anulable",
+          "C) Es nulo",
+          "D) Es subsanable"
+        ],
+        correct: 2,
+        justification: "Nulidad por invadir reserva de ley."
+      },
+      {
+        question: "24. Un superior jerárquico decide resolver un asunto que correspondía a un órgano inferior en un caso concreto. ¿Qué figura es?",
+        options: [
+          "A) Delegación",
+          "B) Avocación",
+          "C) Encomienda",
+          "D) Coordinación"
+        ],
+        correct: 1,
+        justification: "Avocación."
+      },
+      {
+        question: "25. La Administración utiliza una potestad para un fin distinto al previsto legalmente. ¿Qué vicio existe?",
+        options: [
+          "A) Error",
+          "B) Incompetencia",
+          "C) Desviación de poder",
+          "D) Irregularidad"
+        ],
+        correct: 2,
+        justification: "Desviación de poder."
+      },
+      {
+        question: "26. Un ciudadano presenta una denuncia ante la Administración, pero esta decide no iniciar procedimiento alguno tras realizar actuaciones previas. ¿Qué es correcto?",
+        options: [
+          "A) Está obligada a iniciar procedimiento",
+          "B) La denuncia vincula siempre",
+          "C) Puede decidir no iniciar si no aprecia fundamento",
+          "D) Debe archivarlo sin más"
+        ],
+        correct: 2,
+        justification: "No obliga a incoar procedimiento (arts. 55 y 62)."
+      },
+      {
+        question: "27. En un procedimiento administrativo se elimina el trámite de audiencia al interesado para agilizar la resolución. ¿Qué valoración es correcta?",
+        options: [
+          "A) Es válido si acelera el procedimiento",
+          "B) Es un defecto leve",
+          "C) Vulnera una garantía esencial",
+          "D) Solo afecta a la forma"
+        ],
+        correct: 2,
+        justification: "Trámite esencial (art. 82)."
+      },
+      {
+        question: "28. La Administración obliga a un ciudadano a comparecer presencialmente sin justificar la necesidad. ¿Qué principio se vulnera principalmente?",
+        options: [
+          "A) Seguridad jurídica",
+          "B) Proporcionalidad",
+          "C) Jerarquía",
+          "D) Publicidad"
+        ],
+        correct: 1,
+        justification: "Proporcionalidad (art. 19)."
+      },
+      {
+        question: "29. Una norma autonómica contradice una norma básica estatal en materia de procedimiento administrativo. ¿Qué ocurre?",
+        options: [
+          "A) Se aplica la autonómica",
+          "B) Se aplica la más reciente",
+          "C) Prevalece la normativa estatal",
+          "D) Depende del órgano"
+        ],
+        correct: 2,
+        justification: "Prevalece normativa estatal (art. 149.1.18 CE)."
+      },
+      {
+        question: "30. Un acto administrativo se dicta sin seguir ningún procedimiento previo. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Anulabilidad",
+          "B) Nulidad de pleno derecho",
+          "C) Irregularidad",
+          "D) Subsanación"
+        ],
+        correct: 1,
+        justification: "Nulidad por ausencia total de procedimiento (art. 47)."
+      },
+      {
+        question: "31. Una persona física desea relacionarse electrónicamente con la Administración. ¿Qué opción es correcta?",
+        options: [
+          "A) No puede hacerlo",
+          "B) Puede elegir libremente hacerlo",
+          "C) Solo si está obligada",
+          "D) Requiere autorización previo"
+        ],
+        correct: 1,
+        justification: "Persona física elige medio (art. 14)."
+      },
+      {
+        question: "32. Un órgano administrativo actúa fuera de su ámbito territorial. ¿Qué tipo de vicio presenta?",
+        options: [
+          "A) Nulidad",
+          "B) Inexistencia",
+          "C) Anulabilidad",
+          "D) Irregularidad"
+        ],
+        correct: 2,
+        justification: "Incompetencia territorial → anulabilidad."
+      },
+      {
+        question: "33. Una denuncia no da lugar a la incoación de procedimiento administrativo. ¿Qué implica?",
+        options: [
+          "A) Es ilegal",
+          "B) Es una decisión discrecional fundada",
+          "C) Es nula",
+          "D) Es obligatoria la incoación"
+        ],
+        correct: 1,
+        justification: "Decisión discrecional fundada."
+      },
+      {
+        question: "34. Una notificación se practica en papel a un sujeto obligado a relacionarse electrónicamente, sin causa que lo justifique. ¿Qué debe hacerse?",
+        options: [
+          "A) Es válida",
+          "B) Debe repetirse correctamente por vía electrónica",
+          "C) Es irrelevante",
+          "D) Se anula todo el procedimiento"
+        ],
+        correct: 1,
+        justification: "Notificación ineficaz debe repetirse."
+      },
+      {
+        question: "35. El principio de legalidad en la Administración implica:",
+        options: [
+          "A) Aplicación solo en sanciones",
+          "B) Actuación conforme a Derecho",
+          "C) Exclusión de discrecionalidad",
+          "D) Control político"
+        ],
+        correct: 1,
+        justification: "Actuación conforme a Derecho."
+      },
+      {
+        question: "36. Un escrito se presenta sin firma. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Inadmitir",
+          "B) Archivar",
+          "C) Requerir subsanación",
+          "D) Resolver igualmente"
+        ],
+        correct: 2,
+        justification: "Subsanación falta de firma."
+      },
+      {
+        question: "37. La inviolabilidad del Parlamento de Andalucía implica:",
+        options: [
+          "A) No puede ser disuelto",
+          "B) No puede ser controlado",
+          "C) Sus miembros no responden nunca",
+          "D) Protección institucional en su función"
+        ],
+        correct: 3,
+        justification: "Protección institucional."
+      },
+      {
+        question: "38. La Administración retrasa injustificadamente la resolución de un procedimiento. ¿Qué principio se vulnera?",
+        options: [
+          "A) Eficacia",
+          "B) Publicidad",
+          "C) Jerarquía",
+          "D) Seguridad jurídica"
+        ],
+        correct: 0,
+        justification: "Eficacia administrativa."
+      },
+      {
+        question: "39. Una norma establece efectos retroactivos desfavorables para los ciudadanos. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Es discrecional",
+          "C) Vulnera la Constitución",
+          "D) Es irrelevante"
+        ],
+        correct: 2,
+        justification: "Prohibición retroactividad desfavorable."
+      },
+      {
+        question: "40. Un órgano colegiado adopta acuerdos sin levantar acta. ¿Qué problema existe?",
+        options: [
+          "A) Ninguno",
+          "B) Falta de garantía formal",
+          "C) Nulidad automática",
+          "D) Error leve"
+        ],
+        correct: 1,
+        justification: "Falta de garantía formal."
+      },
+      {
+        question: "41. La Administración exige datos innecesarios que no son necesarios para resolver el procedimiento. ¿Qué principio vulnera?",
+        options: [
+          "A) Legalidad",
+          "B) Proporcionalidad",
+          "C) Jerarquía",
+          "D) Publicidad"
+        ],
+        correct: 1,
+        justification: "Proporcionalidad."
+      },
+      {
+        question: "42. La organización administrativa basada en relaciones de superioridad y subordinación responde a:",
+        options: [
+          "A) Coordinación",
+          "B) Descentralización",
+          "C) Jerarquía",
+          "D) Cooperación"
+        ],
+        correct: 2,
+        justification: "Jerarquía."
+      },
+      {
+        question: "43. El silencio administrativo negativo supone:",
+        options: [
+          "A) Estimación",
+          "B) Archivo",
+          "C) Desestimación",
+          "D) Suspensión"
+        ],
+        correct: 2,
+        justification: "Desestimación."
+      },
+      {
+        question: "44. La actuación administrativa conforme a la buena fe se relaciona con:",
+        options: [
+          "A) Legalidad",
+          "B) Confianza legítima",
+          "C) Jerarquía",
+          "D) Seguridad"
+        ],
+        correct: 1,
+        justification: "Confianza legítima."
+      },
+      {
+        question: "45. En caso de conflicto entre ley y reglamento:",
+        options: [
+          "A) Prevalece el reglamento",
+          "B) Se aplica el criterio temporal",
+          "C) Prevalece la ley",
+          "D) Depende del órgano"
+        ],
+        correct: 2,
+        justification: "Prevalece la ley."
+      },
+      {
+        question: "46. La falta de resolución expresa en plazo afecta a:",
+        options: [
+          "A) Derecho de participación",
+          "B) Derecho a una buena administración",
+          "C) Derecho de reunión",
+          "D) Derecho de igualdad"
+        ],
+        correct: 1,
+        justification: "Derecho a buena administración."
+      },
+      {
+        question: "47. Un órgano administrativo dicta resolución sin competencia jerárquica. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Es inexistente",
+          "C) Depende del tipo de incompetencia",
+          "D) Es irrelevante"
+        ],
+        correct: 2,
+        justification: "Depende tipo de incompetencia."
+      },
+      {
+        question: "48. La Administración utiliza medios electrónicos sin garantizar accesibilidad a los ciudadanos. ¿Qué implica?",
+        options: [
+          "A) Ningún problema",
+          "B) Error técnico",
+          "C) Vulneración de derechos",
+          "D) Irregularidad leve"
+        ],
+        correct: 2,
+        justification: "Vulneración de derechos."
+      },
+      {
+        question: "49. El principio de coordinación implica:",
+        options: [
+          "A) Subordinación",
+          "B) Actuación conjunta entre Administraciones",
+          "C) Centralización",
+          "D) Dependencia jerárquica"
+        ],
+        correct: 1,
+        justification: "Coordinación administrativa."
+      },
+      {
+        question: "50. Una actuación administrativa persigue fines privados. ¿Qué vicio existe?",
+        options: [
+          "A) Error material",
+          "B) Incompetencia",
+          "C) Desviación de poder",
+          "D) Irregularidad"
+        ],
+        correct: 2,
+        justification: "Desviación de poder."
+      },
+      {
+        question: "51. Una solicitud no reúne los requisitos formales mínimos. ¿Qué procede?",
+        options: [
+          "A) Inadmisión directa",
+          "B) Archivo inmediato",
+          "C) Subsanación",
+          "D) Desestimación"
+        ],
+        correct: 2,
+        justification: "Subsanación."
+      },
+      {
+        question: "52. Una persona presenta una declaración responsable para iniciar una actividad. ¿Qué efecto produce, con carácter general?",
+        options: [
+          "A) Debe esperar resolución",
+          "B) Puede iniciar la actividad desde su presentación",
+          "C) Necesita autorización previa",
+          "D) Queda suspendida la actividad"
+        ],
+        correct: 1,
+        justification: "Declaración responsable habilita inicio."
+      },
+      {
+        question: "53. Un ciudadano presenta una comunicación previa para realizar una actividad. ¿Qué implica?",
+        options: [
+          "A) Necesita autorización",
+          "B) Puede iniciar la actividad desde la comunicación",
+          "C) Debe esperar control administrativo",
+          "D) Solo es informativa"
+        ],
+        correct: 1,
+        justification: "Comunicación previa habilita inicio."
+      },
+      {
+        question: "54. Se omite el trámite de audiencia, pero el interesado ha podido defenderse plenamente por otros medios. ¿Qué consecuencia jurídica es más correcta?",
+        options: [
+          "A) Nulidad de pleno derecho",
+          "B) Anulabilidad si no hay indefensión real",
+          "C) Validez plena sin matices",
+          "D) Inexistencia"
+        ],
+        correct: 1,
+        justification: "Anulabilidad si no hay indefensión."
+      },
+      {
+        question: "55. Un escrito se presenta ante una Administración distinta a la competente. ¿Qué debe hacerse?",
+        options: [
+          "A) Inadmitir",
+          "B) Archivar",
+          "C) Remisión obligatoria",
+          "D) Desestimar"
+        ],
+        correct: 2,
+        justification: "Remisión."
+      },
+      {
+        question: "56. Un reglamento autonómico vulnera las bases estatutarias o estatales. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es anulable",
+          "C) Es nulo por contradicción con normativa básica",
+          "D) Es un defecto formal"
+        ],
+        correct: 2,
+        justification: "Nulidad por contradicción con normativa básica."
+      },
+      {
+        question: "57. La Administración obliga a un ciudadano no obligado a usar medios electrónicos a comparecer presencialmente sin motivo. ¿Qué derecho se vulnera?",
+        options: [
+          "A) Igualdad",
+          "B) Derecho a elegir medio de relación",
+          "C) Seguridad jurídica",
+          "D) Publicidad"
+        ],
+        correct: 1,
+        justification: "Derecho a elegir medio."
+      },
+      {
+        question: "58. Un órgano dicta un acto sin tener competencia funcional para ello. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Anulabilidad",
+          "B) Nulidad de pleno derecho",
+          "C) Irregularidad",
+          "D) Subsanación"
+        ],
+        correct: 0,
+        justification: "Incompetencia funcional → anulabilidad."
+      },
+      {
+        question: "59. Una notificación se practica omitiendo parte del contenido del acto, pero sin causar indefensión. ¿Qué efecto produce?",
+        options: [
+          "A) Nulidad",
+          "B) Anulabilidad sin indefensión",
+          "C) Inexistencia",
+          "D) Validez plena"
+        ],
+        correct: 1,
+        justification: "Anulabilidad sin indefensión."
+      },
+      {
+        question: "60. La Administración actúa de forma contradictoria respecto a actuaciones anteriores generando confianza. ¿Qué principio se afecta?",
+        options: [
+          "A) Legalidad",
+          "B) Confianza legítima",
+          "C) Jerarquía",
+          "D) Eficacia"
+        ],
+        correct: 1,
+        justification: "Confianza legítima."
+      },
+      {
+        question: "61. Un procedimiento queda paralizado por causa imputable al interesado durante un plazo legal. ¿Qué ocurre?",
+        options: [
+          "A) Nulidad",
+          "B) Suspensión indefinida",
+          "C) Caducidad",
+          "D) Inexistencia"
+        ],
+        correct: 2,
+        justification: "Caducidad."
+      },
+      {
+        question: "62. El Parlamento de Andalucía actúa con autonomía respecto al Gobierno. ¿Qué implica?",
+        options: [
+          "A) Dependencia jerárquica",
+          "B) Subordinación política",
+          "C) Autonomía institucional",
+          "D) Coordinación"
+        ],
+        correct: 2,
+        justification: "Autonomía institucional."
+      },
+      {
+        question: "63. La Administración dicta un acto discrecional sin motivación. ¿Qué problema genera?",
+        options: [
+          "A) Ninguno",
+          "B) Error formal",
+          "C) Impide el control de la actuación",
+          "D) Es irrelevante"
+        ],
+        correct: 2,
+        justification: "Impide control."
+      },
+      {
+        question: "64. Un ciudadano presenta documentación incompleta en su solicitud. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Archivar",
+          "B) Inadmitir",
+          "C) Resolver",
+          "D) Requerir subsanación"
+        ],
+        correct: 3,
+        justification: "Subsanación."
+      },
+      {
+        question: "65. La Administración impone una sanción sin que exista una ley que la respalde. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Es anulable",
+          "C) Nulidad de la sanción sin ley",
+          "D) Es irregular"
+        ],
+        correct: 2,
+        justification: "Nulidad sanción sin ley."
+      },
+      {
+        question: "66. La Administración incumple sistemáticamente los plazos en la tramitación. ¿Qué principio se vulnera?",
+        options: [
+          "A) Seguridad jurídica",
+          "B) Eficacia",
+          "C) Publicidad",
+          "D) Jerarquía"
+        ],
+        correct: 1,
+        justification: "Eficacia."
+      },
+      {
+        question: "67. Un reglamento regula una materia reservada a la ley. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Irregularidad",
+          "B) Anulabilidad",
+          "C) Error formal",
+          "D) Nulidad del reglamento"
+        ],
+        correct: 3,
+        justification: "Nulidad reglamento."
+      },
+      {
+        question: "68. La Administración tramita expedientes sin respetar el orden de entrada sin causa justificada. ¿Qué principio vulnera?",
+        options: [
+          "A) Igualdad",
+          "B) Jerarquía",
+          "C) Coordinación",
+          "D) Legalidad"
+        ],
+        correct: 0,
+        justification: "Igualdad."
+      },
+      {
+        question: "69. Un interesado no accede a una notificación electrónica dentro del plazo establecido. ¿Qué ocurre?",
+        options: [
+          "A) No produce efectos",
+          "B) Debe repetirse",
+          "C) Rechazo de la notificación",
+          "D) Se anula"
+        ],
+        correct: 2,
+        justification: "Rechazo notificación."
+      },
+      {
+        question: "70. La descentralización administrativa implica:",
+        options: [
+          "A) Dependencia jerárquica",
+          "B) Transferencia de competencias a otros entes",
+          "C) Coordinación",
+          "D) Subordinación"
+        ],
+        correct: 1,
+        justification: "Descentralización."
+      },
+      {
+        question: "71. Un órgano dicta un acto sin competencia. ¿Qué ocurre?",
+        options: [
+          "A) Siempre es válido",
+          "B) Es inexistente",
+          "C) Depende del tipo de incompetencia",
+          "D) Es irrelevante"
+        ],
+        correct: 2,
+        justification: "Depende."
+      },
+      {
+        question: "72. La Administración exige requisitos no previstos en la normativa aplicable. ¿Qué principio vulnera?",
+        options: [
+          "A) Legalidad",
+          "B) Publicidad",
+          "C) Seguridad jurídica",
+          "D) Jerarquía"
+        ],
+        correct: 0,
+        justification: "Legalidad."
+      },
+      {
+        question: "73. En un procedimiento iniciado a solicitud del interesado, la Administración no resuelve en plazo. ¿Qué efecto general se produce?",
+        options: [
+          "A) Estimación por silencio positivo",
+          "B) Desestimación",
+          "C) Suspensión",
+          "D) Archivo"
+        ],
+        correct: 0,
+        justification: "Silencio positivo."
+      },
+      {
+        question: "74. La Administración cambia su criterio sin justificación respecto a situaciones idénticas. ¿Qué principio se vulnera?",
+        options: [
+          "A) Jerarquía",
+          "B) Coordinación",
+          "C) Confianza legítima",
+          "D) Publicidad"
+        ],
+        correct: 2,
+        justification: "Confianza legítima."
+      },
+      {
+        question: "75. La Administración utiliza una potestad con una finalidad distinta a la prevista. ¿Qué vicio se produce?",
+        options: [
+          "A) Error material",
+          "B) Incompetencia",
+          "C) Irregularidad",
+          "D) Desviación de poder"
+        ],
+        correct: 3,
+        justification: "Desviación de poder."
+      },
+      {
+        question: "76. La Administración inicia un procedimiento de oficio sin dictar acuerdo formal de inicio. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Irregularidad",
+          "B) Falta de acuerdo de inicio → anulabilidad",
+          "C) Nulidad de pleno derecho",
+          "D) Subsanación"
+        ],
+        correct: 1,
+        justification: "Falta de acuerdo de inicio → anulabilidad."
+      },
+      {
+        question: "77. Un interesado accede al contenido completo de una notificación electrónica dentro de plazo. ¿Qué efecto produce?",
+        options: [
+          "A) No se entiende notificada",
+          "B) Notificación practicada plenamente",
+          "C) Debe repetirse",
+          "D) Produce efectos parciales"
+        ],
+        correct: 1,
+        justification: "Notificación practicada."
+      },
+      {
+        question: "78. Una Comunidad Autónoma modifica el concepto de \"interesado\" en sus procedimientos. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es organizativo",
+          "C) Vulnera normativa básica estatal",
+          "D) Es discrecional"
+        ],
+        correct: 2,
+        justification: "Vulnera normativa básica."
+      },
+      {
+        question: "79. La Administración amplía un plazo sin justificar la decisión. ¿Qué vicio presenta?",
+        options: [
+          "A) Nulidad",
+          "B) Anulabilidad por falta de motivación",
+          "C) Irregularidad",
+          "D) Error material"
+        ],
+        correct: 1,
+        justification: "Anulabilidad por falta de motivación."
+      },
+      {
+        question: "80. Una solicitud no identifica correctamente al interesado. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Archivar",
+          "B) Inadmitir",
+          "C) Resolver",
+          "D) Requerir subsanación"
+        ],
+        correct: 3,
+        justification: "Subsanación."
+      },
+      {
+        question: "81. La Administración pública un acto individual cuando debía notificarlo personalmente. ¿Qué ocurre?",
+        options: [
+          "A) Es válido",
+          "B) Es un defecto leve",
+          "C) Incorrecto (salvo supuestos legales)",
+          "D) Es irrelevante"
+        ],
+        correct: 2,
+        justification: "Incorrecto (salvo supuestos legales)."
+      },
+      {
+        question: "82. Durante el periodo entre legislaturas, ¿qué órgano garantiza la continuidad institucional?",
+        options: [
+          "A) Pleno",
+          "B) Mesa",
+          "C) Junta de Portavoces",
+          "D) Diputación Permanente"
+        ],
+        correct: 3,
+        justification: "Diputación Permanente."
+      },
+      {
+        question: "83. La Administración exige obligaciones no previstas en la ley. ¿Qué principio vulnera?",
+        options: [
+          "A) Seguridad jurídica",
+          "B) Legalidad",
+          "C) Jerarquía",
+          "D) Eficacia"
+        ],
+        correct: 1,
+        justification: "Legalidad."
+      },
+      {
+        question: "84. La tramitación alterando el orden de asuntos sin justificación objetiva afecta a:",
+        options: [
+          "A) Eficiencia",
+          "B) Jerarquía",
+          "C) Igualdad",
+          "D) Coordinación"
+        ],
+        correct: 2,
+        justification: "Igualdad."
+      },
+      {
+        question: "85. Se practica notificación electrónica a un ciudadano no obligado ni que la haya elegido. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Notificación ineficaz → reiteración requerida",
+          "C) Es válida con aviso",
+          "D) Es un acto nulo de pleno derecho"
+        ],
+        correct: 1,
+        justification: "Notificación ineficaz → reiteración."
+      },
+      {
+        question: "86. La Administración ejecuta un acto sin que sea jurídicamente ejecutable. ¿Qué problema existe?",
+        options: [
+          "A) Ninguno",
+          "B) Irregularidad",
+          "C) Posible vía de hecho",
+          "D) Error formal"
+        ],
+        correct: 2,
+        justification: "Posible vía de hecho."
+      },
+      {
+        question: "87. Una norma reglamentaria limita derechos fundamentales sin ley habilitante. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Es anulable",
+          "C) Es una cuestión política",
+          "D) Nulidad de pleno derecho"
+        ],
+        correct: 3,
+        justification: "Nulidad."
+      },
+      {
+        question: "88. Se deniega una solicitud sin motivación previa. ¿Qué implica?",
+        options: [
+          "A) Validez",
+          "B) Irregularidad",
+          "C) Vulnera el derecho de defensa",
+          "D) Subsanación"
+        ],
+        correct: 2,
+        justification: "Vulnera defensa."
+      },
+      {
+        question: "89. Un recurso administrativo presenta defectos formales subsanables. ¿Qué debe hacer la Administración?",
+        options: [
+          "A) Inadmitir",
+          "B) Resolver igualmente",
+          "C) Archivar",
+          "D) Permitir subsanación"
+        ],
+        correct: 3,
+        justification: "Subsanación."
+      },
+      {
+        question: "90. El principio de coordinación administrativa implica:",
+        options: [
+          "A) Jerarquía",
+          "B) Coordinación entre entes",
+          "C) Centralización",
+          "D) Subordinación"
+        ],
+        correct: 1,
+        justification: "Coordinación."
+      },
+      {
+        question: "91. La Administración dicta resoluciones contradictorias en casos idénticos sin justificarlo. ¿Qué principio se vulnera?",
+        options: [
+          "A) Jerarquía",
+          "B) Seguridad jurídica",
+          "C) Igualdad",
+          "D) Publicidad"
+        ],
+        correct: 2,
+        justification: "Igualdad."
+      },
+      {
+        question: "92. Un procedimiento caduca por inactividad imputable al interesado. ¿Qué efecto produce?",
+        options: [
+          "A) Nulidad",
+          "B) Archivo por caducidad",
+          "C) Reanudación automática",
+          "D) Suspensión"
+        ],
+        correct: 1,
+        justification: "Archivo por caducidad."
+      },
+      {
+        question: "93. Se vulneran garantías esenciales del procedimiento sin llegar a nulidad. ¿Qué ocurre?",
+        options: [
+          "A) Validez",
+          "B) Irregularidad",
+          "C) Anulabilidad",
+          "D) Error formal"
+        ],
+        correct: 2,
+        justification: "Anulabilidad."
+      },
+      {
+        question: "94. Una norma establece efectos retroactivos favorables. ¿Qué ocurre?",
+        options: [
+          "A) Está prohibido",
+          "B) Retroactividad favorable válida",
+          "C) Es nulo",
+          "D) Es irrelevante"
+        ],
+        correct: 1,
+        justification: "Retroactividad favorable válida."
+      },
+      {
+        question: "95. Se exige comparecencia reiterada e innecesaria al interesado. ¿Qué principio se vulnera?",
+        options: [
+          "A) Eficacia",
+          "B) Legalidad",
+          "C) Proporcionalidad",
+          "D) Publicidad"
+        ],
+        correct: 2,
+        justification: "Proporcionalidad."
+      },
+      {
+        question: "96. Se dicta un acto prescindiendo totalmente del procedimiento. ¿Qué consecuencia tiene?",
+        options: [
+          "A) Anulabilidad",
+          "B) Irregularidad",
+          "C) Error",
+          "D) Nulidad de pleno derecho"
+        ],
+        correct: 3,
+        justification: "Nulidad."
+      },
+      {
+        question: "97. La Administración impone cargas administrativas innecesarias. ¿Qué principio se vulnera?",
+        options: [
+          "A) Eficiencia",
+          "B) Jerarquía",
+          "C) Seguridad jurídica",
+          "D) Publicidad"
+        ],
+        correct: 0,
+        justification: "Eficiencia."
+      },
+      {
+        question: "98. El Parlamento de Andalucía representa jurídicamente:",
+        options: [
+          "A) A las provincias",
+          "B) A la Administración",
+          "C) Al pueblo andaluz",
+          "D) Al Gobierno"
+        ],
+        correct: 2,
+        justification: "Pueblo andaluz."
+      },
+      {
+        question: "99. Se aplica retroactivamente una sanción desfavorable. ¿Qué ocurre?",
+        options: [
+          "A) Es válida",
+          "B) Es discrecional",
+          "C) Es anulable",
+          "D) Inconstitucional"
+        ],
+        correct: 3,
+        justification: "Inconstitucional."
+      },
+      {
+        question: "100. La Administración utiliza una potestad con finalidad distinta a la prevista legalmente. ¿Qué vicio existe?",
+        options: [
+          "A) Error material",
+          "B) Incompetencia",
+          "C) Irregularidad",
+          "D) Desviación de poder"
+        ],
+        correct: 3,
+        justification: "Desviación de poder."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 26.03.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

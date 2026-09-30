@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen Estatuto de Autonomía y Bloque Constitucional</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TEMAS 4, 5 Y BLOQUE CONSTITUCIONAL</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una consejería dicta una instrucción interna y pretende aplicarla al ciudadano como si fuera una norma general obligatoria. ¿Qué razonamiento constitucional es más sólido para negar ese efecto externo directo?",
+        options: [
+          "A) La Administracion solo puede imponer obligaciones a terceros mediante normas/actos con cobertura en el principio de legalidad y jerarquía normativa; una instrucción interna no puede innovar el ordenamiento frente a ciudadanos.",
+          "B) Toda instrucción interna es equivalente a ley formal si la firma un consejero.",
+          "C) La instruccion es válida frente a ciudadanos si se publica en la web.",
+          "D) La instruccion interna desplaza automáticamente al reglamento."
+        ],
+        correct: 0
+      },
+      {
+        question: "2. En la Junta, se crea una unidad con competencias estables sobre gestión de personal, presupuesto y contratacion dentro de una consejería. Desde el punto de vista organizativo, lo más correcto es calificarla como:",
+        options: [
+          "A) Órgano colegiado periférico.",
+          "B) Unidad/órgano administrativo integrado en la estructura de la consejería (con funciones directivas o de apoyo según rango).",
+          "C) Entidad instrumental con personalidad propia.",
+          "D) Corporación de derecho público."
+        ],
+        correct: 1
+      },
+      {
+        question: "3. Un director general dicta una resolución en materia que, por su trascendencia, el consejero decide asumir para resolver personalmente un caso concreto. Esa técnica se denomina:",
+        options: [
+          "A) Delegación de firma.",
+          "B) Encomienda de gestión.",
+          "C) Avocación.",
+          "D) Desconcentración territorial."
+        ],
+        correct: 2
+      },
+      {
+        question: "4. Una asociación impugna una sanción administrativa alegando que el reglamento aplicado excede la ley habilitante. ¿Cuál es el encaje constitucional más correcto del control judicial en este caso?",
+        options: [
+          "A) Los jueces solo controlan actos administrativos, nunca reglamentos.",
+          "B) El control judicial se limita a comprobar la competencia del órgano sancionador.",
+          "C) El control judicial incluye la fiscalización de la legalidad de la actuación administrativa y la sujeción del reglamento a la ley (control de legalidad).",
+          "D) El control judicial solo existe si se ha agotado previamente la vía parlamentaria."
+        ],
+        correct: 2
+      },
+      {
+        question: "5. Una delegación territorial dicta criterios para homogeneizar decisiones en toda Andalucia y los impone a otras delegaciones como si fueran ordenes jerárquicas entre órganos de distintas consejerías. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Entre órganos de consejerías distintas siempre hay jerarquía general.",
+          "B) Los criterios coordinadores solo pueden dictarlos órganos periféricos.",
+          "C) La coordinación interdepartamental no equivale a jerarquía; requiere cauces y competencias adecuadas (no mando sobre órganos ajenos).",
+          "D) La coordinación solo puede hacerse por circular municipal."
+        ],
+        correct: 2
+      },
+      {
+        question: "6. Una agencia pública pretende ejercer potestad expropiatoria por ser más eficiente. La afirmación más correcta, conforme a la lógica del sector público andaluz, es:",
+        options: [
+          "A) Todas las entidades instrumentales ejercen potestad expropiatoria si lo aprueba su consejo.",
+          "B) Una agencia pública solo puede ejercer potestades públicas si tiene habilitación expresa y su norma de creación/estatutos se lo atribuyen expresamente.",
+          "C) La potestad expropiatoria es discrecional de cualquier ente financiado con fondos públicos.",
+          "D) Basta con que lo acuerde el delegado territorial."
+        ],
+        correct: 1
+      },
+      {
+        question: "7. Un particular reclama indemnización por danos causados por una actuación administrativa licita, pero antijuridica en sus efectos. ¿Qué fundamento constitucional general conecta con la responsabilidad patrimonial?",
+        options: [
+          "A) El principio de responsabilidad de los poderes públicos y la garantía de indemnidad frente a danos imputables al funcionamiento de los servicios públicos.",
+          "B) El derecho de huelga.",
+          "C) La libertad ideológica.",
+          "D) La iniciativa legislativa popular."
+        ],
+        correct: 0
+      },
+      {
+        question: "8. Una consejería firma un convenio con una universidad para que esta realice tareas materiales de apoyo técnico sin transferir la titularidad de la competencia ni la potestad decisoria. La figura es:",
+        options: [
+          "A) Delegación de competencias.",
+          "B) Encomienda de gestión/colaboración instrumental para actuaciones materiales o técnicas.",
+          "C) Descentralización funcional.",
+          "D) Sustitución interorgánica."
+        ],
+        correct: 1
+      },
+      {
+        question: "9. El Parlamento esta disuelto por convocatoria electoral y surge una situación que exige mantener la continuidad funcional de la Camara para decisiones imprescindibles. ¿Qué órgano permanece para ese cometido?",
+        options: [
+          "A) La Mesa en pleno con todas las comisiones.",
+          "B) El Pleno, que puede reunirse libremente.",
+          "C) La Junta de Portavoces, con potestad normativa.",
+          "D) La Diputación Permanente."
+        ],
+        correct: 3
+      },
+      {
+        question: "10. Se aprueba una norma que establece un requisito desproporcionado para acceder a empleo público, sin relación con las funciones del puesto. ¿Que enfoque constitucional es más pertinente?",
+        options: [
+          "A) Solo afecta al derecho de propiedad.",
+          "B) Infracción de los principios de igualdad, mérito y capacidad (y proscripción de la arbitrariedad).",
+          "C) Es inmune al control judicial por ser politica publica.",
+          "D) Solo puede impugnarse por referendum."
+        ],
+        correct: 1
+      },
+      {
+        question: "11. Una norma crea un organo de decisiones tecnicas pero no precisa su rango ni competencias ni régimen de resoluciones. ¿Que defecto tecnico es mas claro?",
+        options: [
+          "A) Falta de firma notarial.",
+          "B) Quiebra del principio de competencia y determinación de órganos (exigencia de norma atributiva de rango y funciones), afectando a la seguridad jurídica.",
+          "C) Exceso de motivación.",
+          "D) Inexistencia de presupuesto municipal."
+        ],
+        correct: 1
+      },
+      {
+        question: "12. En un debate parlamentario, un diputado realiza manifestaciones críticas y el Gobierno pretende sancionarle administrativamente por sus opiniones en la Cámara. ¿Que garantía opera?",
+        options: [
+          "A) Inviolabilidad parlamentaria por opiniones manifestadas en el ejercicio de sus funciones.",
+          "B) Inmunidad solo frente a multas de tráfico.",
+          "C) Exención de pagar impuestos.",
+          "D) Inmunidad absoluta para cualquier delito cometido fuera de la Cámara."
+        ],
+        correct: 0
+      },
+      {
+        question: "13. En un procedimiento sancionador, la Administracion utiliza una prueba obtenida vulnerando de forma grave un derecho fundamental. ¿Que consecuencia constitucional-procesal es la mas coherente?",
+        options: [
+          "A) La prueba puede valorarse si sirve al interes general.",
+          "B) La prueba solo se excluye si lo pide el instructor.",
+          "C) La prueba puede valorarse si existe conviccion moral del organo.",
+          "D) Debe excluirse por vulneracion de garantias y derecho a un proceso con todas las garantias."
+        ],
+        correct: 3
+      },
+      {
+        question: "14. La Camara de Cuentas fiscaliza el sector público andaluz, pero una consejería pretende impedirle acceso a documentación por ser interna. ¿Qué respuesta es más correcta?",
+        options: [
+          "A) La Camara de Cuentas solo controla lo que voluntariamente le remitan.",
+          "B) El control externo exige acceso a información necesaria para la fiscalización, dentro del marco legal, sin que la internalidad sea excusa automática.",
+          "C) El control externo solo existe para ayuntamientos.",
+          "D) La Camara de Cuentas solo actúa si hay sentencia penal."
+        ],
+        correct: 1
+      },
+      {
+        question: "15. Una consejeria dicta una orden para regular un procedimiento interno de tramitacion, pero afecta indirectamente a derechos de los ciudadanos en el acceso y plazos. ¿Que cautela es mas exigible?",
+        options: [
+          "A) Ninguna: si es interno, puede afectar a terceros sin limites.",
+          "B) Debe respetar el principio de legalidad, competencia normativa y no restringir derechos sin cobertura adecuada.",
+          "C) Puede imponer requisitos nuevos por circular.",
+          "D) Basta con la aprobacion por un director general."
+        ],
+        correct: 1
+      },
+      {
+        question: "16. Una ley autonoma pretende atribuir a la comunidad competencia exclusiva sobre legislacion basica de medio ambiente desplazando la basica estatal. ¿Que criterio constitucional es determinante?",
+        options: [
+          "A) Prevalencia automatica de la norma autonómica.",
+          "B) El Estado carece de competencias en medio ambiente.",
+          "C) El reparto competencial se rige por la Constitución y el Estatuto: corresponde al Estado la legislación básica y a la comunidad el desarrollo normativo y la ejecución; no cabe vaciar la competencia básica estatal.",
+          "D) Solo decide el parlamento autonómico por su principio territorial."
+        ],
+        correct: 2
+      },
+      {
+        question: "17. En el Parlamento andaluz, la Mesa decide inadmitir una iniciativa sin motivacion minima y sin atender a reglas procedimentales. ¿Que parametro tecnico es mas relevante para cuestionarlo?",
+        options: [
+          "A) Que la Mesa puede decidir sin control alguno.",
+          "B) Que los acuerdos de la Mesa deben respetar legalidad y motivacion minima, especialmente cuando afectan a funciones parlamentarias y derechos de participacion.",
+          "C) Que solo el presidente de la Junta puede inadmitir iniciativas.",
+          "D) Que el control solo puede hacerlo un notario."
+        ],
+        correct: 1
+      },
+      {
+        question: "18. Un organo superior decide delegar la firma de resoluciones en un inferior, manteniendo la competencia y la titularidad decisoria. ¿Como se califica correctamente?",
+        options: [
+          "A) Delegacion de firma.",
+          "B) Descentralizacion funcional.",
+          "C) Delegacion de competencias (plena).",
+          "D) Sustitucion."
+        ],
+        correct: 0
+      },
+      {
+        question: "19. La Administracion dicta un acto sin audiencia cuando era exigible, y la falta causa indefension real. ¿Que garantia constitucional se proyecta con mayor nitidez?",
+        options: [
+          "A) Derecho de defensa y tutela judicial efectiva (en conexion con garantias del procedimiento).",
+          "B) Derecho a contraer matrimonio.",
+          "C) Derecho de peticion sin limites.",
+          "D) Derecho a la propiedad intelectual."
+        ],
+        correct: 0
+      },
+      {
+        question: "20. El Defensor del Pueblo Andaluz solicita informacion a una consejeria y esta se niega sin causa. ¿Que afirmacion es mas correcta?",
+        options: [
+          "A) El Defensor solo puede pedir informacion a particulares.",
+          "B) La colaboracion con el Defensor forma parte del deber de auxilio institucional; la negativa injustificada es irregular.",
+          "C) El Defensor solo actua en materia tributaria.",
+          "D) El Defensor sustituye a los tribunales y dicta sentencias."
+        ],
+        correct: 1
+      },
+      {
+        question: "21. En Andalucia, una consejeria quiere transferir una competencia propia a una agencia instrumental para que decida y resuelva en nombre propio por simple resolucion del consejero. ¿Que objecion es mas solida?",
+        options: [
+          "A) Es posible siempre que sea mas eficiente.",
+          "B) La titularidad y ejercicio de potestades publicas requieren habilitacion normativa; no cabe ceder competencia por mera decision interna.",
+          "C) La agencia decide siempre por si misma sin norma.",
+          "D) Basta con un informe presupuestario."
+        ],
+        correct: 1
+      },
+      {
+        question: "22. Una norma reglamentaria limita de forma intensa la libertad de reunion imponiendo autorizacion previa general. ¿Que reproche constitucional aflora primero?",
+        options: [
+          "A) Ninguno, porque el reglamento puede limitar derechos fundamentales por si solo.",
+          "B) El derecho de reunion solo existe en periodo electoral.",
+          "C) La reserva de ley y la prohibicion de autorizacion previa general en terminos constitucionales; control estricto de restricciones.",
+          "D) Es valido si lo firma el delegado del Gobierno."
+        ],
+        correct: 2
+      },
+      {
+        question: "23. Un organo periferico decide resolver un expediente que, por norma interna, corresponde al organo central. ¿Que vicio tipico aparece?",
+        options: [
+          "A) Falta de legitimacion del ciudadano.",
+          "B) Inexistencia de plazo.",
+          "C) Vicio de incompetencia por razon del organo (desconocimiento del reparto interno de competencias).",
+          "D) Nulidad por no usar papel timbrado."
+        ],
+        correct: 2
+      },
+      {
+        question: "24. En el Parlamento andaluz, se pretende que una comision permanente apruebe definitivamente una reforma estructural sin pasar por el Pleno, pese a afectar al nucleo de organizacion parlamentaria. ¿Cual es la objecion mas consistente?",
+        options: [
+          "A) Las comisiones pueden sustituir siempre al Pleno.",
+          "B) La Mesa puede suprimir el Pleno por acuerdo simple.",
+          "C) La Junta de Portavoces puede aprobar leyes.",
+          "D) Ciertas decisiones estructurales exigen deliberacion y votacion del organo competente (Pleno) segun el marco estatutario/reglamentario."
+        ],
+        correct: 3
+      },
+      {
+        question: "25. Se aprueba una disposicion sancionadora que se aplica retroactivamente en perjuicio del ciudadano. ¿Que principio constitucional se vulnera de forma mas directa?",
+        options: [
+          "A) Irretroactividad de disposiciones sancionadoras no favorables y seguridad juridica.",
+          "B) Neutralidad ideologica del Estado.",
+          "C) Libertad de empresa.",
+          "D) Derecho a vacaciones."
+        ],
+        correct: 0
+      },
+      {
+        question: "26. Una sociedad mercantil publica pretende ejercer potestad sancionadora por delegacion sin cobertura legal especifica. ¿Que conclusion es mas correcta?",
+        options: [
+          "A) Puede sancionar como cualquier empresa si presta un servicio publico.",
+          "B) Puede sancionar si lo acuerda su consejo de administracion.",
+          "C) Puede sancionar si existe un convenio con una consejeria.",
+          "D) La potestad sancionadora exige cobertura normativa y habilitacion expresa."
+        ],
+        correct: 3
+      },
+      {
+        question: "27. Se detecta que una consejeria dicta actos con criterios distintos en provincias diferentes sin justificacion, generando inseguridad. ¿Que principio organizativo se invoca con mas fuerza?",
+        options: [
+          "A) Coordinacion y homogeneidad en la actuacion administrativa, con sujecion a legalidad y objetividad.",
+          "B) Autonomia absoluta de cada organo periferico.",
+          "C) Autonomia normativa provincial plena.",
+          "D) Arbitrariedad permitida."
+        ],
+        correct: 0
+      },
+      {
+        question: "28. En materia ambiental, se aprueba un plan que sacrifica de forma irrazonable la proteccion del medio sin motivacion. ¿Que enfoque constitucional encaja mejor para el control?",
+        options: [
+          "A) El medio ambiente no tiene relevancia constitucional.",
+          "B) El control se limita a la oportunidad politica.",
+          "C) La motivacion es irrelevante si hay mayoria parlamentaria.",
+          "D) Principios rectores y control de la arbitrariedad/exigencia de racionalidad y motivacion, con sujecion a legalidad."
+        ],
+        correct: 3
+      },
+      {
+        question: "29. Un organo superior dicta instrucciones para asegurar uniformidad, pero pretende alterar la competencia asignada por norma a un organo inferior. ¿Que limite aparece?",
+        options: [
+          "A) Ninguno: instruccion = reasignacion competencial.",
+          "B) Las instrucciones no pueden vaciar ni alterar el reparto competencial normativo; no sustituyen la norma de competencia.",
+          "C) Solo lo limita el presupuesto.",
+          "D) Solo lo limita la opinion del sindicato."
+        ],
+        correct: 1
+      },
+      {
+        question: "30. Se crea un ente instrumental y se discute si debe someterse a controles de estabilidad, auditoria publica e intervencion. ¿Que criterio es mas determinante?",
+        options: [
+          "A) Si maneja fondos publicos y forma parte del sector publico andaluz, queda sujeto a controles publicos en la medida prevista por el ordenamiento.",
+          "B) Si tiene logotipo propio, queda exento.",
+          "C) Si su personal es laboral, queda exento.",
+          "D) Si no tiene sede fisica, queda exento."
+        ],
+        correct: 0
+      },
+      {
+        question: "31. Un ciudadano exige que la Administracion actue solo cuando le convenga sin motivar ni justificar. ¿Que principio constitucional basico refuerza la exigencia de objetividad y servicio al interes general?",
+        options: [
+          "A) Principio de objetividad y servicio al interes general en la actuacion administrativa.",
+          "B) Principio de oportunidad electoral.",
+          "C) Principio de libre designacion universal.",
+          "D) Principio de discrecionalidad ilimitada."
+        ],
+        correct: 0
+      },
+      {
+        question: "32. Una consejeria pretende crear un organo colegiado decisor sin establecer composicion, quorum ni reglas de funcionamiento. ¿Que problema tecnico aparece?",
+        options: [
+          "A) Ninguno: los organos colegiados funcionan por costumbre.",
+          "B) Es valido si el organo es asesor.",
+          "C) Falta de determinacion de elementos esenciales del organo colegiado (composicion y reglas de funcionamiento), afectando a validez y seguridad juridica.",
+          "D) Se suple con la web corporativa."
+        ],
+        correct: 2
+      },
+      {
+        question: "33. El Parlamento de Andalucia solicita informacion al Gobierno y este la deniega alegando confidencialidad sin motivacion. ¿Que enfoque es mas solido?",
+        options: [
+          "A) El deber de informacion al Parlamento forma parte del control parlamentario; las reservas deben justificarse y encajar en limites legales, no ser genericas.",
+          "B) El Parlamento no puede pedir informacion nunca.",
+          "C) Solo puede pedirla el Defensor del Pueblo.",
+          "D) El Gobierno decide sin limite."
+        ],
+        correct: 0
+      },
+      {
+        question: "34. Se regula por decreto-ley una materia que afecta de forma sustancial al contenido esencial de derechos y al regimen electoral general. ¿Que objecion constitucional es mas fuerte?",
+        options: [
+          "A) Ninguna: el decreto-ley puede regularlo todo.",
+          "B) Solo es objecion si lo impugna un ciudadano individual.",
+          "C) La Constitucion establece limites materiales del decreto-ley; no puede afectar a determinadas materias sensibles.",
+          "D) El decreto-ley es equivalente a una reforma constitucional."
+        ],
+        correct: 2
+      },
+      {
+        question: "35. Una Delegacion del Gobierno de la Junta en una provincia pretende dar ordenes jerarquicas a un ayuntamiento. ¿Que objecion es mas correcta?",
+        options: [
+          "A) Es correcto por unidad de accion territorial.",
+          "B) No existe jerarquia entre Administraciones distintas; la relacion se articula por cooperacion, coordinacion o control en los terminos legalmente previstos.",
+          "C) El ayuntamiento es un organo periferico de la Junta.",
+          "D) El ayuntamiento solo obedece si hay subvencion."
+        ],
+        correct: 1
+      },
+      {
+        question: "36. En un expediente, se plantea si una agencia administrativa puede dictar actos administrativos con presuncion de validez y ejecutividad. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) Nunca, porque las agencias son empresas.",
+          "B) Si, en la medida en que el ordenamiento les atribuya potestades administrativas y actuen como Administracion publica en su ambito.",
+          "C) Solo si el acto lo firma un notario.",
+          "D) Solo si lo aprueba el Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "37. Una persona juridica pide entrar en domicilio de un particular para ejecutar una inspeccion sin autorizacion judicial ni consentimiento. ¿Cual es el limite constitucional clave?",
+        options: [
+          "A) Solo se requiere autorizacion del alcalde.",
+          "B) Solo se requiere autorizacion de la consejeria.",
+          "C) La inviolabilidad del domicilio exige consentimiento o autorizacion judicial.",
+          "D) Se permite siempre si hay interes ambiental."
+        ],
+        correct: 2
+      },
+      {
+        question: "38. Una consejeria decide desconcentrar competencias en delegaciones territoriales mediante una norma organizativa. ¿Que idea define mejor la desconcentracion?",
+        options: [
+          "A) Transferencia de competencias a otra Administracion distinta.",
+          "B) Desplazamiento interno de funciones dentro de la misma Administracion, hacia organos perifericos o inferiores.",
+          "C) Privatizacion del servicio.",
+          "D) Cesion a una ONG."
+        ],
+        correct: 1
+      },
+      {
+        question: "39. Se quiere crear una comision parlamentaria de investigacion sobre la gestion de una entidad instrumental. ¿Que afirmacion es mas consistente?",
+        options: [
+          "A) Las comisiones de investigacion solo existen en el Congreso.",
+          "B) No pueden investigar nunca entidades instrumentales.",
+          "C) Solo pueden investigar materias judicializadas.",
+          "D) El control parlamentario puede proyectarse sobre el sector publico andaluz y sus entes, dentro de limites legales."
+        ],
+        correct: 3
+      },
+      {
+        question: "40. Una norma establece que solo quienes compartan una ideologia concreta pueden acceder a ayudas publicas. ¿Que parametro constitucional es mas determinante?",
+        options: [
+          "A) Principio de igualdad y prohibicion de discriminacion por razones ideologicas, y neutralidad de los poderes publicos.",
+          "B) Derecho a la propiedad privada.",
+          "C) Libertad de empresa exclusivamente.",
+          "D) Derecho al trabajo como obligacion."
+        ],
+        correct: 0
+      },
+      {
+        question: "41. Un organo superior dicta una resolucion en materia atribuida legalmente a un organo inferior sin avocacion formal. ¿Que vicio aflora?",
+        options: [
+          "A) Nulidad por falta de sello.",
+          "B) Incompetencia funcional y quiebra del reparto competencial interno.",
+          "C) Validez automatica por superioridad.",
+          "D) Solo un defecto estetico."
+        ],
+        correct: 1
+      },
+      {
+        question: "42. Una entidad instrumental quiere contratar por libre sin respetar principios de publicidad y concurrencia, alegando que es una fundación pública. ¿Que enfoque es mas solido?",
+        options: [
+          "A) Las fundaciones públicas estan siempre fuera de controles.",
+          "B) Si integra el sector público, sus contratos se someten al regimen que corresponda segun su naturaleza y normativa aplicable.",
+          "C) Basta con tres presupuestos verbales.",
+          "D) Puede adjudicar discrecionalmente por eficiencia."
+        ],
+        correct: 1
+      },
+      {
+        question: "43. Se sanciona a un ciudadano por una conducta que no estaba tipificada con claridad en norma previa. ¿Que garantia constitucional encaja mejor?",
+        options: [
+          "A) Libertad de circulacion.",
+          "B) Principio de legalidad sancionadora (tipicidad y previsibilidad) y seguridad juridica.",
+          "C) Derecho de asociacion.",
+          "D) Deber de votar."
+        ],
+        correct: 1
+      },
+      {
+        question: "44. Un organo colegiado de la Junta adopta acuerdos sin quorum y sin levantar acta. ¿Que consecuencia es mas coherente?",
+        options: [
+          "A) Es irrelevante si el acuerdo era necesario.",
+          "B) Se entiende convalidado por el silencio.",
+          "C) Los acuerdos pueden ser invalidos por vulneracion de reglas esenciales de funcionamiento colegiado.",
+          "D) Se convierte en reglamento automaticamente."
+        ],
+        correct: 2
+      },
+      {
+        question: "45. El Parlamento de Andalucia aprueba su Reglamento y pretende cambiarlo por mayoria simple aunque el texto exige mayoria absoluta. ¿Que conclusion es mas correcta?",
+        options: [
+          "A) Prevalece la mayoria simple por ser decision soberana.",
+          "B) Cualquier mayoria vale si hay consenso.",
+          "C) Solo puede cambiarlo el Consejo de Gobierno.",
+          "D) Deben respetarse las mayorias cualificadas previstas para normas internas estructurales del Parlamento."
+        ],
+        correct: 3
+      },
+      {
+        question: "46. En una reforma constitucional, se pretende usar un procedimiento ordinario pese a afectar al nucleo de derechos y al modelo institucional. ¿Que idea es clave?",
+        options: [
+          "A) Toda reforma constitucional se hace siempre por el mismo procedimiento.",
+          "B) Existen procedimientos agravados para materias especialmente sensibles; no puede eludirse ese cauce.",
+          "C) La reforma la decide el Gobierno sin Cortes.",
+          "D) La reforma no admite participación parlamentaria."
+        ],
+        correct: 1
+      },
+      {
+        question: "47. Una consejería dicta una guía que, en la practica, añade requisitos nuevos para conceder autorizaciones ambientales. ¿Que problema es mas solido?",
+        options: [
+          "A) Ninguno: las guias crean Derecho.",
+          "B) Las guias son siempre obligatorias frente a terceros.",
+          "C) Si anade requisitos sustantivos, esta innovando el ordenamiento sin rango/cobertura; debe respetar legalidad y competencia normativa.",
+          "D) Es valido si la guia es extensa."
+        ],
+        correct: 2
+      },
+      {
+        question: "48. En la organización territorial andaluza, un órgano periférico tiene funciones de coordinación general en la provincia sobre servicios de la Junta. ¿Que figura encaja mejor?",
+        options: [
+          "A) La Diputación Provincial.",
+          "B) La Delegación del Gobierno de la Junta en la provincia.",
+          "C) El Defensor del Pueblo Andaluz.",
+          "D) El Tribunal Superior de Justicia."
+        ],
+        correct: 1
+      },
+      {
+        question: "49. Una Administracion deniega acceso a un procedimiento y no permite al interesado conocer el expediente antes de alegar. ¿Que eje constitucional se ve comprometido con mas claridad?",
+        options: [
+          "A) Derecho a la educacion.",
+          "B) Derecho a la cultura.",
+          "C) Derecho de propiedad.",
+          "D) Derecho de defensa y garantias procedimentales conectadas con tutela judicial efectiva."
+        ],
+        correct: 3
+      },
+      {
+        question: "50. Una consejeria disena su estructura interna y decide suprimir direcciones generales, creando secretarias generales para agrupar competencias. ¿Que idea organizativa subyace mejor?",
+        options: [
+          "A) Autoorganizacion dentro del marco legal, buscando eficacia y coordinacion bajo direccion del Consejo de Gobierno y la consejeria.",
+          "B) Transferencia de soberania.",
+          "C) Disolucion del Parlamento.",
+          "D) Reforma constitucional."
+        ],
+        correct: 0
+      },
+      {
+        question: "51. Un ciudadano reclama por funcionamiento anormal del servicio publico y pide que se autoindemnice la consejeria sin procedimiento. ¿Que respuesta tecnica es mas correcta?",
+        options: [
+          "A) La indemnizacion se reconoce sin expediente.",
+          "B) Solo cabe indemnizar si hay sentencia penal previa.",
+          "C) La responsabilidad patrimonial exige acreditacion de requisitos (dano, antijuridicidad, nexo causal), conforme al procedimiento aplicable.",
+          "D) La indemnizacion la decide un notario."
+        ],
+        correct: 2
+      },
+      {
+        question: "52. Una norma limita la libertad de expresion por razones genericas de imagen institucional sin criterios. ¿Que analisis constitucional es mas riguroso?",
+        options: [
+          "A) La libertad de expresion admite censura previa general si se invoca la imagen.",
+          "B) La libertad de expresion puede restringirse sin ley.",
+          "C) La libertad de expresion es irrelevante para empleados publicos.",
+          "D) Las restricciones deben estar previstas en norma con rango adecuado, ser necesarias y proporcionales; la censura previa general es highly sospechosa."
+        ],
+        correct: 3
+      },
+      {
+        question: "53. Se debate si un organo puede delegar la potestad normativa reglamentaria en una entidad instrumental. ¿Que es mas correcto?",
+        options: [
+          "A) La potestad reglamentaria puede delegarse libremente a cualquier ente.",
+          "B) Puede delegarse si hay convenio.",
+          "C) La potestad reglamentaria exige habilitacion y se ejerce por los organos con competencia normativa; no se desplaza por mera delegacion a entes instrumentales.",
+          "D) Solo depende de la financiacion."
+        ],
+        correct: 2
+      },
+      {
+        question: "54. Una unidad administrativa periferica inicia expedientes sancionadores sin estar atribuida la competencia, alegando proximidad al ciudadano. ¿Que vicio se aprecia?",
+        options: [
+          "A) Inexistencia del ciudadano.",
+          "B) Incompetencia del organo (falta de atribucion), con riesgo de invalidez del procedimiento/acto.",
+          "C) Falta de publicidad del expediente.",
+          "D) Falta de consenso politico."
+        ],
+        correct: 1
+      },
+      {
+        question: "55. Un reglamento crea infracciones y sanciones sin respaldo legal suficiente. ¿Que garantia constitucional se activa con mas fuerza?",
+        options: [
+          "A) Iniciativa legislativa popular.",
+          "B) Legalidad sancionadora: tipificacion por norma con cobertura legal suficiente y proscripcion de sancion sin ley.",
+          "C) Derecho a la vivienda.",
+          "D) Derecho a vacaciones."
+        ],
+        correct: 1
+      },
+      {
+        question: "56. Un organo central coordina a otro de distinta consejeria imponiendo instrucciones obligatorias y sanciones internas. ¿Que afirmacion es mas correcta?",
+        options: [
+          "A) La coordinacion no es jerarquia entre organos de distinta cadena; requiere titulo competencial y cauces, sin mando general.",
+          "B) La coordinacion siempre implica poder disciplinario sobre el otro organo.",
+          "C) La coordinacion la ejerce siempre una diputacion.",
+          "D) La coordinacion solo existe en materia sanitaria."
+        ],
+        correct: 0
+      },
+      {
+        question: "57. En el Parlamento andaluz, se pretende que el Presidente de la Camara decida en solitario la composicion de todas las comisiones sin intervencion del Pleno. ¿Que objecion es mas consistente?",
+        options: [
+          "A) El Presidente puede hacerlo libremente.",
+          "B) La composicion y designacion de comisiones se rige por reglas parlamentarias que garantizan proporcionalidad y participacion; no es una potestad unilateral absoluta.",
+          "C) Las comisiones se eligen por sorteo ciudadano.",
+          "D) Las comisiones las nombra el TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "58. En una licitacion publica, se establece un criterio que favorece sin justificacion a empresas de una provincia por razon territorial. ¿Que eje constitucional aparece?",
+        options: [
+          "A) Solo afecta al derecho a la salud.",
+          "B) Igualdad y prohibicion de arbitrariedad; unidad de mercado y no discriminacion territorial sin justificacion.",
+          "C) Derecho de sufragio pasivo.",
+          "D) Derecho a la intimidad."
+        ],
+        correct: 1
+      },
+      {
+        question: "59. Se crea una Agencia con personalidad juridica publica para ejecutar politicas, pero se discute si actua bajo derecho administrativo o privado. ¿Que afirmacion es mas correcta?",
+        options: [
+          "A) Todas las agencias actuan siempre bajo derecho privado.",
+          "B) La naturaleza y el regimen dependen de su tipo y funciones: cuando ejerce potestades publicas, rige el marco publico; en gestion ordinaria puede operar con tecnicas privadas segun norma aplicable.",
+          "C) La agencia decide siempre sin control judicial.",
+          "D) La agencia actua como sindicato."
+        ],
+        correct: 1
+      },
+      {
+        question: "60. Una consejeria establece un protocolo de atencion ciudadana que vulnera el principio de igualdad (trato desigual sin motivo). ¿Que principio organizativo se vulnera mas claramente?",
+        options: [
+          "A) Neutralidad de mercado.",
+          "B) Discrecionalidad plena del funcionario.",
+          "C) Igualdad, objetividad y servicio al interes general en la actuacion administrativa.",
+          "D) Independencia judicial."
+        ],
+        correct: 2
+      },
+      {
+        question: "61. El Parlamento autonomico aprueba una ley que invade frontalmente una competencia estatal exclusiva claramente definida. ¿Que tecnica constitucional se activa para depurar el conflicto?",
+        options: [
+          "A) El conflicto se resuelve por encuesta.",
+          "B) La ley autonoma prevalece siempre.",
+          "C) Control de constitucionalidad y/o mecanismos de solucion de conflictos competenciales previstos en el marco constitucional.",
+          "D) Solo cabe una comision mixta politica sin control juridico."
+        ],
+        correct: 2
+      },
+      {
+        question: "62. Un organo periferico interpreta que desconcentracion equivale a autonomia total y niega instrucciones generales del organo competente. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) La desconcentracion crea soberania provincial.",
+          "B) La desconcentracion no elimina direccion y coordinacion; mantiene unidad administrativa y sujecion a criterios del organo competente dentro de legalidad.",
+          "C) La desconcentracion anula la jerarquia interna.",
+          "D) La desconcentracion convierte la delegacion en municipio."
+        ],
+        correct: 1
+      },
+      {
+        question: "63. El Consejo Consultivo emite dictamen en un procedimiento y la consejeria se aparta sin justificar. ¿Que valor tiene el dictamen en terminos generales?",
+        options: [
+          "A) Es siempre vinculante y sustituye al acto.",
+          "B) Carece de valor y no debe incorporarse.",
+          "C) Solo vincula al Parlamento.",
+          "D) Tiene caracter consultivo (preceptivo en ciertos casos), y apartarse exige motivacion cuando sea relevante o exigible."
+        ],
+        correct: 3
+      },
+      {
+        question: "64. Se establece un requisito que limita la participacion politica (acceso a cargos representativos) por condicion economica. ¿Que eje constitucional se compromete de forma mas directa?",
+        options: [
+          "A) Derecho de participacion politica en condiciones de igualdad (sufragio pasivo) y principio de igualdad.",
+          "B) Derecho a la vivienda.",
+          "C) Derecho a la propiedad intelectual.",
+          "D) Derecho a la huelga."
+        ],
+        correct: 0
+      },
+      {
+        question: "65. Se confunden descentralizacion y desconcentracion justificando que una delegacion territorial actue como si fuese otra Administracion. ¿Que distincion es correcta?",
+        options: [
+          "A) Son lo mismo.",
+          "B) La descentralizacion implica atribucion a otra persona juridica/ente; la desconcentracion es interna dentro de la misma Administracion.",
+          "C) La descentralizacion solo existe en municipios.",
+          "D) La desconcentracion implica soberania propia."
+        ],
+        correct: 1
+      },
+      {
+        question: "66. Un organo pretende delegar competencias en una unidad que no es organo, sino mero equipo tecnico. ¿Que objecion es mas correcta?",
+        options: [
+          "A) Puede delegarse en cualquier persona.",
+          "B) Puede delegarse en un colectivo sin atribucion.",
+          "C) La delegacion exige que el destinatario sea un organo competente/estructura organizativa valida; no cabe en meros equipos sin atribucion organica.",
+          "D) Basta con que el equipo quiera."
+        ],
+        correct: 2
+      },
+      {
+        question: "67. Una Administracion restringe el derecho a la intimidad sin base legal y sin finalidad legitima clara. ¿Que test constitucional basico es ineludible?",
+        options: [
+          "A) Solo el test de eficiencia presupuestaria.",
+          "B) El test de legalidad, necesidad y proporcionalidad (y respeto al contenido esencial cuando proceda).",
+          "C) Solo el test de mayoría parlamentaria.",
+          "D) Solo el test de popularidad social."
+        ],
+        correct: 1
+      },
+      {
+        question: "68. Se propone que el Parlamento andaluz apruebe un acto que ordene directamente a funcionarios concretos como resolver expedientes individuales. ¿Que objecion es mas solida?",
+        options: [
+          "A) Es correcto: el Parlamento ejecuta politicas directamente.",
+          "B) El Parlamento puede dirigir la actividad administrativa singular como organo gestor.",
+          "C) Solo puede hacerlo si el expediente es ambiental.",
+          "D) La funcion parlamentaria es normativa y de control; dirigir actos administrativos individuales choca con separacion funcional y reglas competenciales."
+        ],
+        correct: 3
+      },
+      {
+        question: "69. La Camara pretende crear una nueva institucion estatutaria por acuerdo parlamentario sin ley. ¿Que objecion es mas consistente?",
+        options: [
+          "A) Ninguna: el Parlamento puede crear instituciones por acuerdo.",
+          "B) La creacion de instituciones exige el instrumento normativo adecuado y respeto al bloque estatutario y legal; no basta un acuerdo si afecta a estructura institucional.",
+          "C) Solo lo puede crear el Defensor.",
+          "D) Solo lo puede crear una comision."
+        ],
+        correct: 1
+      },
+      {
+        question: "70. Se impone una tasa que, en la practica, impide el ejercicio de un derecho por su cuantía. ¿Que enfoque es mas correcto?",
+        options: [
+          "A) No hay problema si la tasa aumenta recaudacion.",
+          "B) Se examina si la carga es desproporcionada y vacia el derecho, afectando a su contenido esencial y acceso efectivo.",
+          "C) Solo es problema si lo denuncia un partido politico.",
+          "D) Solo es problema si lo autoriza el Banco de Espana."
+        ],
+        correct: 1
+      },
+      {
+        question: "71. Un organo central pide a un inferior que resuelva un expediente en 24 horas sin expediente ni motivacion por urgencia politica. ¿Que limite quebranta?",
+        options: [
+          "A) Arbitrariedad permitida.",
+          "B) Objetividad, legalidad y motivacion en la actuacion administrativa, ademas de garantias procedimentales.",
+          "C) Inmunidad diplomática.",
+          "D) Libertad sindical."
+        ],
+        correct: 1
+      },
+      {
+        question: "72. En una entidad instrumental, se pretende nombrar personal sin publicidad, alegando que no son funcionarios. ¿Que respuesta es mas solida?",
+        options: [
+          "A) Puede nombrarse libremente siempre.",
+          "B) No rige ningun principio publico.",
+          "C) Deben respetarse los principios de igualdad, merito y capacidad en el acceso al empleo publico del sector publico, en los terminos aplicables segun su naturaleza.",
+          "D) Basta con entrevista informal."
+        ],
+        correct: 2
+      },
+      {
+        question: "73. Una comunidad autonoma aprueba una ley que restringe el derecho de asociacion por motivos ideologicos. ¿Que conclusion es mas correcta?",
+        options: [
+          "A) Es constitucional si la ley es autonoma.",
+          "B) Es constitucional si hay mayoria absoluta.",
+          "C) Es constitucional si lo avala un informe tecnico.",
+          "D) Las restricciones a derechos fundamentales requieren base constitucional y respeto a su contenido esencial; la discriminacion ideologica es altamente problematica."
+        ],
+        correct: 3
+      },
+      {
+        question: "74. Una consejeria pretende que una circular interna sea fuente de obligaciones para ciudadanos y empresas. ¿Que objecion es mas correcta?",
+        options: [
+          "A) Ninguna: circular = reglamento.",
+          "B) Las circulares/instrucciones orientan internamente; no pueden crear deberes externos sin norma/acto con cobertura y procedimiento apropiado.",
+          "C) Solo obliga si se envia por email.",
+          "D) Solo obliga si esta en papel."
+        ],
+        correct: 1
+      },
+      {
+        question: "75. Se debate si una Delegacion Territorial puede dictar directrices sobre otra Delegacion Territorial de distinta consejeria. ¿Que enfoque es mas correcto?",
+        options: [
+          "A) Si, siempre hay jerarquia provincial.",
+          "B) No hay jerarquia automatica entre organos de distintas consejerias; la coordinacion exige cauce y competencia.",
+          "C) Si, si se invoca eficacia.",
+          "D) Si, si lo aprueba la alcaldía."
+        ],
+        correct: 1
+      },
+      {
+        question: "76. En un proceso judicial, se deniega una prueba decisiva sin motivacion razonable, generando indefension. ¿Que garantia se ve mas afectada?",
+        options: [
+          "A) Derecho a un proceso con todas las garantias y tutela judicial efectiva (incluida la motivacion cuando proceda).",
+          "B) Derecho a la propiedad.",
+          "C) Derecho a la educacion.",
+          "D) Derecho al honor del juez."
+        ],
+        correct: 0
+      },
+      {
+        question: "77. Un organo dicta un acto sin competencia, pero la materia era claramente de otro organo. ¿Cual es el remedio tecnico mas correcto?",
+        options: [
+          "A) Mantenerlo por economia procesal.",
+          "B) Revisar la competencia y, en su caso, declarar la invalidez y retrotraer para que resuelva el organo competente conforme al procedimiento aplicable.",
+          "C) Convertirlo en reglamento.",
+          "D) Someterlo a votacion ciudadana."
+        ],
+        correct: 1
+      },
+      {
+        question: "78. El Parlamento solicita comparecencia de un alto cargo de una agencia publica para explicar gestion. ¿Que afirmacion es mas consistente?",
+        options: [
+          "A) Las agencias nunca comparecen.",
+          "B) Solo comparece el Presidente de la Junta.",
+          "C) El control parlamentario puede requerir comparecencias e informacion sobre entes del sector publico andaluz, dentro de reglas parlamentarias.",
+          "D) Comparece solo si hay sentencia condenatoria."
+        ],
+        correct: 2
+      },
+      {
+        question: "79. Una norma establece que la Administracion puede actuar sin motivar por razones de oportunidad. ¿Que limite constitucional general es mas claro?",
+        options: [
+          "A) Ninguno: oportunidad = libertad plena.",
+          "B) Solo debe motivar si el ciudadano lo pide.",
+          "C) La proscripcion de arbitrariedad y el principio de legalidad exigen motivacion, especialmente cuando afecta derechos/intereses.",
+          "D) Motivar es opcional siempre."
+        ],
+        correct: 2
+      },
+      {
+        question: "80. Una consejeria y una agencia discuten quien debe firmar un acto final: la agencia tramitó todo, pero la competencia decisoria es de la consejeria. ¿Que solucion es mas coherente?",
+        options: [
+          "A) Firma la agencia porque trabajo mas.",
+          "B) Firma el organo competente para resolver; la agencia puede tramitar/apoyar, pero no sustituye competencia decisoria sin habilitacion.",
+          "C) Firma cualquier funcionario.",
+          "D) Firma la Camara de Cuentas."
+        ],
+        correct: 1
+      },
+      {
+        question: "81. Un ente instrumental actua con financiacion publica y ejerce funciones publicas; un ciudadano sostiene que debe poder impugnar sus actos como administrativos. ¿Que enfoque es mas correcto?",
+        options: [
+          "A) Nunca se impugnan: es empresa.",
+          "B) Si ejerce potestades publicas o dicta actos administrativos, cabe control conforme al regimen publico aplicable.",
+          "C) Solo se impugnan por conciliacion.",
+          "D) Solo se impugnan por via penal."
+        ],
+        correct: 1
+      },
+      {
+        question: "82. Una ley establece una discriminacion directa por razon de sexo en el acceso a un servicio publico. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) Es valida si hay objetivo presupuestario.",
+          "B) Es valida si la decide una comunidad autonoma.",
+          "C) Vulneracion del principio de igualdad y prohibicion de discriminacion, salvo justificacion constitucionalmente legitima y proporcional (muy exigente).",
+          "D) Solo es invalida si afecta a extranjeros."
+        ],
+        correct: 2
+      },
+      {
+        question: "83. Un organo colegiado adopta acuerdo sin permitir deliberacion real, cerrando debate por decision unilateral del presidente. ¿Que objecion es mas solida?",
+        options: [
+          "A) Ninguna: el presidente manda.",
+          "B) Vulneracion de reglas esenciales de funcionamiento colegiado (deliberacion, quorum, acta), afectando validez.",
+          "C) Solo es defecto si hay prensa.",
+          "D) Es valido si el acuerdo era ambiental."
+        ],
+        correct: 1
+      },
+      {
+        question: "84. La Oficina Andaluza contra el Fraude y la Corrupcion solicita datos para investigar y un organo se niega sin amparo. ¿Que enfoque es mas consistente?",
+        options: [
+          "A) La Oficina no puede solicitar informacion nunca.",
+          "B) La Oficina solo puede actuar en el sector privado.",
+          "C) La cooperacion institucional y entrega de informacion, en los terminos legales, es exigible; la negativa injustificada es irregular.",
+          "D) La Oficina dicta sentencias."
+        ],
+        correct: 2
+      },
+      {
+        question: "85. Se pretende limitar el derecho a la educacion por razones ideologicas del alumno. ¿Que conclusion es mas correcta?",
+        options: [
+          "A) Es posible si lo decide la consejería.",
+          "B) Es posible por razón de cupos.",
+          "C) Es posible si es centro privado.",
+          "D) La limitacion por ideologia es incompatible con el marco constitucional de igualdad y derechos fundamentales, salvo supuestos muy excepcionales y justificados."
+        ],
+        correct: 3
+      },
+      {
+        question: "86. Una consejeria dicta planes que vinculan a otra consejeria como si fueran ordenes. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) Puede ordenar siempre por ser Gobierno.",
+          "B) La vinculacion interdepartamental requiere acuerdo del organo competente y no equivale a jerarquia simple.",
+          "C) Solo vinculan si se publican en prensa.",
+          "D) Solo vinculan a municipios."
+        ],
+        correct: 1
+      },
+      {
+        question: "87. Un organo intenta revocar actos firmes favorables sin procedimiento, por cambio de criterio politico. ¿Que objecion es mas solida?",
+        options: [
+          "A) Puede revocar siempre por oportunidad.",
+          "B) Los actos firmes favorables estan protegidos por legalidad y seguridad juridica; su revision exige cauces y requisitos tasados.",
+          "C) Se revoca con un tweet oficial.",
+          "D) Basta con acuerdo del portavoz."
+        ],
+        correct: 1
+      },
+      {
+        question: "88. Una comunidad autonoma aprueba una ley que impone censura previa a medios audiovisuales. ¿Que analisis constitucional es mas directo?",
+        options: [
+          "A) Solo afecta a libertad de empresa.",
+          "B) Libertad de expresion/informacion y prohibicion de censura previa, con reserva de ley y control estricto.",
+          "C) Solo afecta a derecho de asociacion.",
+          "D) No existe limite constitucional en medios."
+        ],
+        correct: 1
+      },
+      {
+        question: "89. Un ciudadano pide que un organo se abstenga por interes personal del titular y la Administracion lo ignora. ¿Que parametro es mas relevante?",
+        options: [
+          "A) Imparcialidad/objetividad en la actuación y deberes de abstencion cuando concurra causa.",
+          "B) Libertad sindical.",
+          "C) Inmunidad parlamentaria.",
+          "D) Secreto bancario."
+        ],
+        correct: 0
+      },
+      {
+        question: "90. En la estructura central de una consejeria, ¿que organo suele desempenar funciones transversales de coordinacion y apoyo técnico-juridico en la tramitacion?",
+        options: [
+          "A) La Delegación Provincial.",
+          "B) El Pleno del Parlamento.",
+          "C) La Secretaria General Tecnica.",
+          "D) El TSJA."
+        ],
+        correct: 2
+      },
+      {
+        question: "91. El Parlamento pretende imponer al Gobierno la obligacion de ejecutar un acto administrativo singular concreto, bajo amenaza de sancion personal al funcionario. ¿Que objecion es mas solida?",
+        options: [
+          "A) Control parlamentario si; direccion singular ejecutiva coercitiva sobre actos concretos individuales es problematica por separacion funcional y cauces.",
+          "B) Es correcto porque el Parlamento es soberano.",
+          "C) Es correcto si la materia es ambiental.",
+          "D) Es correcto si hay mayoria simple."
+        ],
+        correct: 0
+      },
+      {
+        question: "92. Una delegacion territorial interpreta que desconcentracion equivale a autonomia total y niega instrucciones generales del organo competente. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) La desconcentracion no elimina direccion y coordinacion; mantiene unidad administrativa y sujecion a criterios del organo competente.",
+          "B) La desconcentracion crea soberania provincial.",
+          "C) La desconcentracion anula la jerarquia interna.",
+          "D) La desconcentracion convierte la delegacion en municipio."
+        ],
+        correct: 0
+      },
+      {
+        question: "93. Una instruccion interna establece un criterio que, en la practica, impide el ejercicio de un derecho del ciudadano al exigir requisitos no previstos. ¿Que conclusion es mas correcta?",
+        options: [
+          "A) Es valida porque ordena trabajo.",
+          "B) Puede establecer requisitos nuevos siempre.",
+          "C) Si impone requisitos sustantivos no previstos, es una desviacion: debe respetar legalidad y no innovar frente a terceros.",
+          "D) Solo es invalida si lo firma un director general."
+        ],
+        correct: 2
+      },
+      {
+        question: "94. Se aprueba una norma que establece una presuncion iuris et de iure de culpabilidad en sanciones administrativas. ¿Que garantia constitucional se compromete?",
+        options: [
+          "A) Libertad de residencia.",
+          "B) La presuncion de inocencia y las garantias sancionadoras/procesales.",
+          "C) El derecho a la vivienda.",
+          "D) El derecho a fundar partidos."
+        ],
+        correct: 1
+      },
+      {
+        question: "95. La Camara de Cuentas detecta irregularidades y el organo controlado sostiene que solo los tribunales pueden fiscalizar. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) Es cierto: el control externo no existe.",
+          "B) El control externo de fiscalizacion es distinto del judicial: coexiste y se ejerce conforme a su marco legal, sin sustituir a jueces.",
+          "C) La Camara de Cuentas dicta condenas.",
+          "D) La Camara de Cuentas investiga delitos y detiene."
+        ],
+        correct: 1
+      },
+      {
+        question: "96. Un organo sostiene que puede actuar sin sujecion a principios porque su finalidad es ambiental. ¿Que objecion es mas solida?",
+        options: [
+          "A) La finalidad justifica todo.",
+          "B) El ordenamiento admite excepcion total por materia ambiental.",
+          "C) La Administracion actua con sujecion plena a legalidad, objetividad y principios organizativos; la finalidad no elimina garantias.",
+          "D) Solo se exige legalidad en materia tributaria."
+        ],
+        correct: 2
+      },
+      {
+        question: "97. Se pretende que la Diputacion Permanente apruebe un texto con rango de ley fuera de los supuestos/reglas parlamentarias. ¿Que objecion es mas consistente?",
+        options: [
+          "A) La Diputacion Permanente garantiza continuidad funcional, pero no sustituye ilimitadamente al Pleno en la funcion legislativa ordinaria fuera de los supuestos y reglas previstos.",
+          "B) La Diputacion Permanente es un ministerio.",
+          "C) La Diputacion Permanente puede reformar la Constitucion.",
+          "D) La Diputacion Permanente es un tribunal."
+        ],
+        correct: 0
+      },
+      {
+        question: "98. Una consejeria pretende aprobar un acto general que afecta a toda Andalucia, pero lo firma una delegacion provincial. ¿Que problema aparece?",
+        options: [
+          "A) Ninguno: la provincia manda.",
+          "B) Incompetencia del organo firmante (acto general exige organo con competencia territorial/material adecuada).",
+          "C) Solo un problema de estilo.",
+          "D) Solo problema si hay prensa."
+        ],
+        correct: 1
+      },
+      {
+        question: "99. Se discute si una entidad instrumental puede saltarse el control parlamentario porque tiene personalidad juridica propia. ¿Que afirmacion es mas correcta?",
+        options: [
+          "A) No hay control nunca si es ente instrumental.",
+          "B) El control parlamentario puede proyectarse sobre el sector publico andaluz y entes dependientes, sin perjuicio de la rendición de cuentas.",
+          "C) Solo se controla si hay moción de censura.",
+          "D) El control lo hace la Unión Europea."
+        ],
+        correct: 1
+      },
+      {
+        question: "100. Una consejeria sostiene que, por ser autonoma, no debe justificar sus decisiones ante el principio de interdiccion de la arbitrariedad. ¿Que respuesta es mas correcta?",
+        options: [
+          "A) La interdiccion de arbitrariedad no se aplica a comunidades autonomas.",
+          "B) Solo se aplica al Estado.",
+          "C) Se aplica a todos los poderes publicos: las decisiones deben ser razonables, motivadas y sujetas a legalidad.",
+          "D) Solo se aplica a jueces."
+        ],
+        correct: 2
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TEMAS 4, 5 Y BLOQUE CONSTITUCIONAL (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

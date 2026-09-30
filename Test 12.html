@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 30.04.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (50 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (30.04.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una Administración autonómica dicta una instrucción interna que limita la intervención de asociaciones ambientales en procedimientos sancionadores alegando \"orden interno del expediente\". Una asociación acredita que el resultado puede afectar directamente a sus fines estatutarios. ¿Cuál es la respuesta más correcta?",
+        options: [
+          "A) Puede ser interesada si acredita interés legítimo afectado.",
+          "B) Solo puede intervenir quien inició el expediente.",
+          "C) Las asociaciones nunca son interesadas.",
+          "D) La Administración decide libremente."
+        ],
+        correct: 0,
+        justification: "La condición de interesado alcanza a titulares de derechos e intereses legítimos individuales o colectivos (art. 4 Ley 39/2015)."
+      },
+      {
+        question: "2. Un órgano administrativo rechaza un recurso porque el recurrente no citó correctamente el nombre del recurso, aunque del escrito se deduce claramente el acto impugnado, las razones y la pretensión. ¿Qué debe prevalecer?",
+        options: [
+          "A) La inadmisión automática.",
+          "B) La calificación correcta por la Administración si se deduce su verdadero carácter.",
+          "C) La nulidad del recurso.",
+          "D) La exigencia de nuevo escrito."
+        ],
+        correct: 1,
+        justification: "El error en la calificación del recurso por parte del recurrente no será obstáculo para su tramitación, siempre que se deduzca su verdadero carácter (art. 115.2 Ley 39/2015)."
+      },
+      {
+        question: "3. Una ley autonómica pretende excluir del control parlamentario determinadas actuaciones del Consejo de Gobierno por considerarlas \"técnicas\". ¿Qué objeción resulta más sólida?",
+        options: [
+          "A) Ninguna, porque son materias técnicas.",
+          "B) Solo habría problema si afectan al presupuesto.",
+          "C) Se vulnera la función estatutaria de control parlamentario.",
+          "D) Solo puede objetarlo el Defensor del Pueblo."
+        ],
+        correct: 2,
+        justification: "El Parlamento andaluz ejerce el control político sobre el Consejo de Gobierno y sobre la Administración situada bajo su autoridad, sin que quepan exenciones indeterminadas por razones 'técnicas'."
+      },
+      {
+        question: "4. Una Administración exige firma electrónica avanzada para consultar el estado de un expediente, pese a que el interesado ya se ha identificado válidamente. ¿Cuál es la crítica jurídica más precisa?",
+        options: [
+          "A) Es correcta por seguridad.",
+          "B) Es obligatoria en todo trámite electrónico.",
+          "C) Depende del funcionario.",
+          "D) Confunde identificación y firma, exigiendo más de lo necesario."
+        ],
+        correct: 3,
+        justification: "Identificación y firma no son lo mismo; no toda actuación exige firma. Para meras consultas de expedientes basta con la identificación legalmente admitida (arts. 9 y 10 Ley 39/2015)."
+      },
+      {
+        question: "5. Un ciudadano interpone recurso de alzada contra un acto que no pone fin a la vía administrativa. La Administración lo inadmite alegando que debería haber interpuesto reposición. ¿Qué respuesta procede?",
+        options: [
+          "A) Inadmisión incorrecta: la alzada es el recurso ordinario procedente frente a actos que no agotan la vía administrativa.",
+          "B) Solo cabe reposición siempre.",
+          "C) No cabe recurso administrativo.",
+          "D) Debe acudir directamente al contencioso."
+        ],
+        correct: 0,
+        justification: "El recurso de alzada procede precisamente frente a resoluciones y actos de trámite cualificados que no pongan fin a la vía administrativa (art. 121 Ley 39/2015)."
+      },
+      {
+        question: "6. El Parlamento de Andalucía aprueba una reforma de su Reglamento por mayoría simple de los presentes en el Pleno. ¿Qué objeción es más clara?",
+        options: [
+          "A) Ninguna.",
+          "B) Requiere mayoría absoluta en una votación final sobre el conjunto del texto.",
+          "C) Exige unanimidad.",
+          "D) Solo cabe por ley ordinaria."
+        ],
+        correct: 1,
+        justification: "La aprobación y reforma del Reglamento del Parlamento de Andalucía requiere la votación favorable de la mayoría absoluta de la Cámara en una votación final de conjunto."
+      },
+      {
+        question: "7. Una solicitud individual para obtener una autorización ambiental no se resuelve en plazo. ¿Qué regla de silencio administrativo aplica con carácter general?",
+        options: [
+          "A) Silencio negativo siempre.",
+          "B) Caducidad del expediente.",
+          "C) Silencio positivo, salvo norma con rango de ley o Derecho de la UE que prevea lo contrario.",
+          "D) Archivo provisional."
+        ],
+        correct: 2,
+        justification: "En procedimientos iniciados a solicitud del interesado, la regla general es el silencio estimatorio (positivo) salvo que una norma con rango de ley establezca lo contrario (art. 24 Ley 39/2015)."
+      },
+      {
+        question: "8. Un órgano de contratación fracciona un contrato de obras en varios contratos menores para eludir la publicidad y concurrencia. ¿Qué principio legal se vulnera?",
+        options: [
+          "A) Inviolabilidad parlamentaria.",
+          "B) Irretroactividad favorable.",
+          "C) Mandato imperativo.",
+          "D) Prohibición de fraccionamiento indebido y principios de contratación."
+        ],
+        correct: 3,
+        justification: "La Ley de Contratos del Sector Público (LCSP) prohíbe expresamente fraccionar un contrato con la finalidad de disminuir la cuantía del mismo y eludir las reglas de publicidad y procedimiento."
+      },
+      {
+        question: "9. Un órgano resuelve un recurso administrativo sin contestar a las alegaciones esenciales planteadas. ¿Qué defecto presenta la resolución?",
+        options: [
+          "A) Incongruencia y motivación insuficiente.",
+          "B) Simple error material.",
+          "C) Ninguno si confirma el acto.",
+          "D) Solo defecto estético."
+        ],
+        correct: 0,
+        justification: "La resolución de los recursos debe decidir cuantas cuestiones plantee el expediente; omitir las alegaciones esenciales incurre en incongruencia y vulnera el deber de motivación (art. 119 Ley 39/2015)."
+      },
+      {
+        question: "10. Una persona jurídica presenta una solicitud en papel pese a estar obligada a medios electrónicos. La Administración archiva sin requerir nada. ¿Qué actuación era exigible?",
+        options: [
+          "A) Archivo inmediato.",
+          "B) Requerir subsanación mediante presentación electrónica.",
+          "C) Tramitar siempre en papel.",
+          "D) Denunciar a la entidad."
+        ],
+        correct: 1,
+        justification: "Si un sujeto obligado a la relación electrónica presenta su solicitud en papel, la Administración debe requerir la subsanación mediante su presentación electrónica (art. 68.4 Ley 39/2015)."
+      },
+      {
+        question: "11. Un diputado andaluz es demandado por opiniones emitidas en sesión parlamentaria después de cesar. ¿Qué prerrogativa opera?",
+        options: [
+          "A) Ninguna tras el cese.",
+          "B) Solo inmunidad penal.",
+          "C) Inviolabilidad por opiniones y votos parlamentarios.",
+          "D) Privilegio administrativo."
+        ],
+        correct: 2,
+        justification: "La inviolabilidad parlamentaria por las opiniones manifestadas y votos emitidos en el ejercicio de sus funciones produce efectos de forma permanente, incluso tras haber cesado el mandato."
+      },
+      {
+        question: "12. Un interesado interpone reposición contra un acto que pone fin a la vía administrativa y, antes de resolverse, acude al contencioso-administrativo. ¿Qué problema aparece?",
+        options: [
+          "A) Ninguno, ambas vías son simultáneas.",
+          "B) Debe esperarse resolución expresa o presunta del recurso potestativo.",
+          "C) El recurso contencioso sustituye siempre a la reposición.",
+          "D) La reposición es obligatoria."
+        ],
+        correct: 1,
+        justification: "Interpuesto el recurso de reposición, no se podrá acudir a la vía contencioso-administrativa hasta que sea resuelto expresamente o se haya producido su desestimación presunta (art. 123.2 Ley 39/2015)."
+      },
+      {
+        question: "13. Una Administración dicta una resolución desfavorable copiando literalmente un informe, sin explicar por qué descarta las alegaciones del interesado. ¿Qué exigencia incumple?",
+        options: [
+          "A) Publicación oficial.",
+          "B) Archivo electrónico.",
+          "C) Plazo de audiencia.",
+          "D) Motivación suficiente del acto."
+        ],
+        correct: 3,
+        justification: "Los actos desfavorables o de gravamen deben ser motivados con sucinta referencia de hechos y fundamentos de derecho, sin que la simple reproducción de informes sustituya la respuesta a las alegaciones."
+      },
+      {
+        question: "14. Una Comunidad Autónoma crea órganos administrativos propios para gestionar competencias autonómicas, respetando Constitución y Estatuto. ¿Qué principio lo ampara?",
+        options: [
+          "A) Potestad de autoorganización.",
+          "B) Supremacía reglamentaria.",
+          "C) Mandato imperativo.",
+          "D) Delegación estatal necesaria."
+        ],
+        correct: 0,
+        justification: "Las Comunidades Autónomas ostentan la potestad de autoorganización para estructurar sus propios órganos administrativos en el ámbito de sus competencias."
+      },
+      {
+        question: "15. Un recurso administrativo se presenta fuera de plazo y no concurre defecto de notificación ni causa legal que lo salve. ¿Qué procede?",
+        options: [
+          "A) Admitirlo por antiformalismo.",
+          "B) Resolver el fondo siempre.",
+          "C) Inadmitirlo por extemporáneo.",
+          "D) Convertirlo en queja."
+        ],
+        correct: 2,
+        justification: "El transcurso del plazo para interponer un recurso administrativo sin haberlo ejercitado determina la firmeza del acto y procede la inadmisión del recurso fuera de plazo (art. 116 Ley 39/2015)."
+      },
+      {
+        question: "16. Una Administración deniega a un ciudadano el acceso a documentos que ya forman parte de un expediente en el que es interesado, sin motivar límites legales. ¿Qué derecho se vulnera?",
+        options: [
+          "A) Derecho a no declarar.",
+          "B) Derecho de acceso al expediente.",
+          "C) Derecho de sufragio.",
+          "D) Derecho de asociación."
+        ],
+        correct: 1,
+        justification: "Los interesados en un procedimiento administrativo tienen derecho a acceder y obtener copia de los documentos que integran el expediente (art. 53.1.a Ley 39/2015)."
+      },
+      {
+        question: "17. Una norma interna de un grupo parlamentario prevé pérdida automática del escaño por votar contra la disciplina de partido. ¿Qué principio resulta afectado?",
+        options: [
+          "A) Mandato imperativo prohibido.",
+          "B) Competencia contractual.",
+          "C) Silencio administrativo.",
+          "D) Descentralización funcional."
+        ],
+        correct: 0,
+        justification: "Los parlamentarios representan a todo el pueblo y no están sujetos a mandato imperativo (art. 67.2 CE), por lo que votar en contra de la disciplina de partido no puede conllevar la pérdida del escaño."
+      },
+      {
+        question: "18. En un procedimiento sancionador, el acuerdo de inicio no concreta hechos, infracción ni responsable. ¿Qué problema genera?",
+        options: [
+          "A) Ninguno, se concreta al final.",
+          "B) Defecto de identificación del instructor únicamente.",
+          "C) Indefensión por falta de determinación mínima.",
+          "D) Solo error gramatical."
+        ],
+        correct: 2,
+        justification: "El acuerdo de iniciación en procedimientos sancionadores debe contener la imputación concreta de hechos, infracciones y posibles responsables para garantizar el derecho de defensa (art. 64 Ley 39/2015)."
+      },
+      {
+        question: "19. Un órgano inadmite un recurso de alzada porque el recurrente no acompañó documentos que ya obran en poder de la Administración. ¿Qué regla se incumple?",
+        options: [
+          "A) Libre valoración.",
+          "B) Derecho a no aportar documentos en poder de la Administración.",
+          "C) Jerarquía parlamentaria.",
+          "D) Publicación normativa."
+        ],
+        correct: 1,
+        justification: "Los interesados tienen derecho a no aportar documentos que ya obren en poder de la Administración actuante o hayan sido elaborados por cualquier otra Administración (art. 28.2 y 28.3 Ley 39/2015)."
+      },
+      {
+        question: "20. Una entidad del sector público encomienda a una sociedad mercantil privada la tramitación completa y resolución de subvenciones públicas. ¿Qué objeción existe?",
+        options: [
+          "A) Ejercicio de potestades públicas reserva de Administración.",
+          "B) Libertad de empresa.",
+          "C) Buena fe contractual.",
+          "D) Desconcentración."
+        ],
+        correct: 0,
+        justification: "El ejercicio de potestades públicas que impliquen el ejercicio de autoridad está reservado en exclusiva a las Administraciones Públicas y a los funcionarios públicos."
+      },
+      {
+        question: "21. Un recurrente interpone recurso de alzada y la resolución final aumenta la sanción impuesta inicialmente sin que existiera recurso de tercero. ¿Qué regla se viola?",
+        options: [
+          "A) Prohibición de la reformatio in peius.",
+          "B) Presunción de inocencia.",
+          "C) Buena fe registral.",
+          "D) Principio de publicidad."
+        ],
+        correct: 0,
+        justification: "La resolución de un recurso administrativo debe ser congruente y no puede empeorar la situación inicial del recurrente (prohibición de la reformatio in peius, art. 119.3 Ley 39/2015)."
+      },
+      {
+        question: "22. Un acto administrativo favorable se revoca por mera conveniencia política, lesionando derechos adquiridos y sin procedimiento adecuado. ¿Qué objeción procede?",
+        options: [
+          "A) La Administración puede revocar libremente.",
+          "B) La revisión de actos favorables está sometida a límites y procedimientos.",
+          "C) Solo cabe revocación verbal.",
+          "D) Basta informe de prensa."
+        ],
+        correct: 1,
+        justification: "La declaración de lesividad y la revisión de actos declarativos de derechos o favorables están estrictamente tasadas y sometidas a garantías legales (arts. 106 y 107 Ley 39/2015)."
+      },
+      {
+        question: "23. El Consejo de Gobierno andaluz pretende impedir toda comisión de investigación parlamentaria sobre una agencia pública dependiente. ¿Qué respuesta encaja con el Estatuto?",
+        options: [
+          "A) Puede hacerlo por dirección política.",
+          "B) Solo si afecta a contratación.",
+          "C) No puede vaciar el control parlamentario de la Administración bajo su autoridad.",
+          "D) Depende del presupuesto."
+        ],
+        correct: 2,
+        justification: "El Parlamento de Andalucía ejerce el control de la acción del Consejo de Gobierno y de los organismos y agencias de él dependientes, sin que el Ejecutivo pueda bloquear dicha facultad."
+      },
+      {
+        question: "24. Un interesado interpone recurso extraordinario de revisión alegando simplemente que no está de acuerdo con la valoración jurídica de la Administración. ¿Qué debe responderse?",
+        options: [
+          "A) Es cauce ordinario para reabrir.",
+          "B) Procede siempre contra actos firmes.",
+          "C) Sustituye al recurso de alzada.",
+          "D) Solo procede por causas legalmente tasadas, no por simple discrepancia."
+        ],
+        correct: 3,
+        justification: "El recurso extraordinario de revisión contra actos firmes solo procede cuando concurra alguna de las cuatro causas tasadas previstas en el artículo 125 de la Ley 39/2015."
+      },
+      {
+        question: "25. Una notificación en papel omite indicar los recursos procedentes, órgano y plazo. El interesado recurre cuando tiene conocimiento real del contenido. ¿Qué efecto produce?",
+        options: [
+          "A) Puede darse por subsanada desde que realiza actuaciones que revelan conocimiento.",
+          "B) La notificación es siempre inexistente.",
+          "C) El acto es nulo de pleno derecho siempre.",
+          "D) No puede recurrir nunca."
+        ],
+        correct: 0,
+        justification: "Las notificaciones defectuosas surtirán efecto a partir de la fecha en que el interesado realice actuaciones que supongan el conocimiento del contenido y alcance de la resolución (art. 40.3 Ley 39/2015)."
+      },
+      {
+        question: "26. Un órgano administrativo exige comparecencia personal reiterada sin justificar necesidad, pudiendo tramitarse electrónicamente. ¿Qué principio se compromete?",
+        options: [
+          "A) Mandato parlamentario.",
+          "B) Proporcionalidad y reducción de cargas.",
+          "C) Exclusividad judicial.",
+          "D) Derecho electoral."
+        ],
+        correct: 1,
+        justification: "La comparecencia personal debe estar legalmente prevista y responder a una necesidad justificada, evitando cargas innecesarias o desproporcionadas al ciudadano (art. 19 Ley 39/2015)."
+      },
+      {
+        question: "27. Una Administración autonómica dicta un acto apartándose de un reglamento vigente para favorecer a un solicitante concreto. ¿Qué regla vulnera?",
+        options: [
+          "A) Responsabilidad contractual.",
+          "B) Descentralización.",
+          "C) Inderogabilidad singular de los reglamentos.",
+          "D) Libertad sindical."
+        ],
+        correct: 2,
+        justification: "Las resoluciones administrativas de carácter particular no podrán vulnerar lo establecido en una disposición de carácter general (inderogabilidad singular, art. 37 Ley 39/2015)."
+      },
+      {
+        question: "28. Un órgano resuelve una alzada sin entrar en una causa de nulidad invocada por el recurrente porque \"no fue apreciada de oficio\". ¿Qué defecto hay?",
+        options: [
+          "A) La resolución debe resolver todas las cuestiones planteadas.",
+          "B) Ninguno, solo revisa lo que quiera.",
+          "C) Solo decide el superior político.",
+          "D) Debe archivar."
+        ],
+        correct: 0,
+        justification: "El órgano que resuelva el recurso decidirá cuantas cuestiones, tanto de forma como de fondo, plantee el procedimiento, hayan sido o no alegadas por los interesados (art. 119 Ley 39/2015)."
+      },
+      {
+        question: "29. Un Parlamento autonómico designa senadores autonómicos sin respetar las reglas estatutarias y parlamentarias aplicables. ¿Qué principio se afecta?",
+        options: [
+          "A) Autonomía sin límites.",
+          "B) Sometimiento a las reglas constitucionales y estatutarias.",
+          "C) Contratación menor.",
+          "D) Silencio negativo."
+        ],
+        correct: 1,
+        justification: "La designación de Senadores en representación de la Comunidad Autónoma debe realizarse asegurando la adecuada representación proporcional y según lo establecido en el Estatuto de Autonomía."
+      },
+      {
+        question: "30. Un recurso de alzada no se resuelve en plazo. El interesado pregunta si puede entenderlo desestimado a efectos de acudir a la vía contenciosa. ¿Qué respuesta es correcta?",
+        options: [
+          "A) No produce ningún efecto.",
+          "B) Se entiende estimado siempre.",
+          "C) Solo cabe esperar indefinidamente.",
+          "D) Puede entenderse desestimado en los términos legales."
+        ],
+        correct: 3,
+        justification: "El vencimiento del plazo sin resolución del recurso de alzada permite entenderlo desestimado a los efectos de interponer recurso contencioso-administrativo (salvo la excepción del art. 24.1 pte. 3º Ley 39/2015)."
+      },
+      {
+        question: "31. Un licitador es excluido de un contrato público por criterios no previstos en los pliegos ni relacionados con el objeto. ¿Qué principios se vulneran?",
+        options: [
+          "A) Igualdad, transparencia y vinculación a los pliegos.",
+          "B) Mandato imperativo.",
+          "C) Silencio positivo.",
+          "D) Inviolabilidad domiciliaria."
+        ],
+        correct: 0,
+        justification: "La contratación pública se rige por los principios de igualdad de trato, no discriminación, transparencia y estricta sujeción a los pliegos que rigen la licitación."
+      },
+      {
+        question: "32. Un interesado presenta recurso de reposición contra una disposición administrativa general. ¿Qué defecto existe?",
+        options: [
+          "A) La reposición procede siempre.",
+          "B) Las disposiciones generales no son objeto ordinario de recurso administrativo.",
+          "C) Debe tramitarse como alzada.",
+          "D) Se convierte en solicitud."
+        ],
+        correct: 1,
+        justification: "Contra las disposiciones administrativas de carácter general (reglamentos) no cabrá recurso en vía administrativa (art. 112.3 Ley 39/2015)."
+      },
+      {
+        question: "33. La Administración dicta resolución sancionadora fuera del plazo máximo en procedimiento iniciado de oficio y sancionador. ¿Qué institución puede operar?",
+        options: [
+          "A) Silencio estimatorio.",
+          "B) Reposición obligatoria.",
+          "C) Caducidad del procedimiento.",
+          "D) Descentralización."
+        ],
+        correct: 2,
+        justification: "En procedimientos sancionadores o de gravamen iniciados de oficio, el vencimiento del plazo máximo sin dictar y notificar resolución produce la caducidad (art. 25.1.b Ley 39/2015)."
+      },
+      {
+        question: "34. Una persona física no obligada electrónicamente solicita asistencia en una oficina de registros para presentar electrónicamente un escrito. Se le deniega por no ser empresa. ¿Qué respuesta procede?",
+        options: [
+          "A) Correcto, solo se asiste a personas jurídicas.",
+          "B) Incorrecto, la asistencia se dirige especialmente a quienes la necesitan.",
+          "C) Depende de la simpatía funcionarial.",
+          "D) Solo cabe por gestoría."
+        ],
+        correct: 1,
+        justification: "Las Administraciones están obligadas a asistir a las personas físicas no obligadas a relacionarse electrónicamente cuando acudan a las oficinas de registros (art. 12 Ley 39/2015)."
+      },
+      {
+        question: "35. Un recurso administrativo carece de firma, pero identifica recurrente, acto y pretensión. La Administración lo inadmite sin requerir subsanación. ¿Qué debió hacer?",
+        options: [
+          "A) Requerir subsanación del defecto.",
+          "B) Inadmitir directamente.",
+          "C) Archivar sin acto.",
+          "D) Elevar al Parlamento."
+        ],
+        correct: 0,
+        justification: "Si el escrito de recurso no reúne los requisitos exigidos, la Administración debe requerir al recurrente para que lo subsane en un plazo de diez días (arts. 68 y 115 Ley 39/2015)."
+      },
+      {
+        question: "36. Un reglamento autonómico limita el derecho de reunión por el contenido crítico de los lemas frente al Gobierno. No hay riesgo cierto para personas o bienes. ¿Qué valoración procede?",
+        options: [
+          "A) Válido por neutralidad institucional.",
+          "B) Válido si lo aprueba el Consejo de Gobierno.",
+          "C) Inválido: no cabe prohibir por el contenido crítico sin riesgo constitucionalmente relevante.",
+          "D) Válido por seguridad genérica."
+        ],
+        correct: 2,
+        justification: "El derecho fundamental de reunión solo puede ser prohibido o modificado por razones fundadas de alteración del orden público con peligro para personas o bienes (art. 21 CE)."
+      },
+      {
+        question: "37. Una resolución de recurso administrativo declara inadmisión por falta de legitimación, aunque el recurrente acredita que el acto afecta a su esfera jurídica. ¿Qué concepto se aplica?",
+        options: [
+          "A) Interés legítimo.",
+          "B) Jerarquía normativa.",
+          "C) Presupuesto parlamentario.",
+          "D) Contrato privado."
+        ],
+        correct: 0,
+        justification: "La legitimación para interponer recursos administrativos se ostenta por quienes sean titulares de derechos subjetivos o intereses legítimos (art. 114 Ley 39/2015)."
+      },
+      {
+        question: "38. Una entidad local celebra un contrato oneroso de servicios y pretende no aplicar la LCSP porque el servicio tiene interés municipal propio. ¿Qué respuesta es correcta?",
+        options: [
+          "A) El contrato es privado puro.",
+          "B) Si es contrato oneroso de entidad del sector público, entra en el ámbito de la LCSP en los términos legales.",
+          "C) Solo aplica a la AGE.",
+          "D) Solo aplica si hay fondos europeos."
+        ],
+        correct: 1,
+        justification: "Se encuentran sujetos a la Ley de Contratos del Sector Público todos los contratos onerosos celebrados por las entidades que integran el sector público, incluidas las entidades locales."
+      },
+      {
+        question: "39. Un acto firme se pretende combatir con recurso de alzada ordinario meses después de vencer el plazo. ¿Qué cauce, en su caso, podría proceder si concurre causa legal tasada?",
+        options: [
+          "A) Recurso extraordinario de revisión.",
+          "B) Reposición ordinaria automática.",
+          "C) Queja parlamentaria.",
+          "D) Alegaciones informales."
+        ],
+        correct: 0,
+        justification: "Frente a actos firmes en vía administrativa no caben recursos ordinarios, únicamente el recurso extraordinario de revisión si se da alguna causa del artículo 125 de la Ley 39/2015."
+      },
+      {
+        question: "40. Una Administración no motiva la denegación de suspensión solicitada en un recurso administrativo, pese a alegarse perjuicios de difícil reparación. ¿Qué defecto existe?",
+        options: [
+          "A) Ninguno.",
+          "B) Solo retraso.",
+          "C) Debió ponderar y motivar la suspensión.",
+          "D) La suspensión es automática siempre."
+        ],
+        correct: 2,
+        justification: "La decisión sobre la suspensión de la ejecución de un acto impugnado debe ser razonada, previa ponderación entre el interés público y los perjuicios alegados (art. 117 Ley 39/2015)."
+      },
+      {
+        question: "41. El Presidente de la Junta pretende asumir una función legislativa ordinaria sin intervención parlamentaria, alegando urgencia política. ¿Qué principio institucional se vulnera?",
+        options: [
+          "A) Separación funcional y potestad legislativa del Parlamento.",
+          "B) Desconcentración territorial.",
+          "C) Registro electrónico.",
+          "D) Contratación armonizada."
+        ],
+        correct: 0,
+        justification: "La potestad legislativa en la Comunidad Autónoma corresponde al Parlamento de Andalucía; el Ejecutivo solo puede dictar normas con rango de ley bajo las figuras del Decreto-ley o Decreto Legislativo."
+      },
+      {
+        question: "42. Una Administración resuelve un recurso de reposición confirmando el acto y no indica la vía contencioso-administrativa posterior. ¿Qué problema se plantea?",
+        options: [
+          "A) Notificación defectuosa del recurso resuelto por no indicar recursos procedentes.",
+          "B) Nulidad radical del acto originario.",
+          "C) Validez total.",
+          "D) Archivo automático."
+        ],
+        correct: 0,
+        justification: "Las resoluciones que pongan fin a recursos deben expresar los recursos que contra las mismas procedan, órgano ante el que interponerlos y plazo (art. 40.2 Ley 39/2015)."
+      },
+      {
+        question: "43. Una resolución administrativa aplica efectos retroactivos favorables al interesado y no lesiona derechos de terceros. ¿Qué valoración es correcta?",
+        options: [
+          "A) La retroactividad está siempre prohibida.",
+          "B) Puede admitirse en los supuestos legalmente permitidos.",
+          "C) Solo cabe en sanciones.",
+          "D) Exige ley orgánica."
+        ],
+        correct: 1,
+        justification: "Los actos administrativos pueden tener eficacia retroactiva cuando produzcan efectos favorables al interesado y no lesionen derechos de terceros (art. 39.3 Ley 39/2015)."
+      },
+      {
+        question: "44. En contratación pública se incorpora un criterio medioambiental sin relación con el objeto del contrato. ¿Qué problema surge?",
+        options: [
+          "A) Ninguno, siempre son obligatorios.",
+          "B) Solo problema económico.",
+          "C) Debe existir vinculación con el objeto del contrato.",
+          "D) Se convierte en subvención."
+        ],
+        correct: 2,
+        justification: "Todos los criterios de adjudicación, incluidos los sociales y medioambientales, deben estar directamente vinculados al objeto del contrato (art. 145 LCSP)."
+      },
+      {
+        question: "45. Un interesado desiste de su recurso de alzada, pero existen terceros interesados personados que piden continuar. ¿Qué debe valorar la Administración?",
+        options: [
+          "A) Si procede continuar por afectar a terceros o interés general.",
+          "B) Archivar siempre automáticamente.",
+          "C) Resolver contra el desistido.",
+          "D) Elevar al Tribunal Constitucional."
+        ],
+        correct: 0,
+        justification: "Si se hubieran personado en el procedimiento terceros interesados que instasen su continuación, la Administración limitará los efectos del desistimiento a quien lo formuló y continuará el expediente (art. 94.4 Ley 39/2015)."
+      },
+      {
+        question: "46. Una Administración inadmite un recurso por error en la denominación del órgano, aunque fue presentado ante el competente y dirigido contra un acto administrativo claro. ¿Qué enfoque es correcto?",
+        options: [
+          "A) Formalismo absoluto.",
+          "B) Antiformalismo razonable y admisión del recurso si cumple contenido esencial.",
+          "C) Nulidad automática.",
+          "D) Pérdida del derecho."
+        ],
+        correct: 1,
+        justification: "Rigiendo el principio antiformalista, el error en la denominación o calificación del recurso no impide su tramitación si se deducen sus pretensiones esenciales (art. 115 Ley 39/2015)."
+      },
+      {
+        question: "47. La Diputación Permanente del Parlamento andaluz actúa tras disolución de la Cámara para preservar poderes parlamentarios. ¿Qué afirmación es correcta?",
+        options: [
+          "A) Carece de toda función.",
+          "B) Solo administra edificios.",
+          "C) Garantiza continuidad institucional en los términos estatutarios.",
+          "D) Sustituye definitivamente al Pleno."
+        ],
+        correct: 2,
+        justification: "La Diputación Permanente asume las funciones de velar por los poderes de la Cámara y garantiza la continuidad institucional durante la disolución o expiración del mandato."
+      },
+      {
+        question: "48. Un contrato público incluye prestaciones de servicios y suministros separables, pero se adjudica como contrato único sin justificar prestación principal ni régimen aplicable. ¿Qué problema aparece?",
+        options: [
+          "A) Incorrecta calificación del contrato mixto.",
+          "B) Silencio administrativo.",
+          "C) Mandato imperativo.",
+          "D) Falta de juramento."
+        ],
+        correct: 0,
+        justification: "Los contratos mixtos deben determinar con claridad la prestación principal para aplicar el régimen jurídico de adjudicación correspondiente conforme a la LCSP."
+      },
+      {
+        question: "49. Un recurso administrativo es estimado parcialmente. La Administración debe dictar nuevo acto cumpliendo el criterio de la resolución. ¿Qué principio se proyecta?",
+        options: [
+          "A) Ejecutividad y vinculación de la resolución del recurso.",
+          "B) Libertad de contratación privada.",
+          "C) Inviolabilidad parlamentaria.",
+          "D) Buena fe electoral."
+        ],
+        correct: 0,
+        justification: "Las resoluciones de los recursos administrativos son inmediatamente ejecutivas y obligan a los órganos de la Administración a su exacto cumplimiento."
+      },
+      {
+        question: "50. Un ciudadano solicita revisión de oficio de un acto nulo de pleno derecho. La Administración lo trata como reposición extemporánea y lo inadmite sin examinar la nulidad alegada. ¿Qué crítica procede?",
+        options: [
+          "A) Correcto siempre.",
+          "B) La Administración debe calificar adecuadamente la solicitud y valorar si procede el cauce de revisión de oficio.",
+          "C) Solo cabe si hay contrato.",
+          "D) Debe acudir al Parlamento."
+        ],
+        correct: 1,
+        justification: "La Administración no puede cerrar indebidamente una solicitud de revisión de oficio (art. 106 Ley 39/2015) tratándola de forma errónea como un recurso administrativo extemporáneo."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 30.04.2026 (50 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = `${qIndex + 1}. ${q.question}`;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

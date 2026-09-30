@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 04.03.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (04.03.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Un Ayuntamiento dicta una ordenanza que crea un \"procedimiento\" propio para tramitar autorizaciones ambientales, suprimiendo audiencia y alterando plazos básicos, alegando autonomía local. ¿Cuál es el reproche más sólido?",
+        options: [
+          "A) Ninguno: la autonomía local permite configurar cualquier procedimiento.",
+          "B) La autonomía local no ampara invadir las bases del procedimiento administrativo común fijadas por el Estado.",
+          "C) Es válido si se justifica por urgencia climática.",
+          "D) Solo sería inválido si afectara a tributos."
+        ],
+        correct: 1
+      },
+      {
+        question: "2. En un procedimiento iniciado a instancia de una empresa, la Administración guarda silencio. La empresa sostiene que \"siempre\" hay estimación. ¿Qué matiz es decisivo?",
+        options: [
+          "A) El silencio nunca produce efectos jurídicos.",
+          "B) La estimación por silencio se aplica incluso cuando se afecte dominio público.",
+          "C) La regla general es estimatoria, pero existen excepciones establecidas por norma con rango de ley o por Derecho UE/internacional aplicable.",
+          "D) El silencio siempre es desestimatorio en procedimientos iniciados por el interesado."
+        ],
+        correct: 2
+      },
+      {
+        question: "3. Una Consejería pretende delegar la firma de resoluciones sancionadoras para \"agilizar\". ¿Conclusión correcta?",
+        options: [
+          "A) Es improcedente: la delegación de firma no cabe en resoluciones sancionadoras.",
+          "B) Es válida si se publica en BOJA.",
+          "C) Es válida si el delegante conserva la competencia.",
+          "D) Es válida si el sancionado lo consiente."
+        ],
+        correct: 0
+      },
+      {
+        question: "4. En el Parlamento de Andalucía se pretende reformar el Reglamento con un \"acuerdo político\" sin alcanzar el umbral reforzado, alegando que \"no es una ley\". ¿Qué objeción es más precisa?",
+        options: [
+          "A) Ninguna: el Reglamento se reforma por mayoría simple.",
+          "B) Es una cuestión interna no revisable nunca.",
+          "C) La reforma del Reglamento exige mayoría absoluta, porque así se asegura la autonomía reglamentaria real de la Cámara.",
+          "D) La reforma exige 2/3 por analogía con la Constitución."
+        ],
+        correct: 2
+      },
+      {
+        question: "5. Una Administración notifica electrónicamente y el interesado accede al contenido a los 20 minutos. ¿Cuándo se entiende practicada la notificación?",
+        options: [
+          "A) A las 24 horas, por seguridad jurídica.",
+          "B) Cuando el órgano \"cierra\" el expediente.",
+          "C) Al día siguiente hábil.",
+          "D) En el momento del acceso al contenido."
+        ],
+        correct: 3
+      },
+      {
+        question: "6. Una norma autonómica crea un órgano consultivo económico-social, pero le atribuye potestad para \"anular\" reglamentos por razones de oportunidad. ¿Qué crítica encaja mejor?",
+        options: [
+          "A) Ninguna: un órgano consultivo puede sustituir a los tribunales.",
+          "B) Infringe el diseño constitucional de control de legalidad y reserva jurisdiccional: la anulación con efectos generales no es función consultiva.",
+          "C) Sería válido si lo preside un magistrado.",
+          "D) Solo sería inválido si afectara al presupuesto."
+        ],
+        correct: 1
+      },
+      {
+        question: "7. Se exige a toda persona física relacionarse electrónicamente en cualquier trámite, sin excepciones. ¿Qué enunciado es más ajustado?",
+        options: [
+          "A) Es coherente: la ley impone obligación general a todos.",
+          "B) Es inválido: la obligación recae en sujetos determinados y, para personas físicas, rige como regla el derecho (no obligación) salvo supuestos tasados.",
+          "C) Es válido si hay oficina de asistencia.",
+          "D) Es válido si se publica en web."
+        ],
+        correct: 1
+      },
+      {
+        question: "8. El Presidente de la Junta en funciones pretende disolver el Parlamento \"para desbloquear\" la situación política. ¿Qué respuesta es correcta?",
+        options: [
+          "A) Puede hacerlo si lo aprueba el Consejo de Gobierno.",
+          "B) Puede hacerlo si lo pide la mayoría absoluta del Parlamento.",
+          "C) Puede hacerlo si no hay presupuestos.",
+          "D) No puede: en funciones tiene limitaciones y la disolución está excluida."
+        ],
+        correct: 3
+      },
+      {
+        question: "9. Un reglamento estatal impone criterios cerrados que impiden a Andalucía concretar procedimientos ambientales propios aun respetando trámites básicos. ¿Cuál es el conflicto de fondo?",
+        options: [
+          "A) Ninguno: el Estado puede agotar toda la regulación.",
+          "B) La Comunidad Autónoma puede dictar especialidades procedimentales \"ratione materiae\", respetando lo básico estatal.",
+          "C) Andalucía no puede regular nada procedimental nunca.",
+          "D) Solo el Senado puede decidir."
+        ],
+        correct: 1
+      },
+      {
+        question: "10. Una Administración pide al interesado un documento que ya está en poder de la propia Administración actuante y además lo tiene en formato electrónico. ¿Qué respuesta es la más correcta?",
+        options: [
+          "A) Puede exigirlo: la carga probatoria siempre es del interesado.",
+          "B) Puede exigirlo si lo pide \"por escrito\".",
+          "C) Debe recabarlo y no exigirlo de nuevo, salvo excepciones legales.",
+          "D) Debe archivarse el procedimiento por imposibilidad material."
+        ],
+        correct: 2
+      },
+      {
+        question: "11. En un proceso electoral andaluz, se propone una circunscripción única autonómica \"para igualdad de voto\". ¿Qué obstáculo estatutario directo aparece?",
+        options: [
+          "A) Ninguno: el Estatuto no prevé circunscripción.",
+          "B) La circunscripción estatutaria es la provincia y además existe la regla de que ninguna provincia tenga más del doble de diputados que otra.",
+          "C) La circunscripción depende de cada legislatura.",
+          "D) Solo podría cambiarse por decreto del Consejo de Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "12. Una asociación ambiental pide personarse en un procedimiento por posible afección a un ecosistema. La Administración lo rechaza por no ser \"titular de un derecho\". ¿Qué criterio es más fino?",
+        options: [
+          "A) Solo existe interesado si hay derecho subjetivo perfecto.",
+          "B) Puede haber interesado por interés legítimo (individual o colectivo) si existe afección real y específica al ámbito de fines/actuación.",
+          "C) Nunca pueden ser interesados las asociaciones.",
+          "D) Ser interesado exige empadronamiento."
+        ],
+        correct: 1
+      },
+      {
+        question: "13. Se dicta un acto administrativo con motivación aparente (\"por razones de servicio\"), sin análisis de hechos ni norma. ¿Qué diagnóstico lo perfila mejor?",
+        options: [
+          "A) Es correcto: la motivación puede ser estereotipada.",
+          "B) Es nulo siempre, sin matices.",
+          "C) Es irrelevante si no hay perjuicio económico.",
+          "D) La motivación insuficiente o aparente puede viciar el acto por indefensión y falta de soporte, y suele arrastrar anulabilidad."
+        ],
+        correct: 3
+      },
+      {
+        question: "14. Una notificación electrónica se pone a disposición del interesado, pero este nunca accede. ¿Qué afirmación es la más correcta (regla general)?",
+        options: [
+          "A) Nunca surte efectos.",
+          "B) Se entiende practicada cuando transcurre el plazo legal de puesta a disposición sin acceso, con los efectos que prevea la norma.",
+          "C) Se entiende practicada al tercer intento postal.",
+          "D) Requiere publicación en BOE."
+        ],
+        correct: 1
+      },
+      {
+        question: "15. Una Comunidad Autónoma pretende atribuir a su Tribunal Superior la última palabra sobre interpretación constitucional. ¿Qué límite aparece?",
+        options: [
+          "A) Ninguno: el TSJ culmina todo, incluso lo constitucional.",
+          "B) El TSJ culmina la organización judicial en el territorio, pero el control constitucional corresponde al Tribunal Constitucional.",
+          "C) El TSJ solo existe para asuntos civiles.",
+          "D) Depende de la voluntad del CGPJ."
+        ],
+        correct: 1
+      },
+      {
+        question: "16. Una Consejería encomienda a una universidad pública tareas técnicas del procedimiento, pero también le deja \"decidir\" el sentido de la resolución. ¿Qué es lo más correcto?",
+        options: [
+          "A) Es una encomienda válida completa.",
+          "B) Es delegación encubierta.",
+          "C) La encomienda no puede incluir elementos sustantivos de ejercicio de la competencia: la decisión jurídica debe quedar en el órgano competente.",
+          "D) Es válida si hay convenio."
+        ],
+        correct: 2
+      },
+      {
+        question: "17. Se aprueba una norma que restringe una libertad pública con rango reglamentario cuando era exigible ley. ¿Qué tensión constitucional describe mejor el problema?",
+        options: [
+          "A) Solo un problema de técnica legislativa menor.",
+          "B) Principio de jerarquía normativa y, si afecta a derechos fundamentales, reserva de ley y límites al reglamento.",
+          "C) No hay problema si el reglamento es \"muy detallado\".",
+          "D) El reglamento siempre puede innovar en derechos."
+        ],
+        correct: 1
+      },
+      {
+        question: "18. Un interesado presenta escritos en castellano ante una Administración autonómica; el órgano le obliga a traducirlos a la lengua cooficial. ¿Qué lectura es más defensable?",
+        options: [
+          "A) Puede exigirse siempre traducción.",
+          "B) Solo si lo decide el instructor.",
+          "C) Es irrelevante.",
+          "D) En procedimientos, rigen las reglas de cooficialidad; no puede imponerse traducción al interesado si el uso del castellano es legítimo y no se produce indefensión."
+        ],
+        correct: 3
+      },
+      {
+        question: "19. Un órgano superior asume un asunto que normalmente resolvería un órgano inferior por razones técnicas complejas, mediante acuerdo motivado notificado antes de resolver. ¿Qué técnica es?",
+        options: [
+          "A) Encomienda de gestión.",
+          "B) Delegación de competencias.",
+          "C) Avocación.",
+          "D) Suplencia."
+        ],
+        correct: 2
+      },
+      {
+        question: "20. El Parlamento de Andalucía se define estatutariamente como \"inviolable\". ¿Qué implica con más precisión?",
+        options: [
+          "A) Que sus acuerdos son siempre inatacables.",
+          "B) Que no existe control jurisdiccional nunca.",
+          "C) Que no puede incurrir en delito.",
+          "D) Que goza de protección institucional; no convierte cualquier acto en inmune, y no elimina controles en sus ámbitos revisables."
+        ],
+        correct: 3
+      },
+      {
+        question: "21. Un procedimiento se inicia de oficio y caduca el plazo sin resolver; el afectado alega \"silencio positivo\". ¿Qué respuesta es más correcta?",
+        options: [
+          "A) En iniciados de oficio, la falta de resolución expresa no genera estimación, sino los efectos previstos para ese tipo de iniciación (incluida posible caducidad).",
+          "B) Siempre hay estimación por silencio.",
+          "C) Siempre hay desestimación por silencio.",
+          "D) No hay obligación de resolver."
+        ],
+        correct: 0
+      },
+      {
+        question: "22. Una disposición estatutaria se interpreta en tensión con la Constitución. ¿Qué pauta hermenéutica es más ortodoxa?",
+        options: [
+          "A) Interpretación autónoma, sin referencia a la CE.",
+          "B) Primacía del Estatuto por ser \"pacto\".",
+          "C) Interpretación conforme a la Constitución, evitando contradicciones cuando sea posible.",
+          "D) Decidir por oportunidad política."
+        ],
+        correct: 2
+      },
+      {
+        question: "23. Una Delegación Territorial dicta instrucciones para uniformar criterios y pretende que otras Consejerías le obedezcan jerárquicamente. ¿Qué principio organiza la objeción?",
+        options: [
+          "A) Jerarquía interna sí, pero entre Consejerías distintas no hay jerarquía general: coordinación no es mando.",
+          "B) Las Delegaciones territoriales están por encima de Consejerías.",
+          "C) Toda Administración es una pirámide única.",
+          "D) Es válido si lo firma el Delegado del Gobierno."
+        ],
+        correct: 0
+      },
+      {
+        question: "24. Un ciudadano exige \"asistencia\" para usar medios electrónicos en un trámite. ¿Qué enfoque es correcto?",
+        options: [
+          "A) No existe ese derecho.",
+          "B) Solo si paga tasa.",
+          "C) Es un derecho reconocido en la relación con las AAPP, con obligación correlativa de facilitar esa asistencia.",
+          "D) Solo para empresas."
+        ],
+        correct: 2
+      },
+      {
+        question: "25. Se dicta un acto administrativo que pretende \"derogar para este caso\" la aplicación de un reglamento general por considerarlo injusto. ¿Qué principio lo impide?",
+        options: [
+          "A) Inderogabilidad singular de los reglamentos por actos.",
+          "B) Publicidad normativa.",
+          "C) Irretroactividad absoluta.",
+          "D) Mandato imperativo."
+        ],
+        correct: 0
+      },
+      {
+        question: "26. Se aprueba una ley autonómica que proclama la soberanía \"compartida\" entre Andalucía y el Estado. ¿Qué choca frontalmente?",
+        options: [
+          "A) Con el principio de igualdad.",
+          "B) Con la organización judicial.",
+          "C) Con la unidad de mercado.",
+          "D) Con la soberanía nacional residenciada en el pueblo español."
+        ],
+        correct: 3
+      },
+      {
+        question: "27. Un interesado designa representante y la Administración le niega la actuación \"porque debe ser personal\". ¿Qué regla general es más correcta?",
+        options: [
+          "A) La representación es imposible en vía administrativa.",
+          "B) Puede actuarse por representante acreditado, sin que ello elimine la condición de interesado.",
+          "C) Solo cabe representante abogado.",
+          "D) Solo cabe representante en sanciones."
+        ],
+        correct: 1
+      },
+      {
+        question: "28. Se pretende que el Consejo Económico y Social \"imponga\" directrices obligatorias al Gobierno autonómico. ¿Qué encaje es más correcto?",
+        options: [
+          "A) Es un órgano consultivo, cauce de participación; no está concebido como órgano directivo con potestad de imposición.",
+          "B) Puede imponer por mayoría simple.",
+          "C) Puede imponer si lo acuerdan sindicatos.",
+          "D) Puede imponer si lo publica en BOJA."
+        ],
+        correct: 0
+      },
+      {
+        question: "29. La Administración acuerda ampliar el plazo máximo para resolver por falta de medios, motivándolo. El interesado intenta recurrir el acuerdo de ampliación. ¿Qué ocurre?",
+        options: [
+          "A) Es recurrible en alzada ordinaria.",
+          "B) Es recurrible ante el TC.",
+          "C) No cabe recurso contra ese acuerdo, sin perjuicio de impugnar la resolución final.",
+          "D) Se recurre mediante reposición obligatoria."
+        ],
+        correct: 2
+      },
+      {
+        question: "30. La bandera autonómica se exhibe sola en un edificio público, retirando la de España. ¿Qué lectura constitucional básica se activa?",
+        options: [
+          "A) Es obligatorio: primacía autonómica.",
+          "B) Es facultativo sin límites.",
+          "C) Contraviene el régimen de uso conjunto previsto para enseñas autonómicas junto a la bandera de España en edificios y actos oficiales.",
+          "D) Solo es relevante si hay himno."
+        ],
+        correct: 2
+      },
+      {
+        question: "31. Se debate si una norma estatutaria puede crear instituciones propias. ¿Cuál es el límite material clave?",
+        options: [
+          "A) Ninguno: puede crear cualquier cosa.",
+          "B) No puede contradecir la Constitución ni invadir reservas constitucionales.",
+          "C) Solo puede crear instituciones judiciales.",
+          "D) Solo puede crear órganos municipales."
+        ],
+        correct: 1
+      },
+      {
+        question: "32. La Administración impone comparecencia personal presencial a un interesado con representante acreditado, sin razón. ¿Qué crítica es más fuerte?",
+        options: [
+          "A) La comparecencia siempre es obligatoria.",
+          "B) La comparecencia solo puede imponerse sin motivación.",
+          "C) Es irrelevante.",
+          "D) Debe justificarse conforme a las reglas de comparecencia y al derecho a actuar por representante; imponerla arbitrariamente es atacable."
+        ],
+        correct: 3
+      },
+      {
+        question: "33. Un Parlamento autonómico aprueba un presupuesto propio. ¿Qué afirmación encaja mejor con su autonomía?",
+        options: [
+          "A) No puede aprobar presupuesto propio.",
+          "B) Lo aprueba el Consejo de Gobierno siempre.",
+          "C) Tiene autonomía presupuestaria y aprueba su presupuesto (y el de la Cámara en general en los términos previstos).",
+          "D) Lo aprueba el TSJA."
+        ],
+        correct: 2
+      },
+      {
+        question: "34. Una ley establece un trato distinto no razonable en acceso a servicios públicos por razón de religión. ¿Qué estándar constitucional es el primero que salta?",
+        options: [
+          "A) Principio de igualdad y no discriminación.",
+          "B) Libertad de empresa.",
+          "C) Derecho de propiedad.",
+          "D) Principio de eficacia."
+        ],
+        correct: 0
+      },
+      {
+        question: "35. Un órgano administrativo \"publica\" una notificación electrónica en la sede, pero no garantiza identificación del acceso ni integridad del contenido. ¿Qué aspecto se compromete con más precisión?",
+        options: [
+          "A) La validez del presupuesto.",
+          "B) Las condiciones generales de notificación y la seguridad jurídica del acto notificado.",
+          "C) La inviolabilidad parlamentaria.",
+          "D) La jerarquía de los tribunales."
+        ],
+        correct: 1
+      },
+      {
+        question: "36. Una Comunidad Autónoma regula un órgano antifraude y le atribuye funciones, pero declara que \"sustituye\" a la Cámara de Cuentas y al Defensor del Pueblo. ¿Qué objeción es más fina?",
+        options: [
+          "A) No hay problema: un órgano nuevo puede absorber a todos.",
+          "B) Solo hay problema si lo preside el Gobierno.",
+          "C) Es cuestionable: sus funciones operan sin perjuicio de instituciones de control ya existentes, no para anularlas por decreto funcional.",
+          "D) Es obligatorio sustituirlos."
+        ],
+        correct: 2
+      },
+      {
+        question: "37. Una Administración decide no resolver expresamente porque \"ya se entiende desestimada por silencio\". ¿Qué afirmación es correcta?",
+        options: [
+          "A) Es correcto: el silencio libera de resolver.",
+          "B) Depende del tipo de procedimiento.",
+          "C) La Administración está obligada a dictar resolución expresa y notificarla en todos los procedimientos, cualquiera que sea su forma de iniciación.",
+          "D) Solo debe resolver en sancionadores."
+        ],
+        correct: 2
+      },
+      {
+        question: "38. Se plantea que el modelo territorial español es mera descentralización administrativa. ¿Qué corrección conceptual es la adecuada?",
+        options: [
+          "A) Es centralización pura.",
+          "B) Es descentralización política con autonomía de nacionalidades y regiones, compatible con unidad.",
+          "C) Es confederación.",
+          "D) Es federal simétrico por definición."
+        ],
+        correct: 1
+      },
+      {
+        question: "39. Un acto administrativo produce efectos antes de su notificación al interesado (sin urgencia ni norma habilitante). ¿Qué crítica se sostiene mejor?",
+        options: [
+          "A) Es siempre válido.",
+          "B) La notificación es un requisito \"decorativo\".",
+          "C) La eficacia frente al interesado se articula con reglas de notificación; anticipar efectos puede vulnerar garantías.",
+          "D) Solo afecta a sanciones penales."
+        ],
+        correct: 2
+      },
+      {
+        question: "40. En Andalucía, la Junta se define como institución de autogobierno integrada por tres piezas nucleares. ¿Cuál es el enunciado correcto?",
+        options: [
+          "A) Parlamento, Presidencia y Consejo de Gobierno.",
+          "B) Parlamento, TSJA y Cámara de Cuentas.",
+          "C) Consejo Consultivo, Parlamento y Diputación Permanente.",
+          "D) Defensor del Pueblo, Cámara de Cuentas y Gobierno."
+        ],
+        correct: 0
+      },
+      {
+        question: "41. Una Administración exige a un ciudadano comparecer electrónicamente pero no le ofrece Punto de Acceso General ni canal de asistencia. ¿Qué choque aparece?",
+        options: [
+          "A) Ninguno: la obligación electrónica elimina asistencia.",
+          "B) Incompatibilidad con derechos de relación y asistencia en el uso de medios electrónicos.",
+          "C) Solo afecta a la igualdad territorial.",
+          "D) Es una cuestión de cortesía, no jurídica."
+        ],
+        correct: 1
+      },
+      {
+        question: "42. Se plantea si un Parlamento autonómico puede imponer mandato imperativo a sus diputados. ¿Respuesta correcta?",
+        options: [
+          "A) Sí, por disciplina de partido.",
+          "B) Solo si lo vota la Mesa.",
+          "C) No: el principio representativo excluye mandato imperativo.",
+          "D) Solo en presupuestos."
+        ],
+        correct: 2
+      },
+      {
+        question: "43. Un órgano superior \"suple\" temporalmente a otro por ausencia. ¿Qué técnica encaja?",
+        options: [
+          "A) Delegación de competencias.",
+          "B) Suplencia.",
+          "C) Avocación.",
+          "D) Encomienda."
+        ],
+        correct: 1
+      },
+      {
+        question: "44. La Administración pide colaboración a un ciudadano y pretende imponerle deberes ilimitados sin base legal. ¿Qué lectura es más correcta?",
+        options: [
+          "A) La colaboración de las personas está regulada y no habilita cargas arbitrarias: debe ajustarse a ley y proporcionalidad.",
+          "B) La Administración puede exigir cualquier cosa.",
+          "C) La colaboración siempre incluye sanción automática.",
+          "D) Solo se aplica a funcionarios."
+        ],
+        correct: 0
+      },
+      {
+        question: "45. Un reglamento autonómico crea una tasa. ¿Qué problema aparece típicamente?",
+        options: [
+          "A) Ninguno: el reglamento puede crear tributos.",
+          "B) Podría vulnerar reserva de ley en materia tributaria.",
+          "C) Solo es un problema si no se recauda.",
+          "D) Solo si es ambiental."
+        ],
+        correct: 1
+      },
+      {
+        question: "46. Un interesado aporta copias digitalizadas; la Administración las rechaza siempre por no ser \"compulsadas\". ¿Qué enfoque es más correcto hoy?",
+        options: [
+          "A) Rechazo automático: solo valen originales.",
+          "B) La Administración puede aceptar copias válidas y verificar; la lógica es facilitar aportación y comprobación conforme a régimen de copias.",
+          "C) Solo valen copias notarialmente.",
+          "D) Solo valen copias en papel."
+        ],
+        correct: 1
+      },
+      {
+        question: "47. Se discute si una Comunidad Autónoma puede tener \"derecho propio\" aplicable. ¿Qué afirmación es más ajustada?",
+        options: [
+          "A) No existe derecho autonómico.",
+          "B) Existe derecho propio en su ámbito competencial, con eficacia territorial y dentro del marco constitucional.",
+          "C) Es derecho internacional.",
+          "D) Solo existe por delegación del Rey."
+        ],
+        correct: 1
+      },
+      {
+        question: "48. Se dicta un acto administrativo sin indicar recursos procedentes ni plazos. ¿Cuál es la consecuencia más defendible?",
+        options: [
+          "A) El acto se convierte en inexistente siempre.",
+          "B) No pasa nada.",
+          "C) La omisión puede afectar a garantías del interesado y al cómputo de plazos para recurrir en ciertos supuestos, sin \"matar\" automáticamente el acto.",
+          "D) Obliga a estimar cualquier recurso."
+        ],
+        correct: 2
+      },
+      {
+        question: "49. Un órgano de una Consejería asume competencias de otra sin norma ni acuerdo habilitante, alegando \"interés general\". ¿Qué principio se vulnera?",
+        options: [
+          "A) Eficacia.",
+          "B) Confianza legítima.",
+          "C) Competencia y legalidad: no hay \"interés general\" que sustituya la atribución competencial.",
+          "D) Publicidad de normas."
+        ],
+        correct: 2
+      },
+      {
+        question: "50. Una notificación en papel se practica sin respetar condiciones mínimas (identificación del destinatario, constancia, etc.). ¿Qué bloque conceptual se afecta?",
+        options: [
+          "A) Régimen de presupuestos.",
+          "B) Forma de ley orgánica.",
+          "C) Competencia del Tribunal Supremo.",
+          "D) Garantías formales y fehaciencia de la notificación para su validez y eficacia."
+        ],
+        correct: 3
+      },
+      {
+        question: "51. Un estudiante afirma: \"El Parlamento andaluz es inviolable, así que sus diputados no pueden ser detenidos nunca\". ¿Qué corrección es la buena?",
+        options: [
+          "A) Es correcto.",
+          "B) La inviolabilidad es de la Cámara; los diputados tienen aforamiento e inmunidad parcial (no detención salvo flagrante delito y competencia del TSJA/TS).",
+          "C) No hay ninguna inmunidad en Andalucía.",
+          "D) Solo pueden detenerse por decisión del Presidente."
+        ],
+        correct: 1
+      },
+      {
+        question: "52. Un procedimiento ambiental requiere informes de varios órganos. Se decide concentrar trámites simultáneamente cuando no son sucesivos por naturaleza. ¿Qué técnica se usa?",
+        options: [
+          "A) Concentración de trámites.",
+          "B) Avocación.",
+          "C) Delegación de firma.",
+          "D) Suplencia."
+        ],
+        correct: 0
+      },
+      {
+        question: "53. Un acto administrativo fija efectos retroactivos desfavorables sin habilitación. ¿Qué principio constitucional late detrás del reproche?",
+        options: [
+          "A) Publicidad de normas.",
+          "B) Interdicción de arbitrariedad.",
+          "C) Seguridad jurídica y límites a la retroactividad (especialmente sancionadora no favorable/restrictiva).",
+          "D) Derecho de huelga."
+        ],
+        correct: 2
+      },
+      {
+        question: "54. El Consejo de Gobierno y sus miembros tienen acceso a sesiones del Parlamento y pueden hacerse oír. ¿Qué función institucional refleja mejor?",
+        options: [
+          "A) Supremacía del Ejecutivo.",
+          "B) Exclusión del control parlamentario.",
+          "C) Relación Gobierno-Parlamento basada en control e información recíproca en un sistema parlamentario.",
+          "D) Sustitución del Pleno por comisiones ejecutivas."
+        ],
+        correct: 2
+      },
+      {
+        question: "55. Una entidad instrumental quiere ejercer potestades administrativas intensas sin atribución expresa. ¿Qué regla es más segura?",
+        options: [
+          "A) Puede, por eficiencia.",
+          "B) Solo si lo decide su director.",
+          "C) Las potestades públicas requieren atribución normativa expresa; no nacen automáticamente por tener financiación pública.",
+          "D) Se presumen siempre en agencias."
+        ],
+        correct: 2
+      },
+      {
+        question: "56. Un ciudadano pide acceder al archivo administrativo, pero el órgano deniega sin motivar. ¿Qué principio se quiebra con más precisión?",
+        options: [
+          "A) Irrelevante: el acceso es libre siempre.",
+          "B) Exigencias de motivación, transparencia y derecho de acceso (buena administración y defensa).",
+          "C) Solo afecta a presupuestos.",
+          "D) Solo afecta a jueces."
+        ],
+        correct: 1
+      },
+      {
+        question: "57. La Administración practica notificación electrónica mediante \"comparecencia\" en sede. ¿Qué significa comparecencia en este contexto?",
+        options: [
+          "A) Presencia física en ventanilla.",
+          "B) Firma manuscrita.",
+          "C) Acceso del interesado o representante debidamente identificado al contenido de la notificación.",
+          "D) Publicación en BOJA."
+        ],
+        correct: 2
+      },
+      {
+        question: "58. Se pretende prohibir una manifestación ambiental por \"críticas al gobierno\". ¿Qué encaje constitucional básico se vulneraría típicamente?",
+        options: [
+          "A) Libertad ideológica/expresión y derecho de reunión, con límites solo por razones legalmente justificadas (orden público, etc.).",
+          "B) Derecho de propiedad.",
+          "C) Principio de unidad jurisdiccional.",
+          "D) Derecho a la educación."
+        ],
+        correct: 0
+      },
+      {
+        question: "59. En el reparto de escaños andaluz, se propone que una provincia tenga más del doble que otra por población. ¿Qué choca?",
+        options: [
+          "A) Nada, es proporcional puro.",
+          "B) La regla estatutaria impide que una provincia tenga más del doble de diputados que otra.",
+          "C) Solo lo impide la Constitución.",
+          "D) Lo decide el Senado."
+        ],
+        correct: 1
+      },
+      {
+        question: "60. Un órgano dicta una resolución \"por autorización\" de otro. ¿Qué está operando técnicamente?",
+        options: [
+          "A) Avocación.",
+          "B) Delegación de firma.",
+          "C) Delegación de competencias.",
+          "D) Desconcentración."
+        ],
+        correct: 1
+      },
+      {
+        question: "61. Una Comunidad Autónoma dicta una ley que declara oficiales todas las lenguas de España en su territorio, incluida una no propia. ¿Qué límite aparece?",
+        options: [
+          "A) Ninguno.",
+          "B) La cooficialidad de lenguas distintas del castellano se establece en su respectiva Comunidad conforme a Estatuto y realidad lingüística, no por proclamación arbitraria.",
+          "C) Solo el Rey decide.",
+          "D) Solo el Tribunal Supremo."
+        ],
+        correct: 1
+      },
+      {
+        question: "62. Un acto administrativo se dicta \"para un caso concreto\" pero tiene contenido general y vocación de permanencia. ¿Qué problema aparece?",
+        options: [
+          "A) Ninguno.",
+          "B) Confusión acto-reglamento: eludir el procedimiento normativo y controles propios del reglamento.",
+          "C) Solo afecta a municipios.",
+          "D) Es preferible por eficacia."
+        ],
+        correct: 1
+      },
+      {
+        question: "63. Una Administración inicia un procedimiento y no identifica responsable de tramitación, generando dilaciones. ¿Qué pieza de la Ley 39/2015 está en juego?",
+        options: [
+          "A) Publicidad de normas.",
+          "B) Responsabilidad de la tramitación.",
+          "C) Soberanía nacional.",
+          "D) Inviolabilidad parlamentaria."
+        ],
+        correct: 1
+      },
+      {
+        question: "64. Se aprueba una norma que discrimina por \"opinión\" en el acceso a subvenciones ambientales. ¿Qué estándar constitucional opera?",
+        options: [
+          "A) Prohibición de censura previa.",
+          "B) Reserva de ley orgánica.",
+          "C) Igualdad y no discriminación.",
+          "D) Principio de desconcentración."
+        ],
+        correct: 2
+      },
+      {
+        question: "65. El Parlamento andaluz es elegido por un periodo temporal. ¿Qué enunciado encaja mejor?",
+        options: [
+          "A) Mandato indefinido hasta nueva elección.",
+          "B) Mandato de cuatro años, con reglas sobre prórroga de Diputación Permanente hasta constitución de la nueva Cámara.",
+          "C) Mandato de seis años.",
+          "D) Mandato anual."
+        ],
+        correct: 1
+      },
+      {
+        question: "66. Un órgano dicta un acuerdo de avocación y el interesado lo recurre separadamente. ¿Qué pasa?",
+        options: [
+          "A) Cabe recurso directo siempre.",
+          "B) No cabe recurso contra el acuerdo de avocación, pero puede impugnarse al recurrir la resolución final.",
+          "C) Cabe recurso solo ante el TSJA.",
+          "D) Cabe recurso ante el Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "67. La Administración pretende \"resolver\" mediante un mensaje informal sin firma ni identificación del órgano. ¿Qué problema se plantea?",
+        options: [
+          "A) Ninguno si se entiende el sentido.",
+          "B) Puede vulnerar exigencias de forma y autenticidad del acto administrativo.",
+          "C) Solo afecta a actos penales.",
+          "D) Solo si es una sanción tributaria."
+        ],
+        correct: 1
+      },
+      {
+        question: "68. Un ciudadano quiere comunicarse con la Administración por un punto electrónico común. ¿Qué figura lo canaliza?",
+        options: [
+          "A) Ventanilla única municipal.",
+          "B) Punto de Acceso General electrónico de la Administración.",
+          "C) Correo privado del funcionario.",
+          "D) Foro de participación."
+        ],
+        correct: 1
+      },
+      {
+        question: "69. Un reglamento autonómico contradice una ley autonómica previa. ¿Solución correcta?",
+        options: [
+          "A) Prevalece el reglamento por ser posterior.",
+          "B) Prevalece el reglamento por especialidad.",
+          "C) El reglamento es inválido por contradicción con la ley (jerarquía normativa).",
+          "D) Se decide por referéndum."
+        ],
+        correct: 2
+      },
+      {
+        question: "70. Se crea un órgano que \"vela por la protección de la juventud e infancia\" frente a contenidos audiovisuales. ¿Qué institución autonómica encaja mejor?",
+        options: [
+          "A) Consejo Audiovisual de Andalucía.",
+          "B) Cámara de Cuentas.",
+          "C) TSJA.",
+          "D) Diputación Permanente."
+        ],
+        correct: 0
+      },
+      {
+        question: "71. En una notificación electrónica, el interesado accede, pero no \"descarga\" el documento. ¿Relevancia?",
+        options: [
+          "A) No hay notificación.",
+          "B) El acceso al contenido determina la práctica de la notificación, con independencia de descarga.",
+          "C) Solo cuenta la descarga.",
+          "D) Debe repetirse en papel."
+        ],
+        correct: 1
+      },
+      {
+        question: "72. Se alega que \"los poderes públicos pueden ignorar la Constitución si la mayoría lo decide\". ¿Qué corrección procede?",
+        options: [
+          "A) Es correcto: la Constitución no vincula.",
+          "B) La Constitución vincula a ciudadanos y poderes públicos, y es norma suprema del ordenamiento jurídico.",
+          "C) Solo vincula a jueces.",
+          "D) Solo vincula al Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "73. Una norma autonómica intenta crear \"censura previa\" para charlas críticas sobre políticas ambientales. ¿Qué choque es más directo?",
+        options: [
+          "A) Libertad de empresa.",
+          "B) Propiedad privada.",
+          "C) Libertad ideológica/expresión con prohibición de censura previa.",
+          "D) Derecho de petición."
+        ],
+        correct: 2
+      },
+      {
+        question: "74. El Consejo Económico y Social autonómico se define por su finalidad primordial. ¿Cuál es?",
+        options: [
+          "A) Fiscalizar presupuestos.",
+          "B) Juzgar delitos.",
+          "C) Ser cauce de participación y diálogo permanente en asuntos socioeconómicos.",
+          "D) Otorgar licencias."
+        ],
+        correct: 2
+      },
+      {
+        question: "75. El TSJA tiene sede en una ciudad concreta. ¿Cuál?",
+        options: [
+          "A) Sevilla.",
+          "B) Granada.",
+          "C) Córdoba.",
+          "D) Málaga."
+        ],
+        correct: 1
+      },
+      {
+        question: "76. Una Administración acuerda un trámite de urgencia para recortar plazos sin motivación ni requisitos. ¿Qué afirmación es más correcta?",
+        options: [
+          "A) La urgencia puede declararse arbitrariamente.",
+          "B) Es válida si lo pide un tercero.",
+          "C) La urgencia exige base y respeto de garantías mínimas; recortar plazos sin cobertura es impugnable.",
+          "D) Es obligatoria en medio ambiente."
+        ],
+        correct: 2
+      },
+      {
+        question: "77. En un procedimiento, el interesado pretende usar cualquier lengua sin límites. ¿Qué enfoque es más preciso?",
+        options: [
+          "A) Libertad absoluta sin regla.",
+          "B) Lengua del procedimiento regulada (castellano y cooficial) según reglas y derechos en el marco aplicable.",
+          "C) Solo se admite la lengua cooficial autonómica.",
+          "D) Solo se admite el inglés."
+        ],
+        correct: 1
+      },
+      {
+        question: "78. La Administración rechaza un escrito porque el interesado usó el registro oficial común en vez de una \"ventanilla no regulada\". ¿Qué objeción procede?",
+        options: [
+          "A) Válido: la ventanilla informal manda.",
+          "B) El escrito presentado en registro oficial surte efectos conforme a las reglas de presentación.",
+          "C) Se elimina el escrito.",
+          "D) Exige multa."
+        ],
+        correct: 1
+      },
+      {
+        question: "79. El Parlamento andaluz tiene una función clave en la arquitectura autonómica. ¿Cuál?",
+        options: [
+          "A) Representar al pueblo andaluz, ejercer potestad legislativa y controlar al Gobierno.",
+          "B) Dirigir la policía autonómica directamente.",
+          "C) Dictar sentencias firmes.",
+          "D) Aprobar tributos municipales directamente."
+        ],
+        correct: 0
+      },
+      {
+        question: "80. En la actuación de la Administración andaluza en medio ambiente, la idea de \"desarrollo sostenible\" opera como:",
+        options: [
+          "A) Un eslogan sin relevancia jurídica.",
+          "B) Es un criterio/valor transversal conectado a la protección ambiental y acción pública.",
+          "C) Un tributo específico.",
+          "D) Una causa de exención de responsabilidad."
+        ],
+        correct: 1
+      },
+      {
+        question: "81. Una Administración declara que \"no notificará\" porque el interesado \"ya lo sabe por prensa\". ¿Qué réplica es la más sólida?",
+        options: [
+          "A) Es válido si hay prensa local.",
+          "B) La notificación es formalidad esencial para eficacia y cómputo de plazos; el conocimiento extraprocedimental no sustituye el régimen legal salvo supuestos tasados.",
+          "C) Basta con un tuit oficial.",
+          "D) Solo vale en sanciones."
+        ],
+        correct: 1
+      },
+      {
+        question: "82. La Oficina Andaluza contra el Fraude y la Corrupción pretende investigar hechos ya bajo investigación judicial. ¿Qué límite aparece?",
+        options: [
+          "A) Puede investigar lo mismo, sin límites.",
+          "B) No puede realizar funciones propias de autoridad judicial/Ministerio Fiscal/policía judicial ni investigar los mismos hechos objeto de investigación.",
+          "C) Solo necesita autorización del Parlamento.",
+          "D) Depende del Director."
+        ],
+        correct: 1
+      },
+      {
+        question: "83. Una norma estatutaria pretende reconocer un \"derecho\" contradictorio con un derecho fundamental constitucional (rebajándolo). ¿Qué salida es correcta?",
+        options: [
+          "A) Prevalece el Estatuto por ser LO.",
+          "B) Prevalece el derecho estatutario por especialidad.",
+          "C) La norma estatutaria debe interpretarse conforme a la CE y no puede vaciar/vulnerar los derechos fundamentales constitucionales; si lo hace, es inconstitucional.",
+          "D) Decide el Consejo de Gobierno."
+        ],
+        correct: 2
+      },
+      {
+        question: "84. Una Administración deniega vista de expediente y no celebra audiencia previa a dictar resolución desfavorable. ¿Qué consecuencia es más probable?",
+        options: [
+          "A) Acto perfectamente válido.",
+          "B) Defecto menor insustancial.",
+          "C) Omisión de trámites esenciales con indefensión, generando causa de anulabilidad (o nulidad según gravedad/garantías afectadas).",
+          "D) Convalidación por el mero paso del tiempo."
+        ],
+        correct: 2
+      },
+      {
+        question: "85. El Gobierno autonómico en funciones realiza nombramientos discrecionales masivos fuera de la gestión ordinaria. ¿Qué tacha encaja mejor?",
+        options: [
+          "A) Totalmente correcto: el Gobierno en funciones decide igual.",
+          "B) Se limita la actuación a la gestión ordinaria de asuntos públicos, evitando decisiones de oportunidad política relevante salvo casos de urgencia/interés general justificados.",
+          "C) El Gobierno en funciones no puede firmar nada.",
+          "D) Solo requiere firma del Rey."
+        ],
+        correct: 2
+      },
+      {
+        question: "86. Una notificación electrónica se practica por dirección habilitada única. ¿Qué requisito conceptual es imprescindible?",
+        options: [
+          "A) Que el interesado esté debidamente identificado y pueda acceder al contenido.",
+          "B) Que exista papel paralelo.",
+          "C) Que se publique en BOE.",
+          "D) Que lo firme el Presidente."
+        ],
+        correct: 0
+      },
+      {
+        question: "87. Una Administración intenta \"subsanar\" una solicitud incompleta, pero en vez de requerir, archiva directamente sin dar plazo. ¿Qué crítica es más técnica?",
+        options: [
+          "A) Es correcto: el archivo es discrecional.",
+          "B) Debe requerirse subsanación en plazo antes de tenerle por desistido, con resolución posterior.",
+          "C) Solo se subsana en sanciones.",
+          "D) Solo se subsana si hay abogado."
+        ],
+        correct: 1
+      },
+      {
+        question: "88. Se afirma que la Constitución solo protege igualdad formal, no real. ¿Qué corrección procede?",
+        options: [
+          "A) Correcto.",
+          "B) La Constitución impone a poderes públicos promover condiciones para libertad/igualdad reales y efectivas y remover obstáculos.",
+          "C) Solo impone igualdad a empresas.",
+          "D) Solo impone igualdad a jueces."
+        ],
+        correct: 1
+      },
+      {
+        question: "89. En Andalucía, se crea un órgano para fiscalización económico-financiera externa del sector público. ¿Cuál?",
+        options: [
+          "A) Consejo Consultivo.",
+          "B) Cámara de Cuentas.",
+          "C) Defensor del Pueblo.",
+          "D) Consejo Audiovisual."
+        ],
+        correct: 1
+      },
+      {
+        question: "90. La Administración pretende que el ciudadano use exclusivamente el correo electrónico personal del instructor para presentar escritos. ¿Qué objeción es más sólida?",
+        options: [
+          "A) Ninguna: es más rápido.",
+          "B) Puede vulnerar el régimen de registros y garantías de constancia/fecha/recepción.",
+          "C) Solo afecta a procedimientos judiciales.",
+          "D) Es válido si el correo es corporativo."
+        ],
+        correct: 1
+      },
+      {
+        question: "91. Se dicta un acto administrativo que limita derechos, pero no se motiva pese a ser exigible. ¿Qué núcleo de defensa se activa?",
+        options: [
+          "A) Solo estética.",
+          "B) Motivación como garantía de control y defensa; su ausencia debilita la legalidad del acto.",
+          "C) Solo importa la firma.",
+          "D) Solo importa el sello."
+        ],
+        correct: 1
+      },
+      {
+        question: "92. Un partido pretende expulsar automáticamente a un diputado andaluz del escaño por votar distinto. ¿Qué principio lo frena con más precisión?",
+        options: [
+          "A) Mandato imperativo permitido.",
+          "B) Representación y prohibición de mandato imperativo; el escaño no es \"propiedad\" del partido.",
+          "C) Solo lo decide el Consejo de Gobierno.",
+          "D) Solo lo decide el Rey."
+        ],
+        correct: 1
+      },
+      {
+        question: "93. Una Administración decide resolver fuera de plazo y, además, dicta resolución contraria a lo que habría sido un silencio estimatorio ya producido. ¿Qué matiz es clave?",
+        options: [
+          "A) Siempre puede hacerlo.",
+          "B) Si hubo silencio estimatorio, la resolución expresa posterior solo puede ser confirmatoria del mismo.",
+          "C) El silencio nunca produce acto.",
+          "D) El silencio estimatorio obliga a indemnizar."
+        ],
+        correct: 1
+      },
+      {
+        question: "94. Un ciudadano pide que las AAPP no le exijan documentos redundantes y que consulten datos de otras AAPP. ¿Qué idea lo soporta?",
+        options: [
+          "A) Publicidad de normas.",
+          "B) Principio de comodidad.",
+          "C) Régimen de documentos aportados por o en poder de la Administración, salvo excepciones.",
+          "D) Principio de unidad jurisdiccional."
+        ],
+        correct: 2
+      },
+      {
+        question: "95. La Junta se organiza políticamente con un esquema que reproduce el del Estado según acceso a autonomía \"plena\". ¿Qué artículo constitucional suele conectarse a esa lógica?",
+        options: [
+          "A) El que diseña instituciones autonómicas para ciertas vías, articulando parlamento, presidente y consejo de gobierno.",
+          "B) El de la bandera.",
+          "C) El de las Cortes.",
+          "D) El de la reforma."
+        ],
+        correct: 0
+      },
+      {
+        question: "96. Una Administración practica notificación en papel sin intentar la electrónica a un obligado a relacionarse electrónicamente. ¿Qué ocurre?",
+        options: [
+          "A) Es indiferente siempre.",
+          "B) Puede ser irregular, porque a obligados se les debe notificar por medios electrónicos conforme al régimen aplicable.",
+          "C) Es obligatorio el papel siempre.",
+          "D) Es nulo por falta de sello."
+        ],
+        correct: 1
+      },
+      {
+        question: "97. Se afirma que \"la Constitución permite arbitrariedad administrativa si hay interés general\". ¿Qué corrección procede?",
+        options: [
+          "A) Correcto.",
+          "B) La Constitución garantiza la interdicción de la arbitrariedad de los poderes públicos.",
+          "C) Solo prohíbe arbitrariedad judicial.",
+          "D) Solo prohíbe arbitrariedad municipal."
+        ],
+        correct: 1
+      },
+      {
+        question: "98. Un órgano pretende justificar que un Estatuto autonómico tiene rango \"inferior a ley orgánica\" porque es autonómico. ¿Qué respuesta es la adecuada?",
+        options: [
+          "A) El Estatuto se aprueba como ley orgánica y forma parte del bloque de constitucionalidad.",
+          "B) Es reglamento reinforced.",
+          "C) Es decreto-ley.",
+          "D) Es costumbre."
+        ],
+        correct: 0
+      },
+      {
+        question: "99. Una Administración notifica electrónicamente, pero el interesado accede desde un dispositivo sin poder visualizar parte del contenido por error de formato. ¿Qué crítica es más fina?",
+        options: [
+          "A) Da igual: con \"intento\" basta.",
+          "B) No hay defecto nunca.",
+          "C) La notificación debe permitir acceso real e íntegro al contenido; si se frustra, puede no producir efectos y exigir subsanación.",
+          "D) Se convierte en publicación en BOE automáticamente."
+        ],
+        correct: 2
+      },
+      {
+        question: "100. Un ciudadano pretende que el Consejo Audiovisual \"anule\" una licencia administrativa. ¿Qué respuesta es correcta?",
+        options: [
+          "A) Puede anular porque protege a la infancia.",
+          "B) Solo el Gobierno puede anular.",
+          "C) Puede anular si lo pide el Parlamento.",
+          "D) Es un órgano regulador/consultivo en su ámbito: la anulación de actos administrativos sigue cauces de revisión/recursos y jurisdicción, no decisión \"directa\" del Consejo."
+        ],
+        correct: 3
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 04.03.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

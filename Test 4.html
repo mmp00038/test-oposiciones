@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 02.03.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (02.03.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una persona física no obligada a relacionarse electrónicamente inicia un procedimiento y marca notificación en papel. La Administración decide notificar por sede electrónica \"por defecto\" sin motivación ni constancia de elección. La tacha más sólida es:",
+        options: [
+          "A) La Administración puede imponer el canal electrónico, en cualquier caso.",
+          "B) Solo sería irregular si el interesado lo impugna en 24 horas.",
+          "C) Es incorrecto si no concurre obligación/elección válida del medio y no se respeta el medio señalado por el interesado.",
+          "D) Es correcto si se envía un SMS de aviso."
+        ],
+        correct: 2
+      },
+      {
+        question: "2. En un procedimiento de alta repercusión, la Administración acuerda cerrar totalmente al público la tramitación y no ofrecer información general sin justificar la reserva. Desde el prisma de la transparencia y la publicidad administrativa:",
+        options: [
+          "A) La publicidad es la regla general salvo excepciones legalmente previstas; el cierre indeseado choca con el marco legal.",
+          "B) Es correcto si el órgano instructor lo decide verbalmente.",
+          "C) La publicidad solo aplica a expedientes de urbanismo.",
+          "D) Solo es irregular si lo pide la Fiscalía."
+        ],
+        correct: 0
+      },
+      {
+        question: "3. En una resolución desfavorable para un ciudadano, la Administración no expresa los motivos de hecho ni de derecho que justifican la decisión. El vicio principal se centra en:",
+        options: [
+          "A) Falta de motivación exigible en actos que limiten derechos o restrinjan intereses legítimos.",
+          "B) Falta de sello de registro presencial.",
+          "C) Defecto menor no invalidante en ningún caso.",
+          "D) Error puramente material que se subsana con la firma."
+        ],
+        correct: 0
+      },
+      {
+        question: "4. En el Parlamento andaluz, durante disolución, surge una necesidad urgente de \"activar\" la Cámara. ¿Qué órgano estatutario/reglamentario está diseñado para velar por los poderes de la Cámara?",
+        options: [
+          "A) La Junta de Portavoces.",
+          "B) La Mesa del Parlamento únicamente.",
+          "C) El Pleno en funciones.",
+          "D) La Diputación Permanente."
+        ],
+        correct: 3
+      },
+      {
+        question: "5. En un procedimiento, el interesado pretende aportar un documento que ya obra en poder de la Administración actuante (o fue elaborado por ella). El estándar correcto es:",
+        options: [
+          "A) Debe aportarlo siempre en papel.",
+          "B) No debe exigírsele que lo aporte; la Administración debe recabarlo salvo oposición o excepción legal.",
+          "C) Debe aportarlo compulsado notarialmente.",
+          "D) Solo puede aportarse si el órgano lo pide formalmente."
+        ],
+        correct: 1
+      },
+      {
+        question: "6. Una ley autonómica pretendiera imponer \"mandato imperativo\" a diputados, sancionando la desobediencia con pérdida automática del escaño. El choque más directo es con:",
+        options: [
+          "A) Principio de legalidad tributaria.",
+          "B) Prohibición de arbitrariedad.",
+          "C) Representación política y prohibición del mandato imperativo.",
+          "D) Derecho a la huelga."
+        ],
+        correct: 2
+      },
+      {
+        question: "7. Una notificación en papel se intenta en domicilio: no hay nadie; se intenta de nuevo una sola vez en hora distinta dentro de los tres días siguientes, respetando la regla \"antes/después de las 15:00\". Si el segundo intento también falla, el cauce típico es:",
+        options: [
+          "A) Archivo por imposibilidad.",
+          "B) Publicación por anuncio en el BOE (sin perjuicio de anuncios complementarios).",
+          "C) Silencio estimatorio inmediato.",
+          "D) Notificación por WhatsApp."
+        ],
+        correct: 1
+      },
+      {
+        question: "8. El Parlamento de Andalucía se reúne en períodos ordinarios anuales:",
+        options: [
+          "A) Uno, de enero a diciembre.",
+          "B) Dos: de septiembre a diciembre y de febrero a julio.",
+          "C) Dos: de enero a junio y de julio a diciembre.",
+          "D) Tres, por trimestres."
+        ],
+        correct: 1
+      },
+      {
+        question: "9. Una persona presenta escrito el último día a las 23:50 en registro electrónico. El órgano alega \"fuera de horario de oficina\". La regla correcta es:",
+        options: [
+          "A) Inadmisión automática.",
+          "B) Se entiende presentado en el primer minuto del día siguiente.",
+          "C) El registro electrónico permite presentación 24/7; el cómputo se ajusta a reglas de plazo y sede.",
+          "D) Solo vale si se firma en presencia de funcionario."
+        ],
+        correct: 2
+      },
+      {
+        question: "10. El principio constitucional que proscribe la \"arbitrariedad de los poderes públicos\" opera como:",
+        options: [
+          "A) Cláusula política sin control judicial.",
+          "B) Límite jurídico controlable, conectado con motivación, igualdad y razonabilidad.",
+          "C) Norma solo aplicable al legislador estatal.",
+          "D) Norma exclusiva para el TC en abstracto."
+        ],
+        correct: 1
+      },
+      {
+        question: "11. En procedimientos iniciados de oficio, para iniciar y localizar domicilio, la Administración puede consultar datos del padrón (INE) en ciertos supuestos. La afirmación correcta es:",
+        options: [
+          "A) Está prohibido siempre por protección de datos.",
+          "B) Puede hacerse para la iniciación, según reglas legales de consulta.",
+          "C) Solo puede hacerse si el interesado lo autoriza notarialmente.",
+          "D) Solo los Ayuntamientos pueden consultar el padrón."
+        ],
+        correct: 1
+      },
+      {
+        question: "12. La \"inviolabilidad\" parlamentaria protege principalmente:",
+        options: [
+          "A) Cualquier conducta delictiva.",
+          "B) Opiniones y votos en el ejercicio del cargo, incluso tras cesar.",
+          "C) Solo la asistencia al Pleno.",
+          "D) Únicamente actos fuera del Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "13. Una Administración dicta un acto cuya eficacia se somete a notificación/publicación; sin embargo, lo ejecuta antes sin realizarlas. El reproche central es:",
+        options: [
+          "A) Violación del principio de ejecutividad.",
+          "B) Desconocimiento de reglas de eficacia de los actos administrativos.",
+          "C) Inaplicación del calendario laboral.",
+          "D) Incorrecta denominación del órgano."
+        ],
+        correct: 1
+      },
+      {
+        question: "14. Según el marco parlamentario andaluz, son publicaciones oficiales:",
+        options: [
+          "A) Solo el BOJA.",
+          "B) El BOPA y el Diario de Sesiones (Pleno, Diputación Permanente, Comisiones).",
+          "C) Las redes sociales oficiales.",
+          "D) Solo el BOE."
+        ],
+        correct: 1
+      },
+      {
+        question: "15. Una persona no obligada electrónicamente, tras recibir una notificación en sede electrónica, pide volver a papel para las sucesivas. La solución procedente es:",
+        options: [
+          "A) No puede cambiar nunca si aceptó una vez.",
+          "B) Puede decidir y comunicar en cualquier momento el cambio, si no está obligado a la vía electrónica.",
+          "C) Solo puede cambiar una vez por legislatura.",
+          "D) Solo puede cambiar si hay silencio negativo."
+        ],
+        correct: 1
+      },
+      {
+        question: "16. El derecho constitucional de participación política (acceso a cargos, sufragio/representación) se conecta con:",
+        options: [
+          "A) Art. 23 CE como núcleo de participación en asuntos públicos.",
+          "B) Art. 33 CE.",
+          "C) Art. 38 CE.",
+          "D) Art. 45 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "17. En cómputo de plazos, si un día es hábil en el municipio del interesado pero inhábil en la sede del órgano (o viceversa), se considera:",
+        options: [
+          "A) Hábil siempre.",
+          "B) Inhábil en todo caso a efectos de cómputo.",
+          "C) Depende del funcionario instructor.",
+          "D) Natural, no hábil."
+        ],
+        correct: 1
+      },
+      {
+        question: "18. En Parlamento de Andalucía, las sesiones del Pleno son públicas como regla, salvo supuestos tasados; y las Comisiones no tienen carácter público como regla, con excepciones de acreditados/secretas. Esto es:",
+        options: [
+          "A) Inconstitucional por defecto.",
+          "B) El régimen organizativo parlamentario ordinario.",
+          "C) Prohibido por CE.",
+          "D) Solo aplicable al Congreso."
+        ],
+        correct: 1
+      },
+      {
+        question: "19. Se discute la eficacia de una notificación electrónica que contiene aviso por SMS previo. Si el aviso falla por problema técnico, la consecuencia sobre la notificación es:",
+        options: [
+          "A) Nulidad absoluta de la notificación en todo caso.",
+          "B) El aviso es complementario; su falta no invalida la notificación formal si se practicó correctamente.",
+          "C) Se convierte en notificación presencial obligatoria.",
+          "D) Se concede prórroga automática de 30 días."
+        ],
+        correct: 1
+      },
+      {
+        question: "20. La Constitución establece la capital del Estado en:",
+        options: [
+          "A) Barcelona.",
+          "B) Sevilla.",
+          "C) La villa de Madrid.",
+          "D) Toledo."
+        ],
+        correct: 2
+      },
+      {
+        question: "21. Documentos emitidos por las Administraciones Públicas: la norma exige garantizar autenticidad, integridad y conservación. Esto implica:",
+        options: [
+          "A) Obligación de usar papel timbrado exclusivamente.",
+          "B) Preferencia por medios electrónicos, sin excluir otras formas cuando proceda.",
+          "C) Solo manuscrito.",
+          "D) Solo notarial."
+        ],
+        correct: 1
+      },
+      {
+        question: "22. El Parlamento andaluz está compuesto por:",
+        options: [
+          "A) Un máximo de 109.",
+          "B) Un mínimo de 109, elegidos por sufragio universal, igual, libre, directo y secreto.",
+          "C) 100 fijos.",
+          "D) 120 fijos."
+        ],
+        correct: 1
+      },
+      {
+        question: "23. Un ciudadano alega vulneración de derecho fundamental y solicita amparo constitucional. El objeto típico del amparo se limita a:",
+        options: [
+          "A) Cualquier derecho del Título I sin excepción.",
+          "B) Derechos y libertades especialmente protegidos (arts. 14-29 y objeción de conciencia).",
+          "C) Solo derechos del Capítulo III.",
+          "D) Solo derechos económicos."
+        ],
+        correct: 1
+      },
+      {
+        question: "24. La Administración pretende exigir a un interesado un documento \"emitido por otra Administración\" sin comprobar interoperabilidad. La regla correcta es:",
+        options: [
+          "A) Puede exigirlo siempre.",
+          "B) Debe recabarlo por medios electrónicos, salvo oposición del interesado o excepción legal.",
+          "C) Solo puede exigirlo si se trata de una empresa.",
+          "D) Solo puede exigirlo en sancionadores."
+        ],
+        correct: 1
+      },
+      {
+        question: "25. La circunscripción electoral para la elección de diputados del Parlamento de Andalucía es:",
+        options: [
+          "A) La comarca.",
+          "B) La provincia.",
+          "C) El municipio.",
+          "D) La CA."
+        ],
+        correct: 1
+      },
+      {
+        question: "26. Un ayuntamiento o norma autonómica pretende restringir la libertad de expresión imponiendo autorización previa para charlas críticas. El choque constitucional directo es:",
+        options: [
+          "A) Art. 20 CE: prohibición de censura previa.",
+          "B) Art. 38 CE.",
+          "C) Art. 137 CE.",
+          "D) Principio de unidad jurisdiccional."
+        ],
+        correct: 0
+      },
+      {
+        question: "27. En relación electrónica obligatoria, ¿quiénes están típicamente incluidos como obligados por ley (núcleo mínimo)?",
+        options: [
+          "A) Solo menores de edad.",
+          "B) Personas jurídicas, entidades sin personalidad, profesionales colegiados para trámites de su actividad, representantes de obligados, empleados públicos en trámites por su condición.",
+          "C) Solo desempleados.",
+          "D) Solo universidades públicas."
+        ],
+        correct: 1
+      },
+      {
+        question: "28. El Parlamento puede delegar en Comisiones legislativas la aprobación de leyes, pero hay materias que quedan \"reservadas al Pleno\". ¿Cuál encaja?",
+        options: [
+          "A) Cualquier ley sin excepción.",
+          "B) Leyes presupuestarias/tributarias y las que exijan mayoría cualificada.",
+          "C) Solo leyes de igualdad.",
+          "D) Solo leyes de urbanismo."
+        ],
+        correct: 1
+      },
+      {
+        question: "29. Una Administración inicia expediente y no identifica al órgano competente en su comunicación inicial, dificultando defensa. Esto choca principalmente con:",
+        options: [
+          "A) Derecho de acceso a archivos históricos.",
+          "B) Derechos de las personas en sus relaciones con las AAPP (información, identificación, etc.).",
+          "C) Libertad ideológica.",
+          "D) Derecho a huelga."
+        ],
+        correct: 1
+      },
+      {
+        question: "30. En la Constitución, sindicatos y asociaciones empresariales se definen como:",
+        options: [
+          "A) Órganos del Estado.",
+          "B) Entidades que contribuyen a la defensa y promoción de intereses económicos y sociales propios.",
+          "C) Sociedades mercantiles públicas.",
+          "D) Comisiones parlamentarias permanentes."
+        ],
+        correct: 1
+      },
+      {
+        question: "31. En un procedimiento se fija un plazo de subsanación de 10 días. Si la Administración se refiere a días naturales sin aclararlo de forma expresa en la notificación, la regla general impone:",
+        options: [
+          "A) Se presumen días naturales siempre.",
+          "B) Salvo fijación/expresión contraria fundada en ley, los plazos se entienden hábiles.",
+          "C) Invalidez automática del procedimiento.",
+          "D) Cómputo exclusivo en domingos."
+        ],
+        correct: 1
+      },
+      {
+        question: "32. En el Parlamento andaluz, para convocar la Diputación Permanente fuera de período ordinario, la iniciativa corresponde a:",
+        options: [
+          "A) Un único diputado.",
+          "B) La Presidencia de la Cámara o a petición de dos Grupos parlamentarios o una quinta parte de los miembros.",
+          "C) El Defensor del Pueblo.",
+          "D) La Cámara de Cuentas."
+        ],
+        correct: 1
+      },
+      {
+        question: "33. El Estado social y democrático de Derecho se proclama en:",
+        options: [
+          "A) Art. 1.1 CE con valores superiores (libertad, justicia, igualdad, pluralismo político).",
+          "B) Art. 2 CE.",
+          "C) Art. 9.3 CE.",
+          "D) Art. 10.2 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "34. Un interesado actúa mediante representante. Si la Administración duda de la representación, la técnica correcta es:",
+        options: [
+          "A) Rechazar de plano sin trámite.",
+          "B) Requerir acreditación/subsanación de la representación conforme a reglas de representación.",
+          "C) Exigir poder notarial siempre.",
+          "D) Dar por válido cualquier email."
+        ],
+        correct: 1
+      },
+      {
+        question: "35. En el Parlamento de Andalucía, la sesión constitutiva debe celebrarse dentro de cierto plazo tras elecciones. La regla estatutaria es:",
+        options: [
+          "A) Dentro de 48 horas.",
+          "B) Dentro de 10 días.",
+          "C) Dentro de 25 días siguientes a la celebración de elecciones.",
+          "D) En cualquier momento."
+        ],
+        correct: 2
+      },
+      {
+        question: "36. La Constitución permite extradición:",
+        options: [
+          "A) Nunca.",
+          "B) Solo por decisión del TC.",
+          "C) En virtud de tratado o ley, excluyendo delitos políticos (sin considerar terrorismo como tal).",
+          "D) Solo si lo pide el interesado."
+        ],
+        correct: 2
+      },
+      {
+        question: "37. Un acto administrativo se presume válido y produce efectos desde que se dicta \"salvo\" que:",
+        options: [
+          "A) Se exija notificación/publicación o se disponga otra cosa en el propio acto.",
+          "B) Se firme por el interesado.",
+          "C) Se apruebe por el Parlamento.",
+          "D) Se publique siempre en BOE."
+        ],
+        correct: 0
+      },
+      {
+        question: "38. La Junta de Andalucía, como institución del autogobierno, está integrada por:",
+        options: [
+          "A) Solo Parlamento y Consejo Consultivo.",
+          "B) Parlamento, Presidencia y Consejo de Gobierno.",
+          "C) Parlamento y Defensor del Pueblo Andaluz.",
+          "D) Consejo Económico y Social y Cámara de Cuentas."
+        ],
+        correct: 1
+      },
+      {
+        question: "39. La Constitución fija mayoría de edad en:",
+        options: [
+          "A) 16.",
+          "B) 18.",
+          "C) 21.",
+          "D) 25."
+        ],
+        correct: 1
+      },
+      {
+        question: "40. Derechos de las personas en relaciones con AAPP: ¿cuál encaja como estándar procedimental \"fuerte\"?",
+        options: [
+          "A) Derecho a exigir silencio positivo siempre.",
+          "B) Derecho a conocer el estado de tramitación y obtener copias/identificación de autoridades.",
+          "C) Derecho a elegir el funcionario instructor.",
+          "D) Derecho a que el procedimiento sea secreto siempre."
+        ],
+        correct: 1
+      },
+      {
+        question: "41. Un diputado andaluz no puede ser detenido por delitos cometidos en Andalucía, salvo:",
+        options: [
+          "A) Si lo decide la Mesa.",
+          "B) Si hay flagrante delito.",
+          "C) Si lo pide un ciudadano.",
+          "D) Si hay denuncia anónima."
+        ],
+        correct: 1
+      },
+      {
+        question: "42. El principio de interpretación conforme a tratados internacionales en derechos fundamentales se conecta con:",
+        options: [
+          "A) Art. 10.2 CE.",
+          "B) Art. 14 CE.",
+          "C) Art. 1.1 CE.",
+          "D) Art. 155 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "43. Lengua del procedimiento: la regla general permite:",
+        options: [
+          "A) Únicamente castellano siempre.",
+          "B) Lengua cooficial solo si lo pide el órgano.",
+          "C) Castellano y, en su caso, lengua cooficial según reglas territoriales y derechos del interesado.",
+          "D) Francés si es fronterizo."
+        ],
+        correct: 2
+      },
+      {
+        question: "44. El Parlamento andaluz es \"inviolable\" como institución, lo cual conecta con:",
+        options: [
+          "A) Independencia funcional y garantías institucionales.",
+          "B) Inmunidad penal de toda persona que entre en el edificio.",
+          "C) Exención tributaria total.",
+          "D) Potestad sancionadora judicial."
+        ],
+        correct: 0
+      },
+      {
+        question: "45. Se pretende aprobar una norma con rango infra legal para regular un derecho fundamental con afectación esencial. El enfoque constitucional correcto es:",
+        options: [
+          "A) Basta con circular interna.",
+          "B) Reserva de ley (y, en su caso, orgánica si afecta al desarrollo de derechos fundamentales).",
+          "C) Basta con publicación en web.",
+          "D) Se puede por \"bando\" municipal."
+        ],
+        correct: 1
+      },
+      {
+        question: "46. Registros electrónicos de apoderamientos: su función típica es:",
+        options: [
+          "A) Sustituir el DNI.",
+          "B) Permitir acreditar representación/apoderamiento de forma interoperable.",
+          "C) Ser un archivo histórico.",
+          "D) Permitir voto telemático."
+        ],
+        correct: 1
+      },
+      {
+        question: "47. El Parlamento andaluz puede convocar sesiones extraordinarias fuera de períodos ordinarios si:",
+        options: [
+          "A) Lo decide cualquier diputado individual.",
+          "B) Lo convoca su Presidencia previa aprobación del orden del día por Diputación Permanente, a solicitud de sujetos legitimados.",
+          "C) Solo por mandato del Senado.",
+          "D) Solo por el TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "48. En Constitución, los partidos políticos deben tener:",
+        options: [
+          "A) Estructura jerárquica militar.",
+          "B) Estructura interna y funcionamiento democráticos.",
+          "C) Adscripción obligatoria.",
+          "D) Control directo del Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "49. Un procedimiento exige comparecencia del interesado. La regla correcta es:",
+        options: [
+          "A) Comparecencia siempre obligatoria con sanción penal automática.",
+          "B) Comparecencia solo cuando la norma lo prevea o sea necesaria; y debe respetar derechos/garantías.",
+          "C) Comparecencia prohibida por ley.",
+          "D) Comparecencia solo presencial, nunca telemática."
+        ],
+        correct: 1
+      },
+      {
+        question: "50. La Diputación Permanente andaluza, tras lapsos entre períodos o tras elecciones, debe:",
+        options: [
+          "A) Disolverse sin informar.",
+          "B) Dar cuenta al Pleno en primera sesión ordinaria de lo tratado y decisiones.",
+          "C) Dictar decretos-ley.",
+          "D) Nombrar al Presidente de la Junta."
+        ],
+        correct: 1
+      },
+      {
+        question: "51. Un interesado presenta solicitud sin indicar claramente \"qué pide\". La Administración debe:",
+        options: [
+          "A) Archivar sin más.",
+          "B) Requerir subsanación/mejora y, si no atiende, tenerlo por desistido.",
+          "C) Estimar por silencio.",
+          "D) Convertirlo en denuncia."
+        ],
+        correct: 1
+      },
+      {
+        question: "52. La Constitución reconoce \"derecho de asilo\" en:",
+        options: [
+          "A) Art. 13.4 CE, en los términos que establezca la ley.",
+          "B) Art. 14 CE.",
+          "C) Art. 8 CE.",
+          "D) Art. 1.2 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "53. Un órgano dicta un acto que aplica un reglamento, pero el reglamento ha sido declarado nulo por sentencia firme anterior. La consecuencia técnica más correcta sobre el acto aplicativo es:",
+        options: [
+          "A) Sigue siendo válido por \"seguridad jurídica\".",
+          "B) Debe revisarse su validez por falta de cobertura normativa, según régimen de nulidad/anulabilidad y efectos.",
+          "C) Solo puede anularlo el Parlamento.",
+          "D) Se convierte en acto discrecional."
+        ],
+        correct: 1
+      },
+      {
+        question: "54. En el sistema andaluz, el Parlamento elabora y aprueba su presupuesto y posee facultades para su ejecución/modificación en términos internos. Esto refleja:",
+        options: [
+          "A) Autonomía reglamentaria, presupuestaria, administrativa y disciplinaria.",
+          "B) Dependencia presupuestaria total del Consejo de Gobierno.",
+          "C) Sustitución del BOJA por BOP.",
+          "D) Control exclusivo del Senado."
+        ],
+        correct: 0
+      },
+      {
+        question: "55. La nacionalidad: \"ningún español de origen podrá ser privado de su nacionalidad\". Esto significa:",
+        options: [
+          "A) Puede privarse por decreto.",
+          "B) Puede privarse por sentencia penal siempre.",
+          "C) En ningún caso.",
+          "D) Solo por ley orgánica de traición."
+        ],
+        correct: 2
+      },
+      {
+        question: "56. Un plazo por meses se computa \"de fecha a fecha\"; si no existe día equivalente en el mes de vencimiento, expira:",
+        options: [
+          "A) El día 30 siempre.",
+          "B) El último día del mes.",
+          "C) El primer hábil del mes siguiente.",
+          "D) El día 28 siempre."
+        ],
+        correct: 1
+      },
+      {
+        question: "57. El Parlamento andaluz: los miembros representan a toda Andalucía y no están sujetos a:",
+        options: [
+          "A) Control judicial.",
+          "B) Mandato imperativo.",
+          "C) Estatuto del Diputado.",
+          "D) Reglamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "58. La Constitución configura el Senado como:",
+        options: [
+          "A) Cámara de representación territorial.",
+          "B) Cámara corporativa.",
+          "C) Cámara de representación sindical.",
+          "D) Cámara judicial."
+        ],
+        correct: 0
+      },
+      {
+        question: "59. La \"responsabilidad de la tramitación\" implica:",
+        options: [
+          "A) Que nadie responde por retrasos.",
+          "B) Identificación de responsables/impulso del procedimiento, con deberes de diligencia.",
+          "C) Que el ciudadano debe tramitar su propio expediente.",
+          "D) Que todo plazo es orientativo."
+        ],
+        correct: 1
+      },
+      {
+        question: "60. En Parlamento andaluz, las sesiones ordinarias, por regla, se celebran entre:",
+        options: [
+          "A) Lunes y domingo.",
+          "B) Martes y viernes inclusive.",
+          "C) Sábado y domingo.",
+          "D) Solo jueves."
+        ],
+        correct: 1
+      },
+      {
+        question: "61. La Constitución reconoce que \"la dignidad de la persona\" es:",
+        options: [
+          "A) Un valor superior del ordenamiento en art. 1.1.",
+          "B) Fundamento del orden político y de la paz social en art. 10.1.",
+          "C) Una competencia autonómica.",
+          "D) Un principio rector sin efectos."
+        ],
+        correct: 1
+      },
+      {
+        question: "62. La Administración dicta un acto y cursa notificación más allá del plazo general para cursarla desde que se dictó. La infracción típica se refiere a:",
+        options: [
+          "A) Plazo de 10 días para cursar la notificación.",
+          "B) Plazo de 2 días.",
+          "C) Plazo de 1 mes siempre.",
+          "D) Plazo inexistente."
+        ],
+        correct: 0
+      },
+      {
+        question: "63. La investidura del Presidente del Gobierno (CE) prevé:",
+        options: [
+          "A) Mayoría absoluta siempre, sin segunda votación.",
+          "B) Segunda votación con mayoría simple si no hay mayoría absoluta en primera.",
+          "C) Elección directa por sufragio.",
+          "D) Nombramiento por el TC."
+        ],
+        correct: 1
+      },
+      {
+        question: "64. La comparecencia de las personas ante la Administración:",
+        options: [
+          "A) Puede exigirse sin base legal siempre.",
+          "B) Está vinculada a normas y debe practicarse con respeto a derechos; no es un \"capricho\" del órgano.",
+          "C) Exige presencia de abogado siempre.",
+          "D) Solo se permite por teléfono."
+        ],
+        correct: 1
+      },
+      {
+        question: "65. En Parlamento andaluz, para adquirir condición plena de diputado/a se exigen requisitos (credencial, declaraciones, juramento/promesa...). Si tras tres sesiones plenarias no se adquiere, la Mesa:",
+        options: [
+          "A) Expulsa definitivamente.",
+          "B) Declara suspensión de derechos y prerrogativas hasta que se adquiera (salvo fuerza mayor).",
+          "C) Disuelve el grupo parlamentario.",
+          "D) Convoca nuevas elecciones."
+        ],
+        correct: 1
+      },
+      {
+        question: "66. Principio de publicidad de normas, seguridad jurídica e irretroactividad sancionadora desfavorable se ubica en:",
+        options: [
+          "A) Art. 9.3 CE.",
+          "B) Art. 1.2 CE.",
+          "C) Art. 6 CE.",
+          "D) Art. 13 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "67. Una Administración intenta notificar por dos cauces distintos y ambos llegan; ¿qué fecha manda como fecha de notificación?",
+        options: [
+          "A) La más tardía.",
+          "B) La primera que se produzca.",
+          "C) La que el interesado elija a posteriori.",
+          "D) La del aviso por SMS."
+        ],
+        correct: 1
+      },
+      {
+        question: "68. La Diputación Permanente: su Mesa coincide con:",
+        options: [
+          "A) La Mesa del Consejo de Gobierno.",
+          "B) La Mesa del Parlamento de Andalucía.",
+          "C) La Junta Electoral de Andalucía.",
+          "D) El TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "69. La Constitución permite doble nacionalidad con:",
+        options: [
+          "A) Cualquier país sin límite.",
+          "B) Solo países UE.",
+          "C) Países iberoamericanos o con especial vinculación, mediante tratados.",
+          "D) Nunca."
+        ],
+        correct: 2
+      },
+      {
+        question: "70. La obligación/derecho de relacionarse electrónicamente se articula como:",
+        options: [
+          "A) Simple recomendación sin efectos.",
+          "B) Derecho general, con obligación para determinados sujetos legalmente definidos.",
+          "C) Prohibición de papel siempre.",
+          "D) Obligación solo para sancionadores."
+        ],
+        correct: 1
+      },
+      {
+        question: "71. Una ley establece discriminación por \"lengua\" sin justificación. El control constitucional arranca en:",
+        options: [
+          "A) Art. 14 CE (igualdad y no discriminación).",
+          "B) Art. 8 CE.",
+          "C) Art. 33 CE.",
+          "D) Art. 128 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "72. Cuando un acto tiene destinatario una pluralidad indeterminada o procede en selectivos, la publicación:",
+        options: [
+          "A) Es optativa y no sustituye notificación nunca.",
+          "B) Puede surtir efectos de notificación según supuestos legales.",
+          "C) Está prohibida.",
+          "D) Requiere autorización judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "73. El Parlamento andaluz goza de autonomía:",
+        options: [
+          "A) Solo reglamentaria.",
+          "B) Reglamentaria, presupuestaria, administrativa y disciplinaria.",
+          "C) Solo presupuestaria.",
+          "D) Solo judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "74. El recurso de inconstitucionalidad:",
+        options: [
+          "A) Solo lo puede interponer el Rey.",
+          "B) No existe.",
+          "C) Es un control abstracto de normas con rango de ley, ante el TC, por legitimados.",
+          "D) Solo sirve contra reglamentos."
+        ],
+        correct: 2
+      },
+      {
+        question: "75. Un interesado pide acceder al expediente electrónico, pero el órgano dice \"solo en papel y cuando termine\". El estándar correcto es:",
+        options: [
+          "A) Acceso solo al final siempre.",
+          "B) Derecho a conocer estado y acceder a expediente con límites, durante tramitación conforme a reglas.",
+          "C) Acceso solo con sentencia.",
+          "D) Acceso solo si hay recurso."
+        ],
+        correct: 1
+      },
+      {
+        question: "76. La Cámara puede compatibilizar actividad parlamentaria con funciones públicas honoríficas excepcionales y limitadas: esta previsión aparece en el régimen de:",
+        options: [
+          "A) Inviolabilidad.",
+          "B) Incompatibilidades de diputados.",
+          "C) Estados de alarma.",
+          "D) Referéndum."
+        ],
+        correct: 1
+      },
+      {
+        question: "77. El art. 1.2 CE: la soberanía nacional reside en:",
+        options: [
+          "A) El Rey.",
+          "B) El pueblo español, del que emanan los poderes del Estado.",
+          "C) El Congreso.",
+          "D) El Senado."
+        ],
+        correct: 1
+      },
+      {
+        question: "78. Un acto administrativo se dicta en lengua distinta a la elegida por el interesado en territorio con cooficialidad, sin traducción ni trámite. Problema central:",
+        options: [
+          "A) Nulidad radical siempre por defecto.",
+          "B) Infracción de reglas de lengua del procedimiento y posibles efectos de indefensión.",
+          "C) Solo defecto estético.",
+          "D) Prohibición constitucional absoluta."
+        ],
+        correct: 1
+      },
+      {
+        question: "79. El Parlamento andaluz es elegido por:",
+        options: [
+          "A) 2 años.",
+          "B) 3 años.",
+          "C) 4 años.",
+          "D) 5 años."
+        ],
+        correct: 2
+      },
+      {
+        question: "80. En la Constitución se prohíben expresamente:",
+        options: [
+          "A) Los partidos políticos.",
+          "B) Los tribunales de excepción.",
+          "C) Los recursos administrativos.",
+          "D) Las comisiones parlamentarias."
+        ],
+        correct: 1
+      },
+      {
+        question: "81. Un acto administrativo produce efectos frente a terceros desde su publicación cuando:",
+        options: [
+          "A) Nunca.",
+          "B) Se trate de actos que deban publicarse o cuando la publicación sustituya notificación en supuestos legales.",
+          "C) Solo si lo pide el interesado.",
+          "D) Solo si hay urgencia."
+        ],
+        correct: 1
+      },
+      {
+        question: "82. En Parlamento andaluz, el Pleno puede delegar en Comisiones legislativas la aprobación de proyectos/proposiciones, pero puede:",
+        options: [
+          "A) No recabar nunca el debate.",
+          "B) Recabar en cualquier momento el debate y votación.",
+          "C) Delegar incluso presupuestos.",
+          "D) Delegar leyes de mayoría cualificada."
+        ],
+        correct: 1
+      },
+      {
+        question: "83. La iniciativa legislativa popular estatal requiere:",
+        options: [
+          "A) 100.000 firmas.",
+          "B) 500.000 firmas y puede versar sobre cualquier materia.",
+          "C) 500.000 firmas y tiene límites materiales (p.ej. tributarias, internacionales, prerrogativa de gracia, orgánicas).",
+          "D) 1.000.000 firmas sin límites."
+        ],
+        correct: 2
+      },
+      {
+        question: "84. El \"expediente administrativo\" en Ley 39/2015 es:",
+        options: [
+          "A) Un conjunto ordenado de documentos y actuaciones que sirven de antecedente y fundamento de la resolución.",
+          "B) Solo la solicitud inicial.",
+          "C) Solo informes.",
+          "D) Solo resoluciones."
+        ],
+        correct: 0
+      },
+      {
+        question: "85. La circunscripción electoral (provincia) en Andalucía tiene un límite: ninguna provincia tendrá:",
+        options: [
+          "A) Más de un tercio.",
+          "B) Más del doble de diputados que otra.",
+          "C) Más del triple.",
+          "D) Menos de 12."
+        ],
+        correct: 1
+      },
+      {
+        question: "86. Los valores superiores del ordenamiento jurídico se ubican en:",
+        options: [
+          "A) Preámbulo sin valor jurídico.",
+          "B) Art. 1.1 CE.",
+          "C) Art. 10.1 CE.",
+          "D) Art. 55 CE."
+        ],
+        correct: 1
+      },
+      {
+        question: "87. Un procedimiento se impulsa de oficio: ¿qué principio de ordenación es más correcto?",
+        options: [
+          "A) Impulso a instancia de parte exclusivamente.",
+          "B) Impulso de oficio, sin perjuicio de aportaciones del interesado.",
+          "C) Congelación hasta recurso.",
+          "D) Impulso por el juez."
+        ],
+        correct: 1
+      },
+      {
+        question: "88. Una Comisión no permanente del Parlamento andaluz:",
+        options: [
+          "A) Dura indefinidamente.",
+          "B) Se extingue al concluir el trabajo encomendado y, en todo caso, al concluir la legislatura.",
+          "C) Solo puede ser legislativa.",
+          "D) Solo puede ser de control presupuestario."
+        ],
+        correct: 1
+      },
+      {
+        question: "89. La pena de muerte en CE:",
+        options: [
+          "A) Permitida siempre.",
+          "B) Abolida sin excepción en el texto.",
+          "C) Abolida, salvo lo que puedan disponer leyes penales militares para tiempos de guerra (texto constitucional).",
+          "D) Permitida por decreto-ley."
+        ],
+        correct: 2
+      },
+      {
+        question: "90. En tramitación de urgencia, el efecto típico es:",
+        options: [
+          "A) Anulación de garantías.",
+          "B) Reducción de plazos, manteniendo trámites esenciales.",
+          "C) Suspensión indefinida.",
+          "D) Conversión a procedimiento penal."
+        ],
+        correct: 1
+      },
+      {
+        question: "91. Los diputados andaluces: el Parlamento es inviolable y los diputados tienen inviolabilidad por opiniones/votos. Esto apunta a:",
+        options: [
+          "A) Blindaje penal total.",
+          "B) Garantía funcional para libertad de deliberación parlamentaria.",
+          "C) Privilegio económico.",
+          "D) Sustitución del TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "92. El derecho a no declarar sobre ideología, religión o creencias se conecta con:",
+        options: [
+          "A) Art. 16 CE.",
+          "B) Art. 20 CE.",
+          "C) Art. 8 CE.",
+          "D) Art. 33 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "93. Un plazo vence en día inhábil:",
+        options: [
+          "A) Se adelanta al hábil anterior.",
+          "B) Se prorroga al primer hábil siguiente.",
+          "C) Se convierte en natural.",
+          "D) Se anula."
+        ],
+        correct: 1
+      },
+      {
+        question: "94. En Parlamento andaluz, el Pleno puede ser convocado por su Presidencia o a solicitud de:",
+        options: [
+          "A) Un diputado.",
+          "B) Dos Grupos parlamentarios o una quinta parte de los diputados.",
+          "C) Solo el Consejo de Gobierno.",
+          "D) Solo el TSJA."
+        ],
+        correct: 1
+      },
+      {
+        question: "95. El deber de colaborar con jueces y tribunales (cumplir sentencias firmes y prestar colaboración requerida) es:",
+        options: [
+          "A) Art. 118 CE.",
+          "B) Art. 1.1 CE.",
+          "C) Art. 14 CE.",
+          "D) Art. 66 CE."
+        ],
+        correct: 0
+      },
+      {
+        question: "96. La obligación de resolver expresamente:",
+        options: [
+          "A) Existe solo en sancionadores.",
+          "B) Es regla general, con disciplina de plazos y efectos del silencio.",
+          "C) No existe; todo va por silencio.",
+          "D) Depende del tamaño del municipio."
+        ],
+        correct: 1
+      },
+      {
+        question: "97. En Andalucía, los diputados \"titulares y suplentes\" que integren la Diputación Permanente ven prorrogado su mandato:",
+        options: [
+          "A) Hasta un año después.",
+          "B) Hasta la constitución de la nueva Cámara.",
+          "C) Solo 30 días.",
+          "D) No se prorroga."
+        ],
+        correct: 1
+      },
+      {
+        question: "98. La libertad y seguridad (detención preventiva) fija un máximo constitucional:",
+        options: [
+          "A) 24 horas.",
+          "B) 48 horas.",
+          "C) 72 horas.",
+          "D) 7 días."
+        ],
+        correct: 2
+      },
+      {
+        question: "99. Un acto se dicta sin firma válida del órgano competente y sin posibilidad de identificar autoría. El defecto más serio es:",
+        options: [
+          "A) Defecto menor subsanable siempre.",
+          "B) Vicio que compromete autenticidad/competencia, afectando validez del acto según régimen aplicable.",
+          "C) Da igual si se publica.",
+          "D) Solo afecta a archivo."
+        ],
+        correct: 1
+      },
+      {
+        question: "100. En un procedimiento con notificación electrónica obligatoria, se pone a disposición la notificación y el interesado no accede. La notificación se entiende rechazada a los:",
+        options: [
+          "A) 5 días hábiles.",
+          "B) 10 días naturales.",
+          "C) 15 días naturales.",
+          "D) 1 mes."
+        ],
+        correct: 1
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 02.03.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

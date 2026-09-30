@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 05.02.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (05.02.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. La condición de Estado social se proyecta jurídicamente cuando los poderes públicos:",
+        options: [
+          "A) Se abstienen de intervenir en la economía",
+          "B) Garantizan solo igualdad formal",
+          "C) Actúan para remover obstáculos que impidan la igualdad real",
+          "D) Limitan su actuación a la legalidad estricta"
+        ],
+        correct: 2
+      },
+      {
+        question: "2. El Estatuto de Autonomía se integra en el bloque de constitucionalidad porque:",
+        options: [
+          "A) Es aprobado por una Comunidad Autónoma",
+          "B) Desarrolla la Constitución con rango inferior",
+          "C) Es ley orgánica aprobada conforme a la Constitución",
+          "D) Tiene naturaleza reglamentaria reforzada"
+        ],
+        correct: 2
+      },
+      {
+        question: "3. En la Ley 39/2015, puede ser interesado quien ostente:",
+        options: [
+          "A) Unicamente un derecho subjetivo",
+          "B) Un interés legítimo susceptible de afección",
+          "C) Solo la condición de solicitante inicial",
+          "D) Exclusivamente representación legal"
+        ],
+        correct: 1
+      },
+      {
+        question: "4. Existe vulneración de la jerarquía normativa cuando:",
+        options: [
+          "A) Una ley posterior modifica una anterior",
+          "B) Un reglamento innova el ordenamiento sin habilitación legal",
+          "C) Una ley autonómica regula una competencia propia",
+          "D) Un reglamento desarrolla una ley"
+        ],
+        correct: 2
+      },
+      {
+        question: "5. Los derechos estatutarios deben interpretarse:",
+        options: [
+          "A) Con autonomía plena respecto de la Constitución",
+          "B) Como derechos fundamentales",
+          "C) De conformidad con la Constitución",
+          "D) Como principios sin efectos jurídicos"
+        ],
+        correct: 2
+      },
+      {
+        question: "6. La obligación de relación electrónica con la Administración:",
+        options: [
+          "A) Es general para toda la ciudadanía",
+          "B) Depende de la voluntad administrativa",
+          "C) Afecta a sujetos determinados legalmente",
+          "D) Se limita a procedimientos sancionadores"
+        ],
+        correct: 2
+      },
+      {
+        question: "7. La autonomía política se manifiesta principalmente en:",
+        options: [
+          "A) La potestad sancionadora",
+          "B) La capacidad de autoorganización",
+          "C) La supremacia normativa",
+          "D) La dependencia financiera"
+        ],
+        correct: 1
+      },
+      {
+        question: "8. En el Estatuto andaluz, el medio ambiente se configura como:",
+        options: [
+          "A) Materia residual",
+          "B) Competencia estatal exclusiva",
+          "C) Ambito competencial propio con principios",
+          "D) Política meramente programática"
+        ],
+        correct: 2
+      },
+      {
+        question: "9. La condición de interesado puede adquirirse:",
+        options: [
+          "A) Solo al inicio del procedimiento",
+          "B) En cualquier fase si concurren los requisitos",
+          "C) Unicamente mediante solicitud expresa",
+          "D) Solo por resolución administrativa"
+        ],
+        correct: 1
+      },
+      {
+        question: "10. El principio de eficacia administrativa exige, entre otros aspectos:",
+        options: [
+          "A) Priorizar la forma sobre el resultado",
+          "B) Evitar la motivación",
+          "C) Resolver expresamente",
+          "D) Limitar la participación"
+        ],
+        correct: 2
+      },
+      {
+        question: "11. El modelo territorial constitucional se basa en:",
+        options: [
+          "A) Centralización administrativa",
+          "B) Desconcentración funcional",
+          "C) Descentralización política",
+          "D) Delegación ocasional"
+        ],
+        correct: 2
+      },
+      {
+        question: "12. Una previsión estatutaria será inconstitucional cuando:",
+        options: [
+          "A) Regule competencias propias",
+          "B) Cree instituciones autonómicas",
+          "C) Contradiga la Constitución",
+          "D) Desarrolle principios rectores"
+        ],
+        correct: 2
+      },
+      {
+        question: "13. La capacidad de obrar administrativa puede reconocerse:",
+        options: [
+          "A) Solo con plena capacidad civil",
+          "B) Exclusivamente a mayores de edad",
+          "C) Aunque no exista plena capacidad civil",
+          "D) Solo a personas jurídicas"
+        ],
+        correct: 2
+      },
+      {
+        question: "14. La supremacía constitucional implica que:",
+        options: [
+          "A) Las leyes orgánicas prevalecen",
+          "B) El Estatuto tiene igual rango",
+          "C) La Constitución prevalece sobre cualquier norma",
+          "D) Los reglamentos pueden desarrollarla directamente"
+        ],
+        correct: 2
+      },
+      {
+        question: "15. Los principios rectores estatutarios:",
+        options: [
+          "A) Carecen de efectos",
+          "B) Vinculan a los poderes públicos",
+          "C) Generan derechos fundamentales",
+          "D) Son meramente declarativos"
+        ],
+        correct: 1
+      },
+      {
+        question: "16. La motivación de los actos se conecta con:",
+        options: [
+          "A) Jerarquía normativa",
+          "B) Derecho de defensa",
+          "C) Descentralización",
+          "D) Legalidad presupuestaria"
+        ],
+        correct: 1
+      },
+      {
+        question: "17. La protección ambiental en el Estatuto andaluz se articula desde:",
+        options: [
+          "A) Primacía económica",
+          "B) Subordinación municipal",
+          "C) Desarrollo sostenible",
+          "D) Exclusión autonómica"
+        ],
+        correct: 2
+      },
+      {
+        question: "18. La condición de interesado excluye:",
+        options: [
+          "A) A asociaciones",
+          "B) A quienes tengan interés legítimo",
+          "C) A quienes carezcan de afectación",
+          "D) A personas jurídicas"
+        ],
+        correct: 2
+      },
+      {
+        question: "19. La distribución territorial del poder reconoce:",
+        options: [
+          "A) Subordinación jerárquica",
+          "B) Autonomía política",
+          "C) Unidad absoluta sin cooperación",
+          "D) Centralización normativa"
+        ],
+        correct: 1
+      },
+      {
+        question: "20. El principio de legalidad administrativa supone:",
+        options: [
+          "A) Oportunidad discrecional",
+          "B) Sometimiento pleno al ordenamiento",
+          "C) Prevalencia del interés económico",
+          "D) Flexibilidad normativa"
+        ],
+        correct: 1
+      },
+      {
+        question: "21. La igualdad material exige:",
+        options: [
+          "A) Neutralidad absoluta",
+          "B) Trato idéntico siempre",
+          "C) Medidas correctoras de desigualdad",
+          "D) Ausencia de intervención pública"
+        ],
+        correct: 2
+      },
+      {
+        question: "22. El Estatuto andaluz despliega eficacia porque:",
+        options: [
+          "A) Emana del Parlamento autonómico",
+          "B) Es norma institucional básica",
+          "C) Es reglamento ejecutivo",
+          "D) Es ley ordinaria"
+        ],
+        correct: 1
+      },
+      {
+        question: "23. La representación en la Ley 39/2015 permite:",
+        options: [
+          "A) Actuar sin acreditación",
+          "B) Actuar siempre de forma presencial",
+          "C) Actuar por medio de representante acreditado",
+          "D) Sustituir la condición de interesado"
+        ],
+        correct: 2
+      },
+      {
+        question: "24. Un reglamento es inválido cuando:",
+        options: [
+          "A) Desarrolla una ley",
+          "B) Contradice una ley",
+          "C) Es posterior a la ley",
+          "D) Regula aspectos técnicos"
+        ],
+        correct: 1
+      },
+      {
+        question: "25. Los derechos estatutarios:",
+        options: [
+          "A) Sustituyen a los constitucionales",
+          "B) Tienen rango constitucional",
+          "C) Se subordinan a la Constitución",
+          "D) Carecen de tutela"
+        ],
+        correct: 2
+      },
+      {
+        question: "26. La relación electrónica obligatoria pretende:",
+        options: [
+          "A) Excluir a personas físicas",
+          "B) Facilitar eficacia y seguridad",
+          "C) Reducir derechos",
+          "D) Eliminar atención presencial"
+        ],
+        correct: 1
+      },
+      {
+        question: "27. La autoorganización autonómica se concreta en:",
+        options: [
+          "A) Política exterior",
+          "B) Organización institucional propia",
+          "C) Defensa nacional",
+          "D) Sistema monetario"
+        ],
+        correct: 1
+      },
+      {
+        question: "28. El medio ambiente en el Estatuto se vincula a:",
+        options: [
+          "A) Política residual",
+          "B) Interés económico exclusivo",
+          "C) Principios y competencias",
+          "D) Materia municipal exclusiva"
+        ],
+        correct: 2
+      },
+      {
+        question: "29. Es interesado quien:",
+        options: [
+          "A) Puede resultar afectado",
+          "B) Tiene mera curiosidad",
+          "C) Es vecino del lugar",
+          "D) Es funcionario"
+        ],
+        correct: 0
+      },
+      {
+        question: "30. La eficacia exige:",
+        options: [
+          "A) Silencio como regla",
+          "B) Resolución motivada",
+          "C) Falta de respuesta",
+          "D) Tramitación indefinida"
+        ],
+        correct: 1
+      },
+      {
+        question: "31. El Estado autonómico garantiza:",
+        options: [
+          "A) Uniformidad normativa",
+          "B) Autonomía sin límites",
+          "C) Unidad y autonomía",
+          "D) Supremacía autonómica"
+        ],
+        correct: 2
+      },
+      {
+        question: "32. Una contradicción estatutaria con la CE se resuelve por:",
+        options: [
+          "A) Interpretación extensiva",
+          "B) Prevalencia estatutaria",
+          "C) Control de constitucionalidad",
+          "D) Costumbre"
+        ],
+        correct: 2
+      },
+      {
+        question: "33. Capacidad administrativa implica poder:",
+        options: [
+          "A) Litigar siempre",
+          "B) Comparecer y actuar",
+          "C) Legislar",
+          "D) Sancionar"
+        ],
+        correct: 1
+      },
+      {
+        question: "34. La Constitución vincula a:",
+        options: [
+          "A) Solo al Estado",
+          "B) Solo a CCAA",
+          "C) Todos los poderes públicos",
+          "D) Solo a tribunales"
+        ],
+        correct: 2
+      },
+      {
+        question: "35. Los principios rectores orientan:",
+        options: [
+          "A) Solo políticas privadas",
+          "B) Actuación pública",
+          "C) Interpretación judicial penal",
+          "D) Actos privados"
+        ],
+        correct: 1
+      },
+      {
+        question: "36. La motivación permite:",
+        options: [
+          "A) Evitar recursos",
+          "B) Controlar la legalidad",
+          "C) Aumentar discrecionalidad",
+          "D) Reducir transparencia"
+        ],
+        correct: 1
+      },
+      {
+        question: "37. La sostenibilidad ambiental integra:",
+        options: [
+          "A) Crecimiento sin límites",
+          "B) Equilibrio ambiental y social",
+          "C) Prioridad económica",
+          "D) Exclusión normativa"
+        ],
+        correct: 1
+      },
+      {
+        question: "38. La condición de interesado puede perderse cuando:",
+        options: [
+          "A) Cambia el órgano",
+          "B) Desaparece la afección",
+          "C) Se archiva el expediente",
+          "D) Se delega la competencia"
+        ],
+        correct: 1
+      },
+      {
+        question: "39. La autonomía no implica:",
+        options: [
+          "A) Separación del Estado",
+          "B) Capacidad normativa",
+          "C) Autoorganización",
+          "D) Participación institucional"
+        ],
+        correct: 0
+      },
+      {
+        question: "40. La legalidad administrativa impide:",
+        options: [
+          "A) Interpretación",
+          "B) Discrecionalidad",
+          "C) Arbitrariedad",
+          "D) Motivación"
+        ],
+        correct: 2
+      },
+      {
+        question: "41. La igualdad exige tratar de forma distinta cuando:",
+        options: [
+          "A) No hay diferencia",
+          "B) La ley lo prohíbe",
+          "C) Existen situaciones desiguales",
+          "D) Hay interés económico"
+        ],
+        correct: 2
+      },
+      {
+        question: "42. El Estatuto andaluz se reforma mediante:",
+        options: [
+          "A) Decreto",
+          "B) Ley ordinaria",
+          "C) Procedimiento reforzado",
+          "D) Reglamento"
+        ],
+        correct: 2
+      },
+      {
+        question: "43. La representación puede acreditarse:",
+        options: [
+          "A) Solo notarialmente",
+          "B) Por cualquier medio válido",
+          "C) Nunca electrónicamente",
+          "D) Solo judicialmente"
+        ],
+        correct: 1
+      },
+      {
+        question: "44. Un reglamento sin habilitación legal:",
+        options: [
+          "A) Es válido",
+          "B) Es nulo",
+          "C) Es anulable",
+          "D) Es eficaz provisionalmente"
+        ],
+        correct: 1
+      },
+      {
+        question: "45. Los derechos estatutarios:",
+        options: [
+          "A) Son indisponibles",
+          "B) Tienen tutela constitucional directa",
+          "C) Se integran en el ordenamiento",
+          "D) Son simbólicos"
+        ],
+        correct: 2
+      },
+      {
+        question: "46. La relación electrónica obligatoria afecta a:",
+        options: [
+          "A) Menores",
+          "B) Personas jurídicas",
+          "C) Toda persona física",
+          "D) Jubilados"
+        ],
+        correct: 1
+      },
+      {
+        question: "47. La organización institucional autonómica incluye:",
+        options: [
+          "A) Cortes Generales",
+          "B) Tribunal Constitucional",
+          "C) Parlamento autonómico",
+          "D) Consejo General del Poder Judicial"
+        ],
+        correct: 2
+      },
+      {
+        question: "48. El medio ambiente exige cooperación entre:",
+        options: [
+          "A) Estado y CCAA",
+          "B) Solo municipios",
+          "C) Solo Estado",
+          "D) Solo particulares"
+        ],
+        correct: 0
+      },
+      {
+        question: "49. El interés legítimo se caracteriza por:",
+        options: [
+          "A) Ser abstracto",
+          "B) Ser indirecto irrelevante",
+          "C) Tener afección real",
+          "D) Ser meramente moral"
+        ],
+        correct: 2
+      },
+      {
+        question: "50. La eficacia se opone a:",
+        options: [
+          "A) Motivación",
+          "B) Legalidad",
+          "C) Inactividad",
+          "D) Resolución"
+        ],
+        correct: 2
+      },
+      {
+        question: "51. El principio de unidad se compatibiliza con:",
+        options: [
+          "A) Autonomía política",
+          "B) Centralismo",
+          "C) Supremacía local",
+          "D) Fragmentación"
+        ],
+        correct: 0
+      },
+      {
+        question: "52. El Estatuto desarrolla la Constitución:",
+        options: [
+          "A) Con rango inferior",
+          "B) En contradicción",
+          "C) Dentro de sus límites",
+          "D) De forma independiente"
+        ],
+        correct: 2
+      },
+      {
+        question: "53. La capacidad administrativa permite:",
+        options: [
+          "A) Actuar en procedimientos",
+          "B) Dictar sentencias",
+          "C) Ejercer potestades",
+          "D) Representar siempre"
+        ],
+        correct: 0
+      },
+      {
+        question: "54. La Constitución es norma:",
+        options: [
+          "A) Programática",
+          "B) Suprema",
+          "C) Reglamentaria",
+          "D) Discrecional"
+        ],
+        correct: 1
+      },
+      {
+        question: "55. Los principios rectores:",
+        options: [
+          "A) Informan la legislación y la práctica judicial",
+          "B) Crean derechos subjetivos directos",
+          "C) Carecen de valor normativo",
+          "D) Solo obligan al ciudadano"
+        ],
+        correct: 0
+      },
+      {
+        question: "56. La motivación refuerza:",
+        options: [
+          "A) Arbitrariedad",
+          "B) Transparencia",
+          "C) Discrecionalidad",
+          "D) Oportunidad"
+        ],
+        correct: 1
+      },
+      {
+        question: "57. La sostenibilidad integra:",
+        options: [
+          "A) Exclusión social",
+          "B) Protección ambiental",
+          "C) Crecimiento ilimitado",
+          "D) Prioridad fiscal"
+        ],
+        correct: 1
+      },
+      {
+        question: "58. Se es interesado cuando:",
+        options: [
+          "A) Se tiene curiosidad",
+          "B) Se participa indirectamente",
+          "C) Puede afectarse un interés legítimo",
+          "D) Se es vecino"
+        ],
+        correct: 2
+      },
+      {
+        question: "59. La autonomía implica:",
+        options: [
+          "A) Soberanía",
+          "B) Independencia",
+          "C) Autogobierno",
+          "D) Supremacía"
+        ],
+        correct: 2
+      },
+      {
+        question: "60. La legalidad administrativa exige:",
+        options: [
+          "A) Flexibilidad absoluta",
+          "B) Sometimiento a la ley",
+          "C) Decisión política",
+          "D) Prioridad económica"
+        ],
+        correct: 1
+      },
+      {
+        question: "61. La igualdad material requiere:",
+        options: [
+          "A) Neutralidad",
+          "B) Diferenciación razonable",
+          "C) Uniformidad",
+          "D) Abstención"
+        ],
+        correct: 1
+      },
+      {
+        question: "62. El Estatuto andaluz tiene eficacia:",
+        options: [
+          "A) Simbólica",
+          "B) Jurídica",
+          "C) Política únicamente",
+          "D) Consultiva"
+        ],
+        correct: 1
+      },
+      {
+        question: "63. La representación puede limitarse cuando:",
+        options: [
+          "A) Lo decide la Administración sin causa",
+          "B) La ley lo establezca",
+          "C) Sea electrónica",
+          "D) Sea gratuita"
+        ],
+        correct: 1
+      },
+      {
+        question: "64. Un reglamento contrario a la ley es:",
+        options: [
+          "A) Eficaz",
+          "B) Nulo",
+          "C) Subsidiario",
+          "D) Preferente"
+        ],
+        correct: 1
+      },
+      {
+        question: "65. Los derechos estatutarios:",
+        options: [
+          "A) No vinculan",
+          "B) Vinculan a poderes públicos",
+          "C) Sustituyen derechos fundamentales",
+          "D) Son programáticos sin efecto"
+        ],
+        correct: 1
+      },
+      {
+        question: "66. La relación electrónica mejora:",
+        options: [
+          "A) Exclusión",
+          "B) Accesibilidad",
+          "C) Opacidad",
+          "D) Discrecionalidad"
+        ],
+        correct: 1
+      },
+      {
+        question: "67. La autoorganización se concreta en:",
+        options: [
+          "A) Tratados internacionales",
+          "B) Normas propias",
+          "C) Defensa",
+          "D) Política monetaria"
+        ],
+        correct: 1
+      },
+      {
+        question: "68. La protección ambiental exige:",
+        options: [
+          "A) Actuación aislada",
+          "B) Coordinación",
+          "C) Inacción",
+          "D) Privatización"
+        ],
+        correct: 1
+      },
+      {
+        question: "69. El interés legítimo debe ser:",
+        options: [
+          "A) Hipotético",
+          "B) Real y actual",
+          "C) Moral",
+          "D) Abstracto"
+        ],
+        correct: 1
+      },
+      {
+        question: "70. La eficacia combate:",
+        options: [
+          "A) Transparencia",
+          "B) Legalidad",
+          "C) Inactividad",
+          "D) Motivación"
+        ],
+        correct: 2
+      },
+      {
+        question: "71. El Estado autonómico descansa en:",
+        options: [
+          "A) Unidad y autonomía",
+          "B) Centralismo",
+          "C) Soberanía compartida",
+          "D) Confederación"
+        ],
+        correct: 0
+      },
+      {
+        question: "72. El Estatuto no puede:",
+        options: [
+          "A) Crear instituciones",
+          "B) Contradecir la CE",
+          "C) Regular competencias",
+          "D) Proteger derechos"
+        ],
+        correct: 1
+      },
+      {
+        question: "73. Capacidad administrativa supone:",
+        options: [
+          "A) Poder sancionador",
+          "B) Poder de obrar",
+          "C) Poder legislativo",
+          "D) Poder judicial"
+        ],
+        correct: 1
+      },
+      {
+        question: "74. La Constitución vincula también a:",
+        options: [
+          "A) Particulares solo",
+          "B) Poderes públicos",
+          "C) Solo al legislador",
+          "D) Solo a la Administración"
+        ],
+        correct: 1
+      },
+      {
+        question: "75. Los principios rectores sirven de:",
+        options: [
+          "A) Criterio interpretativo",
+          "B) Título sancionador",
+          "C) Regla reglamentaria",
+          "D) Costumbre"
+        ],
+        correct: 0
+      },
+      {
+        question: "76. La motivación posibilita:",
+        options: [
+          "A) Control",
+          "B) Arbitrariedad",
+          "C) Discrecionalidad",
+          "D) Opacidad"
+        ],
+        correct: 0
+      },
+      {
+        question: "77. El desarrollo sostenible implica:",
+        options: [
+          "A) Crecimiento ilimitado",
+          "B) Protección ambiental",
+          "C) Exclusión social",
+          "D) Prioridad económica"
+        ],
+        correct: 1
+      },
+      {
+        question: "78. La condición de interesado excluye:",
+        options: [
+          "A) Afectados indirectos",
+          "B) Titulares de interés legítimo",
+          "C) No afectados",
+          "D) Representantes"
+        ],
+        correct: 2
+      },
+      {
+        question: "79. Autonomía significa:",
+        options: [
+          "A) Separación",
+          "B) Autogobierno",
+          "C) Soberanía",
+          "D) Independencia"
+        ],
+        correct: 1
+      },
+      {
+        question: "80. La legalidad administrativa proscribe:",
+        options: [
+          "A) Interpretación",
+          "B) Arbitrariedad",
+          "C) Motivación",
+          "D) Transparencia"
+        ],
+        correct: 1
+      },
+      {
+        question: "81. La igualdad material justifica:",
+        options: [
+          "A) Trato idéntico",
+          "B) Trato desigual razonable",
+          "C) Discriminación",
+          "D) Inacción"
+        ],
+        correct: 1
+      },
+      {
+        question: "82. El Estatuto se integra en:",
+        options: [
+          "A) Reglamento",
+          "B) Bloque de constitucionalidad",
+          "C) Derecho consuetudinario",
+          "D) Jurisprudencia"
+        ],
+        correct: 1
+      },
+      {
+        question: "83. La representación puede acreditarse mediante:",
+        options: [
+          "A) Cualquier medio válido",
+          "B) Solo escritura",
+          "C) Solo comparecencia",
+          "D) Solo registro"
+        ],
+        correct: 0
+      },
+      {
+        question: "84. Un reglamento ultra vires es:",
+        options: [
+          "A) Preferente",
+          "B) Nulo",
+          "C) Subsidiario",
+          "D) Eficaz"
+        ],
+        correct: 1
+      },
+      {
+        question: "85. Los derechos estatutarios obligan a:",
+        options: [
+          "A) Particulares",
+          "B) Poderes públicos",
+          "C) Solo tribunales",
+          "D) Nadie"
+        ],
+        correct: 1
+      },
+      {
+        question: "86. La relación electrónica obligatoria excluye:",
+        options: [
+          "A) Personas jurídicas",
+          "B) Colectivos determinados",
+          "C) Personas físicas no obligadas",
+          "D) Administraciones"
+        ],
+        correct: 2
+      },
+      {
+        question: "87. La autoorganización permite:",
+        options: [
+          "A) Crear órganos propios",
+          "B) Dictar sentencias",
+          "C) Recaudar impuestos estatales",
+          "D) Celebrar tratados"
+        ],
+        correct: 0
+      },
+      {
+        question: "88. La protección ambiental exige:",
+        options: [
+          "A) Coordinación interadministrativa",
+          "B) Inacción estatal",
+          "C) Exclusión municipal",
+          "D) Privatización"
+        ],
+        correct: 0
+      },
+      {
+        question: "89. El interés legítimo requiere:",
+        options: [
+          "A) Afección concreta",
+          "B) Curiosidad",
+          "C) Vecindad",
+          "D) Simpatía"
+        ],
+        correct: 0
+      },
+      {
+        question: "90. La eficacia administrativa se vulnera con:",
+        options: [
+          "A) Resolución expresa",
+          "B) Motivación",
+          "C) Inactividad",
+          "D) Transparencia"
+        ],
+        correct: 2
+      },
+      {
+        question: "91. El Estado autonómico implica:",
+        options: [
+          "A) Confederación",
+          "B) Unidad con autonomía",
+          "C) Soberanía autonómica",
+          "D) Fragmentación"
+        ],
+        correct: 1
+      },
+      {
+        question: "92. El Estatuto andaluz está subordinado a:",
+        options: [
+          "A) Reglamentos",
+          "B) Leyes ordinarias",
+          "C) Constitución",
+          "D) Decretos"
+        ],
+        correct: 2
+      },
+      {
+        question: "93. Capacidad administrativa permite:",
+        options: [
+          "A) Comparecer",
+          "B) Legislar",
+          "C) Juzgar",
+          "D) Sancionar siempre"
+        ],
+        correct: 0
+      },
+      {
+        question: "94. La supremacía constitucional supone:",
+        options: [
+          "A) Prevalencia normativa",
+          "B) Sentencias penales",
+          "C) Contratos privados",
+          "D) Costumbres"
+        ],
+        correct: 0
+      },
+      {
+        question: "95. Los principios rectores:",
+        options: [
+          "A) Orientan políticas públicas",
+          "B) Crean sanciones",
+          "C) Son ordenanzas",
+          "D) Sustituyen la ley"
+        ],
+        correct: 0
+      },
+      {
+        question: "96. La motivación refuerza:",
+        options: [
+          "A) Control y transparencia",
+          "B) Arbitrariedad",
+          "C) Oportunidad",
+          "D) Discrecionalidad"
+        ],
+        correct: 0
+      },
+      {
+        question: "97. El desarrollo sostenible integra:",
+        options: [
+          "A) Protección ambiental y social",
+          "B) Exclusión económica",
+          "C) Crecimiento ilimitado",
+          "D) Prioridad fiscal"
+        ],
+        correct: 0
+      },
+      {
+        question: "98. Es interesado quien puede:",
+        options: [
+          "A) Resultar afectado",
+          "B) Opinar",
+          "C) Fiscalizar",
+          "D) Representar sin poder"
+        ],
+        correct: 0
+      },
+      {
+        question: "99. La autonomía no equivale a:",
+        options: [
+          "A) Autogobierno",
+          "B) Independencia",
+          "C) Capacidad normativa",
+          "D) Organización propia"
+        ],
+        correct: 1
+      },
+      {
+        question: "100. La legalidad administrativa exige:",
+        options: [
+          "A) Arbitrariedad",
+          "B) Sometimiento a la ley",
+          "C) Oportunidad",
+          "D) Discrecionalidad absoluta"
+        ],
+        correct: 1
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 05.02.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

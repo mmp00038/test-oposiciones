@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Examen 12.03.2026</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (100 preguntas)</option>
+        <option value="b1">Bloque 1: Preguntas 1 - 25</option>
+        <option value="b2">Bloque 2: Preguntas 26 - 50</option>
+        <option value="b3">Bloque 3: Preguntas 51 - 75</option>
+        <option value="b4">Bloque 4: Preguntas 76 - 100</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">EXAMEN TIPO TEST (12.03.2026)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Una persona física comparece personalmente en un procedimiento ambiental promovido por ella misma, pero la Administración le deniega toda actuación porque \"carece de plena capacidad civil\". La objeción más precisa es:",
+        options: [
+          "A) En vía administrativa la capacidad de obrar se identifica siempre con la capacidad civil plena.",
+          "B) Solo las personas jurídicas pueden promover procedimientos administrativos.",
+          "C) La capacidad de obrar administrativa puede reconocerse en supuestos más amplios que la estricta capacidad civil plena.",
+          "D) Solo cabe actuar por medio de representante."
+        ],
+        correct: 2
+      },
+      {
+        question: "2. El Parlamento andaluz pretende atribuir a una comisión permanente la aprobación definitiva de una reforma integral de su Reglamento sin intervención del Pleno. La crítica más sólida es:",
+        options: [
+          "A) La autonomía reglamentaria de la Cámara no permite vaciar el papel del Pleno cuando el propio sistema exige mayoría reforzada para aprobar o reformar el Reglamento.",
+          "B) Las comisiones pueden asumir siempre cualquier competencia parlamentaria.",
+          "C) El Reglamento parlamentario puede modificarse por simple acuerdo político de la Mesa.",
+          "D) La reforma del Reglamento corresponde al Consejo de Gobierno."
+        ],
+        correct: 0
+      },
+      {
+        question: "3. Una asociación ecologista que no inició un procedimiento de autorización industrial acredita, semanas después, que la instalación proyectada afectará de forma directa a los intereses colectivos que estatutariamente defiende. La opción correcta es:",
+        options: [
+          "A) Nunca puede adquirir la condición de interesada si no fue solicitante inicial.",
+          "B) Solo puede personarse si el promotor del proyecto lo acepta.",
+          "C) Su entrada en el procedimiento depende exclusivamente de la discrecionalidad del instructor.",
+          "D) Puede adquirir la condición de interesada en una fase posterior si concurre un interés legítimo afectado."
+        ],
+        correct: 3
+      },
+      {
+        question: "4. En Andalucía, una ley ordinaria quisiera privar de toda eficacia a la inviolabilidad de los diputados por votos emitidos en sede parlamentaria. El obstáculo jurídico más directo es:",
+        options: [
+          "A) La inviolabilidad es una mera costumbre parlamentaria.",
+          "B) El Estatuto y la lógica constitucional de la representación impiden desactivar por ley ordinaria una prerrogativa institucional de ese rango.",
+          "C) La inviolabilidad solo protege frente a sanciones administrativas, no penales.",
+          "D) La inviolabilidad decae automáticamente al acabar el mandato."
+        ],
+        correct: 1
+      },
+      {
+        question: "5. Una fundación privada comparece en nombre de una plataforma ciudadana, aportando un poder privado firmado electrónicamente por su portavoz. El órgano rechaza de plano la representación sin ofrecer subsanación. La respuesta más ajustada es:",
+        options: [
+          "A) La representación en vía administrativa solo se acredita mediante comparecencia notarial.",
+          "B) El defecto solo puede alegarse en recurso judicial.",
+          "C) La Administración puede exigir libremente la forma que prefiera para acreditar representación.",
+          "D) Debe admitirse la acreditación por medios válidos legalmente y, en su caso, permitir la subsanación."
+        ],
+        correct: 3
+      },
+      {
+        question: "6. El Consejo de Gobierno andaluz en funciones acuerda presentar un proyecto de ley de amplia reforma administrativa y, además, disolver el Parlamento para acelerar su aprobación futura. El reproche más exacto es:",
+        options: [
+          "A) En funciones puede ejercer esas facultades si aprecia interés general sin más límite.",
+          "B) Solo necesita el refrendo de la Mesa del Parlamento.",
+          "C) El Consejo de Gobierno en funciones conserva plena iniciativa legislativa y el Presidente en funciones puede disolver la Cámara.",
+          "D) El régimen de Gobierno en funciones impone límites materiales que excluyen esas facultades."
+        ],
+        correct: 3
+      },
+      {
+        question: "7. Una comunidad de propietarios pide que todas las notificaciones del procedimiento se hagan a su administrador. La Administración entiende acreditada la representación para recibir notificaciones, pero no para formular desistimiento. La solución correcta es:",
+        options: [
+          "A) La representación para actuaciones de mero trámite no equivale sin más a representación para actos que implican disposición de derechos o renuncia.",
+          "B) Toda representación administrativa es necesariamente general e ilimitada.",
+          "C) La representación para recibir notificaciones es inexistente en Ley 39/2015.",
+          "D) El administrador no puede representar nunca a la comunidad en vía administrativa."
+        ],
+        correct: 0
+      },
+      {
+        question: "8. Una norma andaluza crea un órgano consultivo con capacidad para anular reglamentos por razones de oportunidad política. La objeción constitucional más afinada es:",
+        options: [
+          "A) La anulación general de normas no puede desplazarse a un órgano consultivo al margen del sistema de fuentes y del control jurisdiccional.",
+          "B) Todo órgano consultivo puede sustituir a los tribunales si lo crea una ley autonómica.",
+          "C) La oportunidad política es siempre parámetro suficiente para expulsar reglamentos del ordenamiento.",
+          "D) Los reglamentos autonómicos no están sometidos a control de legalidad."
+        ],
+        correct: 0
+      },
+      {
+        question: "9. Fallecido un denunciante en un procedimiento iniciado a su solicitud, comparece su heredera alegando afección patrimonial directa derivada del resultado del expediente. La regla correcta es:",
+        options: [
+          "A) La sucesión en la posición procedimental es imposible.",
+          "B) La muerte del interesado obliga siempre al archivo.",
+          "C) Si el derecho o interés es transmisible, puede sucederle quien acredite esa posición.",
+          "D) Solo el Ministerio Fiscal puede continuar el procedimiento."
+        ],
+        correct: 2
+      },
+      {
+        question: "10. Si el Parlamento de Andalucía pretendiera imponer jurídicamente a sus diputados instrucciones de voto vinculantes bajo pérdida automática del escaño, el choque principal sería con:",
+        options: [
+          "A) La libertad ideológica del art. 16 CE exclusivamente.",
+          "B) La prohibición del mandato imperativo y la lógica de la representación parlamentaria.",
+          "C) El principio de reserva de ley tributaria.",
+          "D) La potestad reglamentaria del Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "11. Una persona jurídica pretende identificarse en un procedimiento mediante un sistema técnico no previsto entre los admitidos por la Administración actuante, aunque ofrece garantías funcionalmente equivalentes. La respuesta correcta es:",
+        options: [
+          "A) La Administración puede rechazarlo si no está entre los sistemas admitidos, sin perjuicio de que deba ofrecer cauces legales alternativos.",
+          "B) Debe aceptarlo necesariamente si al interesado le resulta más cómodo.",
+          "C) Toda forma tecnológica de identificación es válida por equivalencia material.",
+          "D) Las personas jurídicas no necesitan identificarse electrónicamente."
+        ],
+        correct: 0
+      },
+      {
+        question: "12. Un reglamento autonómico dispusiera que en Andalucía el castellano dejará de ser utilizable ante la Administración autonómica en determinados procedimientos internos. La tacha más directa sería:",
+        options: [
+          "A) No existe tacha, por primacía absoluta de la autoorganización lingüística autonómica.",
+          "B) Solo habría problema si afectara a extranjeros.",
+          "C) Contradiría el marco constitucional sobre oficialidad lingüística y el derecho a usar el castellano.",
+          "D) Sería válido si lo apoyara una mayoría parlamentaria reforzada."
+        ],
+        correct: 2
+      },
+      {
+        question: "13. Una Administración exige firma electrónica avanzada para una mera solicitud respecto de la que la ley solo impone identificación. El reproche más técnico es:",
+        options: [
+          "A) Identificación y firma son categorías siempre intercambiables.",
+          "B) La firma solo puede exigirse cuando la ley o la naturaleza de la actuación lo requieran.",
+          "C) Toda solicitud administrativa exige siempre firma cualificada.",
+          "D) La identificación nunca es posible por medios electrónicos."
+        ],
+        correct: 1
+      },
+      {
+        question: "14. La Cámara de Cuentas de Andalucía y el Tribunal de Cuentas del Estado fiscalizan parcialmente una misma entidad del sector público andaluz. La afirmación más correcta es:",
+        options: [
+          "A) Existe incompatibilidad estructural entre ambos controles.",
+          "B) El control externo autonómico excluye todo control estatal.",
+          "C) El control interno sustituye al externo y evita cualquier superposición.",
+          "D) Pueden coexistir controles en sus respectivos ámbitos sin anularse entre sí."
+        ],
+        correct: 3
+      },
+      {
+        question: "15. Una persona física no obligada a relacionarse electrónicamente actúa ante una oficina de asistencia y solicita ayuda para presentar electrónicamente una solicitud compleja. La obligación de la oficina es:",
+        options: [
+          "A) Negarse, porque la asistencia solo se presta a obligados electrónicos.",
+          "B) Asistirle en el uso de medios electrónicos en los términos legalmente previstos.",
+          "C) Limitarse a informar de la dirección de la sede electrónica.",
+          "D) Exigirle representante profesional."
+        ],
+        correct: 1
+      },
+      {
+        question: "16. El Presidente de la Junta es investido tras una primera votación fallida y una segunda en la que obtiene un apoyo inferior al inicialmente requerido. La lógica institucional de ese diseño responde a:",
+        options: [
+          "A) Evitar toda negociación parlamentaria.",
+          "B) Reforzar al Ejecutivo frente al Parlamento mediante automatismo.",
+          "C) Facilitar la formación de gobierno preservando la legitimación parlamentaria.",
+          "D) Sustituir la investidura por una designación regia material."
+        ],
+        correct: 2
+      },
+      {
+        question: "17. La Administración rechaza un escrito porque se presentó en registro distinto del órgano destinatario. La objeción más precisa es:",
+        options: [
+          "A) El sistema registral legal impide ese rechazo cuando la presentación se realiza en registros válidos.",
+          "B) Cada escrito solo puede presentarse en el registro del órgano competente para resolver.",
+          "C) La presentación en registro distinto produce siempre inexistencia jurídica.",
+          "D) La regla solo opera para la Administración General del Estado."
+        ],
+        correct: 0
+      },
+      {
+        question: "18. La creación de una agencia administrativa andaluza con personalidad jurídica propia para gestionar competencias técnicas especializadas se explica mejor por:",
+        options: [
+          "A) El principio de descentralización funcional dentro del sector público autonómico.",
+          "B) La desconcentración territorial estricta.",
+          "C) La delegación legislativa.",
+          "D) La sustitución de toda potestad pública por gestión privada."
+        ],
+        correct: 0
+      },
+      {
+        question: "19. Una presentación electrónica realizada en día inhábil para la sede electrónica actuante plantea la duda de su fecha de entrada. La respuesta correcta es:",
+        options: [
+          "A) Se entiende presentada en la primera hora del primer día hábil siguiente, según el cómputo legal de plazos.",
+          "B) Es nula por presentarse fuera de jornada presencial.",
+          "C) Se retrotrae al primer día hábil anterior.",
+          "D) Exige convalidación por resolución expresa."
+        ],
+        correct: 0
+      },
+      {
+        question: "20. El Consejo Consultivo de Andalucía se caracteriza por ser:",
+        options: [
+          "A) Un órgano de fiscalización contable externa.",
+          "B) El superior órgano consultivo del Consejo de Gobierno y de la Administración de la Junta.",
+          "C) Una sala jurisdiccional especial del TSJA.",
+          "D) Un comisionado parlamentario para la defensa de derechos."
+        ],
+        correct: 1
+      },
+      {
+        question: "21. La Administración exige compulsar notarialmente copias de documentos que ella misma puede cotejar electrónicamente. La crítica más ajustada es:",
+        options: [
+          "A) La legislación actual favorece la validez de copias y la simplificación, sin imponer formalismos innecesarios de ese tipo.",
+          "B) La compulsa notarial es presupuesto universal de validez documental.",
+          "C) La copia electrónica carece siempre de eficacia.",
+          "D) La compulsa solo puede dispensarse a las Administraciones locales."
+        ],
+        correct: 0
+      },
+      {
+        question: "22. Una comisión de investigación parlamentaria autonómica pretende declarar penalmente responsable a un alto cargo por hechos vinculados a contratación pública. La objeción más exacta es:",
+        options: [
+          "A) Ninguna, porque el Parlamento puede ejercer función jurisdiccional complementaria.",
+          "B) La comisión puede depurar responsabilidades penales, aunque no civiles.",
+          "C) No puede invadir la función jurisdiccional ni sustituir a los órganos penales.",
+          "D) Solo puede hacerlo si el afectado no es aforado."
+        ],
+        correct: 2
+      },
+      {
+        question: "23. Un órgano administrativo concede cinco días para subsanar una solicitud, pero lo hace mediante un requerimiento oscuramente redactado que no identifica el defecto real. La consecuencia más correcta es:",
+        options: [
+          "A) La falta de precisión del requerimiento puede impedir apreciar válidamente la no subsanación posterior.",
+          "B) La oscuridad del requerimiento es irrelevante si se notificó en plazo.",
+          "C) La Administración puede rechazar después la solicitud por cualquier defecto que advierta.",
+          "D) La subsanación nunca procede respecto de documentos omitidos."
+        ],
+        correct: 0
+      },
+      {
+        question: "24. La Oficina Andaluza contra el Fraude y la Corrupción, según el material subido, se concibe principalmente como:",
+        options: [
+          "A) Un órgano judicial anticorrupción.",
+          "B) Un instrumento específico de prevención, investigación y lucha contra el fraude y la corrupción, con protección de la persona denunciante.",
+          "C) Una comisión parlamentaria temporal de encuesta.",
+          "D) Un servicio de inspección tributaria autonómica."
+        ],
+        correct: 1
+      },
+      {
+        question: "25. La Administración exige aportaciones documentales en papel a un interesado respecto de títulos oficiales que ya constan en bases públicas interoperables. La regla legal vulnerada es:",
+        options: [
+          "A) La libertad absoluta de la Administración para pedir cualquier documentación.",
+          "B) El derecho a no aportar documentos que ya obren en poder de las Administraciones, salvo oposición o excepción legal.",
+          "C) Solo puede recabarse documentación entre Administraciones mediante convenio singular.",
+          "D) Nunca pueden compartirse datos entre Administraciones públicas."
+        ],
+        correct: 1
+      },
+      {
+        question: "26. El Tribunal Superior de Justicia de Andalucía, conforme al material aportado, se define mejor como:",
+        options: [
+          "A) El órgano que culmina la organización judicial en Andalucía en los términos de la ley orgánica correspondiente.",
+          "B) El supremo intérprete exclusivo del Estatuto al margen del Tribunal Constitucional.",
+          "C) Un órgano administrativo de la Junta de Andalucía.",
+          "D) Un ente instrumental del Poder Judicial autonómico."
+        ],
+        correct: 0
+      },
+      {
+        question: "27. En un procedimiento selectivo, un aspirante pide acceso al expediente completo durante la fase de alegaciones y la Administración le facilita solo una nota-resumen elaborada por el tribunal. La crítica más fuerte es:",
+        options: [
+          "A) El interesado no tiene derecho alguno al conocimiento del expediente durante la tramitación.",
+          "B) El acceso puede modularse, pero no vaciar de contenido el derecho a conocer los elementos relevantes para su defensa.",
+          "C) Basta siempre con un resumen oficioso.",
+          "D) El expediente solo existe tras la resolución final."
+        ],
+        correct: 1
+      },
+      {
+        question: "28. Si una norma autonómica dispusiera una circunscripción electoral única para el Parlamento andaluz sin reforma estatutaria, la objeción más directa sería:",
+        options: [
+          "A) La circunscripción electoral es cuestión reglamentaria del Parlamento.",
+          "B) Solo podría hacerlo por decreto-ley.",
+          "C) No habría problema si se invoca la igualdad del voto.",
+          "D) Chocaría con el marco estatutario que configura la provincia como circunscripción."
+        ],
+        correct: 3
+      },
+      {
+        question: "29. Un órgano dicta una resolución sin identificar con claridad el órgano que la adopta ni la autoridad que la firma. El problema técnico se proyecta sobre:",
+        options: [
+          "A) La forma y la imputación subjetiva del acto administrativo.",
+          "B) Solo la oportunidad política del acto.",
+          "C) Exclusivamente la competencia territorial.",
+          "D) Únicamente la fase de ejecución forzosa."
+        ],
+        correct: 0
+      },
+      {
+        question: "30. La Administración de la Junta de Andalucía, según el temario, actúa con personalidad jurídica única, sin perjuicio de:",
+        options: [
+          "A) que desaparezca toda jerarquía interna.",
+          "B) que las entidades instrumentales tengan, en su caso, la personalidad propia que la norma les atribuya.",
+          "C) que cada Consejería sea una persona jurídica distinta.",
+          "D) que el Parlamento asuma funciones administrativas ordinarias."
+        ],
+        correct: 1
+      },
+      {
+        question: "31. Un reglamento interno de una Consejería pretende imponer la comparecencia presencial obligatoria en todos los procedimientos, incluso a obligados electrónicos. La crítica más precisa es:",
+        options: [
+          "A) El reglamento interno puede desplazar libremente la ley procedimental común.",
+          "B) No cabe contrariar el régimen legal de relación electrónica y de comparecencia mediante una decisión de rango inferior.",
+          "C) La comparecencia física puede imponerse siempre por razones de eficacia.",
+          "D) La comparecencia presencial y la electrónica son jurídicamente idénticas."
+        ],
+        correct: 1
+      },
+      {
+        question: "32. La Cámara de Cuentas de Andalucía depende orgánicamente del:",
+        options: [
+          "A) Consejo de Gobierno.",
+          "B) Tribunal Superior de Justicia de Andalucía.",
+          "C) Parlamento de Andalucía.",
+          "D) Consejo Consultivo."
+        ],
+        correct: 2
+      },
+      {
+        question: "33. Si la Administración omite resolver expresamente una solicitud pese a su obligación legal, el defecto principal es:",
+        options: [
+          "A) La vulneración del deber de resolver en plazo y de notificar la resolución expresa.",
+          "B) Un simple defecto no relevante jamás.",
+          "C) La conversión automática del silencio en nulidad radical del expediente.",
+          "D) La imposibilidad de recurso."
+        ],
+        correct: 0
+      },
+      {
+        question: "34. La posibilidad de que el Parlamento andaluz elabore y apruebe su propio presupuesto se conecta con:",
+        options: [
+          "A) Su autonomía presupuestaria, administrativa y reglamentaria.",
+          "B) La potestad ejecutiva del Consejo de Gobierno.",
+          "C) La competencia del Tribunal de Cuentas estatal exclusivamente.",
+          "D) La potestad sancionadora del Presidente de la Cámara."
+        ],
+        correct: 0
+      },
+      {
+        question: "35. Un documento emitido por una Administración pública incorpora un código seguro de verificación y se aporta al expediente electrónico. La afirmación correcta es:",
+        options: [
+          "A) No puede reconocerse su autenticidad fuera de la Administración emisora.",
+          "B) El CSV puede servir como mecanismo de comprobación de autenticidad en los términos legalmente previstos.",
+          "C) Todo documento administrativo electrónico necesita firma manuscrita añadida.",
+          "D) El documento carece de eficacia si no se imprime en papel."
+        ],
+        correct: 1
+      },
+      {
+        question: "36. La Oficina Andaluza contra el Fraude y la Corrupción se justifica también, según el temario, por la exigencia de:",
+        options: [
+          "A) reemplazar a la jurisdicción penal.",
+          "B) garantizar un instrumento independiente de prevención y combate del fraude, conforme a estándares internacionales y europeos.",
+          "C) suprimir las competencias de control interno de la Junta.",
+          "D) centralizar toda la contratación pública en un único órgano."
+        ],
+        correct: 1
+      },
+      {
+        question: "37. Una Administración suspende el plazo máximo para resolver sin base legal y durante tiempo indeterminado \"hasta nueva orden\". El análisis correcto es:",
+        options: [
+          "A) La suspensión del plazo está tasada y no puede utilizarse de forma abierta o indeterminada.",
+          "B) La suspensión es libre mientras se motive genéricamente.",
+          "C) Toda suspensión equivale a ampliación.",
+          "D) La Administración puede suspender indefinidamente por mera carga de trabajo."
+        ],
+        correct: 0
+      },
+      {
+        question: "38. El Defensor del Pueblo Andaluz, conforme al material subido, cuando reciba quejas relativas al funcionamiento de la Administración de Justicia en Andalucía debe:",
+        options: [
+          "A) resolverlas con fuerza vinculante frente a jueces y magistrados.",
+          "B) dictar instrucciones al Tribunal Superior de Justicia.",
+          "C) trasladarlas al Ministerio Fiscal o al CGPJ, sin perjuicio de su reflejo en el informe al Parlamento.",
+          "D) archivarlas sin más por falta de competencia absoluta."
+        ],
+        correct: 2
+      },
+      {
+        question: "39. Una resolución expresa se dicta dentro de plazo, pero se notifica fuera de él. La cuestión jurídica se examina principalmente desde:",
+        options: [
+          "A) la distinción entre adopción de la resolución y su notificación a efectos de cumplimiento del plazo máximo.",
+          "B) la nulidad absoluta de la firma del órgano.",
+          "C) la inexistencia del acto administrativo.",
+          "D) la reserva de ley orgánica."
+        ],
+        correct: 0
+      },
+      {
+        question: "40. El Consejo Económico y Social de Andalucía se define institucionalmente como un órgano:",
+        options: [
+          "A) de control presupuestario previo vinculante.",
+          "B) colegiado consultivo del Gobierno andaluz en materia económica y social.",
+          "C) de gestión directa de servicios públicos de empleo.",
+          "D) judicial especializado en conflictos colectivos."
+        ],
+        correct: 1
+      },
+      {
+        question: "41. La Administración requiere al interesado la aportación repetida de un informe ambiental emitido por otra Consejería, ya obrante en el expediente. La crítica principal es:",
+        options: [
+          "A) Se vulnera la regla de aportación única y el deber de recabar documentación accesible.",
+          "B) Es plenamente válido por el principio de contradicción.",
+          "C) La Administración nunca puede consultar datos entre órganos propios.",
+          "D) El informe solo vale si lo presenta el interesado."
+        ],
+        correct: 0
+      },
+      {
+        question: "42. La sede del Tribunal Superior de Justicia de Andalucía se fija estatutariamente en:",
+        options: [
+          "A) Sevilla.",
+          "B) Málaga.",
+          "C) Córdoba.",
+          "D) Granada."
+        ],
+        correct: 3
+      },
+      {
+        question: "43. El órgano instructor decide no practicar una prueba propuesta por el interesado y lo justifica con una fórmula genérica: \"no se estima pertinente\". La crítica más técnica es:",
+        options: [
+          "A) La inadmisión de prueba puede hacerse sin motivación reforzada en todo caso.",
+          "B) La denegación de prueba debe conectarse de forma razonada con su improcedencia o inutilidad.",
+          "C) Toda prueba propuesta por el interesado es obligatoria.",
+          "D) La prueba solo existe en procedimientos sancionadores."
+        ],
+        correct: 1
+      },
+      {
+        question: "44. La Administración de la Junta de Andalucía, según el material del tema 5, se organiza y actúa también conforme al principio de:",
+        options: [
+          "A) inmunidad frente al control judicial.",
+          "B) subordinación a intereses partidistas.",
+          "C) potestad reglamentaria ilimitada.",
+          "D) buena administración y calidad de los servicios."
+        ],
+        correct: 3
+      },
+      {
+        question: "45. El cómputo de plazos expresados por horas exige, de forma más precisa:",
+        options: [
+          "A) atender a horas hábiles administrativas convencionales.",
+          "B) contar exclusivamente dentro del horario de atención presencial.",
+          "C) computar de hora en hora y de minuto en minuto desde la notificación o publicación, salvo disposición distinta.",
+          "D) convertirlos siempre en días hábiles."
+        ],
+        correct: 2
+      },
+      {
+        question: "46. Los diputados andaluces representan, conforme al Estatuto:",
+        options: [
+          "A) solo la provincia por la que fueron elegidos.",
+          "B) al partido en cuya candidatura concurrieron.",
+          "C) a toda Andalucía.",
+          "D) a la Mesa del Parlamento."
+        ],
+        correct: 2
+      },
+      {
+        question: "47. Una Administración acuerda ampliar el plazo máximo para resolver cuando el expediente ya está vencido. La conclusión correcta es:",
+        options: [
+          "A) La ampliación solo es posible antes del vencimiento del plazo originario.",
+          "B) Puede ampliarlo en cualquier momento si existe carga de trabajo.",
+          "C) La ampliación posterior convierte el silencio en válido.",
+          "D) La ampliación tardía es una modalidad de suspensión legal."
+        ],
+        correct: 0
+      },
+      {
+        question: "48. La gestión compartida entre Delegaciones Territoriales y Delegaciones del Gobierno, según el material del tema 5, se articula:",
+        options: [
+          "A) por resolución unilateral de cualquier delegado territorial.",
+          "B) mediante orden conjunta de las consejerías afectadas, con determinación de funciones, unidades y mecanismos de coordinación.",
+          "C) por acuerdo verbal entre secretarías generales provinciales.",
+          "D) exclusivamente por ley del Parlamento."
+        ],
+        correct: 1
+      },
+      {
+        question: "49. Si un plazo se señala por días y no se especifica otra cosa, la regla general en la Ley 39/2015 es que se trata de:",
+        options: [
+          "A) días naturales.",
+          "B) días hábiles, salvo que una norma o el Derecho de la Unión dispongan otra cosa.",
+          "C) días administrativos presenciales.",
+          "D) días hábiles solo en procedimientos iniciados a solicitud del interesado."
+        ],
+        correct: 1
+      },
+      {
+        question: "50. La Oficina Andaluza contra el Fraude y la Corrupción se crea, además, para:",
+        options: [
+          "A) sustituir la Intervención General.",
+          "B) tramitar recursos administrativos comunes.",
+          "C) ejercer funciones jurisdiccionales sobre altos cargos.",
+          "D) proteger a las personas denunciantes."
+        ],
+        correct: 3
+      },
+      {
+        question: "51. Un interesado presenta escrito en un día hábil en su municipio, pero inhábil en la sede del órgano destinatario. A efectos de cómputo, la regla legal conduce a:",
+        options: [
+          "A) considerar necesariamente hábil el día.",
+          "B) considerar inhábil el día cuando lo sea en el lugar de presentación o en el de la sede electrónica/órgano, según el régimen legal aplicable.",
+          "C) dejar la cuestión a la discrecionalidad del instructor.",
+          "D) aplicar siempre el calendario del interesado."
+        ],
+        correct: 1
+      },
+      {
+        question: "52. El Parlamento de Andalucía es inviolable. La formulación correcta de esa idea institucional es:",
+        options: [
+          "A) el Parlamento queda fuera del Derecho.",
+          "B) la Cámara disfruta de una garantía institucional que protege su funcionamiento constitucional y su autonomía en los términos del ordenamiento.",
+          "C) todos sus actos son irrevisables judicialmente.",
+          "D) sus diputados no responden nunca penalmente por ningún hecho."
+        ],
+        correct: 1
+      },
+      {
+        question: "53. Un órgano administrativo exige comparecencia personal cuando la ley no la prevé y sin justificar necesidad. La crítica más ajustada es:",
+        options: [
+          "A) La comparecencia personal solo puede imponerse dentro de los límites legales y con justificación suficiente.",
+          "B) Toda Administración puede exigir presencia física libremente.",
+          "C) La comparecencia es un deber general de ciudadanía ante cualquier requerimiento.",
+          "D) Solo cabe comparecencia en procedimientos sancionadores."
+        ],
+        correct: 0
+      },
+      {
+        question: "54. El Consejo Audiovisual de Andalucía, según el material aportado, vela especialmente por:",
+        options: [
+          "A) la protección de juventud e infancia en la programación de los medios audiovisuales andaluces.",
+          "B) la legalidad urbanística municipal.",
+          "C) la fiscalización económico-presupuestaria.",
+          "D) la selección de jueces sustitutos."
+        ],
+        correct: 0
+      },
+      {
+        question: "55. La responsabilidad de la tramitación administrativa, conforme a la Ley 39/2015, se conecta con la idea de que:",
+        options: [
+          "A) el impulso procedimental corresponde solo al interesado.",
+          "B) los titulares de las unidades administrativas y el personal responsable deben adoptar las medidas necesarias para remover obstáculos y evitar retrasos indebidos.",
+          "C) el retraso procedimental nunca produce consecuencias jurídicas.",
+          "D) la carga de tramitar se desplaza a la ciudadanía."
+        ],
+        correct: 1
+      },
+      {
+        question: "56. La composición del Parlamento andaluz presenta, según el material subido, la siguiente regla estructural:",
+        options: [
+          "A) número variable fijado por cada legislatura sin mínimo estatutario.",
+          "B) mínimo estatutario y concreción legal de 109 diputados.",
+          "C) 75 diputados fijos por mandato constitucional.",
+          "D) 120 diputados inmodificables por ley autonómica."
+        ],
+        correct: 1
+      },
+      {
+        question: "57. Una Administración invoca \"seguridad jurídica\" para no aplicar su propia sede electrónica y obligar a presentar todos los escritos en papel. La objeción más sólida es:",
+        options: [
+          "A) La seguridad jurídica legitima cualquier restricción organizativa.",
+          "B) La seguridad jurídica opera también en favor del administrado y no permite desconocer el sistema legal de registros y presentación electrónica.",
+          "C) La sede electrónica es optativa para la Administración.",
+          "D) El registro electrónico solo sirve para recursos administrativos."
+        ],
+        correct: 1
+      },
+      {
+        question: "58. La Administración andaluza se define, conforme al tema 5, como una organización bajo la dirección del:",
+        options: [
+          "A) Parlamento de Andalucía.",
+          "B) Consejo de Gobierno.",
+          "C) Tribunal Superior de Justicia de Andalucía.",
+          "D) Defensor del Pueblo Andaluz."
+        ],
+        correct: 1
+      },
+      {
+        question: "59. Si la Administración no resuelve en plazo un procedimiento iniciado a solicitud del interesado, la respuesta correcta exige atender:",
+        options: [
+          "A) exclusivamente al criterio que prefiera el órgano.",
+          "B) a la regla general del silencio estimatorio y a las excepciones legalmente previstas.",
+          "C) siempre al silencio desestimatorio.",
+          "D) a la necesidad de agotar antes la vía judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "60. La Diputación Permanente del Parlamento andaluz cumple, de forma característica, la función de:",
+        options: [
+          "A) sustituir definitivamente al Pleno en toda la legislatura.",
+          "B) actuar como órgano jurisdiccional interno.",
+          "C) velar por los poderes de la Cámara cuando esta no está reunida o está disuelta.",
+          "D) ejercer potestad reglamentaria externa."
+        ],
+        correct: 2
+      },
+      {
+        question: "61. La falta de resolución expresa en procedimientos iniciados de oficio puede producir, según la naturaleza del procedimiento:",
+        options: [
+          "A) siempre estimación automática.",
+          "B) siempre archivo material del expediente ya iniciado.",
+          "C) efectos distintos según se trate de procedimientos susceptibles de producir efectos favorables o desfavorables.",
+          "D) nulidad radical de todas las actuaciones."
+        ],
+        correct: 2
+      },
+      {
+        question: "62. El Consejo de Gobierno andaluz y sus miembros, según el material subido, deben ante el Parlamento, entre otras cosas:",
+        options: [
+          "A) acudir cuando la Cámara reclame su presencia y facilitar la información y ayuda que precise.",
+          "B) comparecer solo si media autorización judicial.",
+          "C) atender exclusivamente preguntas escritas.",
+          "D) limitarse a una comparecencia anual de balance."
+        ],
+        correct: 0
+      },
+      {
+        question: "63. Un documento presentado por el interesado en un procedimiento ya concluido se incorpora a un expediente diferente sin audiencia ni relación material. La crítica más afinada es:",
+        options: [
+          "A) La Administración puede redistribuir libremente documentos entre expedientes sin relevancia jurídica.",
+          "B) La incorporación de documentos debe respetar la lógica del procedimiento, la finalidad del expediente y los derechos del interesado.",
+          "C) Todo expediente administrativo es fungible respecto de la documentación.",
+          "D) La audiencia previa nunca es necesaria si existe expediente electrónico."
+        ],
+        correct: 1
+      },
+      {
+        question: "64. La Cámara de Cuentas ejerce el control externo de la actividad económica y presupuestaria de:",
+        options: [
+          "A) la Junta de Andalucía únicamente.",
+          "B) la Junta, las entidades locales y el resto del sector público andaluz.",
+          "C) solo las agencias administrativas.",
+          "D) exclusivamente las sociedades mercantiles públicas autonómicas."
+        ],
+        correct: 1
+      },
+      {
+        question: "65. Si un interesado elige voluntariamente un canal electrónico para notificaciones sin estar obligado a ello, la Administración:",
+        options: [
+          "A) no puede utilizarlo porque solo rige para obligados.",
+          "B) queda vinculada a notificar siempre en papel.",
+          "C) puede practicar notificaciones por medios electrónicos conforme al régimen legal, sin perjuicio del derecho del interesado a modificar su opción en los términos procedentes.",
+          "D) debe usar simultáneamente todos los canales posibles."
+        ],
+        correct: 2
+      },
+      {
+        question: "66. El Defensor del Pueblo Andaluz coordina sus funciones con:",
+        options: [
+          "A) el Consejo Consultivo de Andalucía.",
+          "B) la Presidencia del Parlamento.",
+          "C) la Cámara de Cuentas.",
+          "D) el Defensor del Pueblo del Estado."
+        ],
+        correct: 3
+      },
+      {
+        question: "67. Una Administración pretende justificar la ausencia total de motivación de un acto desfavorable en que \"la ley no exige motivar todos los actos\". La réplica correcta es:",
+        options: [
+          "A) Los actos desfavorables, discrecionales o que se separan de criterio previo, entre otros supuestos, exigen motivación.",
+          "B) La motivación solo se exige en sentencias judiciales.",
+          "C) La motivación es facultativa en todo acto administrativo.",
+          "D) La motivación puede sustituirse siempre por silencio posterior."
+        ],
+        correct: 0
+      },
+      {
+        question: "68. Según el tema 5, las entidades instrumentales de la Junta de Andalucía comprenden:",
+        options: [
+          "A) únicamente empresas públicas con forma de sociedad mercantil.",
+          "B) solo agencias administrativas excluyendo a las de régimen especial.",
+          "C) agencias y entidades instrumentales privadas del sector público andaluz en los términos legales.",
+          "D) exclusivamente consorcios universitarios."
+        ],
+        correct: 2
+      },
+      {
+        question: "69. La notificación electrónica se entiende rechazada, con el efecto legal correspondiente, cuando:",
+        options: [
+          "A) el interesado no accede a su contenido en el plazo legal de puesta a disposición, salvo imposibilidad técnica o material acreditada.",
+          "B) no se remite un SMS complementario.",
+          "C) no comparece físicamente en oficina.",
+          "D) la Administración tarda más de 24 horas en abrir el acuse."
+        ],
+        correct: 0
+      },
+      {
+        question: "70. Una ley autonómica quisiera suprimir la posibilidad de que el Parlamento controle políticamente al Consejo de Gobierno mediante preguntas, interpelaciones o mociones. La objeción más seria es:",
+        options: [
+          "A) sería una mera cuestión reglamentaria secundaria.",
+          "B) vaciaría una función esencial del Parlamento en el sistema institucional andaluz.",
+          "C) solo afectaría a las minorías parlamentarias sin relevancia constitucional.",
+          "D) sería válida si se mantiene la sesión de control anual."
+        ],
+        correct: 1
+      },
+      {
+        question: "71. Si una copia electrónica auténtica ha sido expedida por una Administración conforme al régimen legal, la consecuencia ordinaria es:",
+        options: [
+          "A) carece de valor fuera del expediente concreto.",
+          "B) puede producir los efectos jurídicos previstos sin necesidad de exigir el original, salvo supuestos excepcionales.",
+          "C) siempre necesita legalización notarial adicional.",
+          "D) solo vale ante órganos de la misma Administración."
+        ],
+        correct: 1
+      },
+      {
+        question: "72. El Presidente de la Junta de Andalucía ostenta, en el sistema institucional autonómico, una posición que combina:",
+        options: [
+          "A) jefatura del Estado y del Gobierno autonómico.",
+          "B) jefatura del Gobierno autonómico y representación ordinaria del Estado en Andalucía en los términos estatutarios.",
+          "C) presidencia del Parlamento y del Consejo de Gobierno.",
+          "D) presidencia del TSJA y del Consejo de Gobierno."
+        ],
+        correct: 1
+      },
+      {
+        question: "73. Una Administración deja transcurrir el plazo máximo para resolver, sin notificar ni practicar actuación alguna, y después intenta \"reactivar\" el procedimiento sin adoptar acuerdo formal. El análisis correcto es:",
+        options: [
+          "A) El procedimiento puede revivir informalmente en cualquier momento.",
+          "B) El vencimiento del plazo carece de todo efecto.",
+          "C) Debe atenderse al régimen del silencio o de la caducidad, según el tipo de procedimiento.",
+          "D) Toda inactividad determina automáticamente nulidad de pleno derecho."
+        ],
+        correct: 2
+      },
+      {
+        question: "74. El Consejo Económico y Social de Andalucía sirve primordialmente como:",
+        options: [
+          "A) órgano consultivo y cauce de participación y diálogo permanente en materia socioeconómica.",
+          "B) autoridad sancionadora en materia laboral.",
+          "C) órgano de fiscalización contable externa.",
+          "D) sala especializada del TSJA."
+        ],
+        correct: 0
+      },
+      {
+        question: "75. Cuando una Administración emite un documento administrativo electrónico, la exigencia principal es que:",
+        options: [
+          "A) solo exista en soporte papel para ser válido.",
+          "B) pueda determinarse su autenticidad, integridad y, en su caso, la identificación del órgano emisor por los medios legalmente previstos.",
+          "C) vaya siempre acompañado de firma manuscrita escaneada.",
+          "D) lo autorice un fedatario notarial."
+        ],
+        correct: 1
+      },
+      {
+        question: "76. La organización territorial provincial de la Junta de Andalucía, según el temario, se apoya intensamente en el principio de:",
+        options: [
+          "A) descentralización política plena de las delegaciones.",
+          "B) desconcentración funcional y territorial.",
+          "C) autonomía municipal interna.",
+          "D) sustitución de las consejerías centrales."
+        ],
+        correct: 1
+      },
+      {
+        question: "77. Una Administración deniega una solicitud por silencio desestimatorio \"retroactivo\" antes incluso de que expire el plazo máximo para resolver. La objeción más exacta es:",
+        options: [
+          "A) El silencio administrativo no puede anticiparse ni declararse antes de que venza el plazo legal.",
+          "B) La Administración puede fijar libremente cuándo nace el silencio.",
+          "C) El silencio negativo nace desde la entrada de la solicitud.",
+          "D) El silencio solo existe si lo declara el juez."
+        ],
+        correct: 0
+      },
+      {
+        question: "78. El Consejo Audiovisual de Andalucía es, según el material subido, una autoridad:",
+        options: [
+          "A) jurisdiccional.",
+          "B) dependiente orgánicamente del Gobierno en materia de sentencias.",
+          "C) audiovisual independiente.",
+          "D) fiscalizadora económico-financiera."
+        ],
+        correct: 2
+      },
+      {
+        question: "79. En el expediente electrónico, la agrupación ordenada de documentos y actuaciones se vincula con la idea de:",
+        options: [
+          "A) expediente administrativo como conjunto ordenado de documentos y actuaciones que sirven de antecedente y fundamento de la resolución.",
+          "B) archivo muerto ajeno al procedimiento.",
+          "C) mera base de datos sin relevancia jurídica.",
+          "D) colección libre de escritos sin trazabilidad."
+        ],
+        correct: 0
+      },
+      {
+        question: "80. La Oficina Andaluza contra el Fraude y la Corrupción se orienta, según el material, a combatir conductas que perjudiquen también:",
+        options: [
+          "A) exclusivamente a particulares andaluces sin dimensión institucional.",
+          "B) los intereses financieros de la Unión Europea, entre otros ámbitos.",
+          "C) solo al Parlamento de Andalucía.",
+          "D) únicamente a las entidades locales menores."
+        ],
+        correct: 1
+      },
+      {
+        question: "81. La tramitación de urgencia en la Ley 39/2015 permite, con carácter general:",
+        options: [
+          "A) suprimir cualquier trámite de audiencia.",
+          "B) reducir a la mitad los plazos ordinarios salvo determinadas excepciones legales.",
+          "C) transformar el procedimiento en sancionador.",
+          "D) impedir la interposición de recursos."
+        ],
+        correct: 1
+      },
+      {
+        question: "82. La condición plena de diputado andaluz exige, según el material reglamentario reseñado en el tema 4, entre otros requisitos:",
+        options: [
+          "A) únicamente la proclamación electoral.",
+          "B) presentar credencial, cumplir declaraciones exigidas y prestar promesa o juramento en los términos reglamentarios.",
+          "C) pertenecer a grupo parlamentario propio.",
+          "D) autorización de la Junta Electoral Central para cada voto."
+        ],
+        correct: 1
+      },
+      {
+        question: "83. Una Administración utiliza el principio de \"colaboración\" para requerir al ciudadano informes técnicos costosos que corresponden a la propia actividad instructora. La crítica más correcta es:",
+        options: [
+          "A) La colaboración del administrado no desplaza sin más las cargas instructoras que corresponden a la Administración.",
+          "B) La colaboración convierte al ciudadano en instructor del procedimiento.",
+          "C) La Administración puede externalizar toda la instrucción en el interesado.",
+          "D) La colaboración solo existe en materia tributaria."
+        ],
+        correct: 0
+      },
+      {
+        question: "84. Según el material de los temas 4 y 5, la Junta de Andalucía está integrada institucionalmente por:",
+        options: [
+          "A) Parlamento, Presidencia de la Junta y Consejo de Gobierno.",
+          "B) Parlamento, TSJA y Defensor del Pueblo Andaluz.",
+          "C) Presidencia, Cámara de Cuentas y Consejo Consultivo.",
+          "D) Consejo de Gobierno, Parlamento y Tribunal Constitucional."
+        ],
+        correct: 0
+      },
+      {
+        question: "85. En el cómputo de plazos administrativos, si el último día es inhábil, la regla general determina que:",
+        options: [
+          "A) el plazo vence el día anterior hábil.",
+          "B) el plazo se entiende prorrogado al primer día hábil siguiente.",
+          "C) el plazo queda suspendido indefinidamente.",
+          "D) depende de la voluntad del órgano instructor."
+        ],
+        correct: 1
+      },
+      {
+        question: "86. La composición del Parlamento andaluz responde, conforme al material aportado, a una lógica de:",
+        options: [
+          "A) sufragio censitario corregido por población.",
+          "B) designación mixta autonómico-estatal.",
+          "C) representación proporcional con provincia como circunscripción y límites estatutarios de distribución.",
+          "D) elección indirecta por cabildos o diputaciones."
+        ],
+        correct: 2
+      },
+      {
+        question: "87. La Administración inadmite una solicitud sin requerir subsanación de un defecto formal subsanable claramente identificable. La objeción más fuerte es:",
+        options: [
+          "A) La Administración puede inadmitir sin más todo escrito imperfecto.",
+          "B) Los defectos subsanables exigen, con carácter general, ofrecer la posibilidad de subsanación en los términos legales.",
+          "C) La subsanación solo rige para recursos administrativos.",
+          "D) La subsanación es facultativa y políticamente disponible."
+        ],
+        correct: 1
+      },
+      {
+        question: "88. El Consejo Consultivo de Andalucía ejerce sus funciones con:",
+        options: [
+          "A) dependencia jerárquica del Consejo de Gobierno.",
+          "B) subordinación orgánica al Parlamento en cada dictamen.",
+          "C) autonomía, en los términos previstos por su ley reguladora.",
+          "D) sujeción al TSJA como órgano revisor."
+        ],
+        correct: 2
+      },
+      {
+        question: "89. La publicación sustituye o complementa a la notificación individual en los supuestos legalmente previstos porque:",
+        options: [
+          "A) la Administración puede optar libremente por el medio menos costoso.",
+          "B) la publicación carece siempre de efectos frente a interesados concretos.",
+          "C) el régimen legal contempla supuestos específicos en los que la publicidad opera como forma válida de comunicación del acto.",
+          "D) la notificación individual ha desaparecido del procedimiento común."
+        ],
+        correct: 2
+      },
+      {
+        question: "90. El Parlamento andaluz se reúne en períodos ordinarios, según el material subido, en:",
+        options: [
+          "A) un único período anual continuo.",
+          "B) dos períodos ordinarios: de septiembre a diciembre y de febrero a julio.",
+          "C) tres períodos cuatrimestrales.",
+          "D) solo cuando lo convoca el Presidente de la Junta."
+        ],
+        correct: 1
+      },
+      {
+        question: "91. Una Administración recaba por interoperabilidad un documento que obra en otra Administración y el interesado se opone expresamente en un supuesto en que la ley permite esa oposición. La solución correcta es:",
+        options: [
+          "A) La oposición puede obligar a que sea el interesado quien aporte el documento, salvo que una norma imponga la consulta.",
+          "B) La oposición es siempre irrelevante.",
+          "C) La interoperabilidad elimina toda intervención del interesado.",
+          "D) La oposición convierte el procedimiento en inválido."
+        ],
+        correct: 0
+      },
+      {
+        question: "92. La Oficina Andaluza contra el Fraude y la Corrupción se inserta mejor en la lógica de:",
+        options: [
+          "A) refuerzo institucional de la prevención y detección del fraude, con exigencia de independencia funcional suficiente.",
+          "B) jurisdicción penal especial andaluza.",
+          "C) control presupuestario externo clásico sustitutivo de la Cámara de Cuentas.",
+          "D) oficina de atención general sin especialización material."
+        ],
+        correct: 0
+      },
+      {
+        question: "93. En un procedimiento con pluralidad de interesados, uno de ellos renuncia a continuar actuando. La regla general más correcta es:",
+        options: [
+          "A) la renuncia de uno extingue necesariamente la posición de todos.",
+          "B) la tramitación puede continuar con los demás interesados afectados.",
+          "C) la pluralidad de interesados impide toda renuncia individual.",
+          "D) la Administración debe archivar íntegramente el expediente."
+        ],
+        correct: 1
+      },
+      {
+        question: "94. La Administración de la Junta de Andalucía actúa, según el tema 5, también conforme a los principios de:",
+        options: [
+          "A) confianza legítima y buena fe.",
+          "B) inmunidad y autotutela absoluta.",
+          "C) secreto estructural y opacidad decisoria.",
+          "D) supremacía sobre la Constitución."
+        ],
+        correct: 0
+      },
+      {
+        question: "95. Un órgano administrativo pretende fijar por instrucción interna un calendario propio de días inhábiles distinto del oficialmente aprobado. La objeción más precisa es:",
+        options: [
+          "A) El calendario de días inhábiles no puede alterarse por una instrucción interna de ese tipo.",
+          "B) Cada órgano puede diseñar libremente su propio calendario procedimental.",
+          "C) El calendario solo importa para plazos judiciales.",
+          "D) Los días inhábiles son siempre idénticos en todo el territorio sin matiz alguno."
+        ],
+        correct: 0
+      },
+      {
+        question: "96. Fuera del territorio andaluz, la responsabilidad penal de los diputados autonómicos, según el material estatutario reseñado, corresponde en los mismos términos a:",
+        options: [
+          "A) la Audiencia Nacional.",
+          "B) la Sala de lo Penal del Tribunal Supremo.",
+          "C) el Tribunal Constitucional.",
+          "D) el Juzgado Central de Instrucción que corresponda."
+        ],
+        correct: 1
+      },
+      {
+        question: "97. Las actuaciones previas del art. 55 de la Ley 39/2015 se justifican principalmente para:",
+        options: [
+          "A) sustituir íntegramente la iniciación formal del procedimiento.",
+          "B) resolver definitivamente sin audiencia.",
+          "C) determinar con carácter preliminar las circunstancias del caso y la conveniencia o no de iniciar el procedimiento.",
+          "D) ejecutar inmediatamente medidas forzosas."
+        ],
+        correct: 2
+      },
+      {
+        question: "98. La creación de entidades instrumentales que dupliquen estructuras ya existentes, según el material del tema 5, exige:",
+        options: [
+          "A) mantener íntegramente todas las duplicidades para reforzar el control.",
+          "B) que la duplicación se ignore por razones de eficacia política.",
+          "C) suprimir o reducir debidamente funciones o competencias duplicadas.",
+          "D) limitarse a una declaración formal sin efectos organizativos."
+        ],
+        correct: 2
+      },
+      {
+        question: "99. Si un acto administrativo contiene un defecto formal no invalidante que no ha producido indefensión ni impide alcanzar su fin, la tesis correcta es:",
+        options: [
+          "A) todo defecto formal genera nulidad de pleno derecho.",
+          "B) la invalidez debe examinarse conforme al régimen de anulabilidad y a la relevancia real del vicio.",
+          "C) el defecto convierte automáticamente el acto en inexistente.",
+          "D) solo puede sanarlo un órgano judicial."
+        ],
+        correct: 1
+      },
+      {
+        question: "100. La Administración andaluza, según el tema 5, desarrolla funciones ejecutivas de carácter administrativo bajo la dirección del:",
+        options: [
+          "A) Consejo de Gobierno.",
+          "B) Parlamento de Andalucía.",
+          "C) Tribunal Superior de Justicia de Andalucía.",
+          "D) Consejo Consultivo."
+        ],
+        correct: 0
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75),
+      "b4": allQuestions.slice(75, 100)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN TIPO TEST - 12.03.2026 (100 PREGUNTAS)",
+        "b1": "BLOQUE 1: PREGUNTAS 1 A 25",
+        "b2": "BLOQUE 2: PREGUNTAS 26 A 50",
+        "b3": "BLOQUE 3: PREGUNTAS 51 A 75",
+        "b4": "BLOQUE 4: PREGUNTAS 76 A 100"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = "¡Correcto!";
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>
