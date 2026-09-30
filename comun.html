@@ -26,6 +26,7 @@
       --card-bg: #ffffff;
       --text-main: #1c2a1e;
       --text-muted: #52634f;
+      --accent-bg: #e8f5e9;
       --border-color: #dcdfd8;
     }
 
@@ -47,11 +48,11 @@
     }
 
     header {
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
       text-align: center;
       position: relative;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
     }
 
     h1 {
@@ -61,7 +62,12 @@
       letter-spacing: -0.025em;
     }
 
-    /* Botón Volver al Índice */
+    .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
     .btn-back-main {
       position: absolute;
       left: 0;
@@ -88,46 +94,96 @@
       transform: translateY(-2px);
     }
 
-    /* Tarjeta de Contenido en Construcción */
-    .construction-card {
-      background-color: var(--card-bg);
-      border-radius: 1.5rem;
-      padding: 3.5rem 2rem;
-      text-align: center;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--border-color);
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
       width: 100%;
-      max-width: 600px;
-      margin-top: 1rem;
+      max-width: 900px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1rem;
+      text-decoration: none;
+      color: var(--text-main);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
+      transition: all 0.2s ease-in-out;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .construction-icon {
-      font-size: 4.5rem;
+    .card:hover, .card:active {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-icon {
+      width: 55px;
+      height: 55px;
+      background-color: var(--accent-bg);
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .card:hover .card-icon {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .nature-emoji {
+      font-size: 1.75rem;
       line-height: 1;
-      animation: pulse 2s infinite ease-in-out;
+      user-select: none;
     }
 
-    .construction-title {
-      font-size: 1.6rem;
+    .card-stats {
+      width: 100%;
+      background-color: #f8faf7;
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 0.85rem;
+      border: 1px dashed var(--border-color);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-value {
       font-weight: 700;
       color: var(--primary-hover);
-    }
-
-    .construction-text {
-      color: var(--text-muted);
-      font-size: 1rem;
-      max-width: 400px;
-      line-height: 1.5;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
     }
 
     @media (max-width: 600px) {
@@ -155,21 +211,283 @@
       touch-action: manipulation;
     }
   </style>
+
+  <!-- Módulos de Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const progressRef = ref(db, 'progress');
+    onValue(progressRef, (snapshot) => {
+      const data = snapshot.val() || {};
+
+      document.querySelectorAll('.card').forEach(card => {
+        const topicId = card.getAttribute('data-topic');
+        if (!topicId) return;
+
+        const topicData = data[topicId] || {};
+
+        const attempts = topicData.attempts || 0;
+        const bestScore = topicData.bestScore;
+
+        const attemptsEl = document.getElementById(`attempts-${topicId}`);
+        const bestEl = document.getElementById(`best-${topicId}`);
+
+        if (attemptsEl) attemptsEl.textContent = attempts;
+        if (bestEl) bestEl.textContent = (bestScore !== undefined && bestScore !== null) ? `${bestScore}/10` : '-';
+      });
+    });
+  </script>
 </head>
 <body>
 
   <header>
     <a href="index.html" class="btn-back-main">← Inicio</a>
     <h1>Parte Común</h1>
+    <p class="subtitle">Selecciona un tema para comenzar la práctica</p>
   </header>
 
-  <main class="construction-card">
-    <div class="construction-icon">🚧</div>
-    <h2 class="construction-title">Sección en Construcción</h2>
-    <p class="construction-text">
-      Actualmente estamos preparando los test correspondientes a la Parte Común. ¡Estarán disponibles muy pronto!
-    </p>
+  <main class="grid-container">
+    <!-- ================= PARTE COMÚN (TEMAS 1 AL 12) ================= -->
+
+    <!-- Tema 1 -->
+    <a href="comun/Tema 1.html" class="card" data-topic="c1">
+      <div class="card-header">
+        <div class="card-icon">1</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c1">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c1">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 2 -->
+    <a href="comun/Tema 2.html" class="card" data-topic="c2">
+      <div class="card-header">
+        <div class="card-icon">2</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c2">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c2">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 3 -->
+    <a href="comun/Tema 3.html" class="card" data-topic="c3">
+      <div class="card-header">
+        <div class="card-icon">3</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c3">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c3">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 4 -->
+    <a href="comun/Tema 4.html" class="card" data-topic="c4">
+      <div class="card-header">
+        <div class="card-icon">4</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c4">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c4">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 5 -->
+    <a href="comun/Tema 5.html" class="card" data-topic="c5">
+      <div class="card-header">
+        <div class="card-icon">5</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c5">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c5">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 6 -->
+    <a href="comun/Tema 6.html" class="card" data-topic="c6">
+      <div class="card-header">
+        <div class="card-icon">6</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c6">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c6">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 7 -->
+    <a href="comun/Tema 7.html" class="card" data-topic="c7">
+      <div class="card-header">
+        <div class="card-icon">7</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c7">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c7">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 8 -->
+    <a href="comun/Tema 8.html" class="card" data-topic="c8">
+      <div class="card-header">
+        <div class="card-icon">8</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c8">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c8">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 9 -->
+    <a href="comun/Tema 9.html" class="card" data-topic="c9">
+      <div class="card-header">
+        <div class="card-icon">9</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c9">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c9">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 10 -->
+    <a href="comun/Tema 10.html" class="card" data-topic="c10">
+      <div class="card-header">
+        <div class="card-icon">10</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c10">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c10">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 11 -->
+    <a href="comun/Tema 11.html" class="card" data-topic="c11">
+      <div class="card-header">
+        <div class="card-icon">11</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c11">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c11">-</span>
+        </div>
+      </div>
+    </a>
+    
+    <!-- Tema 12 -->
+    <a href="comun/Tema 12.html" class="card" data-topic="c12">
+      <div class="card-header">
+        <div class="card-icon">12</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-c12">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-c12">-</span>
+        </div>
+      </div>
+    </a>
   </main>
+
+  <script>
+    const natureEmojis = ['🌿', '🌳', '🌻', '🌱', '🌲', '🍃', '🌴', '🌵', '🌾', '🪻', '🌷', '🍁', '🪵', '🍄', '🐝', '🦋', '🦉', '🦊', '🐿️', '⛰️'];
+    document.querySelectorAll('.nature-emoji').forEach(span => {
+      const randomEmoji = natureEmojis[Math.floor(Math.random() * natureEmojis.length)];
+      span.textContent = randomEmoji;
+    });
+  </script>
 
 </body>
 </html>
