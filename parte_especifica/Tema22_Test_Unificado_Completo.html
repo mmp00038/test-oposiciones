@@ -219,6 +219,51 @@
         padding-top: 115px;
       }
     }
+  /* Botón orgánico inspirado en la naturaleza */
+    .box, .btn-volver {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #2e7d32;
+      color: #ffffff !important;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1b5e20;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+    
+    .box:hover, .box:active,
+    .btn-volver:hover, .btn-volver:active {
+      background-color: #1b5e20;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
+    }
+
+    /* Estilo del botón Reiniciar Progreso */
+    .btn-reset {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+  
+    .btn-reset:hover, .btn-reset:active {
+      background-color: #dc2626;
+    }
   </style>
 </head>
 <body>
