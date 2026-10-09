@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 6 (Vías Pecuarias)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 6 Unificado Completo (40 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Individuales">
+          <option value="t1_all">Test 6-1 - Test Básico (20 preguntas)</option>
+          <option value="t2_all">Test 6-2 - Test Autoevaluación (20 preguntas)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 6 - VÍAS PECUARIAS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Según se establece en la Constitución Española, ¿Quién tiene la competencia exclusiva para establecer la legislación básica en materia de vías pecuarias?",
+        options: [
+          "a) El Estado",
+          "b) Las Comunidades Autónomas",
+          "c) El Gobierno",
+          "d) Las Entidades Locales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El Estado)."
+      },
+      {
+        question: "2.- ¿Cuál de las siguientes definiciones se corresponde con \"colada\"?",
+        options: [
+          "a) Lugar donde se recoge de noche el ganado y se albergan los pastores.",
+          "b) Parte que arranca de la línea principal de un camino, una cordillera, un río, etc., en este caso una vía pecuaria.",
+          "c) Cualquier vía pecuaria de menor anchura que las veredas",
+          "d) Tierras que dependían directamente del rey o la reina y no pertenecía a la nobleza o la Iglesia"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cualquier vía pecuaria de menor anchura que las veredas)."
+      },
+      {
+        question: "3.- Según se establece en el artículo 2 de la Ley 3/1995, de 23 de marzo, de vías Pecuarias, la naturaleza jurídica de las vías pecuarias será:",
+        options: [
+          "a) Bienes de Dominio público del Estado.",
+          "b) Bienes de Dominio público de las Comunidades Autónomas.",
+          "c) Bienes Patrimoniales de las Comunidades Autónomas solo si han sido clasificadas.",
+          "d) Bienes Patrimoniales de las Comunidades Autónomas solo si han sido deslindadas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Bienes de Dominio público de las CCAA)."
+      },
+      {
+        question: "4.- Señale la opción correcta según lo established en el artículo 4 de la Ley 3/1995, de 23 de marzo, de vías Pecuarias:",
+        options: [
+          "a) Las Cañadas son aquellas vías cuya anchura no exceda de los 75 metros",
+          "b) Son Cordeles, cuando su anchura no sobrepase los 37,5 metros",
+          "c) Veredas son las vías que tienen una anchura no superior a los 20 metros",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "5.- El artículo 20 de la Ley 3/1995, de 23 de marzo, de vías pecuarias establece que con independencia de las que puedan corresponder en concepto de sanción, el órgano sancionador podrá acordar la imposición de multas coercitivas con arreglo a lo dispuesto en el artículo 99 de la Ley 30/1992 una vez transcurridos los plazos señalados en el requerimiento correspondiente. La cuantía de cada una de dichas multas no superará:",
+        options: [
+          "a) El 20% de la multa fijada por la infracción correspondiente.",
+          "b) El 10% de la multa fijada por la infracción correspondiente.",
+          "c) El 20% de la multa prevista para la infracción correspondiente.",
+          "d) 1/3 de la multa prevista para la infracción correspondiente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El 20% de la multa fijada por la infracción correspondiente)."
+      },
+      {
+        question: "6.- Según lo establecido en la Ley 3/1995, de 23 de marzo, de vías pecuarias, \"la edificación o ejecución no autorizada de cualquier tipo de obras en terrenos de vías pecuarias\" se clasificará como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Especialmente grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy Grave)."
+      },
+      {
+        question: "7.- Según lo establecido en la Ley 3/1995, de 23 de marzo, de vías pecuarias, \"las acciones u omisiones que causen daño o menoscabo en las vías pecuarias, sin que impidan el tránsito de ganado o demás usos compatibles o complementarios\" se clasificará como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Grave solo en el caso de que la vía pecuaria se halle deslindada por resolución firme"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)."
+      },
+      {
+        question: "8.- Según lo establecido en la Ley 3/1995, de 23 de marzo, de vías pecuarias, la sanción impuesta por una infracción muy grave ascenderá a:",
+        options: [
+          "a) Multa de 5.000.001 a 25.000.000 de pesetas.",
+          "b) Multa desde 601,01 a 30.050,60 €",
+          "c) Multa desde 10.000 a 100.000 pesetas",
+          "d) Las respuestas a) y b) son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Multa de 5.000.001 a 25.000.000 de pesetas)."
+      },
+      {
+        question: "9.- Según lo establecido en la Ley 3/1995, de 23 de marzo, de vías pecuarias, la prescripción por infracciones muy graves prescribirá a los:",
+        options: [
+          "a) 3 años",
+          "b) 2 años",
+          "c) 5 años",
+          "d) 4 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5 años)."
+      },
+      {
+        question: "10.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, a los efectos previstos en la legislación sobre el Patrimonio de la Comunidad Autónoma de Andalucía y en el presente Reglamento, las Vías Pecuarias se adscriben a:",
+        options: [
+          "a) La Consejería competente en materia de ganadería.",
+          "b) La Consejería de Medio Ambiente.",
+          "c) La Consejería de Ordenación del Territorio.",
+          "d) Al Consejo de Gobierno."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La Consejería de Medio Ambiente)."
+      },
+      {
+        question: "11.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, la resolución que ponga fin al procedimiento de clasificación será dictada en un plazo no superior a:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 18 meses)."
+      },
+      {
+        question: "12.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, la resolución que ponga fin al procedimiento de deslinde será dictada en un plazo no superior a:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 18 meses)."
+      },
+      {
+        question: "13.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, la resolución que ponga fin al procedimiento de recuperación será dictada en un plazo no superior a:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 6 meses)."
+      },
+      {
+        question: "14.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, la resolución que ponga fin al procedimiento de desafectación será dictada en un plazo (aplicando la modificación de dicho plazo establecida por la Ley 9/2001, de 12 de julio, por la que se establece el sentido del silencio administrativo y los plazos de determinados procedimientos como garantías procedimentales para los ciudadanos) no superior a:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 10 meses)."
+      },
+      {
+        question: "15.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía la resolución que ponga fin al procedimiento de modificación del trazado será dictada en un plazo no superior a:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 12 meses)."
+      },
+      {
+        question: "16.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, el expediente de ocupación de una vía pecuaria se iniciará:",
+        options: [
+          "a) De oficio por el Viceconsejero",
+          "b) De oficio por el Delegado provincial de la Consejería de medio ambiente",
+          "c) Mediante solicitud razonada por la entidad pública o particular interesado",
+          "d) Las respuestas a) y c) son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Mediante solicitud razonada por la entidad pública o particular interesado)."
+      },
+      {
+        question: "17.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, el plazo máximo para resolver el procedimiento de ocupación de una vía pecuaria será de:",
+        options: [
+          "a) 2 meses, con silencio administrativo estimatorio",
+          "b) 3 meses, con silencio administrativo desestimatorio",
+          "c) 4 meses",
+          "d) 6 meses"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 6 meses)."
+      },
+      {
+        question: "18.- Según lo establecido en el Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, \"los usos tradicionales que, siendo de carácter agrícola y no teniendo la naturaleza de la ocupación, puedan ejercitarse en armonía con el tránsito ganadero y los valores ambientales, favoreciendo la regeneración ecológica de la vía pecuaria\" son considerados:",
+        options: [
+          "a) Usos comunes",
+          "b) Usos compatibles",
+          "c) Usos complementarios",
+          "d) Usos autorizables"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Usos compatibles)."
+      },
+      {
+        question: "19.- El Plan para la recuperación y ordenación de la red de vías pecuarias de la Comunidad autónoma de Andalucía establece un plazo de ejecución de:",
+        options: [
+          "a) 5 años",
+          "b) 10 años",
+          "c) 20 años",
+          "d) 30 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 20 años)."
+      },
+      {
+        question: "20.- ¿Cómo se denomina la iniciativa llevada a cabo por la Junta de Andalucía que permite conectar los núcleos urbanos andaluces de más de 50.000 habitantes con su entorno más inmediato, a través de itinerarios no motorizados destinados al uso de los ciudadanos?",
+        options: [
+          "a) Programa Puertas Verdes",
+          "b) REVERMED (Red Verde del Mediterráneo)",
+          "c) Proyecto GUADIATER",
+          "d) Proyecto UADIATURS"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Programa Puertas Verdes)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- El tránsito ganadero asociado a las vías pecuarias puede ser:",
+        options: [
+          "a) Estante o local",
+          "b) Transterminante",
+          "c) Trashumante",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "2.- ¿Mediante qué normativa se traspasó a la Comunidad Autónoma de Andalucía las competencias relativas a Vías Pecuarias?",
+        options: [
+          "a) Ley 3/1995, de 23 de marzo",
+          "b) Decreto 155/1998, de 21 de julio",
+          "c) Las competencias en materia de vías pecuarias corresponden al Estado.",
+          "d) Real Decreto 1096/1984 de 4 de abril"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Real Decreto 1096/1984 de 4 de abril)."
+      },
+      {
+        question: "3.- Cuando hablamos de \"Paraje o Infraestructura donde los pastores recogen su ganado por la noche o en momentos críticos para los animales\", nos referimos a:",
+        options: [
+          "a) Descansadero",
+          "b) Aprisco",
+          "c) Realenga",
+          "d) Agostadero"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Aprisco)."
+      },
+      {
+        question: "4.- Las vías pecuarias son, según la definición establecida en el artículo 1.2 de la Ley 3/1995, de 23 de marzo, de vías pecuarias:",
+        options: [
+          "a) Caminos de trashumancia que unen los lugares tradicionales de pastoreo de España para que los pastores y ganaderos puedan llevar el ganado a los mejores pastos aprovechando la bonanza del clima.",
+          "b) Camino de dominio público, tradicionalmente utilizado para la circulación de los ganados y que actualmente suele tener otros usos adicionales (deportivos, recreativos, medioambientales, etc.)",
+          "c) Rutas o itinerarios por donde discurre o ha venido discurriendo tradicionalmente el tránsito ganadero.",
+          "d) Rutas o itinerarios por donde discurre o ha venido discurriendo tradicionalmente el tránsito ganadero y donde se permiten usos compatibles y complementarios"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Rutas o itinerarios por donde discurre o ha venido discurriendo tradicionalmente el tránsito ganadero)."
+      },
+      {
+        question: "5.- Una vía pecuaria con una anchura de 35 metros, a tenor de lo establecido en el artículo 4 de la Ley 3/1995, de 23 de marzo, de Vías Pecuarias, tiene la denominación de:",
+        options: [
+          "a) Vereda",
+          "b) Cordel",
+          "c) Cañada",
+          "d) Colada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cordel)."
+      },
+      {
+        question: "6.- Las ocupaciones temporales de las vías pecuarias, según lo establecido en el artículo 14 de la Ley 3/1995, de 23 de marzo, de Vías Pecuarias, tendrán una duración de:",
+        options: [
+          "a) No están permitidas las ocupaciones de vías pecuarias",
+          "b) Un mínimo de 10 años, renovable por periodos iguales",
+          "c) Nunca más de 10 años, sin posibilidad de renovación",
+          "d) No podrán tener una duración superior a los 10 años, sin perjuicio de su ulterior renovación."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: No podrán tener una duración superior a los 10 años...)."
+      },
+      {
+        question: "7.- La cantidad de kilómetros Clasificados y Deslindados de vías pecuarias en Andalucía en el año 2022 asciende a:",
+        options: [
+          "a) 34.045 km de vías pecuarias clasificadas y 8.879 km de vías pecuarias deslindadas",
+          "b) 34.045,55 km de vías pecuarias clasificadas y 9.924,22 km de vías pecuarias deslindadas",
+          "c) 32.670,57 km de vías pecuarias clasificadas y 10.054,09 km de vías pecuarias deslindadas",
+          "d) 39.425 km de vías pecuarias clasificadas y 24.055 km de vías pecuarias deslindadas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 32.670,57 km clasificadas y 10.054,09 km deslindadas)."
+      },
+      {
+        question: "8.- El artículo 15 de la Ley 3/1995, de 23 de marzo, de Vías Pecuarias establece que los frutos y productos no utilizados por el ganado en el normal tránsito ganadero podrán ser objeto de aprovechamiento, que tendrá:",
+        options: [
+          "a) Carácter temporal y plazo no superior a 5 años, sin perjuicio de su ulterior renovación",
+          "b) Carácter temporal y plazo no superior a 10 años, sin perjuicio de su ulterior renovación",
+          "c) Carácter temporal y plazo no superior a 20 años, sin perjuicio de su ulterior renovación",
+          "d) Ninguna de las anteriores opciones es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna de las anteriores opciones es correcta)."
+      },
+      {
+        question: "9.- El artículo 15 del Decreto 155/1998 de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía establece el periodo de información pública para el acto administrativo de clasificación de las vías pecuarias, siendo éste de: (señale la opción más correcta)",
+        options: [
+          "a) 20 días",
+          "b) 1 mes",
+          "c) 1 mes, y otorgando además un plazo de 20 días a partir de la finalización del mismo para formular cuantas alegaciones estimen oportunas.",
+          "d) 1 mes, y otorgando además un plazo de 15 días a partir de la finalización del mismo para formular cuantas alegaciones estimen oportunas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1 mes)."
+      },
+      {
+        question: "10.- Según el artículo 22 del Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía, el plazo de resolución del acto administrativo de Deslinde cuando el procedimiento se tramite en su totalidad como abreviado, será de:",
+        options: [
+          "a) 6 meses",
+          "b) 9 meses",
+          "c) 10 meses",
+          "d) 18 meses con la posibilidad de su ampliación por un plazo igual a la mitad del plazo inicialmente previsto."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 9 meses)."
+      },
+      {
+        question: "11.- La sección tercera del Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía regula el acto administrativo de Amojonamiento de vías pecuarias, y establece que el plazo máximo para la resolución de dicho procedimiento será de:",
+        options: [
+          "a) 10 meses",
+          "b) 12 meses",
+          "c) 18 meses con la posibilidad de su ampliación por un plazo igual a la mitad del plazo inicialmente previsto.",
+          "d) Ninguna de las opciones anteriores es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna de las opciones anteriores es correcta)."
+      },
+      {
+        question: "12.- El artículo 17 de la Ley 3/1995, de 23 de marzo, de Vías Pecuarias establece que, para usos complementarios, en el caso de instalaciones vinculadas a una actividad de servicios, será necesario:",
+        options: [
+          "a) Autorización de la Consejería competente en materia de Medio Ambiente",
+          "b) La opción anterior es correcta, además el plazo de resolución de dicha autorización será de 3 meses, siendo el silencio administrativo estimatorio",
+          "c) Será necesaria la presentación de una Declaración Responsable",
+          "d) La respuesta anterior es correcta, además dicha declaración deberá presentarse con una antelación mínima de 30 días, para que la Comunidad Autónoma pueda comprobar la compatibilidad de la instalación desmontable con lo previsto en el artículo 1.3 de dicha Ley."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Será necesaria la presentación de una Declaración Responsable)."
+      },
+      {
+        question: "13.- El artículo 57 del Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía establece que, para un uso compatible de una vía pecuaria que conlleve una alteración de las características físicas de la misma, requerirá autorización, que tendrá un plazo de resolución y un silencio administrativo: (señale la respuesta correcta)",
+        options: [
+          "a) Plazo de resolución de 6 meses con silencio administrativo desestimatorio",
+          "b) Plazo de resolución de 3 meses con silencio administrativo desestimatorio",
+          "c) Plazo de resolución de 3 meses con silencio administrativo estimatorio",
+          "d) Plazo de resolución de 2 meses con silencio administrativo desestimatorio"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Plazo de resolución de 2 meses con silencio administrativo desestimatorio)."
+      },
+      {
+        question: "14.- La roturación o plantación no autorizada que se realice en cualquier vía pecuaria, sin la necesaria autorización, a tenor de lo establecido en la Ley 3/1995 de 23 de marzo, de Vías Pecuarias, se considerará una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Estas acciones no necesitan autorización, en todo caso la presentación de una Declaración Responsable."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)."
+      },
+      {
+        question: "15.- En artículo 62 del Decreto 155/1998 de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía establece la competencia sancionadora en materia de vías pecuarias. Una infracción con una sanción asociada de 500.000 pesetas (3005,06€) será impuesta por:",
+        options: [
+          "a) El Delegado Territorial de la Consejería competente en materia de Medio Ambiente",
+          "b) El Secretario General Técnico",
+          "c) El Director General del Política Forestal y Biodiversidad",
+          "d) El Viceconsejero de la Consejería competente en materia de Medio Ambiente"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El Delegado Territorial)."
+      },
+      {
+        question: "16.- El artículo 24 de la Ley 3/1995, de 23 de marzo, de Vías Pecuarias, establece que las infracciones administrativas contra lo dispuesto en esta ley prescribirán:",
+        options: [
+          "a) En el plazo de cinco años las muy graves, en el de tres años las graves y en el de un año las leves.",
+          "b) En el plazo de cinco años las muy graves, en el de tres años las graves y en el de seis meses las leves.",
+          "c) En el plazo de cinco años las muy graves, en el de dos años las graves y en el de un año las leves.",
+          "d) En el plazo de tres años las muy graves, en el de dos años las graves y en el de un año las leves."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cinco años muy graves, tres años graves y un año leves)."
+      },
+      {
+        question: "17.- El Plan para la Recuperación y Ordenación de la Red de Vías Pecuarias de la Comunidad Autónoma de Andalucía fue aprobado por:",
+        options: [
+          "a) Decreto del Consejo de Gobierno de 27 de marzo de 2001",
+          "b) Orden del titular de la Consejería de Medio Ambiente y Ordenación del territorio de 27 de marzo de 2001",
+          "c) Acuerdo del Consejo de Gobierno de 27 de marzo de 2001",
+          "d) Resolución del titular de la Dirección General de Gestión del Medio natural de 21 de marzo de 2001"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Acuerdo del Consejo de Gobierno de 27 de marzo de 2001)."
+      },
+      {
+        question: "18.- La Ley 9/2001, de 12 de julio, por la que se establece el sentido del silencio administrativo y los plazos de determinados procedimientos como garantías procedimentales para los ciudadanos, establece que el plazo máximo para la resolución y notificación de los procedimientos sancionadores en materia de vías pecuarias será de:",
+        options: [
+          "a) 6 meses",
+          "b) 9 meses",
+          "c) 10 meses",
+          "d) 12 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 10 meses)."
+      },
+      {
+        question: "19.- ¿Cuál de las siguientes potestades administrativas sobre las vías pecuarias NO corresponde a la Consejería competente en materia de medio ambiente según lo establecido en el artículo 8 del Decreto 155/1998, de 21 de julio, por el que se aprueba el Reglamento de Vías Pecuarias de la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) La planificación en materia de vías pecuarias",
+          "b) Prestar asistencia técnica para la realización de las acciones que redunden en la consecución de las competencias asumidas en materia de vías pecuarias.",
+          "c) La investigación de la situación de aquellos terrenos que se presuman pertenecientes a las vías pecuarias",
+          "d) La desafectación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Prestar asistencia técnica...)."
+      },
+      {
+        question: "20.- ¿Cuál de los siguientes NO es un uso de los previstos en el Plan para la Recuperación y Ordenación de la Red de Vías Pecuarias de la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) Uso deportivo",
+          "b) Uso Ecológico",
+          "c) Uso turístico-recreativo",
+          "d) Uso Tradicional"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Uso deportivo)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t2_all": test2Questions
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 6 - VÍAS PECUARIAS (UNIFICADO COMPLETO 40 PREGUNTAS)",
+        "t1_all": "TEST 6-1 - TEST BÁSICO (20 PREGUNTAS)",
+        "t2_all": "TEST 6-2 - TEST AUTOEVALUACIÓN (20 PREGUNTAS)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

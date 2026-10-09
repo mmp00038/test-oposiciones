@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 16 (Espacios Naturales Protegidos)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 16 Unificado Completo (100 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 16.1 (50 Preguntas)">
+          <option value="t1_all">Test 16.1 - Completo (1 - 50)</option>
+          <option value="t1_b1">Test 16.1 - Bloque 1 (1 - 25)</option>
+          <option value="t1_b2">Test 16.1 - Bloque 2 (26 - 50)</option>
+        </optgroup>
+        <optgroup label="Test 16.2 (50 Preguntas)">
+          <option value="t2_all">Test 16.2 - Completo (1 - 50)</option>
+          <option value="t2_b1">Test 16.2 - Bloque 1 (1 - 25)</option>
+          <option value="t2_b2">Test 16.2 - Bloque 2 (26 - 50)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 16 - ESPACIOS NATURALES PROTEGIDOS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. De acuerdo con el art. 25.2 de la Ley 42/2007, del Patrimonio Natural y la Biodiversidad, la inclusión de hábitats en el Catálogo Español de Hábitats en Peligro de Desaparición se llevará a cabo por:",
+        options: [
+          "a) El Ministerio con competencias en materia de Medio Ambiente, a propuesta de la Comisión de Patrimonio Natural y Biodiversidad, o bien del propio Ministerio",
+          "b) Acuerdo del Consejo de Ministros, a propuesta del Ministerio competente en Medio Ambiente",
+          "c) Las CCAA, a propuesta del órgano ambiental correspondiente",
+          "d) Acuerdo del Consejo del Consejo de Gobierno, a propuesta de la Consejería competente en materia de Medio Ambiente"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 186]."
+      },
+      {
+        question: "2. Según el art. 30 de la Ley 42/2007, de 13 de diciembre, en función de los bienes y valores a proteger, y de los objetivos de gestión a cumplir, los espacios naturales protegidos, ya sean terrestres o marinos, se clasificarán, al menos, en alguna de las siguientes categorías:",
+        options: [
+          "a) Reserva Natural Concertada",
+          "b) Paraje Natural",
+          "c) Paisaje Protegido",
+          "d) Zonas de Importancia Comunitaria"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Paisaje Protegido)[cite: 186]."
+      },
+      {
+        question: "3. Para la declaración de Parques y Reservas Naturales se exigirá, de acuerdo con el art. 36 de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad:",
+        options: [
+          "a) La previa elaboración y aprobación del PORN y el PRUG de dicho espacio",
+          "b) La previa elaboración del PORN, y posteriormente, la aprobación del mismo en el plazo máximo de 1 año",
+          "c) La previa elaboración y aprobación del PORN de la zona",
+          "d) Excepcionalmente, podrán declararse Parques y Reservas sin la previa aprobación del PORN, debiendo tramitarse en el plazo de dos años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 186]."
+      },
+      {
+        question: "4. La Red de Áreas Marinas Protegidas de España (RAMPE), fue creada por:",
+        options: [
+          "a) La Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad",
+          "b) La Ley 30/2014, de 3 de diciembre, de Parques Nacionales",
+          "c) El Real Decreto 435/2004, de 12 de marzo, por el que se regula el Inventario nacional de zonas húmedas",
+          "d) Ley 41/2010, de 29 de diciembre, de protección del Medio Marino"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ley 41/2010, de 29 de diciembre, de protección del Medio Marino)[cite: 186]."
+      },
+      {
+        question: "5. En base al art. 50 de la Ley 42/2007, del Patrimonio Natural y la Biodiversidad, los Geoparques son declarados por:",
+        options: [
+          "a) Real Decreto",
+          "b) El Consejo de Europa",
+          "c) La UICN",
+          "d) La UNESCO"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La UNESCO)[cite: 186]."
+      },
+      {
+        question: "6. De acuerdo con el art. 4 del Real Decreto 598/2016, de 5 de diciembre, por el que se regula la composición, funciones y funcionamiento del Consejo de la Red de Parques Nacionales, la presidencia del dicho Consejo le corresponderá a:",
+        options: [
+          "a) El titular del Ministerio con competencias en medio ambiente",
+          "b) El Director del OAPN",
+          "c) El titular de la Secretaría de Estado en materia de medio Ambiente",
+          "d) Los Directores de cada Parque Nacional de la Red, por turnos de 6 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El titular del Ministerio con competencias en medio ambiente)[cite: 186]."
+      },
+      {
+        question: "7. En relación con el Consejo de la Red de Parques Nacionales, según el art. 27.4 de la Ley 30/2014, de 3 de diciembre, cuál de las siguientes funciones NO corresponde a dicho Consejo:",
+        options: [
+          "a) Elaborar el informe previo a la determinación del estado de conservación desfavorable de cualquiera de los parques nacionales",
+          "b) Informar el Plan Director de la Red de Parques Nacionales, y sus revisiones",
+          "c) Informar La memoria anual de la Red de Parques Nacionales, antes de su elevación al Ministerio de Agricultura, Alimentación y Medio Ambiente para su aprobación",
+          "d) Informar los PRUG de los diferentes parques nacionales, antes de su aprobación"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 186]."
+      },
+      {
+        question: "8. La normativa aplicable a los Espacios Naturales Protegidos (EENNPP), define \"aquellos espacios que se declaren como tales en atención a las excepcionales exigencias cualificadoras de sus singulares valores, y con la finalidad de atender a la conservación de su flora, fauna, constitución geomorfológica, especial belleza u otros componentes de muy destacado rango natural\", como:",
+        options: [
+          "a) Reserva Natural",
+          "b) Parque",
+          "c) Reserva de la Biosfera",
+          "d) Paraje Natural"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Paraje Natural)[cite: 186]."
+      },
+      {
+        question: "9. Las Reservas Naturales, conforme al art. 5 de la Ley 2/1989, de 18 de julio, serán declaradas mediante:",
+        options: [
+          "a) Decreto del Consejo de Gobierno",
+          "b) Acuerdo del Consejo de Gobierno",
+          "c) Ley del Parlamento Andaluz",
+          "d) Orden del titular de la Consejería con competencias en materia de medio ambiente"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Ley del Parlamento Andaluz)[cite: 186]."
+      },
+      {
+        question: "10. Conforme al art. 3 de la Ley 2/1989, de 18 de julio, se delimitará una zona de protección exterior, continua y periférica, con la finalidad de prevenir y, en su caso, corregir cuantos impactos repercutan negativamente en aquéllos, así como promover los usos del suelo compatibles con su conservación, en los siguientes EENNPP:",
+        options: [
+          "a) Parques y Reservas Naturales",
+          "b) Reservas naturales y Monumentos naturales",
+          "c) Parques y Parajes Naturales",
+          "d) Monumentos Naturales y Parajes Naturales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Reservas naturales y Monumentos naturales)[cite: 186]."
+      },
+      {
+        question: "11. Según lo dispuesto en el art. 8 de la Ley 2/1989, de 18 de julio, la competencia para declarar nuevos parques naturales en un futuro, oído el Ayuntamiento correspondiente, con su consiguiente incorporación al Inventario, corresponderá a:",
+        options: [
+          "a) El Parlamento andaluz, mediante Ley",
+          "b) El Consejo de Gobierno, a propuesta de la Consejería de Medio Ambiente",
+          "c) La Consejería de Medio Ambiente, a propuesta de la Dirección General competente en EENNPP",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El Consejo de Gobierno, a propuesta de la Consejería de Medio Ambiente)[cite: 186]."
+      },
+      {
+        question: "12. Respecto al ejercicio de la actividad cinegética y piscícola en los espacios declarados como Reserva Natural, el art. 11 de la Ley 2/1989, de 18 de julio, establece que:",
+        options: [
+          "a) Queda prohibido el ejercicio de ambas actividades, en todo caso",
+          "b) Queda prohibido el ejercicio de ambas actividades, salvo que, de acuerdo con el art. 9.2, de forma excepcional, la CMA pueda autorizar actividades cuyo objetivo sea la conservación y regeneración de las reservas naturales",
+          "c) Queda prohibido el ejercicio de la actividad cinegética, salvo que sea declarada como actividad cinegética tradicional en aquellos espacios que alcancen la superficie mínima para tener un plan técnico de caza",
+          "d) Queda prohibida la actividad cinegética, pero no la piscícola"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 186]."
+      },
+      {
+        question: "13. La declaración y gestión de los parques periurbanos, conforme a la normativa aplicable, será competencia de:",
+        options: [
+          "a) El Consejo de Gobierno",
+          "b) La Consejería con competencias en medio ambiente, mediante Orden",
+          "c) El municipio",
+          "d) Antes era competencia municipal y desde la Ley 5/2010, de Autonomía Local de Andalucía la declaración le corresponde a la Comunidad Autónoma"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El municipio)[cite: 186]."
+      },
+      {
+        question: "14. La gestión de los Parques Nacionales, en base al art. 21 de la Ley 30/2014, de 3 de diciembre, corresponde a:",
+        options: [
+          "a) La Administración General del Estado (AGE)",
+          "b) Las CCAA en cuyos territorios estén situados, salvo los marítimo-terrestres en los que exista continuidad ecológica del ecosistema terrestre con el marino",
+          "c) Las CCAA, en todo caso",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 186]."
+      },
+      {
+        question: "15. La ordenación, regulación y gestión de los EEENNPP, de acuerdo con la Constitución Española y el Estatuto de Autonomía, es una competencia:",
+        options: [
+          "a) Exclusiva de la CCAA de Andalucía",
+          "b) Compartida entre el Estado y la CCAA de Andalucía",
+          "c) Exclusiva del Estado en cuanto a la legislación básica sobre protección del medio ambiente",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 186]."
+      },
+      {
+        question: "16. Aquellos espacios o elementos de la naturaleza constituidos básicamente por formaciones de notoria singularidad, rareza o belleza, que merecen ser objeto de una protección especial, serán, conforme al art. 34 de la Ley 42/2007, declarados como:",
+        options: [
+          "a) Paisajes protegidos",
+          "b) Monumentos Naturales",
+          "c) Reservas de la Biosfera",
+          "d) Reservas Naturales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Monumentos Naturales)[cite: 186]."
+      },
+      {
+        question: "17. El territorio constituido por los términos municipales que aportan terreno a un Parque Nacional, así como, excepcionalmente, siempre que haya causas objetivas que lo definan, por otros directamente relacionados, cuando así se considere en las leyes declarativas, en los que las administraciones públicas llevarán a cabo políticas activas para su desarrollo, es definido en el art. 3 de la Ley 30/2014, de 3 de diciembre, como:",
+        options: [
+          "a) Zona periférica de protección",
+          "b) Área de desarrollo sostenible",
+          "c) Área de influencia socioeconómica",
+          "d) Zona de influencia periférica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Área de influencia socioeconómica)[cite: 186]."
+      },
+      {
+        question: "18. Uno de los requerimientos territoriales para la declaración de un Parque Nacional exige que estos espacios tengan una superficie, salvo en casos debidamente justificados, de al menos:",
+        options: [
+          "a) 50.000 ha en parques nacionales marítimos y marítimo terrestres insulares",
+          "b) 20.000 ha en parques nacionales terrestres o marítimo-terrestres peninsulares y en parques nacionales en aguas marinas",
+          "c) 5.000 ha en parques nacionales terrestres o marítimo-terrestres peninsulares",
+          "d) 20.000 ha en parques nacionales insulares"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 186]."
+      },
+      {
+        question: "19. El Anexo de la Ley 30/2014, de 3 de diciembre, de Parques Nacionales contiene:",
+        options: [
+          "a) Hábitats naturales o seminaturales, clasificados en peninsulares e insulares",
+          "b) Sistemas naturales españoles, clasificados en terrestres y marinos",
+          "c) Relación de los Parques Nacionales declarados en el territorio español",
+          "d) Criterios ecológicos y ambientales para la declaración de Parques Nacionales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Sistemas naturales españoles, clasificados en terrestres y marinos)[cite: 186]."
+      },
+      {
+        question: "20. El art. 7 de la Ley 30/2014, de 3 de diciembre, de Parques Nacionales contiene los plazos para el ejercicio del derecho de tanteo y retracto de la administración, respecto de los actos o negocios jurídicos de carácter oneroso celebrados inter vivos, que recaigan sobre fincas rústicas situadas en el interior del Parque Nacional o bien enclavadas dentro del mismo. Estos plazos son:",
+        options: [
+          "a) 3 meses para el derecho de tanteo, y 1 año para el de retracto",
+          "b) 3 meses para el derecho de tanteo, y 6 meses para el de retracto",
+          "c) 1 año para el derecho de tanteo, y 10 años para el de retracto",
+          "d) Los plazos serán los que establezca la legislación de las CCAA en cada caso"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 3 meses para el derecho de tanteo, y 1 año para el de retracto)[cite: 186]."
+      },
+      {
+        question: "21. De las siguientes actividades, señala cuáles serán consideradas incompatibles, en todo caso, por la Ley 30/2014, de Parques Nacionales en su art. 7:",
+        options: [
+          "a) La pesca deportiva y recreativa y la caza deportiva y comercial, salvo la tala con fines comerciales.",
+          "b) El sobrevuelo a menos de 3.000 metros de altura sobre la vertical del terreno, salvo autorización expresa o por causa de fuerza mayor",
+          "c) Las explotaciones y extracciones mineras, de hidrocarburos, áridos y canteras",
+          "d) Todas las actividades anteriores son consideradas incompatibles en Parques Nacionales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 186]."
+      },
+      {
+        question: "22. ¿Cuál las siguientes fases NO forma parte del procedimiento de declaración de Parque Nacional, established en el art. 8 de la Ley 30/2014, de Parques Nacionales?",
+        options: [
+          "a) Aprobación inicial de la propuesta conjunta del Consejo de Ministros y el órgano correspondiente de las CCAA",
+          "b) Trámite de información pública de mínimo 3 meses",
+          "c) Informe del Consejo de la Red de Parques Nacionales",
+          "d) Elaboración y aprobación del proyecto de Ley por la Comunidad Autónoma donde se ubique"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 186]."
+      },
+      {
+        question: "23. Respecto a la pérdida de la condición de Parque Nacional, el art. 12 de la Ley 30/2014, de 3 de diciembre, establece que:",
+        options: [
+          "a) Sólo podrá aprobarse de conformidad con las CCAA afectadas, siempre que se haya alterado su estado de conservación favorable",
+          "b) Se efectuará por Ley de las Cortes Generales, a propuesta del Gobierno de la Nación",
+          "c) Requerirá informe favorable del Patronato",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 186]."
+      },
+      {
+        question: "24. La declaración del estado de emergencia por catástrofe medioambiental, según el art. 13 de la Ley 30/2014, corresponde a:",
+        options: [
+          "a) El Presidente del OAPN",
+          "b) Al Consejo de Ministros, mediante Acuerdo, previa consulta a la Comunidad o CCAA afectadas",
+          "c) Al Ministro de Medio Ambiente",
+          "d) Al presidente o presidentes de la Comunidad o CCAA afectadas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Al Ministro de Medio Ambiente)[cite: 186]."
+      },
+      {
+        question: "25. El Parque Natural de las Sierras Subbéticas fue declarado en:",
+        options: [
+          "a) 1987",
+          "b) 1988",
+          "c) 1989",
+          "d) 1999"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1988)[cite: 186]."
+      },
+      {
+        question: "26. Además de Parque Nacional, Sierra Nevada cuenta con otras figuras de protección. Señala la respuesta INCORRECTA:",
+        options: [
+          "a) Reserva de la Biosfera",
+          "b) Geoparque mundial de la UNESCO",
+          "c) ZEC y ZEPA",
+          "d) Sitio Ramsar"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Geoparque mundial de la UNESCO)[cite: 186]."
+      },
+      {
+        question: "27. De acuerdo con el Decreto 24/2007, de 30 de enero, por el que se declara el Espacio Natural de Sierra Nevada y se regulan los órganos de gestión y participación de los Espacios Naturales de Doñana y de Sierra Nevada, la gestión del Espacio Natural de Sierra Nevada, corresponde a:",
+        options: [
+          "a) El Consejo de Participación",
+          "b) La Consejería de Medio Ambiente a través de la Delegación Territorial",
+          "c) La Consejería de Medio Ambiente a través de un Equipo de Gestión",
+          "d) El Patronato"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 186]."
+      },
+      {
+        question: "28. La Presidencia de los Consejos de Participación, en base al Decreto 24/2007, de 30 de enero, será nombrada por:",
+        options: [
+          "a) El Director del Equipo de Gestión del Espacio Natural",
+          "b) El titular de la Consejería de Medio Ambiente, a propuesta de los miembros del Consejo",
+          "c) El Consejo de Gobierno, a propuesta del titular de la Consejería de Medio Ambiente",
+          "d) Los miembros del Consejo por mayoría cualificada"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 186]."
+      },
+      {
+        question: "29. ¿Cuál es el número de Parques Naturales declarados en la provincia de Málaga?:",
+        options: [
+          "a) 5",
+          "b) 4",
+          "c) 6",
+          "d) 3"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5)[cite: 186]."
+      },
+      {
+        question: "30. El Parque Natural de Sierra de Aracena y Picos de Aroche pertenece a la provincia de:",
+        options: [
+          "a) Huelva",
+          "b) Huelva y Sevilla",
+          "c) Sevilla",
+          "d) Córdoba"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Huelva)[cite: 186]."
+      },
+      {
+        question: "31. Quedan clasificados a todos los efectos como suelo no urbanizable objeto de protección especial, por el art. 15 de la Ley 2/1989, de 18 de julio, los terrenos incluidos en:",
+        options: [
+          "a) Parajes Naturales",
+          "b) Reservas Naturales y Parajes Naturales",
+          "c) Reservas Naturales y Monumentos Naturales",
+          "d) Paisajes Protegidos y Parajes Naturales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Reservas Naturales y Parajes Naturales)[cite: 186]."
+      },
+      {
+        question: "32. La declaración de un Paraje Natural será, según lo establecido en el art. 2 de la Ley 2/1989, de 18 de julio, mediante:",
+        options: [
+          "a) Ley del Parlamento de Andalucía",
+          "b) Decreto del Consejo de Gobierno",
+          "c) Tanto por Ley como por Decreto",
+          "d) Por Acuerdo del Consejo de Gobierno"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley del Parlamento de Andalucía)[cite: 186]."
+      },
+      {
+        question: "33. El Paraje Natural Marismas del Odiel fue declarado en el año:",
+        options: [
+          "a) 1989",
+          "b) 1986",
+          "c) 1978",
+          "d) 1984"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 1984)[cite: 186]."
+      },
+      {
+        question: "34. En virtud de lo establecido en el art. 19 de la Ley 2/1989, de 18 de julio, para la gestión y administración de las Reservas Naturales, la Consejería de Medio Ambiente estará asistida por el siguiente órgano colegiado consultivo:",
+        options: [
+          "a) Junta Rectora",
+          "b) Consejos Provinciales de Participación",
+          "c) Patronatos, en el caso de que la Reserva esté inscrita en un convenio o acuerdo internacional",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 186]."
+      },
+      {
+        question: "35. Cuál de las siguientes respuestas es INCORRECTA, en relación con lo establecido en el art. 16 de la Ley 30/2014, de 3 de diciembre, sobre el Informe de situación de la Red de Parques Nacionales:",
+        options: [
+          "a) Es elaborado por el Consejo de la Red de Parques Nacionales",
+          "b) Es un informe trienal",
+          "c) Será elevado al Senado",
+          "d) Deberá hacerse público"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 186]."
+      },
+      {
+        question: "36. El art. 4 del Decreto 225/1999 de 9 de septiembre, de regulación y desarrollo de la figura de Monumento Natural, clasifica estos espacios protegidos, de acuerdo con el criterio dominante que motive su declaración, en los siguientes tipos:",
+        options: [
+          "a) Geológico, Biótico, Geográfico, Ecocultural y Mixto",
+          "b) Geológico, Biológico, Cultural, Ambiental y Mixto",
+          "c) Geológico, Biótico, Morfológico, Ecológico y Mixto",
+          "d) Geológico, Biológico, Morfológico, Etnográfico y Mixto"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Geológico, Biótico, Geográfico, Ecocultural y Mixto)[cite: 186]."
+      },
+      {
+        question: "37. El Monumento Natural 'Cueva del Hundidero' está ubicado en la provincia de:",
+        options: [
+          "a) Málaga",
+          "b) Cádiz",
+          "c) Huelva",
+          "d) Córdoba"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Málaga)[cite: 186]."
+      },
+      {
+        question: "38. Los usos y actividades que según el art. 31 del Decreto 225/1999, de 9 de septiembre, tendrán prioridad con carácter general en un Monumento Natural, son:",
+        options: [
+          "a) El uso público y la educación ambiental",
+          "b) Actividades relacionadas con la investigación y la conservación del Monumento Natural",
+          "c) Actividades económicas compatibles con su conservación",
+          "d) Actividades tradicionales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El uso público y la educación ambiental)[cite: 186]."
+      },
+      {
+        question: "39. ¿Cuál de los siguientes espacios está declarado como Reserva Natural Concertada?",
+        options: [
+          "a) Dehesa de Abajo",
+          "b) Laguna Honda",
+          "c) Laguna de la Paja",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 186]."
+      },
+      {
+        question: "40. Señala cuál de los siguientes espacios es un Paraje Natural:",
+        options: [
+          "a) Marisma del Burro",
+          "b) Complejo Endorreico de El Puerto de Santa María",
+          "c) Marismas de Sancti Petri",
+          "d) Cañada de los Pájaros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Marismas de Sancti Petri)[cite: 186]."
+      },
+      {
+        question: "41. De los siguientes espacios naturales protegidos, señale cuál NO ha sido declarado como Reserva de la Biosfera:",
+        options: [
+          "a) Marismas del Odiel",
+          "b) Sierra de Cazorla, Segura y las Villas",
+          "c) Laguna de Fuente de Piedra",
+          "d) Dehesas de Sierra Morena"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Laguna de Fuente de Piedra)[cite: 186]."
+      },
+      {
+        question: "42. En Andalucía, han sido declaradas 4 Zonas Especialmente Protegidas de Importancia para el Mediterráneo (ZEPIM). Señale la respuesta INCORRECTA:",
+        options: [
+          "a) Isla de Alborán y fondos marinos de su entorno",
+          "b) Acantilados y Fondos Marinos Calahonda-Castell de Ferro",
+          "c) Cabo de Gata-Níjar",
+          "d) Acantilados Maro-Cerro Gordo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 186]."
+      },
+      {
+        question: "43. El Plan Director de la Red de Parques Nacionales, según lo previsto en el art. 19 de la Ley 30/2014, de Parques Nacionales, tendrá una vigencia:",
+        options: [
+          "a) Mínima de 10 años",
+          "b) Máxima de 10 años",
+          "c) De 10 años, prorrogable 2 años más",
+          "d) B y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Máxima de 10 años)[cite: 186]."
+      },
+      {
+        question: "44. Respecto a los Planes Rectores de Uso y Gestión, NO es cierto que:",
+        options: [
+          "a) En Parques Naturales son aprobados provisionalmente por la Junta Rectora",
+          "b) Tienen una vigencia mínima de 8 años, según la normativa de Parques Nacionales",
+          "c) Son aprobados por el Consejo de gobierno",
+          "d) Contendrán los criterios para la supresión de las formaciones vegetales exóticas presentes en el interior del parque nacional, así como para la erradicación de las especies invasoras"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 186]."
+      },
+      {
+        question: "45. Encender fuego en un sitio no autorizado, está tipificado en la Ley 2/1989, de 18 de julio, como una infracción:",
+        options: [
+          "a) Muy grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Leve, excepto si causa daños importantes al medio ambiente, en cuyo caso se considerará Grave."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 186]."
+      },
+      {
+        question: "46. La destrucción o alteración significativa de las peculiaridades de la naturaleza declaradas Monumento Natural, está tipificado en el art. 26 de la Ley 2/1989 de 18 de julio, como una infracción:",
+        options: [
+          "a) Grave",
+          "b) Muy grave",
+          "c) Leve",
+          "d) Esta infracción viene recogida en el Decreto 225/1999 de 9 de septiembre, y no en la Ley 2/1989, de 18 de julio"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Muy grave)[cite: 186]."
+      },
+      {
+        question: "47. La infracción de la pregunta anterior será sancionada con una multa de:",
+        options: [
+          "a) 60,10 a 601,01 euros",
+          "b) 60.101,22 a 300.506,05 euros",
+          "c) 601,02 a 60.101,21 euros",
+          "d) Ninguna es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 60.101,22 a 300.506,05 euros)[cite: 186]."
+      },
+      {
+        question: "48. El plazo de resolución del procedimiento de inclusión de un humedal en el Inventario de Humedales de Andalucía, en virtud de lo previsto en el art. 7 del Decreto 98/2004, de 9 de marzo, será de:",
+        options: [
+          "a) 2 meses, silencio positivo",
+          "b) 3 meses, silencio positivo",
+          "c) 6 meses, silencio negativo",
+          "d) 4 meses, silencio negativo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3 meses, silencio positivo)[cite: 186]."
+      },
+      {
+        question: "49. En relación con la Orden del 15 de diciembre de 2004, por la que se regula el régimen jurídico y el procedimiento de concesión de licencia de uso de la marca Parque Natural de Andalucía, dicha licencia de uso, tendrá una vigencia de:",
+        options: [
+          "a) Indefinida",
+          "b) 5 años, renovables",
+          "c) 10 años",
+          "d) 3 años, renovables"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Indefinida)[cite: 186]."
+      },
+      {
+        question: "50. Indique cuál de los siguientes ha sido declarado como Geoparque Mundial de la UNESCO:",
+        options: [
+          "a) Geoparque de Granada",
+          "b) Geoparque de las Sierras Subbéticas",
+          "c) Geoparque de Cabo de Gata-Níjar",
+          "d) Todos los anteriores son Geoparques"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todos los anteriores son Geoparques)[cite: 186]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. Según el artículo 149.1.23ª de la Constitución Española, ¿qué competencia exclusiva tiene el Estado en materia de medio ambiente?",
+        options: [
+          "a) Gestión de los espacios protegidos",
+          "b) Legislación básica sobre la protección del medio ambiente",
+          "c) Delimitación de los espacios naturales protegidos",
+          "d) B y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Legislación básica sobre la protección del medio ambiente)[cite: 187]."
+      },
+      {
+        question: "2. ¿Cuál de las siguientes normas NO está incluida dentro de la normativa estatal para la protección de los espacios naturales?",
+        options: [
+          "a) Ley 42/2007, de 13 de diciembre",
+          "b) Ley 41/2010 de 29 de diciembre",
+          "c) Ley 2/1989, de 18 de julio",
+          "d) Ley 30/2014, de 3 de diciembre"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Ley 2/1989, de 18 de julio, que es normativa autonómica andaluza)[cite: 187]."
+      },
+      {
+        question: "3. A tenor de lo establecido en la Ley 42/2007, de 13 de diciembre, ¿qué figura de planificación se considera el instrumento básico para la ordenación de los recursos naturales?",
+        options: [
+          "a) Planes Rectores de Uso y Gestión (PRUG)",
+          "b) Planes de Ordenación de los Recursos Naturales (PORN)",
+          "c) Planes de Desarrollo Sostenible (PDS)",
+          "d) Planes de Gestión de las ZEC"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Planes de Ordenación de los Recursos Naturales)[cite: 187]."
+      },
+      {
+        question: "4. ¿Qué artículo del Estatuto de Autonomía de Andalucía reconoce la competencia exclusiva de la Comunidad Autónoma sobre la gestión integral de los espacios naturales protegidos?",
+        options: [
+          "a) Artículo 57",
+          "b) Artículo 45",
+          "c) Artículo 130",
+          "d) Artículo 149"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Artículo 57)[cite: 187]."
+      },
+      {
+        question: "5. Conforme al art. 50 de la Ley 42/2007, de 13 de diciembre, tendrán la consideración de áreas protegidas por instrumentos internacionales todos aquellos espacios naturales que sean formalmente designados de conformidad con lo dispuesto en los Convenios y Acuerdos internacionales de los que sea parte España. ¿Cuál de los siguientes NO tiene tal consideración?",
+        options: [
+          "a) Reserva Natural Estricta de la UICN",
+          "b) Los Geoparques declarados por la UNESCO",
+          "c) Las Reservas biogenéticas del Consejo de Europa",
+          "d) Las áreas protegidas del Convenio para la protección del medio ambiente marino del Atlántico del nordeste (OSPAR)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Reserva Natural Estricta de la UICN)[cite: 187]."
+      },
+      {
+        question: "6. En el marco del Estatuto de Autonomía de Andalucía, ¿qué competencia exclusiva tiene la Comunidad Autónoma en relación con los espacios naturales protegidos (EENNPP)?",
+        options: [
+          "a) Delimitación y ordenación de los EENNPP, salvo los que afecten a las aguas marítimas",
+          "b) Gestión integral de los EENNPP",
+          "c) Establecimiento de normas adicionales de protección ambiental",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)[cite: 187]."
+      },
+      {
+        question: "7. Según la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, ¿qué figura de protección se aplica a aquellos espacios marinos designados para la protección de ecosistemas y elementos biológicos o geológicos del medio marino?",
+        options: [
+          "a) Reserva natural marina",
+          "b) Área marina protegida",
+          "c) Paisaje marino protegido",
+          "d) ZEPA (Zonas de Especial Protección para Áreas marinas)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Área marina protegida)[cite: 187]."
+      },
+      {
+        question: "8. Conforme a lo dispuesto en el Decreto 170/2024, del 26 de agosto, por el que se establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿qué órgano es responsable de coordinar la gestión de la Red de Espacios Naturales Protegidos de Andalucía (RENPA)?",
+        options: [
+          "a) Consejería de Medio Ambiente",
+          "b) Secretaría General de Medio Ambiente y Cambio Climático",
+          "c) Agencia de Medio Ambiente",
+          "d) Dirección General de Espacios Naturales Protegidos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Dirección General de Espacios Naturales Protegidos)[cite: 187]."
+      },
+      {
+        question: "9. ¿Qué norma regula la figura de Monumento Natural en Andalucía?",
+        options: [
+          "a) Decreto 225/1999, de 9 de noviembre",
+          "b) Decreto 95/2003, de 8 de abril",
+          "c) Ley 30/2014, de 3 de diciembre",
+          "d) Decreto 98/2004, de 9 de marzo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Decreto 225/1999, de 9 de noviembre)[cite: 187]."
+      },
+      {
+        question: "10. Según lo establecido en el art. 27 de la Ley 42/2007, de 13 de diciembre ¿quién aprueba las estrategias de conservación y restauración de hábitats en peligro de desaparición?",
+        options: [
+          "a) Conferencia Sectorial de Medio Ambiente",
+          "b) Consejo de Ministros",
+          "c) Orden ministerial",
+          "d) Comisión Estatal de Patrimonio Natural y Biodiversidad"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Conferencia Sectorial de Medio Ambiente)[cite: 187]."
+      },
+      {
+        question: "11. ¿Qué norma establece la creación del Inventario de Espacios Naturales Protegidos de Andalucía?",
+        options: [
+          "a) Ley 8/2003, de 28 de octubre",
+          "b) Decreto 95/2003, de 8 de abril.",
+          "c) Ley 2/1989, de 18 de julio",
+          "d) Decreto 155/1998, de 21 de julio"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Ley 2/1989, de 18 de julio)[cite: 187]."
+      },
+      {
+        question: "12. Según establece el art. 4 del Real Decreto 598/2016, de 5 de diciembre ¿qué figura es la encargada de presidir el Consejo de la Red de Parques Nacionales?",
+        options: [
+          "a) El Director del OAPN (Organismo Autónomo Parques Nacionales)",
+          "b) El titular del Ministerio competente en Medio Ambiente",
+          "c) Un representante rotatorio de las Comunidades Autónomas",
+          "d) El Presidente del Consejo de Ministros"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El titular del Ministerio competente en Medio Ambiente)[cite: 187]."
+      },
+      {
+        question: "13. Conforme al art. 19 de la Ley 30/2014, de 3 de diciembre, el Plan Director de la Red de Parques Nacionales será elaborado por...",
+        options: [
+          "a) El Ministerio competente en medio ambiente",
+          "b) El Consejo de la Red de Parques Nacionales",
+          "c) El Comité de colaboración y coordinación",
+          "d) El Patronato"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El Ministerio competente en medio ambiente)[cite: 187]."
+      },
+      {
+        question: "14. Cuál de las siguientes funciones NO está atribuida al Consejo de la Red de Parques Nacionales según lo dispuesto en el art. 27 de la Ley 30/2014, de 3 de diciembre y el art. 3 del Real Decreto 598/2016, de 5 de diciembre...",
+        options: [
+          "a) Informar la propuesta de revocación de la declaración de un parque nacional",
+          "b) Aprobación provisional de los PRUG de los parque nacionales",
+          "c) Declarar hábitat y especies de interés especial para la Red",
+          "d) Acordar la imagen corporativa de la Red, la uniformidad del personal y el diseño común de la señalética"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Aprobación provisional de los PRUG)[cite: 187]."
+      },
+      {
+        question: "15. El Consejo de la Red de Parques Nacionales, según lo establecido en el art. 27 de la Ley 30/2014, de 3 de diciembre, de Parques Nacionales, es un órgano colegiado...",
+        options: [
+          "a) De asesoramiento",
+          "b) De participación",
+          "c) De cooperación",
+          "d) De carácter consultivo"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: De carácter consultivo)[cite: 187]."
+      },
+      {
+        question: "16. Aquellos espacios cuya creación tiene como finalidad la protección de ecosistemas, comunidades o elementos biológicos que, por su rareza, fragilidad, importancia o singularidad merecen una valoración especial, serán, de acuerdo con el art. 32 de la Ley 42/2007, de 13 de diciembre:",
+        options: [
+          "a) Parajes naturales",
+          "b) Parques",
+          "c) Reservas naturales",
+          "d) Reservas de la Biosfera"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Reservas naturales)[cite: 187]."
+      },
+      {
+        question: "17. La preservación de la interacción armoniosa entre la naturaleza y la cultura en una zona determinada, es, conforme al art. 35 de la Ley 42/2007, de 13 de diciembre, uno de los objetivos principales de los/las:",
+        options: [
+          "a) Reservas naturales",
+          "b) Paisajes protegidos",
+          "c) Monumentos naturales",
+          "d) Reservas de la Biosfera"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Paisajes protegidos)[cite: 187]."
+      },
+      {
+        question: "18. Para evitar impactos ecológicos o paisajísticos precedentes del exterior en los EENNPP, el art. 38 de la Ley 42/2007, de 13 de diciembre, dispone que:",
+        options: [
+          "a) Se establecerán zonas periféricas de protección",
+          "b) Se establecerán áreas de protección exterior",
+          "c) Se podrán establecer zonas periféricas de protección",
+          "d) Se podrán establecer áreas de protección exterior"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Se podrán establecer zonas periféricas de protección)[cite: 187]."
+      },
+      {
+        question: "19. ¿En qué categoría de manejo de áreas protegidas de la UICN se encuentra clasificada la figura de \"Parque Nacional\"?",
+        options: [
+          "a) Categoría II. Conservación y protección del ecosistema",
+          "b) Categoría III. Conservación de los rasgos naturales",
+          "c) Categoría I. Protección estricta",
+          "d) Categoría IV. Conservación mediante manejo activo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Categoría II. Conservación y protección del ecosistema)[cite: 187]."
+      },
+      {
+        question: "20. Respecto a la caracterización y objetivos que la Ley 30/2014, de 3 de diciembre, establece para los Parques Nacionales, señala la respuesta INCORRECTA:",
+        options: [
+          "a) De alto valor ecológico y cultural",
+          "b) De interés general del Estado",
+          "c) Poco transformados",
+          "d) Sólo A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 187]."
+      },
+      {
+        question: "21. El art. 8 de la Ley 30/2014, de 3 de diciembre, regula el proceso de declaración de un Parque Nacional. Este artículo establece que la iniciativa para la declaración, se formalización mediante:",
+        options: [
+          "a) La aprobación de la propuesta inicial por parte del Consejo de Ministros",
+          "b) La presentación de la proposición inicial al Ministerio de Medio Ambiente",
+          "c) La presentación y aprobación de la iniciativa por el Consejo de la Red de Parques",
+          "d) La aprobación inicial de una propuesta conjunta por el Consejo de Ministros y el órgano correspondiente de las CCAA donde se encuentre el futuro Parque Nacional."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 187]."
+      },
+      {
+        question: "22. ¿Cómo se podrían modificar los límites territoriales de un Parque Nacional conforme al art. 11 de la Ley 30/2014, de 3 de diciembre?",
+        options: [
+          "a) Por Real Decreto",
+          "b) Por el procedimiento previsto para la declaración o según establezca la ley declarativa",
+          "c) Por Acuerdo del Consejo de Ministros",
+          "d) Por Ley de Cortes, en todo caso"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 187]."
+      },
+      {
+        question: "23. El órgano colegiado de participación de la sociedad en los Parques Nacionales, según dispone el art. 24 de la Ley 30/2014, de 3 de diciembre, será el...",
+        options: [
+          "a) Patronato",
+          "b) Consejo de la Participación",
+          "c) Consejo de la Red de Parques Nacionales",
+          "d) Comité de coordinación"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Patronato)[cite: 187]."
+      },
+      {
+        question: "24. El comité de colaboración y coordinación de Parques Nacionales, conforme al art. 25 de la Ley 30/2014, de 3 de diciembre, está presidido por:",
+        options: [
+          "a) El titular del Ministerio competente en medio ambiente",
+          "b) La persona designada por el titular del Ministerio",
+          "c) El presidente del Organismo Autónomo de Parques Nacionales (OAPN)",
+          "d) El Director del OAPN"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: El Director del OAPN)[cite: 187]."
+      },
+      {
+        question: "25. La Ley 41/2010, de 29 de diciembre, de Protección del medio marino, ha establecido como instrumentos esenciales de planificación del medio marino:",
+        options: [
+          "a) Los planes de gestión de las áreas marinas",
+          "b) Las reservas marítimas",
+          "c) Las estrategias marinas",
+          "d) Las demarcaciones marinas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las estrategias marinas)[cite: 187]."
+      },
+      {
+        question: "26. El Anexo I del Real Decreto 435/2004, de 12 de marzo, por el que se regula el inventario nacional de zonas húmedas, clasifica los humedales en 3 tipos, y éstos son...",
+        options: [
+          "a) Humedales costeros, interiores y artificiales o modificados",
+          "b) Humedales salados, salobres y dulces",
+          "c) Humedales marinos, lacustres y ribereños",
+          "d) Humedales naturales, antrópicos y mixtos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Humedales costeros, interiores y artificiales o modificados)[cite: 187]."
+      },
+      {
+        question: "27. Indique cuál de las siguientes figuras de protección NO ha sido establecida por la Ley 2/1989, de 18 de julio:",
+        options: [
+          "a) Parajes naturales",
+          "b) Zonas de Importancia Comunitaria",
+          "c) Parques periurbanos",
+          "d) Paisaje Protegido"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Paisaje Protegido)[cite: 187]."
+      },
+      {
+        question: "28. ¿Cómo queda regulada la actividad cinegética en los parajes naturales según lo dispuesto en el art. 11 de la Ley 2/1989, de 18 de julio?",
+        options: [
+          "a) Queda prohibida en todo caso",
+          "b) Queda prohibida, sin perjuicio de lo establecido en el art. 17 de la Ley 8/2003, que regula la prevención de daños por fauna silvestre",
+          "c) Se podrán autorizar actividades cinegéticas tradicionales en los parajes que alcancen la superficie mínima para tener un plan técnico de caza",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)[cite: 187]."
+      },
+      {
+        question: "29. El Plan Rector de Uso y Gestión (PRUG) determinará el régimen de actividades de los parques naturales. Conforme al art. 13 de la Ley 2/1989, de 18 de julio, ¿cómo se aprueba este instrumento y qué órganos intervienen?",
+        options: [
+          "a) Aprobación provisional del PRUG por la Junta Rectora del Parque natural",
+          "b) Aprobación del PRUG por el Consejo de Gobierno de la Junta de Andalucía",
+          "c) Aprobación del PRUG por Decreto",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 187]."
+      },
+      {
+        question: "30. En el procedimiento de autorizaciones de la Consejería de medio ambiente reguladas por el art.16 de la Ley 2/1989, de 18 de julio, cuando tienen por objeto actividades sujetas también a autorización o licencia urbanística, a la Consejería de medio ambiente le corresponde evacuar un informe de carácter vinculante, que remitirá a la Administración urbanística competente en un plazo de:",
+        options: [
+          "a) 2 meses, desestimatorio",
+          "b) 2 meses, estimatorio",
+          "c) 3 meses, desestimatorio",
+          "d) 3 meses, estimatorio"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2 meses, estimatorio)[cite: 187]."
+      },
+      {
+        question: "31. A tenor de lo establecido en el art. 20 de la Ley 2/1989, de 18 de julio, el órgano colegiado de participación con la Consejería de medio ambiente en los Parques naturales, será el/la...",
+        options: [
+          "a) Patronato",
+          "b) Junta Rectora",
+          "c) Consejo Provincial de Medio Ambiente y Biodiversidad",
+          "d) Consejo de Participación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Junta Rectora)[cite: 187]."
+      },
+      {
+        question: "32. Indique cuál de las siguientes infracciones está tipificada como MUY GRAVE por el art. 26 de la Ley 2/1989, de 18 de julio:",
+        options: [
+          "a) Ejecución de edificaciones en lugares donde se halle expresamente prohibido",
+          "b) Actos de menoscabo o deterioro de las peculiaridades de la naturaleza declaradas Monumento natural",
+          "c) Acciones que atenten directa o indirectamente contra la configuración geológica o biológica de los terrenos produciendo su deterioro",
+          "d) Vulneración de las normas específicas contenidas en los instrumentos de planificación de los EENNPP cuando ello ponga en riesgo o cause daño a sus valores naturales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ejecución de edificaciones en lugares donde se halle expresamente prohibido)[cite: 187]."
+      },
+      {
+        question: "33. De acuerdo con lo establecido en el art. 28 de la Ley 2/1989, de 18 de julio, si un mismo hecho estuviera previsto en más de una legislación específica, se aplicará:",
+        options: [
+          "a) La disposición sancionadora de la norma aprobada más reciente",
+          "b) La disposición sancionadora de cuantía superior",
+          "c) La disposición sancionadora de cuantía inferior",
+          "d) La disposición sancionadora que establezca una mayor plazo para la prescripción de la infracción"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La disposición sancionadora de cuantía superior)[cite: 187]."
+      },
+      {
+        question: "34. El art. 2 del Decreto 225/1999, de 9 de septiembre, establece varios principios inspiradores para el establecimiento, desarrollo y gestión de la figura de Monumento natural en Andalucía. Señala cuál de los siguientes principios NO es uno de ellos:",
+        options: [
+          "a) Principio de Monumentalidad",
+          "b) Principio de Gestión asistida",
+          "c) Principio de Singularidad",
+          "d) Principio de Uso público"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Principio de Singularidad)[cite: 187]."
+      },
+      {
+        question: "35. La declaración de Monumento natural en Andalucía, se hará, según establece el art. 11 del Decreto 225/1999, de 9 de septiembre, por...",
+        options: [
+          "a) El Consejo de Gobierno de la Junta de Andalucía",
+          "b) Orden de la Consejería de medio ambiente",
+          "c) Ley del Parlamento de Andalucía",
+          "d) Resolución de la Dirección General competente en EENNPPP"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El Consejo de Gobierno de la Junta de Andalucía)[cite: 187]."
+      },
+      {
+        question: "36. El Inventario de humedales de Andalucía (IHA), según dispone el art. 3 del Decreto 98/2004, de 9 de marzo, depende orgánicamente de:",
+        options: [
+          "a) La Consejería de Medio Ambiente",
+          "b) La Dirección General competente en materia de la Red de EENNPP",
+          "c) Las Delegaciones Territoriales en cada provincia",
+          "d) La Secretaría General de Medio Ambiente y Cambio Climático"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La Dirección General competente en materia de la Red de EENNPP)[cite: 187]."
+      },
+      {
+        question: "37. El nombramiento y cese de los miembros del Comité Andaluz de Humedales viene regulado en el art. 12 del Decreto 98/2004, de 9 de marzo. ¿A qué órgano le corresponde dicha función, y cuál será la duración de dicho nombramiento?",
+        options: [
+          "a) Lo realiza el Consejo de Gobierno de la Junta, y la duración es de 4 años",
+          "b) Lo realiza el titular de la CMA, y la duración es de 4 años",
+          "c) Lo realiza el Consejo de Gobierno de la Junta, y la duración es de 3 años",
+          "d) Lo realiza el titular de la CMA, y la duración es de 3 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Lo realiza el titular de la CMA, y la duración es de 4 años)[cite: 187]."
+      },
+      {
+        question: "38. A tenor del art. 2 de la Orden de 15 de diciembre de 2004, por la que se regula el régimen jurídico y el procedimiento de concesión de licencia de uso de la marca Parque Natural de Andalucía, ¿qué categorías de productos o servicios pueden solicitar esta licencia?",
+        options: [
+          "a) Producto artesanal",
+          "b) Recurso natural",
+          "c) Producto ecológico",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Producto artesanal)[cite: 187]."
+      },
+      {
+        question: "39. La vigencia del Plan Director de la Red de Áreas Marinas Protegidas, establecida en el art. 29 de la Ley 41/2010, de 29 de diciembre, será:",
+        options: [
+          "a) Máxima de 8 años",
+          "b) Mínima de 10 años",
+          "c) Máxima de 10 años",
+          "d) Mínima de 8 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Máxima de 10 años)[cite: 187]."
+      },
+      {
+        question: "40. Respecto al alcance de los Planes de Ordenación de Recursos Naturales (PORN), el art. 19 de la Ley 42/2007, del Patrimonio Natural y de la Biodiversidad, establece sobre estos planes que:",
+        options: [
+          "a) Serán determinantes respecto de cualesquiera actuaciones, planes o programas sectoriales, sin perjuicio de lo que disponga al respecto la legislación autonómica",
+          "b) Las actuaciones, planes o programas sectoriales, no podrán contradecir el contenido de los PORN en ningún caso",
+          "c) Los instrumentos urbanísticos deberán adaptarse a los PORN si resultan contradictorios con ellos",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 187]."
+      },
+      {
+        question: "41. Iniciado el proceso de aprobación de un PORN y hasta que ésta se produzca, no podrá reconocerse a los interesados la facultad de realizar actos de transformación de la realidad física, geológica, y biológica, sin informe favorable de la administración actuante. Esta protección cautelar, regulada en el art. 23 de la Ley 42/2007, de 13 de diciembre, dispone que dicho informe deberá ser emitido por el órgano ambiental en un plazo de:",
+        options: [
+          "a) 15 días",
+          "b) 30 días",
+          "c) 60 días",
+          "d) 90 días"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 90 días)[cite: 187]."
+      },
+      {
+        question: "42. En relación con los Planes de gestión de las Zonas de Especial Conservación, señale cuál de las siguientes afirmaciones es INCORRECTA:",
+        options: [
+          "a) Planes de Gestión son aprobados por la Dirección General competente en EENNPP",
+          "b) Para las ZEC y ZEPA que también ostentan una figura de protección de la normativa nacional o autonómica, tienen la consideración oficial de Plan de gestión los correspondientes PORN y PRUG",
+          "c) Las Directrices de conservación de la Red Natura 2000 en España sirven de guía a las administraciones públicas competentes para la elaboración de los planes de gestión",
+          "d) El marco normativo estatal que regula la elaboración de estos instrumentos de gestión es la Ley 42/2007, de 13 de diciembre"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 187]."
+      },
+      {
+        question: "43. ¿Cuántos Parques nacionales han sido declarados en las islas Canarias y las islas Baleares?",
+        options: [
+          "a) 3",
+          "b) 4",
+          "c) 5",
+          "d) 2"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5 en total - 4 en Canarias y 1 en Baleares)[cite: 187]."
+      },
+      {
+        question: "44. El número de Parajes naturales declarados en la Comunidad autónoma de Andalucía asciende a:",
+        options: [
+          "a) 32",
+          "b) 28",
+          "c) 36",
+          "d) 24"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 32)[cite: 187]."
+      },
+      {
+        question: "45. ¿Cuántos Parques naturales se encuentran ubicados en la provincia de Almería?",
+        options: [
+          "a) 2",
+          "b) 5",
+          "c) 3",
+          "d) 4"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 3)[cite: 187]."
+      },
+      {
+        question: "46. Indique cuál de los siguientes EENNPP está declarado como Reserva natural:",
+        options: [
+          "a) Laguna Grande",
+          "b) Doñana",
+          "c) Salinas de Cabo de Gata",
+          "d) Albufera de Adra"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Albufera de Adra)[cite: 187]."
+      },
+      {
+        question: "47. Los monumentos naturales 'Bosque de Bañizuela', 'Huellas de Dinosaurio' y 'El Piélago' pertenecen a la provincia de:",
+        options: [
+          "a) Málaga",
+          "b) Jaén",
+          "c) Córdoba",
+          "d) Sevilla"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Jaén)[cite: 187]."
+      },
+      {
+        question: "48. ¿Cuáles fueron la primera y la última Reserva de la Biosfera declaradas en Andalucía?",
+        options: [
+          "a) Doñana y Dehesas de Sierra Morena, respectivamente",
+          "b) Grazalema e Intercontinental del Mediterráneo, respectivamente",
+          "c) Cazorla, Segura y las Villas, y Dehesas de Sierra Morena, respectivamente",
+          "d) Marismas del Odiel e Intercontinental del Mediterráneo, respectivamente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grazalema e Intercontinental del Mediterráneo)[cite: 187]."
+      },
+      {
+        question: "49. A tenor de lo dispuesto en el Real Decreto 1022/2022, de 13 de diciembre, por el que se regula la licencia de uso de la marca \"Reservas de la Biosfera Españolas\". ¿Qué validez establece el art. 13 para esta licencia de uso?",
+        options: [
+          "a) Indefinida",
+          "b) 5 años",
+          "c) 10 años",
+          "d) 4 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 4 años)[cite: 187]."
+      },
+      {
+        question: "50. El Decreto 88/2024, de 9 de abril, ha creado el nuevo órgano colegiado de participación administrativa y social, de carácter consultivo, con funciones de coordinación y asesoramiento de la Administración de la Junta de Andalucía en materia de Reservas de la Biosfera. El nombre de este órgano es:",
+        options: [
+          "a) Consejo Andaluz de Reservas de la Biosfera",
+          "b) Comité de Reservas de la Biosfera",
+          "c) Comisión Andaluza de Reservas de la Biosfera",
+          "d) Junta Andaluza de Reservas de la Biosfera"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Consejo Andaluz de Reservas de la Biosfera)[cite: 187]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 25),
+      "t1_b2": test1Questions.slice(25, 50),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 25),
+      "t2_b2": test2Questions.slice(25, 50)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 16 - ESPACIOS NATURALES PROTEGIDOS (COMPLETO 100 PREGUNTAS)",
+        "t1_all": "TEST 16.1 - COMPLETO (50 PREGUNTAS)",
+        "t1_b1": "TEST 16.1 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "t1_b2": "TEST 16.1 - BLOQUE 2 (PREGUNTAS 26 A 50)",
+        "t2_all": "TEST 16.2 - COMPLETO (50 PREGUNTAS)",
+        "t2_b1": "TEST 16.2 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "t2_b2": "TEST 16.2 - BLOQUE 2 (PREGUNTAS 26 A 50)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

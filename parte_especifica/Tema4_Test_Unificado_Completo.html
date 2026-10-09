@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 4 (Flora, Fauna y Biodiversidad)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 4 Unificado Completo (177 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 4-1 (40 Preguntas)">
+          <option value="t1_all">Test 4-1 - Completo (1 - 40)</option>
+          <option value="t1_b1">Test 4-1 - Bloque 1 (1 - 20)</option>
+          <option value="t1_b2">Test 4-1 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+        <optgroup label="Test 4-2 (40 Preguntas)">
+          <option value="t2_all">Test 4-2 - Completo (1 - 40)</option>
+          <option value="t2_b1">Test 4-2 - Bloque 1 (1 - 20)</option>
+          <option value="t2_b2">Test 4-2 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+        <optgroup label="Test 4-3 Especies (25 Preguntas)">
+          <option value="t3_all">Test 4-3 Especies - Completo (1 - 25)</option>
+        </optgroup>
+        <optgroup label="Test 4-4 (40 Preguntas)">
+          <option value="t4_all">Test 4-4 - Completo (1 - 40)</option>
+          <option value="t4_b1">Test 4-4 - Bloque 1 (1 - 20)</option>
+          <option value="t4_b2">Test 4-4 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+        <optgroup label="Test 4-5 Especies (32 Preguntas)">
+          <option value="t5_all">Test 4-5 Especies - Completo (1 - 32)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 4 - PROTECCIÓN DE FLORA, FAUNA Y BIODIVERSIDAD (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. La competencia en materia de flora y fauna silvestres corresponde a la Comunidad Autónoma de Andalucía, de acuerdo con:",
+        options: [
+          "a) El art. 28 del Estatuto de Autonomía de Andalucía, y es una competencia exclusiva",
+          "b) El art. 57 del Estatuto de Autonomía de Andalucía, sin perjuicio del art. 149.1.23º de la Constitución española, y es una competencia exclusiva",
+          "c) El art. 57 del Estatuto de Autonomía de Andalucía, y es una competencia ejecutiva",
+          "d) Esta competencia de la Comunidad Autónoma es compartida, junto con la competencia de legislación básica del Estado."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Art. 57 del Estatuto de Autonomía)[cite: 165]."
+      },
+      {
+        question: "2. La Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, es una norma:",
+        options: [
+          "a) De legislación básica estatal",
+          "b) Autonómica de desarrollo",
+          "c) Actualmente derogada por la Ley 7/2018, de 20 de julio",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: De legislación básica estatal)[cite: 165]."
+      },
+      {
+        question: "3. El objeto de la Ley 42/2007, del Patrimonio Natural y la Biodiversidad, es (art. 1):",
+        options: [
+          "a) Establecer el régimen jurídico básico de la conservación, uso sostenible, mejora y restauración del patrimonio natural y de la biodiversidad",
+          "b) Desarrollo del deber de conservar el medio ambiente establecido en la Constitución (art. 45)",
+          "c) Garantizar el derecho a disfrutar de un medio ambiente adecuado para el desarrollo de la persona (art. 45 de la Constitución)",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)[cite: 165]."
+      },
+      {
+        question: "4. Es un principio de la Ley 42/2007, del Patrimonio Natural y la Biodiversidad (art.2):",
+        options: [
+          "a) Establecimiento de los supuestos de prevalencia de la ordenación territorial y urbanística sobre la protección ambiental",
+          "b) La integración de los requisitos de la conservación, uso sostenible, mejora y restauración del patrimonio natural y la biodiversidad en las políticas sectoriales y, en particular, en la toma de decisiones en el ámbito político, económico y social, así como la participación justa y equitativa en el reparto de beneficios que se deriven de la utilización de los recursos genéticos",
+          "c) A y B son correctas",
+          "d) Ninguna es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 165]."
+      },
+      {
+        question: "5. De acuerdo con el art. 3.9 de la Ley 42/2007, la 'Custodia del territorio' se define como:",
+        options: [
+          "a) Organización pública o privada, sin ánimo de lucro, que lleva a cabo iniciativas que incluyan la realización de acuerdos para la conservación del patrimonio natural y la biodiversidad",
+          "b) Es un documento técnico elaborado por la administración estatal que recoge las directrices y criterios principales para la gestión sostenible del territorio",
+          "c) Es un conjunto de estrategias o técnicas jurídicas a través de las cuales se implican a los propietarios y usuarios del territorio en la conservación y uso de los valores y los recursos naturales, culturales y paisajísticos",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 165]."
+      },
+      {
+        question: "6. La Ley 42/2007 define 'Especie exótica invasora' en su art. 3.13 como:",
+        options: [
+          "a) Aquellas especies o subespecies, incluyendo sus partes, gametos, semillas, huevos o propágulos que pudieran sobrevivir o reproducirse, introducidos fuera de su área de distribución natural, y de su área potencial de dispersión, que no hubiera podido ocupar sin la introducción directa o indirecta, o sin el cuidado del hombre",
+          "b) Especie exótica que se introduce o establece en un ecosistema o hábitat natural o seminatural, y que es un agente de cambio y amenaza para la diversidad biológica nativa, ya sea por su comportamiento invasor, o por el riesgo de contaminación genética",
+          "c) Especies alóctonas que presentan alta capacidad reproductiva",
+          "d) Especie alóctona que podría convertirse en invasora en España, en especial aquellas que han demostrado ese carácter en otros países o regiones de condiciones ecológicas semejantes a las de España"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 165]."
+      },
+      {
+        question: "7. En base a la definición establecida por la Ley 42/2007 en su art. 3.30, se consideran 'Recursos naturales':",
+        options: [
+          "a) El paisaje",
+          "b) La geodiversidad y biodiversidad",
+          "c) La atmósfera",
+          "d) Todas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)[cite: 165]."
+      },
+      {
+        question: "8. Las medidas compensatorias, según la definición de la Ley 42/2007 (art. 3.24) consisten en:",
+        options: [
+          "a) Medidas específicas incluidas en un plan o proyecto, que tienen por objeto compensar, lo más exactamente posible, su impacto negativo sobre la especie o el hábitat afectado",
+          "b) Medidas concretas establecidas por la administración competente en medio ambiente, para su aplicación a los ecosistemas y hábitats degradados",
+          "c) Medidas específicas que deberán aplicar los titulares del territorio que tiene por objeto la restauración del daño causado",
+          "d) Medidas especiales, establecidas en planes o proyectos, que tiene como objeto la recuperación de espacios naturales degradados y la conservación de las especies silvestres"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "9. Conforme al art. 4.2 de la Ley del Patrimonio Natural y la Biodiversidad, las actividades encaminadas a la consecución de los fines de esta ley:",
+        options: [
+          "a) Podrán ser declaradas de utilidad pública o interés social, a todos los efectos y en particular a los expropiatorios, respecto de los bienes o derechos que pudieran resultar afectados",
+          "b) Serán declaradas de utilidad pública o interés social, a todos los efectos y en particular a los expropiatorios, respecto de los bienes o derechos que pudieran resultar afectados",
+          "c) Podrán ser declaradas de utilidad pública o interés social, a todos los efectos, salvo a los expropiatorios, respecto de los bienes o derechos que pudieran resultar afectados",
+          "d) Serán ser declaradas de utilidad pública o interés social, a todos los efectos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "10. El art. 6 de la Ley 42/2007, del Patrimonio Natural y la Biodiversidad establece que el ejercicio de las funciones de dicha ley, corresponde a las CCAA:",
+        options: [
+          "a) Cuando se trate de especies silvestres (incluidas las altamente migratorias) y espacios, hábitat o áreas críticas situadas en el medio marino, cuando exista continuidad ecológica del ecosistema marino con el espacio natural terrestre objeto de protección",
+          "b) Cuando se trate de especies silvestres situadas en el medio marino, cuando exista continuidad ecológica del ecosistema marino con el espacio natural terrestre objeto de protección. Los hábitats y áreas críticas son competencia del Estado.",
+          "c) Cuando se trate de especies silvestres (excepto las altamente migratorias) y espacios, hábitat o áreas críticas situadas en el medio marino, cuando exista continuidad ecológica del ecosistema marino con el espacio natural terrestre objeto de protección",
+          "d) La protección de las especies silvestres (excepto las highly migratorias) y espacios, hábitat o áreas críticas sólo si están situadas en el territorio de su comunidad autónoma."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 165]."
+      },
+      {
+        question: "11. El órgano de participación pública en el ámbito de la conservación y el uso sostenible del patrimonio natural y la biodiversidad, creado por la Ley 42/2007 en su art. 8, se corresponde con:",
+        options: [
+          "a) La Comisión Estatal para el Patrimonio Natural y la Biodiversidad",
+          "b) El Consejo Estatal para el Patrimonio Natural y la Biodiversidad",
+          "c) El Consejo Andaluz de Biodiversidad",
+          "d) La Conferencia Sectorial de Medio Ambiente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El Consejo Estatal para el Patrimonio Natural y la Biodiversidad)[cite: 165]."
+      },
+      {
+        question: "12. La Comisión Estatal para el Patrimonio Natural y la Biodiversidad está integrada por varios comités especializados, entre los que se encuentra, según el art. 5 del Real Decreto 1424/2008, de 14 de agosto:",
+        options: [
+          "a) Comité de caza y pesca",
+          "b) Comité de humedales",
+          "c) Comité de Geodiversidad",
+          "d) B y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Comité de humedales)[cite: 165]."
+      },
+      {
+        question: "13. A tenor del art. 2 del Real Decreto 948/2009, de 5 de junio, son funciones del Consejo Estatal para el Patrimonio Natural y la Biodiversidad:",
+        options: [
+          "a) Informar, antes de su aprobación, del Plan Estratégico Estatal del Patrimonio Natural y la Biodiversidad",
+          "b) Proponer al Ministerio de Medio Ambiente la inclusión o exclusión de hábitats en el Catálogo Español de Hábitats en Peligro de Desaparición, cuya conservación o, en su caso, restauración exijan medidas específicas de protección y conservación",
+          "c) Proponer para su aprobación a la Conferencia Sectorial de Medio Ambiente las estrategias de gestión, control y posible erradicación de las especies exóticas invasoras",
+          "d) B y C son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "14. ¿Cuál de los siguientes comités especializados forma parte de la Comisión Estatal para el Patrimonio Natural y la Biodiversidad, según lo dispuesto en el art. 5 del Real Decreto 1424/2008, de 14 de agosto? Señala la respuesta INCORRECTA",
+        options: [
+          "a) Comité del Inventario Español del Patrimonio Natural y de la Biodiversidad",
+          "b) Comité para la mejora y conservación de recursos genéticos forestales",
+          "c) Comité para la Infraestructura Verde y la Conectividad",
+          "d) Comité sobre acceso y utilización de los recursos genéticos y conocimientos tradicionales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 165]."
+      },
+      {
+        question: "15. El ámbito de aplicación de la Ley 8/2003, de 28 de octubre, de la Flora y Fauna Silvestres, incluye:",
+        options: [
+          "a) Los hábitats de la flora y fauna silvestres, así como la flora y fauna silvestres",
+          "b) Las especies del aprovechamiento agrícola y ganadero",
+          "c) La caza y la pesca continental",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 165]."
+      },
+      {
+        question: "16. La Ley 8/2003, de Flora y Fauna Silvestres, en su artículo 2, define 'Hábitat de una especie' como:",
+        options: [
+          "a) El medio acuático o terrestre, diferenciado por sus características geográficas y factores abióticos y bióticos, donde desarrolla en todo o en parte su ciclo biológico",
+          "b) Complejo dinámico de comunidades vegetales, animales y de microorganismos y su medio no viviente que interactúan como una unidad funcional",
+          "c) Zonas terrestres o acuáticas diferenciadas por sus características geográficas, abióticas y bióticas, tanto si son enteramente naturales como seminaturales",
+          "d) Aquellos sectores incluidos en el área de distribución que contengan hábitats esenciales para la conservación favorable de la especie o que por su situación estratégica para la misma requieran su adecuado mantenimiento."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "17. Son fines de la Ley 8/2003, de 28 de octubre:",
+        options: [
+          "a) La preservación de la biodiversidad garantizando la supervivencia de las especies mediante la protección y conservación de la flora y la fauna silvestre y sus hábitats",
+          "b) La ordenación de los aprovechamientos de la flora y fauna silvestres",
+          "c) Garantizar el derecho de todos al uso y disfrute del medio natural como espacio cultural y de ocio",
+          "d) Todas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)[cite: 165]."
+      },
+      {
+        question: "18. En relación con el régimen de protección general establecido en el art. 7 de la Ley 8/2003, de 28 de octubre, todo agente de la autoridad...",
+        options: [
+          "a) Deberá ordenar la paralización de aquellas actividades que infrinjan lo dispuesto en el art. 7",
+          "b) Deberá ordenar el cese de cualquier actividad que infrinja lo dispuesto en el art. 7, comunicándolo inmediatamente a sus órganos superiores a efectos de la adopción de las medidas correspondientes",
+          "c) Podrá ordenar el cese de cualquier actividad no autorizada que infrinja, gravemente, lo dispuesto en el art. 7, comunicándolo inmediatamente a la Consejería competente en materia de medio ambiente a efectos de inicio del correspondiente expediente sancionador",
+          "d) Podrá ordenar la paralización de las actuaciones que infrinjan lo dispuesto en el art. 7, siempre que no se disponga de autorización"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 165]."
+      },
+      {
+        question: "19. El Anexo 1 de la Ley 8/2003, de Flora y Fauna Silvestres recoge...",
+        options: [
+          "a) Las especies objeto de caza y pesca",
+          "b) El catálogo andaluz de especies amenazadas",
+          "c) Los medios de captura prohibidos",
+          "d) El baremo de indemnización por especie y ejemplar"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Los medios de captura prohibidos)[cite: 165]."
+      },
+      {
+        question: "20. El título I de la Ley 42/2007 recoge la regulación de los instrumentos para el conocimiento y la planificación del patrimonio natural y la biodiversidad. Cuál de los siguientes NO es uno de estos instrumentos:",
+        options: [
+          "a) El Listado de Especies en Régimen de Protección Especial",
+          "b) Los Planes de Ordenación de los Recursos Naturales (PORN)",
+          "c) Estrategia Estatal de Infraestructura Verde y de la Conectividad y Restauración Ecológicas",
+          "d) Inventario Español del Patrimonio Natural y de la Biodiversidad"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "21. Cuando hablamos del Inventario Español del Patrimonio Natural y la Biodiversidad (IEPNB), regulado en los art. 9-11 de la Ley 42/2007, de 13 de diciembre, NO es cierto que...",
+        options: [
+          "a) Una de sus herramientas es el sistema de indicadores, que se aprobarán mediante Acuerdo del Consejo de Ministros",
+          "b) Todos los datos del IEPNB se albergan en el llamado Banco de Datos de la Naturaleza",
+          "c) Está regulado por el Real Decreto 556/2011, de 20 de abril",
+          "d) El IEPNB incluye también el Inventario Español de Zonas Húmedas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "22. El Plan Estratégico del Patrimonio Natural y la Biodiversidad, será aprobado mediante (art. 13 de la Ley 42/2007):",
+        options: [
+          "a) Acuerdo del Consejo de Ministros",
+          "b) Real Decreto",
+          "c) Orden ministerial",
+          "d) Resolución de la Secretaría de Estado de Medio Ambiente del Ministerio, previa aprobación de la Conferencia Sectorial de Medio Ambiente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Real Decreto)[cite: 165]."
+      },
+      {
+        question: "23. Respecto a la Estrategia Estatal de Infraestructura Verde y de la Conectividad y Restauración Ecológicas, el art. 15 de la Ley 42/2007, de 13 de diciembre, establece que...",
+        options: [
+          "a) Es elaborada por el Ministerio en colaboración con las CCAA, y aprobada mediante Real Decreto",
+          "b) En base a esta Estrategia, las CCAA deberán desarrollar su propia Estrategia en un plazo máximo de 5 años",
+          "c) En Andalucía se ha aprobado el 'Plan Director para la mejora de la conectividad ecológica'",
+          "d) Todas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 165]."
+      },
+      {
+        question: "24. Los Planes de Ordenación de los Recursos Naturales (PORN) serán aprobados mediante:",
+        options: [
+          "a) Acuerdo del Consejo de Gobierno",
+          "b) Decreto del Consejo de Gobierno",
+          "c) Orden Conjunta de las Consejerías implicadas",
+          "d) Resolución de la DG de Medio Natural, Biodiversidad y Espacios Protegidos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Decreto del Consejo de Gobierno)[cite: 165]."
+      },
+      {
+        question: "25. El órgano de participación pública en el ámbito de la conservación y el uso sostenible del patrimonio natural y la biodiversidad, creado por el art. 8 de la Ley 42/2007, es...",
+        options: [
+          "a) La Conferencia Sectorial de Medio Ambiente",
+          "b) La Comisión Estatal para el Patrimonio Natural y la Biodiversidad",
+          "c) El Consejo Estatal para el Patrimonio Natural y la Biodiversidad",
+          "d) El Consejo de Medio Ambiente y Biodiversidad"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Consejo Estatal para el Patrimonio Natural y la Biodiversidad)[cite: 165]."
+      },
+      {
+        question: "26. El órgano de consultivo y de cooperación entre el Estado y las CCAA en materia de conservación del patrimonio natural y la biodiversidad, creado por el art. 7 de la Ley 42/2007 es...",
+        options: [
+          "a) La Conferencia Sectorial de Medio Ambiente",
+          "b) La Comisión Estatal para el Patrimonio Natural y la Biodiversidad",
+          "c) El Consejo Estatal para el Patrimonio Natural y la Biodiversidad",
+          "d) El Consejo de Medio Ambiente y Biodiversidad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La Comisión Estatal para el Patrimonio Natural y la Biodiversidad)[cite: 165]."
+      },
+      {
+        question: "27. Para adquirir la condición de Entidad colaboradora de la Consejería competente en materia de medio ambiente, de acuerdo con el art. 5 del Decreto 23/2012, de 14 de febrero, se debe cumplir:",
+        options: [
+          "a) Tener personalidad jurídica propia",
+          "b) Desarrollo de las actividades sin ánimo de lucro",
+          "c) Enviar el modelo de solicitud (cumplimentado) recogido en el Anexo III del Decreto 23/2012",
+          "d) Todas son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 165]."
+      },
+      {
+        question: "28. En base a lo dispuesto en el art. 32 de la Ley 8/2003, de 28 de octubre, la Consejería competente en materia de medio ambiente fomentará la constitución de las Reservas Ecológicas:",
+        options: [
+          "a) Mediante la declaración, por Decreto del Consejo de Gobierno, como espacios protegidos",
+          "b) En terrenos en terrenos o masas de agua en los que se realice un aprovechamiento compatible de carácter educativo, cultural, científico o de ocio, sin ánimo de lucro",
+          "c) Mediante su declaración, por Orden de la Consejería, previo convenio con titular del terreno",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 165]."
+      },
+      {
+        question: "29. La Red de Custodia del Territorio de Andalucía, dependiente de la Consejería competente en materia de medio ambiente, se crea por:",
+        options: [
+          "a) La Ley 42/2007, de 13 de diciembre, en su título I",
+          "b) La Ley 8/2003, de 28 de octubre, en su título I",
+          "c) El Decreto 23/2012, de 14 de febrero, en su capítulo I",
+          "d) Existen las Entidades de Custodia del Territorio, pero no la Red"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Decreto 23/2012, de 14 de febrero)[cite: 165]."
+      },
+      {
+        question: "30. En base al régimen general de protección de las especies silvestres, establecido por el art. 7 de la Ley 8/2003, de 28 de octubre, la prohibición de dar muerte, dañar, molestar o inquietar intencionadamente a los animales silvestres, se extiende a:",
+        options: [
+          "a) Todos los animales silvestres",
+          "b) Los animales silvestres incluidos en el Listado de Especies Silvestres en Régimen de Protección Especial",
+          "c) Los animales silvestres del Catálogo Español de Especies Amenazadas",
+          "d) Todas las anteriores, y además se aplicará a los animales dedicados al aprovechamiento de agricultura y ganadería"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Todos los animales silvestres)[cite: 165]."
+      },
+      {
+        question: "31. El art. 54.5 de la Ley 42/2007, en aras de garantizar la protección de las especies silvestres, establece la prohibición genérica de dar muerte, dañar, molestar o inquietar intencionadamente a los animales silvestres, sea cual fuere el método empleado. Asimismo, esta prohibición:",
+        options: [
+          "a) Se aplicará a los periodos de hibernación, reproducción, crianza y migración de las especies silvestres",
+          "b) Incluye la recolección de los huevos vacíos",
+          "c) Incluye la posesión, transporte, tráfico y comercio, salvo el comercio exterior",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Incluye la recolección de los huevos vacíos)[cite: 165]."
+      },
+      {
+        question: "32. El Listado Especies Silvestres en Régimen de Protección Especial (LESRPE), creado por el art. 56 de la Ley 42/2007 de 13 de diciembre, incluirá:",
+        options: [
+          "a) Las especies, subespecies y poblaciones merecedoras de una atención y protección particular en función de su valor científico, ecológico, cultural, por su singularidad, rareza, o grado de amenaza",
+          "b) Las especies que figuren como protegidas en los anexos de las Directivas y los convenios internacionales ratificados por España",
+          "c) A y B son correctas",
+          "d) Además de lo anterior, el Listado se incluye dentro del Catálogo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: A y B son correctas)[cite: 165]."
+      },
+      {
+        question: "33. La inclusión, exclusión o cambio de categoría de un taxón o población en el Listado Especies Silvestres en Régimen de Protección Especial (LESRPE) se aprobará, según el art. 6 del Real Decreto 139/2011, de 4 de febrero, por:",
+        options: [
+          "a) Acuerdo del Consejo de Ministros",
+          "b) Real Decreto",
+          "c) Orden ministerial",
+          "d) La modificación del LESRPE le corresponde a las CCAA"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Orden ministerial)[cite: 165]."
+      },
+      {
+        question: "34. La inclusión de un taxón o población en el LESRPE conllevará, según establece el art. 9 del Real Decreto 139/2011, de 4 de febrero, la evaluación periódica de su estado de conservación al menos cada:",
+        options: [
+          "a) 6 años si se trata de una especie del Catálogo",
+          "b) 6 años si se trata de una especie del Listado",
+          "c) 3 años si se trata de una especie del Catálogo",
+          "d) 3 años si se trata de una especies del Listado"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 años si se trata de una especie del Listado)[cite: 165]."
+      },
+      {
+        question: "35. El Catálogo Andaluz de Especies Amenazadas...",
+        options: [
+          "a) Fue creado por la Ley 8/2003, de 28 de octubre",
+          "b) Contiene las siguientes categorías de amenaza: Extinto, En peligro de Extinción, Vulnerable, y De interés especial",
+          "c) Se encuentra recogido en el Anexo I de la Ley 8/2003, de 28 de octubre",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Fue creado por la Ley 8/2003, de 28 de octubre)[cite: 165]."
+      },
+      {
+        question: "36. Señala la respuesta INCORRECTA respecto al Listado Andaluz de Especies Silvestres en Régimen de Protección Especial (LAESRPE), conforme a lo recogido en los art. 39 y 40 del Decreto 23/2012, de 14 de febrero:",
+        options: [
+          "a) Se encuentra incluido en el Anexo X del Decreto 23/2012, de 14 de febrero",
+          "b) Fue creado por la Ley 8/2003, de 28 de octubre",
+          "c) Incluye el Catálogo Andaluz de Especies Amenazadas",
+          "d) La inclusión, exclusión o cambio de categoría de un taxón o población en el Listado Andaluz o el Catálogo Andaluz, se realizará mediante Orden del titular de la Consejería de Medio Ambiente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 165]."
+      },
+      {
+        question: "37. De acuerdo con el art. 59 de la Ley de Patrimonio Natural y Biodiversidad, la inclusión de un taxón o población en el Catálogo Español de Especies Amenazadas, conllevará la elaboración de:",
+        options: [
+          "a) Un plan de conservación, en el plazo máximo de 3 años, cuando se incluya en la categoría de 'vulnerable'",
+          "b) Un plan de recuperación, en el plazo máximo de 5 años, cuando se incluya en la categoría de 'en peligro de extinción'",
+          "c) Un plan de conservación, en el plazo máximo de 5 años, cuando se incluya en la categoría de 'en peligro de extinción'",
+          "d) Un plan de conservación, en el plazo máximo de 5 años, cuando se incluya en la categoría de 'vulnerable'"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Un plan de conservación, en el plazo máximo de 5 años, cuando se incluya en la categoría de 'vulnerable')[cite: 165]."
+      },
+      {
+        question: "38. De acuerdo con la Orden TEC/1078/2018, de 28 septiembre, por la que se declaran especies en situación crítica, indica la respuesta INCORRECTA:",
+        options: [
+          "a) Cistus heterophyllus carthaginensis (Jara de Cartagena)",
+          "b) Marmaronetta angustirostris (Cerceta pardilla)",
+          "c) Pinna nobilis (Nacra común)",
+          "d) Patella ferruginea (Lapa ferruginea)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 165]."
+      },
+      {
+        question: "39. Las Estrategias de Conservación para las Especies Amenazadas, reguladas en el art. 60 de la Ley 42/2007..",
+        options: [
+          "a) Constituirán el marco orientativo de los Planes de Recuperación y Conservación",
+          "b) Las aprueban las CCAA",
+          "c) Serán publicadas en el BOE",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 165]."
+      },
+      {
+        question: "40. Los Planes de Recuperación y Conservación de Especies Amenazadas en Andalucía son aprobados por (art. 43 del Decreto 23/2012):",
+        options: [
+          "a) Decreto del Consejo de Gobierno",
+          "b) Acuerdo del Consejo de Gobierno",
+          "c) Orden de la Consejería",
+          "d) Orden conjunta de las Consejerías implicadas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Acuerdo del Consejo de Gobierno)[cite: 165]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. La Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, recoge una serie de principios inspiradores en su art. 2. Señale la respuesta INCORRECTA:",
+        options: [
+          "a) La conservación y restauración de la biodiversidad y de la geodiversidad mediante la conservación de los hábitats naturales y de la fauna y flora silvestres.",
+          "b) La prevalencia de la protección ambiental sobre la ordenación territorial y urbanística y los supuestos básicos de dicha prevalencia",
+          "c) La prevención de los problemas emergentes consecuencia del cambio climático, la mitigación y adaptación al mismo, así como la lucha contra sus efectos adversos",
+          "d) Todas las anteriores son principios de la Ley 42/2007"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son principios de la Ley 42/2007)[cite: 166]."
+      },
+      {
+        question: "2. La Ley 8/2003, de 28 de octubre, de la Flora y Fauna Silvestres es una norma:",
+        options: [
+          "a) Básica de ámbito estatal",
+          "b) Es una ley conservacionista, pues regula exclusivamente la conservación de la flora y la fauna silvestres",
+          "c) Es una ley autonómica que regula la conservación y aprovechamiento de especies silvestres",
+          "d) Son correctas las respuestas A y B"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Es una ley autonómica que regula la conservación y aprovechamiento de especies silvestres)[cite: 166]."
+      },
+      {
+        question: "3. La Ley 8/2003, de 28 de octubre, define \"Hábitat de una especie\" como:",
+        options: [
+          "a) Medio acuático o terrestre, diferenciado por sus características geográficas y factores abióticos y bióticos, donde desarrolla en todo o en parte su ciclo biológico",
+          "b) Complejo dinámico de comunidades vegetales, animales y de microorganismos y su medio no viviente que interactúan como una unidad funcional",
+          "c) Zonas terrestres o acuáticas diferenciadas por sus características geográficas, abióticas y bióticas, tanto si son enteramente naturales como seminaturales",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 166]."
+      },
+      {
+        question: "4. De acuerdo con las definiciones de la Ley 8/2003, de 28 de octubre, podemos considerar como \"especie silvestre\":",
+        options: [
+          "a) Las que viven o se reproducen de forma natural en estado salvaje en Andalucía, constituyendo este territorio la totalidad o parte de su área de distribución natural",
+          "b) Las distintas plantas, animales o formas de vida que desarrollen todo o parte de su ciclo biológico natural sin intervención regular del ser humano",
+          "c) Aquella que existe dentro de su área de distribución natural",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 166]."
+      },
+      {
+        question: "5. El Anexo VII de la Ley 42/2007, de 13 de diciembre, corresponde con:",
+        options: [
+          "a) Especies animales y vegetales de interés comunitario que requieren una protección estricta",
+          "b) Geodiversidad en el territorio español",
+          "c) Catálogo Español de Especies Amenazadas",
+          "d) Procedimientos para la captura o muerte de animales y modos de transporte que quedan prohibidos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 166]."
+      },
+      {
+        question: "6. La ley básica estatal sobre la conservación del Patrimonio Natural y la Biodiversidad, define los PORN (Planes de Ordenación de los Recursos Naturales), en su art. 17, como:",
+        options: [
+          "a) El instrumento para establecer y definir los objetivos, acciones y criterios que promuevan la conservación, uso sostenible y, en su caso, la restauración del patrimonio, recursos naturales terrestres y marinos y de la biodiversidad y de la geodiversidad",
+          "b) El instrumento de planificación adecuado para gestionar la protección de las especies amenazadas en un determinado ámbito espacial",
+          "c) El instrumento específico para la delimitación, tipificación, integración en red y determinación de su relación con el resto del territorio, de los sistemas que integran patrimonio y los recursos naturales de un determinado ámbito espacial",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 166]."
+      },
+      {
+        question: "7. Iniciado el procedimiento de aprobación de un PORN, y hasta que ésta se produzca, no podrá reconocerse a los interesados la facultad de realizar actos de transformación de la realidad física, geológica y biológica, sin informe favorable de la Administración actuante. A tenor del art. 23 de la Ley 42/2007, dicho informe deberá ser sustanciado y emitido por el órgano ambiental de la administración actuante en un plazo máximo de:",
+        options: [
+          "a) 90 días",
+          "b) 60 días",
+          "c) 30 días",
+          "d) 20 días"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 90 días)[cite: 166]."
+      },
+      {
+        question: "8. Los centros cuyo objeto es la recuperación de animales heridos o enfermos de especies amenazadas, para su posterior liberación en el medio natural, según las definiciones del Decreto 23/2012, de 14 de febrero, se corresponden con los:",
+        options: [
+          "a) CREA",
+          "b) CEGMA",
+          "c) Laboratorios de especies",
+          "d) Muladares"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: CREA)[cite: 166]."
+      },
+      {
+        question: "9. En relación con la naturalización de especies de fauna silvestre, el art. 15 de la Ley 8/2003, y el art. 36 del Decreto 23/2012, establecen que:",
+        options: [
+          "a) El propietario de fauna autóctona deberá comunicar la naturalización de sus ejemplares dentro del plazo de 1 mes desde la realización de la misma",
+          "b) Para ejemplares de especies alóctonas será necesaria la autorización de la Consejería de Medio Ambiente",
+          "c) Igualmente, la naturalización de especies cobradas de caza se podrá realizar previa comunicación a la Consejería de Medio Ambiente",
+          "d) A y B son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 166]."
+      },
+      {
+        question: "10. El Catálogo Andaluz de Árboles y Arboledas Singulares fue creado mediante el/la:",
+        options: [
+          "a) Ley 8/2003, de 28 de octubre",
+          "b) Ley 2/1992, de 15 de junio",
+          "c) Decreto 23/2012, de 14 de febrero",
+          "d) Decreto 208/1997, de 9 de septiembre"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley 8/2003, de 28 de octubre)[cite: 166]."
+      },
+      {
+        question: "11. El Real Decreto 139/2011, de 4 de febrero, desarrolla:",
+        options: [
+          "a) El Catálogo Español de Especies Amenazadas",
+          "b) El Listado de Especies Silvestres en Régimen de Protección Especial y el Catálogo Español de Especies Amenazadas",
+          "c) El Catálogo Español de Especies Exóticas Invasoras",
+          "d) La Lista de especies en situación crítica en el estado español"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 166]."
+      },
+      {
+        question: "12. Las categorías de especies amenazadas...",
+        options: [
+          "a) Son establecidas a nivel estatal por la Ley 42/2007, de 13 de diciembre",
+          "b) Las CCAA pueden aplicar las categorías establecidas por la normativa básica, o crear las suyas propias",
+          "c) Andalucía no ha establecido ninguna categoría adicional",
+          "d) Las categorías de amenaza son 4: Extinto, En peligro de Extinción, Vulnerable, y De interés Especial"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 166]."
+      },
+      {
+        question: "13. De las excepciones al régimen general de protección de las especies silvestres, establecidas en el art. 9 de la Ley 8/2003, de 28 de octubre, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Cuando sea necesario por razones justificadas de investigación, educación, repoblación o reintroducción, o cuando se precise para la cría en cautividad orientada a los mismos fines",
+          "b) Para prevenir accidentes en relación con la seguridad aérea",
+          "c) Cuando puedan derivarse daños para especies domésticas y ganaderas",
+          "d) Para prevenir perjuicios importantes para la agricultura, la ganadería, los bosques y montes o la calidad de las aguas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 166]."
+      },
+      {
+        question: "14. Las prohibiciones establecidas en el art. 7 de la Ley 8/2003, de 28 de octubre, serán de aplicación sobre:",
+        options: [
+          "a) Las especies del Catálogo Andaluz de Especies Amenazadas",
+          "b) Las especies del Listado de Especies Silvestres en Régimen de Protección Especial",
+          "c) Las especies silvestres objeto de regulación específica en materia de caza",
+          "d) Todas las especies silvestres"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las especies silvestres)[cite: 166]."
+      },
+      {
+        question: "15. La Resolución de 1 de agosto de 2018, de la Secretaría de Estado de Medio Ambiente, por la que se publica el Acuerdo de la Conferencia Sectorial de Medio Ambiente en relación al Listado de especies extinguidas en todo el medio natural español, incluye las siguientes especies:",
+        options: [
+          "a) Esturión europeo (Acipenser sturio)",
+          "b) Foca monje del Mediterráneo (Monachus monachus)",
+          "c) Lamprea de río (Lampetra fluviatilis)",
+          "d) Todas las anteriores están en el Listado"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores están en el Listado)[cite: 166]."
+      },
+      {
+        question: "16. Según establece el art. 55 de la Ley 42/2007, para realizar la reintroducción de especies silvestres autóctonas extinguidas del medio natural español, incluidas en el Listado de especies extinguidas, o aún presentes en España en estado silvestre pero extinguidas en un determinado ámbito territorial y que sean susceptibles de extenderse por otra u otras comunidades autónomas en las que la especie objetivo no está presente en la actualidad, deberá elaborarse un proyecto de reintroducción...",
+        options: [
+          "a) Que deberá ser avalado por el Consejo de Ministros",
+          "b) Que deberá recibir el informe favorable de la Comisión Estatal para el Patrimonio Natural y la Biodiversidad",
+          "c) Que deberá aprobarse previamente por el Consejo Estatal para el Patrimonio Natural y la Biodiversidad",
+          "d) Cuya autorización corresponderá a la Comisión Europea en el caso de que se trate de una especie de interés comunitario"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 166]."
+      },
+      {
+        question: "17. ¿Cuál de las siguientes es la principal amenaza del águila imperial ibérica (Aquila adalberti), según establece el Plan de Recuperación de dicha especie?:",
+        options: [
+          "a) Molestias en la reproducción",
+          "b) Electrocución en líneas eléctricas",
+          "c) Cebos envenenados",
+          "d) Reducción de las poblaciones de conejo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Electrocución en líneas eléctricas)[cite: 166]."
+      },
+      {
+        question: "18. El alimoche (Neophron percnopterus) está incluido en el Catálogo Español de Especies Amenazadas en la categoría de:",
+        options: [
+          "a) En peligro de extinción",
+          "b) Vulnerable",
+          "c) Sensible a la alteración de su hábitat",
+          "d) Está incluido en el Listado (LESRPE), pero no en el Catálogo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Vulnerable)[cite: 166]."
+      },
+      {
+        question: "19. ¿Cuál de las siguientes especies de helechos incluidos en el Plan de Recuperación y Conservación de Helechos aprobado por la Junta de Andalucía, está catalogada como vulnerable?",
+        options: [
+          "a) Christella dentata",
+          "b) Dryopteris guanchica",
+          "c) Psilotum nudum",
+          "d) Equisetum palustre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Equisetum palustre)[cite: 166]."
+      },
+      {
+        question: "20. Dentro del Plan de Recuperación y Conservación de Aves Esteparias encontramos tres especies en la categoría vulnerable, y cuatro especies en peligro de extinción. Indique cuáles se encuentran dentro de esta última categoría:",
+        options: [
+          "a) Aguilucho cenizo (Circus pygargus) y Sisón (Tetrax tetrax)",
+          "b) Avutarda (Otis tarda) y Ganga ortega (Pterocles orientalis)",
+          "c) Alondra ricotí (Chersophilus duponti) y Torillo andaluz (Turnix sylvatica)",
+          "d) Sisón (Tetrax tetrax) y Ganga ibérica (Pterocles alchata)"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Alondra ricotí y Torillo andaluz)[cite: 166]."
+      },
+      {
+        question: "21. Incluido en el Plan de Recuperación y Conservación de peces e invertebrados epicontinentales, cuando hablamos de un pez endémico de la península ibérica, catalogado en peligro de extinción, con una longitud aproximada de 5 centímetros, distribuido únicamente a lo largo de la costa mediterránea (en Andalucía, lo podemos encontrar en la cuenca del río Adra, la albuferas de Adra, y canales y balsas de riego asociadas a los invernaderos), nos estamos refiriendo a...",
+        options: [
+          "a) Aphanius Iberus (fartet)",
+          "b) Aphanius baeticus (salinete)",
+          "c) Anaecypris hispanica (jarabugo)",
+          "d) Iberocypris palaciosi (bogardilla)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Aphanius Iberus - fartet)[cite: 166]."
+      },
+      {
+        question: "22. De acuerdo con el Plan de Recuperación y Conservación de invertebrados amenazados y fanerógamas de medio marino, la fauna invertebrada marina del litoral andaluz y los fondos marinos destaca por su diversidad y vulnerabilidad. De las especies recogidas en este plan, ¿cuál de ellas, perteneciente al grupo de los moluscos, se caracteriza por vivir sobre sustratos rocosos de la franja mesolitoral?",
+        options: [
+          "a) Patella ferruginea",
+          "b) Pinna nobilis",
+          "c) Charonia lampas",
+          "d) Posidonia oceanica"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Patella ferruginea)[cite: 166]."
+      },
+      {
+        question: "23. La actividad de anillamiento científico constituye una de las excepciones al régimen general de protección, cuya autorización excepcional está regulada en el art. 20 del Decreto 23/2012, de 14 febrero. Si quisiéramos anillar ejemplares de la especie Merops apiaster, ¿qué requerimientos tendremos que cumplir?:",
+        options: [
+          "a) Estar en posesión de carnet de anillador",
+          "b) Carnet de anillador, y una autorización excepcional para anillar adultos de esta especie",
+          "c) Carnet de anillador, y una autorización excepcional para anillar pollos de esta especie",
+          "d) Sólo necesitamos carnet de anillador cuando se anilla esta especie en época de reproducción"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 166]."
+      },
+      {
+        question: "24. La tenencia o posesión de especies silvestres autóctonas, según la normativa autonómica se considera una actividad:",
+        options: [
+          "a) Sujeta al procedimiento de comunicación a la Consejería de Medio Ambiente",
+          "b) Prohibida para cualquier especie silvestre, con carácter general",
+          "c) Prohibida sólo para especies incluidas en el LESRPE",
+          "d) Prohibida sólo para especies incluidas en el Catálogo Andaluz de Especies Amenazadas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Prohibida con carácter general)[cite: 166]."
+      },
+      {
+        question: "25. Entre las medidas de conservación ex situ que establece la Ley básica estatal sobre Patrimonio Natural y Biodiversidad, Ley 42/2007, encontramos las siguientes:",
+        options: [
+          "a) Desarrollo de programas de cría y propagación fuera del hábitat natural",
+          "b) Promover la existencia de una Red de Bancos de Material Biológico y Genético",
+          "c) Las medidas de conservación deben realizarse in situ, a través de la conservación de los hábitats como garante de la conservación de las especies silvestres",
+          "d) A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y B son correctas)[cite: 166]."
+      },
+      {
+        question: "26. Dentro de Red Andaluza de Centros de Recuperación, Conservación, Andalucía cuenta con el Banco de Germoplasma Vegetal Andaluz, cuya sede se encuentra en:",
+        options: [
+          "a) Los Servicios Centrales de la Consejería competente en Medio Ambiente",
+          "b) La Universidad de Sevilla",
+          "c) El Jardín Botánico de Córdoba",
+          "d) Jerez de la Frontera"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Jardín Botánico de Córdoba)[cite: 166]."
+      },
+      {
+        question: "27. Los ensayos para determinar la calidad del material forestal de reproducción utilizado por la Consejería, mediante la realización de análisis físicos y biológicos de los distintos lotes de semillas, es una de las funciones de:",
+        options: [
+          "a) El Banco Andaluz de Germoplasma Vegetal",
+          "b) El Laboratorio de Propagación Vegetal",
+          "c) Los Jardines Botánicos de la Red",
+          "d) Los Viveros de la Red"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El Laboratorio de Propagación Vegetal)[cite: 166]."
+      },
+      {
+        question: "28. El Jardín Botánico \"El Castillejo\" está ubicado en la provincia de:",
+        options: [
+          "a) Cádiz, en el Parque Natural de Grazalema",
+          "b) Cádiz, en el Parque Natural de Los Alcornocales",
+          "c) Sevilla, en el Parque Natural de Sierra Norte de Sevilla",
+          "d) Málaga, en el Parque Natural de la Sierra de Tejeda, Almijara y Alhama"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cádiz, en el P.N. de Grazalema)[cite: 166]."
+      },
+      {
+        question: "29. ¿Cuántos centros de gestión del medio marino (CEGMA) existen en Andalucía?",
+        options: [
+          "a) 2",
+          "b) 3",
+          "c) 4",
+          "d) 1"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2 centros)[cite: 166]."
+      },
+      {
+        question: "30. Según establece el art. 21 del Decreto 23/2012, de 14 de febrero, la fotografía, filmación, grabación y seguimiento de especies silvestres requerirá una autorización excepcional cuando:",
+        options: [
+          "a) Afecte a cualquier especie en peligro de extinción y vulnerable",
+          "b) Se instalen puestos fijos durante más de una jornada",
+          "c) Las especies de la respuesta a), que además se encuentren en época de reproducción",
+          "d) A y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Se instalen puestos fijos durante más de una jornada)[cite: 166]."
+      },
+      {
+        question: "31. Conforme al art. 4 del Real Decreto 1432/2008, de 29 de agosto, por el que se establecen medidas para la protección de la avifauna contra la colisión y la electrocución en líneas eléctricas de alta tensión, las Zonas de Protección serán:",
+        options: [
+          "a) Las ZEPA y los ámbitos de aplicación de los planes de recuperación y conservación elaborados por las CCAA",
+          "b) Los Espacios Naturales Protegidos y los ámbitos de los planes de recuperación y conservación elaborados por las CCAA",
+          "c) Las ZEPA, los ámbitos de aplicación de los planes de recuperación y conservación elaborados por las CCAA, y las áreas prioritarias de reproducción, alimentación, dispersión y concentración local de especies del Catálogo",
+          "d) Los Espacios Naturales Protegidos y las áreas prioritarias de reproducción, alimentación, dispersión y concentración local de especies del Catálogo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 166]."
+      },
+      {
+        question: "32. En base al art. 7 del Real Decreto 1432/2008, de 29 de agosto, ¿Cada cuántos metros se dispondrán los salvapájaros o señalizadores visuales?",
+        options: [
+          "a) 20 metros",
+          "b) 10 metros",
+          "c) 5 metros",
+          "d) Cada 10 metros si el cable de tierra es único, o alternadamente, cada 20 metros, si son dos cables de tierra paralelos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 166]."
+      },
+      {
+        question: "33. Según establece el art. 2 del Real Decreto 1432/2008, de 29 de agosto, se define \"apoyo de alineación\" como:",
+        options: [
+          "a) Apoyo con cadenas de aislamiento de amarre",
+          "b) Apoyos que sirven para derivar nuevos ramales de la red",
+          "c) Apoyo de suspensión, amarre o anclaje usado en un tramo rectilíneo de la línea",
+          "d) Estructura del apoyo que sirve para anclar los aisladores que sujetan los conductores"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 166]."
+      },
+      {
+        question: "34. Las medidas anticolisión establecidas en el Decreto 178/2006, de 10 de octubre, reguladas en el art. 3, serán de aplicación a:",
+        options: [
+          "a) Todas las instalaciones aéreas de alta tensión, tanto de nueva construcción como a las ya existentes que discurran por zonas declaradas como ZEPA",
+          "b) Las instalaciones aéreas de alta tensión, existentes o de nueva construcción, que discurran por ZEPA calificadas por su importancia para laavutarda y el sisón",
+          "c) Las instalaciones aéreas de alta tensión de nueva construcción que discurran por espacios naturales protegidos",
+          "d) Todas son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 166]."
+      },
+      {
+        question: "35. La cuantía de las sanciones por infracciones muy graves que establece la Ley 8/2003, de 28 de octubre, en su art. 82, es de:",
+        options: [
+          "a) 100.000 a 1.000.000 de euros",
+          "b) 30.101 a 300.506,05 euros",
+          "c) 6.010 a 600.500 euros",
+          "d) 60.101,22 a 300.506,05 euros"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 60.101,22 a 300.506,05 euros)[cite: 166]."
+      },
+      {
+        question: "36. El cuadro de sanciones de la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, según dispone su art. 81, alcanza aproximadamente la cuantía de:",
+        options: [
+          "a) 2.000.000 de euros",
+          "b) 1.000.000 de euros",
+          "c) 600.000 euros",
+          "d) 300.000 euros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Hasta 2.000.000 de euros)[cite: 166]."
+      },
+      {
+        question: "37. El plazo de prescripción de las sanciones muy graves, graves y leves que establece la Ley 42/2007 de 13 de diciembre en su art. 83, será",
+        options: [
+          "a) 5, 2 y 1 año, respectivamente",
+          "b) 5, 3 y 1 año, respectivamente",
+          "c) 3, 2 y 1 año, respectivamente",
+          "d) 3, 1 y 6 meses, respectivamente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5, 3 y 1 año, respectivamente)[cite: 166]."
+      },
+      {
+        question: "38. A tenor del art. 67 de la Ley 8/2003, de 28 de octubre, el plazo máximo de resolución de los procedimientos sancionadores en materia de conservación de flora y fauna será de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 10 meses",
+          "d) 12 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 10 meses)[cite: 166]."
+      },
+      {
+        question: "39. Las infracciones leves tipificadas en la Ley 8/2003, de 28 de octubre, de la flora y fauna silvestres, según su art. 70, prescribirán pasado/s:",
+        options: [
+          "a) 6 meses",
+          "b) 1 año",
+          "c) 2 meses",
+          "d) 2 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6 meses)[cite: 166]."
+      },
+      {
+        question: "40. De acuerdo con el art. 11 del Decreto 23/2012, de 14 de febrero, la resolución de la solicitud para la constitución de una reserva ecológica le corresponderá a:",
+        options: [
+          "a) La persona titular de la Consejería competente en medio ambiente",
+          "b) La persona titular de la Delegación Territorial de la provincia donde se ubique el terreno",
+          "c) La respuesta anterior, y además, en caso de que el territorio se extienda por más de una provincia, será la persona titular de la Dirección general competente en materia de flora y fauna silvestre",
+          "d) La respuesta anterior, y además, en caso de que el territorio se extienda por más de una provincia, será la persona titular de la Delegación Territorial de la provincia que albergue mayor extensión"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 166]."
+      }
+    ];
+
+    const test3Questions = [
+      {
+        question: "1. ¿Cuál de los siguientes endemismos de la Sierra de Cazorla, Segura y las Villas NO está incluido en el Plan de Recuperación y Conservación de especies de Altas Cumbres?",
+        options: [
+          "a) Viola cazorlensis",
+          "b) Narcissus longispathus",
+          "c) Hormathophylla baetica",
+          "d) Geranium cazorlense"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Hormathophylla baetica)[cite: 167]."
+      },
+      {
+        question: "2. Señale cuál de las siguientes especies está catalogada en peligro de extinción en el Catálogo Andaluz de Especies Amenazadas",
+        options: [
+          "a) Betula pendula subespecie fontqueri",
+          "b) Quercus faginea, subespecie alpestris",
+          "c) Aquilegia pyrenaica, subespecie cazorlensis",
+          "d) Sarcocapnos baetica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Aquilegia pyrenaica, subespecie cazorlensis)[cite: 167]."
+      },
+      {
+        question: "3. ¿Cuál de las siguientes especies se corresponde con un alga invasora localizada principalmente por la costa de Almería?",
+        options: [
+          "a) Batrachochytrium dendrobatidis",
+          "b) Caulerpa racemosa",
+          "c) Psilotum nudum",
+          "d) Fallopia japonica"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Caulerpa racemosa)[cite: 167]."
+      },
+      {
+        question: "4. El nombre científico del cangrejo señal o cangrejo de California corresponde con:",
+        options: [
+          "a) Procambarus clarkii",
+          "b) Austropotamobius pallipes",
+          "c) Pacifastacus leniusculus",
+          "d) Eriocheir sinensis"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Pacifastacus leniusculus)[cite: 167]."
+      },
+      {
+        question: "5. ¿Cuál de las siguientes opciones corresponde con una especie endémica de Doñana?",
+        options: [
+          "a) Diplotaxis siettiana",
+          "b) Linaria tursica",
+          "c) Onopordum dissectum",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)[cite: 167]."
+      },
+      {
+        question: "6. ¿Cuál de las siguientes especies NO está incluida en el Plan de Recuperación y Conservación de peces e invertebrados epicontinentales?",
+        options: [
+          "a) Petromyzon marinus",
+          "b) Lampetra fluviatilis",
+          "c) Leuctra bidula",
+          "d) Acipenser sturio"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Lampetra fluviatilis)[cite: 167]."
+      },
+      {
+        question: "7. Indique cuál de las siguientes especies está catalogada en peligro de extinción según el Catálogo Español de Especies Amenazadas:",
+        options: [
+          "a) Ardeola ralloides",
+          "b) Ciconia nigra",
+          "c) Myotis capaccinii",
+          "d) Pandion haliaetus"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Myotis capaccinii)[cite: 167]."
+      },
+      {
+        question: "8. De los siguientes endemismos de Sierra Nevada, ¿Cuál está catalogado como vulnerable?",
+        options: [
+          "a) Pinguicula nevadensis",
+          "b) Erodium rupicola",
+          "c) Arenaria nevadensis",
+          "d) Odontites granatensis"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Pinguicula nevadensis)[cite: 167]."
+      },
+      {
+        question: "9. El Plan de Recuperación y Conservación de invertebrados amenazados y fanerógamas del medio marino incluye dos especies de gasterópodos. ¿Alguna de las especies siguientes es un gasterópodo?",
+        options: [
+          "a) Astroides calycularis",
+          "b) Cymodocea nodosa",
+          "c) Oxygastra curtisii",
+          "d) Dendropoma petraeum"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Dendropoma petraeum)[cite: 167]."
+      },
+      {
+        question: "10. La especie Plantago nivalis, conocida como la estrella de las nieves, es una especie:",
+        options: [
+          "a) Está catalogada en peligro de extinción",
+          "b) Es una endemismo de la Sierra de las Nieves",
+          "c) Está incluida en el LESRPE y en el Plan de Recuperación y Conservación de Altas Cumbres",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna de las anteriores es correcta)[cite: 167]."
+      },
+      {
+        question: "11. Laserpitium longiradium es un endemismo de:",
+        options: [
+          "a) Sierra Bermeja",
+          "b) Sierra Nevada",
+          "c) Sierra de Gádor",
+          "d) Doñana"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Sierra Nevada)[cite: 167]."
+      },
+      {
+        question: "12. La especie Limonium subglabrum es un endemismo de las margas y yesos de la zona de La Malahá (Granada). Indique en qué nivel de protección se encuentra actualmente:",
+        options: [
+          "a) Incluida en el Listado de Especies Silvestres en Régimen de Protección Especial (LESRPE)",
+          "b) Catalogada como vulnerable",
+          "c) Incluida en el Plan de dunas, arenales y acantilados costeros",
+          "d) B y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Catalogada como vulnerable)[cite: 167]."
+      },
+      {
+        question: "13. Sobre la lagartija de Valverde (Algyroides marchi), es CIERTO que:",
+        options: [
+          "a) Está catalogada en peligro de extinción",
+          "b) Está incluida en el LESRPE",
+          "c) Está catalogada como vulnerable",
+          "d) La C, y no está incluida en ningún Plan"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Catalogada como vulnerable y no incluida en ningún Plan)[cite: 167]."
+      },
+      {
+        question: "14. ¿Cuántas especies de anfibios tenemos recogidas en el Catálogo Andaluz de Especies Amenazadas?",
+        options: [
+          "a) 1",
+          "b) 3",
+          "c) 5",
+          "d) 6"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1 especie)[cite: 167]."
+      },
+      {
+        question: "15. Una de las siguientes especies NO está recogida en el Plan de Recuperación y Conservación de Aves de Humedales:",
+        options: [
+          "a) Fulica cristata",
+          "b) Botaurus stellaris",
+          "c) Pterocles alchata",
+          "d) Aythya niroca"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Pterocles alchata)[cite: 167]."
+      },
+      {
+        question: "16. Señale cuál de las siguientes especies está catalogada como vulnerable en el Catálogo Andaluz de Especies Amenazadas:",
+        options: [
+          "a) Juniperus oxycedrus, subespecie macrocarpa",
+          "b) Linaria lamarckii",
+          "c) Patella ferruginea",
+          "d) Chlidonias niger"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Juniperus oxycedrus subesp. macrocarpa)[cite: 167]."
+      },
+      {
+        question: "17. El nombre científico del sisón es:",
+        options: [
+          "a) Turnix sylvatica",
+          "b) Tetrax tetrax",
+          "c) Otis tarda",
+          "d) Circus pygargus"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tetrax tetrax)[cite: 167]."
+      },
+      {
+        question: "18. La especie Lynx pardinus está catalogada en peligro de extinción a nivel estatal y andaluz, y cuenta con un Plan de Recuperación aprobado por la Junta de Andalucía. ¿Cuál está considerada la principal amenaza para esta especie de acuerdo con dicho Plan?",
+        options: [
+          "a) La fragmentación y destrucción de su hábitat",
+          "b) Los problemas genéticos a causa de la existencia de poblaciones pequeñas y aisladas",
+          "c) La reducción en la población de conejos",
+          "d) Los atropellos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La fragmentación y destrucción de su hábitat)[cite: 167]."
+      },
+      {
+        question: "19. Indique cuál de las siguientes especies es un endemismo típico de Sierra Mágina:",
+        options: [
+          "a) Centaurea lainzii",
+          "b) Artemisia granatensis",
+          "c) Limonium malacitanum",
+          "d) Jurinea fontqueri"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Jurinea fontqueri)[cite: 167]."
+      },
+      {
+        question: "20. Si hablamos de una especie de gramínea originaria de América del Sur, con un claro comportamiento invasor que coloniza rápidamente terrenos removidos como cunetas, taludes y zonas abandonadas, llegando a formar poblaciones muy densas y numerosas que impiden el desarrollo de los ecosistemas autóctonos, y que porta en sus plumeros miles de semillas ligeras para dispersarse grandes distancias, nos referimos a la especie invasora:",
+        options: [
+          "a) Opuntia dillenii",
+          "b) Azolla spp",
+          "c) Cortaderia selloana",
+          "d) Agave americana"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cortaderia selloana)[cite: 167]."
+      },
+      {
+        question: "21. ¿Cuál de las siguientes especies está incluida en el Plan de Recuperación y Conservación de Helechos como especie vulnerable?",
+        options: [
+          "a) Diplazium caudatum",
+          "b) Equisetum palustre",
+          "c) Culcita macrocarpa",
+          "d) Todas las anteriores están catalogadas como vulnerables"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Equisetum palustre)[cite: 167]."
+      },
+      {
+        question: "22. De las siguientes especies, señale cuál está incluida en el Anexo del Real Decreto 630/2013, y por tanto es considerada una especie exótica invasora:",
+        options: [
+          "a) Eichhornia crassipes",
+          "b) Arbutus unedo, en Canarias",
+          "c) Ovis musimon, en Canarias",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)[cite: 167]."
+      },
+      {
+        question: "23. Indique cuál de los siguientes nombres científicos corresponde al chanchito, una especie incluida en el Catálogo Español de Especies Exóticas Invasoras:",
+        options: [
+          "a) Australoheros facetus",
+          "b) Lepomis gibbosus",
+          "c) Anaecypris hispanica",
+          "d) Gomphus graslinii"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Australoheros facetus)[cite: 167]."
+      },
+      {
+        question: "24. La especie Alopochen aegyptiacus, conocida como el ganso del Nilo, está considerada...",
+        options: [
+          "a) Una especie amenazada",
+          "b) Una especie exótica invasora en Canarias y Baleares",
+          "c) Una especie alóctona no incluida en el Catálogo Español de EEI",
+          "d) Una especie exótica invasora"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Una especie exótica invasora)[cite: 167]."
+      },
+      {
+        question: "25. El único pez catalogado como vulnerable dentro del Plan de Recuperación y Conservación de peces e invertebrados epicontinentales es...",
+        options: [
+          "a) Aphanius iberus",
+          "b) Macromia splendens",
+          "c) Salaria fluviatilis (=Blennius fluviatilis)",
+          "d) Squalius palaciosi (= Iberocypris palaciosi)"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Salaria fluviatilis)[cite: 167]."
+      }
+    ];
+
+    const test4Questions = [
+      {
+        question: "1. Conforme a lo dispuesto en el art. 57 del Estatuto de Autonomía de Andalucía, en materia de flora y fauna silvestre, le corresponderá a la Comunidad Autónoma de Andalucía...",
+        options: [
+          "a) Competencia exclusiva",
+          "b) Competencia compartida",
+          "c) Competencia ejecutiva",
+          "d) El art. 57 del Estatuto no regula la competencia en esa materia"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Competencia exclusiva)[cite: 168]."
+      },
+      {
+        question: "2. De acuerdo con el art. 205 del Estatuto de Autonomía de Andalucía, los poderes públicos velarán por la protección de los animales, en particular...",
+        options: [
+          "a) Por los animales silvestres",
+          "b) Por aquellas especies protegidos que cuenten con protección estatal y europea",
+          "c) Por aquellas especies en peligro de extinción",
+          "d) Por todas las especies silvestres autóctonas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Por aquellas especies en peligro de extinción)[cite: 168]."
+      },
+      {
+        question: "3. La Ley 42/2007 de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, en su art. 29 ter, define \"Especie naturalizada\" como:",
+        options: [
+          "a) Especie exótica invasora establecida en el ecosistema con carácter permanente, introducida legalmente antes de la entrada en vigor de la presente Ley, y respecto de la que no existan indicios ni evidencias de efectos significativos en el medio natural en que habita",
+          "b) Especie exótica, establecida en el ecosistema con carácter permanente, introducida legalmente antes de la entrada en vigor de la presente Ley, y respecto de la que no existan indicios ni evidencias de efectos significativos en el medio natural en que habita, presentando además un especial interés, social o económico",
+          "c) Especie que sin tener el carácter de autóctona en una zona ha sido introducida en tiempos históricos por el hombre, manteniendo actualmente una población estable y en equilibrio con el resto de la comunidad biológica.",
+          "d) Especie exótica que ha sido introducida en un nuevo hábitat y ha logrado establecerse y reproducirse exitosamente en ese entorno"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "4. La Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad, en su art. 22 bis, define \"Introducción\" como:",
+        options: [
+          "a) El movimiento por acción humana, voluntaria o accidental, de una especie fuera de su área de distribución natural. Este movimiento puede realizarse dentro de un país, o entre países o zonas fuera de la jurisdicción nacional",
+          "b) Entrada de una especie alóctona en un ecosistema natural, voluntaria o accidental",
+          "c) Liberación de ejemplares de especies en el medio natural, con o sin autorización",
+          "d) Proceso de traer y establecer deliberadamente una especie en un nuevo hábitat o área geográfica donde no es nativa"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 168]."
+      },
+      {
+        question: "5. Según el art. 6 de la Ley 42/2007 del Patrimonio Natural y la Biodiversidad, corresponde a las CCAA el ejercicio de las funciones a las que se refiere esta ley con respecto a especies (salvo las altamente migratorias) y espacios, hábitats o áreas críticas situados...",
+        options: [
+          "a) En el medio marino siempre que no exista continuidad ecológica con el terrestre",
+          "b) En el medio marino cuando exista continuidad ecológica con el espacio natural terrestre objeto de protección",
+          "c) En el medio marino, sólo cuando el espacio protegido haya sido declarado después de la entrada en vigor de la presente Ley",
+          "d) Sólo en el territorio de su Comunidad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "6. ¿En qué órgano colegiado, creado por la Ley 42/2007, de 13 de diciembre, podemos encontrar una representación de las entidades locales?",
+        options: [
+          "a) En la Conferencia Sectorial",
+          "b) En la Comisión Estatal para el Patrimonio Natural y la Biodiversidad",
+          "c) En el Consejo Estatal para el Patrimonio Natural y la Biodiversidad",
+          "d) En el Consejo Andaluz de Biodiversidad"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: En el Consejo Estatal para el Patrimonio Natural y la Biodiversidad)[cite: 168]."
+      },
+      {
+        question: "7. El contenido y estructura del Inventario Español del Patrimonio Natural y la Biodiversidad fue aprobado mediante:",
+        options: [
+          "a) Orden ministerial",
+          "b) Real Decreto",
+          "c) Está recogido en un Anexo de la Ley 42/2007",
+          "d) Por Resolución de la Dirección General competente en materia de Biodiversidad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Real Decreto)[cite: 168]."
+      },
+      {
+        question: "8. De acuerdo con el art. 11 de la Ley 42/2007, de 13 de diciembre, ¿cada cuánto tiempo se deberá realizar el informe sobre el estado y evolución del Patrimonio Natural y de la Biodiversidad?:",
+        options: [
+          "a) 5 años",
+          "b) 3 años",
+          "c) 10 años",
+          "d) 6 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 6 años)[cite: 168]."
+      },
+      {
+        question: "9. El Ministerio competente en materia de medio ambiente, conforme al art. 54 de la Ley 42/2007, de 13 de diciembre, sólo autorizará la importación en el territorio nacional de una especie del Listado de taxones alóctonos susceptibles de competir con las especies silvestres autóctonas, alterar su pureza genética o los equilibrios ecológicos, cuando...",
+        options: [
+          "a) El operador realice una evaluación de un análisis de riesgo y el resultado sea favorable",
+          "b) Dicha especie no se encuentre en el Catálogo Español de Especies Invasoras",
+          "c) Sólo podrá autorizarse si la especie no está en ese Listado",
+          "d) A y B son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 168]."
+      },
+      {
+        question: "10. El art. 58 de la Ley 42/2007, del Patrimonio Natural y de la Biodiversidad, define la categoría \"vulnerable\" como...",
+        options: [
+          "a) Taxones o poblaciones cuya supervivencia es poco probable si los factores causales de su actual situación siguen actuando",
+          "b) Taxones o poblaciones que corren el riesgo de pasar a la categoría anterior en un futuro inmediato si los factores adversos que actúan sobre ellos no son corregidos",
+          "c) Taxones o poblaciones cuya supervivencia en un futuro inmediato no es probable si los factores de amenaza no son corregidos",
+          "d) Taxones o poblaciones cuya evolución más probable es desfavorable si los factores causales continúan sin ser eliminados"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "11. Conforme al art. 60 de la Ley 42/2007, de 13 de diciembre, ¿A qué órgano le corresponde la aprobación de las Estrategias de conservación de especies amenazadas y de lucha contra amenazas para la biodiversidad?",
+        options: [
+          "a) Conferencia Sectorial de Medio Ambiente",
+          "b) Ministerio competente en materia de Medio Ambiente",
+          "c) Comisión Estatal del Patrimonio Natural y Biodiversidad",
+          "d) Consejo de Ministros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Conferencia Sectorial de Medio Ambiente)[cite: 168]."
+      },
+      {
+        question: "12. El art. 61 de la Ley 42/2007, de 13 de diciembre, regula las excepciones al régimen general de protección de especies, que podrán autorizarse cuando concurra alguna de las siguientes circunstancias. Indique la INCORRECTA:",
+        options: [
+          "a) Cuando sea necesario por razón de investigación, educación, repoblación o reintroducción, o cuando se precise para la cría en cautividad orientada a dichos fines",
+          "b) Si de su aplicación se derivaran efectos perjudiciales para la salud y seguridad de las personas",
+          "c) Para permitir, en condiciones estrictamente controladas y mediante métodos selectivos, la captura, retención o cualquier otra explotación prudente de determinadas especies, en pequeñas cantidades y con las limitaciones precisas para garantizar su conservación, siempre que no estén incluidas en el Catálogo.",
+          "d) En el caso de las aves, para prevenir accidentes en relación con la seguridad aérea"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "13. El Catálogo Español de Especies Exóticas Invasoras ha sido creado por:",
+        options: [
+          "a) Ley 42/2007, de 13 de diciembre",
+          "b) Real Decreto 630/2013, de 2 de agosto",
+          "c) Real Decreto 139/2011, de 4 de febrero",
+          "d) Fue creado por la Ley estatal anterior a la Ley 42/2007 (Ley 4/1989), pero aún no ha sido desarrollado"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley 42/2007, de 13 de diciembre)[cite: 168]."
+      },
+      {
+        question: "14. En los supuestos con regulación específica (en especial en la legislación de montes, caza, agricultura, sanidad y salud pública, pesca continental y pesca marítima), en casos excepcionales, por motivos imperiosos de interés público, incluidos los de naturaleza social y económica, el/la _____ podrá acordar la suspensión del procedimiento de catalogación de una especie o promover la descatalogación de una especie previamente catalogada como especie exótica invasora. De acuerdo con el art. 64, esta suspensión o descatalogación podrá realizarse mediante _____",
+        options: [
+          "a) Consejo de Ministros / Real Decreto",
+          "b) Comisión Estatal de Patrimonio Natural y Biodiversidad / Declaración como especie naturalizada",
+          "c) Titular del Ministerio de Medio Ambiente / Orden ministerial",
+          "d) Conferencia Sectorial / Declaración de interés público de primer orden"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "15. La inclusión de una especie o subespecie en el Catálogo Español de Especies Exóticas Invasoras, según establece el art. 7 del Real Decreto 630/2013, de 2 de agosto, conlleva las siguientes prohibiciones. Señala la respuesta INCORRECTA:",
+        options: [
+          "a) La prohibición genérica de su posesión, transporte, tráfico y comercio de ejemplares vivos, de sus restos o propágulos, que pudieran sobrevivir o reproducirse, incluyendo el comercio exterior",
+          "b) La prohibición de su introducción en el medio natural, dentro del ámbito del territorio nacional de aplicación recogido en el anexo de dicho Real Decreto",
+          "c) En todo caso, la prohibición de la devolución al medio natural de aquellos ejemplares de especies animales y vegetales incluidas en el catálogo que sean extraídos de la naturaleza por cualquier procedimiento",
+          "d) En ningún caso, se podrán contemplar actuaciones o comportamientos destinados al fomento de las especies incluidas en el Catálogo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "16. Para la gestión, control o posible erradicación, a través de la caza y la pesca, de especies objeto de aprovechamiento cinegético y piscícola incluidas en el Catálogo Español de EEI, el art. 64 ter de la Ley 42/2007, de 13 de diciembre, establece una serie de condiciones. Señale la respuesta CORRECTA:",
+        options: [
+          "a) Estas especies deben haber sido introducidas en el medio natural con posterioridad a la entrada en vigor de la Ley 42/2007",
+          "b) La caza y pesca quedará supeditada a la aprobación de la delimitación cartográfica del área ocupada por dichas especies antes de la entrada en vigor de la Ley 42/2007",
+          "c) La caza y pesca de estas especies fuera del área de distribución delimitada cartográficamente, sólo podrá realizarse con una autorización excepcional",
+          "d) Para poder realizar la caza o pesca de estas especies con el objetivo de su control o posible erradicación deberán ser previamente declaradas como especies naturalizadas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "17. El objeto del Real Decreto 630/2013, de 2 de agosto, queda regulado en su artículo 1, y consiste en (señala la respuesta INCORRECTA):",
+        options: [
+          "a) Regular el Catálogo Español de Especies Exóticas Invasoras",
+          "b) Establecer las características y contenido de las estrategias de gestión, control y posible erradicación de las especies exóticas invasoras",
+          "c) Se aplica además a los recursos fitogenéticos, pesqueros y zoogenéticos de naturaleza exótica",
+          "d) Establecer las medidas necesarias para prevenir la introducción de especies exóticas invasoras y para su control y posible erradicación"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "18. El art. 2 del Real Decreto 630/2013, de 2 de agosto, define a un \"animal de la fauna no autóctona que de manera individual depende de los humanos, convive con ellos, y ha asumido la costumbre de cautiverio\" como...",
+        options: [
+          "a) Especie exótica o alóctona",
+          "b) Animales domésticos",
+          "c) Animal de compañía exótico",
+          "d) Animales de compañía"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Animal de compañía exótico)[cite: 168]."
+      },
+      {
+        question: "19. De acuerdo con el procedimiento de inclusión o exclusión de especies en el Catálogo Español de EEI, regulado en el art. 5 del Real Decreto 630/2013, de 2 de agosto, una vez valorada la solicitud, la Dirección General competente notificará la decisión en un plazo máximo de _____, y transcurrido dicho plazo sin haberse notificado resolución expresa, la petición se entenderá _____.",
+        options: [
+          "a) 3 meses, desestimada",
+          "b) 6 meses, desestimada",
+          "c) 3 meses, estimada",
+          "d) 6 meses, estimada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 meses, desestimada)[cite: 168]."
+      },
+      {
+        question: "20. ¿Qué nombre recibe el fondo creado en el art. 78 de la Ley 42/2007, de 13 de diciembre, con el objeto de poner en práctica aquellas medidas destinadas a apoyar la consecución de los objetivos para lograr la transición a un modelo productivo y social más ecológico, en el ámbito de competencias del Ministerio para la Transición Ecológica y el Reto Demográfico?",
+        options: [
+          "a) Fondo del patrimonio natural y la biodiversidad",
+          "b) Fondo para la transición ecológica",
+          "c) Fondo de restauración ecológica y resiliencia",
+          "d) Fondo de conservación y economía circular"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Fondo de restauración ecológica y resiliencia)[cite: 168]."
+      },
+      {
+        question: "21. La destrucción del hábitat de especies incluidas en el Listado de Especies Silvestres en Régimen de Protección Especial que no estén catalogadas, en particular del lugar de reproducción, invernada, reposo, campeo o alimentación, conforme al art. 80 de la Ley 42/2007, se tratará de una infracción calificada como:",
+        options: [
+          "a) Muy grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Tiene que valorarse el tiempo necesario para restaurar el daño causado para poder calificar la infracción"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 168]."
+      },
+      {
+        question: "22. Indique cuál de los siguientes Hábitat de Interés Comunitario recogidos en el Anexo I de la Ley 42/2007, de 13 de diciembre, y presente en Andalucía, es considerado prioritario:",
+        options: [
+          "a) 2250. Dunas litorales con Juniperus spp",
+          "b) 6310. Dehesas perennifolias de Quercus spp",
+          "c) 9380. Bosques de Ilex aquifolium",
+          "d) 1320. Pastizales de Spartina (Spartinion maritimae)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2250. Dunas litorales con Juniperus spp)[cite: 168]."
+      },
+      {
+        question: "23. Señale cuál de los siguientes Hábitat de Interés Comunitario recogidos en el Anexo I de la Ley 42/2007, de 13 de diciembre, y presentes en Andalucía, NO está considerado como prioritario:",
+        options: [
+          "a) 1120. Praderas de Posidonia (Posidonion oceanicae)",
+          "b) 2130. Dunas costeras fijas con vegetación herbácea (dunas grises)",
+          "c) 3170. Estanques temporales mediterráneos",
+          "d) 9520. Abetales de Abies pinsapo"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 9520. Abetales de Abies pinsapo)[cite: 168]."
+      },
+      {
+        question: "24. Dentro del bloque II (Contextos geológicos de España de relevancia mundial) del Anexo VIII de la Ley 42/2007, de 13 de diciembre, se incluyen una serie de elementos de la Geodiversidad española, entre los que se encuentran:",
+        options: [
+          "a) La Faja Pirítica Ibérica",
+          "b) Extensión miocena en el Dominio de Alborán",
+          "c) Mineralizaciones de mercurio de la región de Almadén",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)[cite: 168]."
+      },
+      {
+        question: "25. El Anexo V de la Ley 42/2007, del Patrimonio Natural y de la Biodiversidad, recoge:",
+        options: [
+          "a) Las especies animales y vegetales de interés comunitario cuya recogida en la naturaleza y cuya explotación pueden ser objeto de medidas de gestión",
+          "b) Las especies animales y vegetales de interés comunitario que requieren una protección estricta",
+          "c) Las especies animales y vegetales de interés comunitario para cuya conservación es necesario designar zonas especiales de conservación",
+          "d) Procedimientos para la captura o muerte de animales y modos de transporte que quedan prohibidos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "26. \"La utilización de productos químicos o de sustancias biológicas, la realización de vertidos, tanto líquidos como sólidos, el derrame de residuos, así como el depósito de elementos sólidos para rellenos, que alteren las condiciones de los ecosistemas con daño para los valores en ellos contenidos\", está tipificado como una infracción a la Ley 42/2007, de 13 de diciembre. ¿De qué tipo de infracción se trata según lo dispuesto en el art. 80 de dicha Ley?",
+        options: [
+          "a) Infracción muy grave si la valoración de los daños supera los 100.000 euros",
+          "b) Infracción grave si la valoración de los daños es inferior a 200.000 euros",
+          "c) También se considera infracción cuando no se hayan producido daños, pero hubiera existido un riesgo serio de alteración de los ecosistemas",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 168]."
+      },
+      {
+        question: "27. En relación con la tenencia y cría en cautividad de especies silvestres, la Ley 8/2003, de flora y fauna silvestres, establece en su art. 11 que:",
+        options: [
+          "a) Para la tenencia de especies silvestres será necesaria la autorización de la CMA",
+          "b) Para cría en cautividad de especies silvestres será necesaria una autorización de la CMA, salvo en el caso de especies amenazadas que no está permitido",
+          "c) La tenencia de especies silvestres requerirá la documentación y/o marca indeleble e inviolable que acredite su legal adquisición",
+          "d) Tanto la tenencia como la cría en cautividad de especies silvestres requieren autorización de la CMA, y en el caso de especies amenazadas sólo será posible su tenencia en parques zoológicos o en centros públicos autorizados."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "28. De las siguientes circunstancias, señale aquella que NO está recogida en el art. 9 de la Ley 8/2003, de flora y fauna silvestres, como una de las excepciones al régimen general de protección:",
+        options: [
+          "a) Para la recogida esporádica, en pequeñas cantidades de ejemplares silvestres en lugares y fechas tradicionales, siempre que no entrañe riesgo de desaparición local de la especie",
+          "b) Para prevenir perjuicios importantes para la agricultura, ganadería, los bosques y montes o calidad de las aguas",
+          "c) Para prevenir accidentes en relación con la seguridad aérea",
+          "d) Cuando las especies de flora y fauna silvestres provoquen riesgos para la salud o seguridad de las personas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 168]."
+      },
+      {
+        question: "29. En relación con el Catálogo Andaluz de Especies Amenazadas, indique la respuesta INCORRECTA:",
+        options: [
+          "a) Fue creado por la Ley 8/2003, de 28 de octubre",
+          "b) Incluye las categorías Extinto, En Peligro de Extinción, Vulnerable, y de Interés Especial",
+          "c) Está incluido dentro del Listado Andaluz de Especies Silvestres en Régimen de Protección Especial",
+          "d) Ha sido modificado por el Decreto 23/2012, de 14 de febrero"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "30. La catalogación de una determinada especie en alguna de las categorías de amenaza del Catálogo Andaluz de Especies Amenazadas, exigirá, según el art. 27 de la Ley 8/2003, de 28 de octubre, la elaboración para la misma de alguno de los siguientes planes:",
+        options: [
+          "a) Un plan de manejo para las especies catalogadas como sensibles a la alteración de su hábitat",
+          "b) Un plan de restauración para las especies catalogadas en peligro de extinción",
+          "c) Un plan de conservación para las especies catalogadas como vulnerables",
+          "d) Un plan de viabilidad para las especies catalogadas como extintas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un plan de conservación para las especies catalogadas como vulnerables)[cite: 168]."
+      },
+      {
+        question: "31. La vigilancia, inspección y control de las especies y sus hábitats corresponde a la Consejería competente en materia de medio ambiente a través de los agentes de medio ambiente, que en el ejercicio de sus funciones, podrán, de acuerdo con el art. 65 de la Ley 8/2003, de 28 de octubre (Señala la respuesta INCORRECTA):",
+        options: [
+          "a) Tomar o sacar muestras de sustancias y materiales",
+          "b) Acceder y entrar libremente en todo tipo de terreno e instalaciones sujetos a inspección, en cualquier momento y sin previo aviso",
+          "c) Se deberá respetar, en todo caso, la inviolabilidad del domicilio",
+          "d) Las respuestas anteriores sólo se podrán realizar si se notifica la presencia de los agentes al titular o representante"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 168]."
+      },
+      {
+        question: "32. Según lo dispuesto en el art. 70 de la Ley 8/2003, de 28 de octubre, la prescripción de las sanciones por infracciones muy graves, graves y leves será de:",
+        options: [
+          "a) 5, 3 y 1 año, respectivamente",
+          "b) 5, 2 y 1 año, respectivamente",
+          "c) 3, 2 y 1 año respectivamente",
+          "d) 3, 2 años y 6 meses, respectivamente"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 3, 2 y 1 año respectivamente)[cite: 168]."
+      },
+      {
+        question: "33. La destrucción o degradación manifiesta del hábitat de especies amenazadas catalogadas como vulnerables o de interés especial, o de sus lugares de reproducción, invernada, reposo, campeo o alimentación, será, conforme al art. 74 de la Ley 8/2003, de 28 de octubre, una infracción:",
+        options: [
+          "a) Muy grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Si la destrucción del hábitat es irreparable, será muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 168]."
+      },
+      {
+        question: "34. Conforme al art. 83 de la Ley 8/2003, de 28 de octubre, la comisión de una infracción grave podrá llevar aparejada una sanción accesoria que consiste en:",
+        options: [
+          "a) La suspensión o inhabilitación para la obtención de la correspondiente licencia o autorización del aprovechamiento por un periodo comprendido entre 6 meses y 5 años",
+          "b) La suspensión o inhabilitación para la obtención de la correspondiente licencia o autorización del aprovechamiento por un periodo comprendido entre un mes y 5 años",
+          "c) La suspensión o inhabilitación para la obtención de la correspondiente licencia o autorización del aprovechamiento por un periodo comprendido entre 1-10 años",
+          "d) La suspensión o inhabilitación para la obtención de la correspondiente licencia o autorización del aprovechamiento por un periodo comprendido entre 2-10 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 168]."
+      },
+      {
+        question: "35. A tenor del art. 2 del Real Decreto 1432/2008, de 29 de agosto, por el que se establecen medidas para la protección de la avifauna contra la colisión y la electrocución en líneas de alta tensión, la definición \"dispositivo externo colocado sobre las crucetas para evitar que se posen las aves\", corresponde a:",
+        options: [
+          "a) Salvapájaros",
+          "b) Señalizador",
+          "c) Protector de cruceta",
+          "d) Disuasor de posada"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Disuasor de posada)[cite: 168]."
+      },
+      {
+        question: "36. A tenor del art. 2 del Real Decreto 1432/2008, de 29 de agosto, por el que se establecen medidas para la protección de la avifauna contra la colisión y la electrocución en líneas de alta tensión, la \"distancia mínima de seguridad (d)\" se define como:",
+        options: [
+          "a) La comprendida entre la punta de la cruceta y la grapa de amarre",
+          "b) La comprendida entre el inicio del conductor y el final del aislador",
+          "c) La comprendida entre el inicio y el final de la cadena de aisladores",
+          "d) La comprendida entre el extremo superior del apoyo y los puentes entre conductores"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 168]."
+      },
+      {
+        question: "37. Las medidas antielectrocución establecidas en el Decreto 178/2006, de 10 de octubre, por el que se establecen normas de protección de la avifauna para las instalaciones eléctricas de alta tensión, serán de aplicación a las instalaciones eléctricas aéreas de alta tensión cuando se trate de (Señala la INCORRECTA):",
+        options: [
+          "a) Ampliaciones o modificaciones de las líneas existentes que requieran autorización administrativa",
+          "b) Líneas existentes que discurran por ZEC y ZEPAS",
+          "c) Líneas existentes ubicadas en espacios naturales protegidos",
+          "d) Líneas de nueva construcción"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "38. El Decreto 23/2012 de 14 de febrero, dispone en su Sección 4ª. Parques Zoológicos, que conforme a la Ley 31/2003, de 27 de octubre, de conservación de la fauna silvestre en parques zoológicos, le corresponderá a la Consejería competente en materia de medio ambiente las siguientes funciones:",
+        options: [
+          "a) Establecer los requisitos sobre bienestar animal que se deben cumplir en dichos recintos",
+          "b) Realizar las inspecciones para comprobar que se cumplen los requisitos de bienestar animal, al menos una vez al año",
+          "c) Los requisitos serán aprobados mediante Orden de la Consejería",
+          "d) Todas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)[cite: 168]."
+      },
+      {
+        question: "39. En relación con la aprobación de los planes de especies amenazadas, el art. 41 del Decreto 23/2012, de 14 de febrero, establece lo siguiente:",
+        options: [
+          "a) Se podrán aprobar planes que abarquen varios taxones o poblaciones siempre que tengan la misma categoría",
+          "b) Sólo pueden incluirse especies amenazadas del Catálogo Andaluz",
+          "c) Los planes permanecerán vigentes por el tiempo que se establezca en cada plan y como mínimo hasta que las especies pasen a una categoría de protección inferior",
+          "d) Todas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 168]."
+      },
+      {
+        question: "40. De acuerdo con lo dispuesto en el art. 55 del Decreto 23/2012, de 14 de febrero, sobre la circulación de vehículos a motor en el medio natural, las normas y disposiciones que establece dicho Decreto serán aplicables a (Señala la respuesta INCORRECTA):",
+        options: [
+          "a) Los terrenos forestales y las vías pecuarias",
+          "b) Los espacios naturales protegidos",
+          "c) Las carreteras y vías de comunicación",
+          "d) Los lechos de lagos, lagunas y embalses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las carreteras y vías de comunicación)[cite: 168]."
+      }
+    ];
+
+    const test5Questions = [
+      {
+        question: "1. El pinsapo (Abies pinsapo) es una especie...",
+        options: [
+          "a) Catalogada como vulnerable",
+          "b) Es un endemismo de Sierra Morena",
+          "c) Se ha aprobado un Plan de Recuperación para esta especie",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Se ha aprobado un Plan de Recuperación)[cite: 169]."
+      },
+      {
+        question: "2. Señale cuál de las siguientes especies está catalogada en peligro de extinción en el Catálogo Andaluz de Especies Amenazadas:",
+        options: [
+          "a) Salix hastata",
+          "b) Pennisetum setaceum",
+          "c) Martes foina",
+          "d) Rugulopteryx okamurae"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Salix hastata)[cite: 169]."
+      },
+      {
+        question: "3. ¿Cuál de las siguientes especies NO es una especie exótica invasora?",
+        options: [
+          "a) Acacia dealbata",
+          "b) Asparagus asparagoides",
+          "c) Pacifastacus leniusculus",
+          "d) Erigeron frigidus"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Erigeron frigidus)[cite: 169]."
+      },
+      {
+        question: "4. La Resolución de 1 de agosto de 2018, de la Secretaría de Estado de Medio Ambiente, por la que se publica el Acuerdo de la Conferencia Sectorial de Medio Ambiente en relación al Listado de especies extinguidas en todo el medio natural español, incluye varias especies entre las que NO se encuentra:",
+        options: [
+          "a) Foca monje del mediterráneo (Monachus monachus)",
+          "b) Gallo lira (Tetrao tetrix)",
+          "c) Torillo (Turnix sylvatica)",
+          "d) Murciélago mediterráneo de herradura (Rhinolophus euryale)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Rhinolophus euryale)[cite: 169]."
+      },
+      {
+        question: "5. ¿Cuál de las siguientes especies está incluida en el Plan de Recuperación y Conservación de Aves de Humedales, se ha declarado en \"situación crítica\", y tiene aprobado un Programa LIFE para su recuperación?",
+        options: [
+          "a) Marmaronetta angustirostris",
+          "b) Himantopus himantopus",
+          "c) Pandion haliaetus",
+          "d) Oxyura jamaicensis"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Marmaronetta angustirostris)[cite: 169]."
+      },
+      {
+        question: "6. ¿Cuál es la principal población del águila imperial ibérica (Aquila adalberti) en Andalucía, según lo dispuesto en el Plan de Recuperación aprobado para esta especie?",
+        options: [
+          "a) Doñana",
+          "b) Sierras de Cádiz",
+          "c) Sierra Morena",
+          "d) Sierra Nevada"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Sierra Morena)[cite: 169]."
+      },
+      {
+        question: "7. ¿Cuál de las siguientes especies NO es un endemismo de Sierra Nevada?",
+        options: [
+          "a) Laurus nobilis",
+          "b) Laserpitium longiradium",
+          "c) Artemisia granatensis",
+          "d) Tephroseris elodes"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Laurus nobilis)[cite: 169]."
+      },
+      {
+        question: "8. ¿Qué tienen en común las especies Gomphus graslinii, Macromia splendens y Oxygastra curtisii?",
+        options: [
+          "a) Son especies de invertebrados del Orden Odonatos (libélulas)",
+          "b) Están incluidas en el Plan de Recuperación y Conservación de Altas Cumbres",
+          "c) Las tres especies están catalogadas como vulnerables",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Son odonatos/libélulas)[cite: 169]."
+      },
+      {
+        question: "9. La especie Posidonia oceanica está incluida dentro del Plan de Recuperación y Conservación de Invertebrados Amenazados y fanerógamas del medio marino, ¿qué grado de protección se ha establecido para ella?",
+        options: [
+          "a) Vulnerable",
+          "b) Incluida en el Listado de Especies Silvestres en Régimen de Protección Especial",
+          "c) En Peligro de Extinción",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Incluida en el LESRPE)[cite: 169]."
+      },
+      {
+        question: "10. Señale la respuesta CORRECTA sobre la especie Betula pendula subsp. fontqueri:",
+        options: [
+          "a) Está catalogada en peligro de extinción",
+          "b) Es una especie forestal sin protección especial",
+          "c) Está catalogada como vulnerable y recogida en el Plan de Recuperación y Conservación de Altas Cumbres",
+          "d) Es una especie exótica invasora"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 169]."
+      },
+      {
+        question: "11. ¿Cuál es la principal enfermedad que afecta a los anfibios en Andalucía?:",
+        options: [
+          "a) Marteiliosis",
+          "b) Quitridiomicosis",
+          "c) Enfermedad hemorrágica vírica",
+          "d) Tuberculosis zoonótica"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Quitridiomicosis)[cite: 169]."
+      },
+      {
+        question: "12. ¿Qué nivel de protección tiene el Ibis eremita (Geronticus eremita) en los listados y catálogos estatales?",
+        options: [
+          "a) Incluida en el Listado de Especies Silvestres en Régimen de Protección Especial (LESRPE)",
+          "b) Catalogada como vulnerable",
+          "c) Catalogada en peligro de extinción",
+          "d) Catalogada como extinta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Incluida en el LESRPE)[cite: 169]."
+      },
+      {
+        question: "13. Señale el nombre científico y el grado de protección de la especie que aparece en la imagen (Delichon urbicum):",
+        options: [
+          "a) Hirundo rustica, catalogada como vulnerable",
+          "b) Troglodytes troglodytes, listada en el LESRPE",
+          "c) Delichon urbicum, listada en el LESRPE",
+          "d) Chersophilus duponti, catalogada en peligro de extinción"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Delichon urbicum, listada en el LESRPE)[cite: 169]."
+      },
+      {
+        question: "14. Nos encontramos ante un ave zancuda de aspecto inconfundible por su gran tamaño, su plumaje de color blanco, y su costumbre de vadear los someros fondos de los humedales mientras rastrea el fango con su pico largo y aplanado... Las principales colonias reproductoras en Andalucía se encuentran en Marismas del Odiel, Doñana y Marismas de Isla Cristina. ¿De qué especie estamos hablando?",
+        options: [
+          "a) Ciconia ciconia",
+          "b) Ardeola ralloides",
+          "c) Platalea leucorodia",
+          "d) Alopochen aegyptiacus"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Platalea leucorodia - Espátula)[cite: 169]."
+      },
+      {
+        question: "15. ¿En qué nivel de protección jurídica se encuentra la especie de la pregunta anterior (Platalea leucorodia)?",
+        options: [
+          "a) Catalogada como vulnerable",
+          "b) Catalogada en peligro de extinción",
+          "c) Listada en el LESRPE",
+          "d) Ninguna de las anteriores"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Listada en el LESRPE)[cite: 169]."
+      },
+      {
+        question: "16. Qué nivel de protección tiene en Andalucía la especie Salamandra salamandra subsp. longirostris?:",
+        options: [
+          "a) Catalogada como vulnerable",
+          "b) Catalogada en peligro de extinción",
+          "c) Listada en el LESRPE",
+          "d) Ninguna de las anteriores"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Listada en el LESRPE)[cite: 169]."
+      },
+      {
+        question: "17. Señale el nombre científico de la especie que aparece en la imagen (Abubilla):",
+        options: [
+          "a) Merops apiaster",
+          "b) Upupa epops",
+          "c) Pterocles alchata",
+          "d) Psittacula krameri"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Upupa epops)[cite: 169]."
+      },
+      {
+        question: "18. ¿Cuál de las siguientes especies del Catálogo Andaluz de Especies Amenazadas se encuentra en la categoría de vulnerable?",
+        options: [
+          "a) Dryopteris guanchica (helecho canario)",
+          "b) Myotis capaccinii (murciélago patudo)",
+          "c) Nyctalus lasiopterus (nóctulo grande)",
+          "d) Neophron percnopterus (alimoche común)"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Nyctalus lasiopterus)[cite: 169]."
+      },
+      {
+        question: "19. ¿Qué nivel de protección tiene el delfín común (Delphinus delphis) en el Mediterráneo?",
+        options: [
+          "a) Catalogado como vulnerable",
+          "b) Listado en el LESRPE",
+          "c) Catalogado en peligro de extinción",
+          "d) El delfín común no está incluido en el Listado, sí lo está el delfín mular (Tursiops truncatus)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Catalogado como vulnerable)[cite: 169]."
+      },
+      {
+        question: "20. Las especies que se indican a continuación comparten varias características: se distribuyen por zonas costeras del litoral atlántico, están catalogadas como vulnerables en el Catálogo Andaluz de Especies Amenazadas, e incluidas en el Plan de Recuperación y Conservación de especies de dunas, arenales y acantilados costeros. Señale aquella que NO cumple con estos requisitos:",
+        options: [
+          "a) Dianthus hinoxianus",
+          "b) Erodium astragaloides",
+          "c) Carduus myriacanthus",
+          "d) Juniperus oxycedrus subsp. macrocarpa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Erodium astragaloides)[cite: 169]."
+      },
+      {
+        question: "21. La especie Culcita macrocarpa, ¿se encuentra incluida en algún Plan de Recuperación y/o conservación de especies amenazadas?",
+        options: [
+          "a) Sí, en el Plan de Recuperación y Conservación de especies de Altas Cumbres",
+          "b) Sí, en el Plan de Recuperación y Conservación de Helechos",
+          "c) No, esta especie sólo está listada en el LAESRPE",
+          "d) Sí, en el Plan de Recuperación y Conservación de Invertebrados amenazados y Fanerógamas del medio marino"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Plan de Recuperación y Conservación de Helechos)[cite: 169]."
+      },
+      {
+        question: "22. ¿Cuál es la única especie de ANFIBIO que se encuentra catalogada en Andalucía?",
+        options: [
+          "a) Algyroides marchi (Lagartija de Valverde)",
+          "b) Alytes dickhilleni (sapo partero bético)",
+          "c) Trachemys scripta (Galápago de Florida)",
+          "d) Hyla arborea (Ranita de San Antón)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Alytes dickhilleni)[cite: 169]."
+      },
+      {
+        question: "23. Indique cuál de las siguientes especies está recogida en el Anexo del Real Decreto 630/2013, de 2 de agosto:",
+        options: [
+          "a) Opuntia maxima",
+          "b) Pistia stratiotes",
+          "c) Carpobrotus edulis",
+          "d) Todas las especies anteriores están incluidas en el Anexo"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores)[cite: 169]."
+      },
+      {
+        question: "24. La especie Sarcocapnos speciosa, conocida como Hierba de la Lucía o Zapaticos de la Virgen, es una especie...",
+        options: [
+          "a) Amenazada, en la categoría en peligro de extinción",
+          "b) Amenazada, e incluida en el Plan de Recuperación y Conservación de Helechos",
+          "c) Listada en el LAESRPE",
+          "d) Incluida en el Catálogo de Especies Exóticas Invasoras"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Catalogada en peligro de extinción)[cite: 169]."
+      },
+      {
+        question: "25. Indique el nombre científico de la especie que aparece en la imagen (Cigüeñuela):",
+        options: [
+          "a) Himantopus himantopus",
+          "b) Chlidonias niger",
+          "c) Aythya niroca",
+          "d) Myiopsitta monachus"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Himantopus himantopus)[cite: 169]."
+      },
+      {
+        question: "26. Indique el nombre científico de la especie que aparece en la imagen (Martín pescador):",
+        options: [
+          "a) Alcedo atthis",
+          "b) Hirundo rustica",
+          "c) Luscinia megarhynchos",
+          "d) Estrilda astrild"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Alcedo atthis)[cite: 169]."
+      },
+      {
+        question: "27. ¿En qué Plan de Recuperación y Conservación está incluida la especie Goniomma compressisquama, catalogada como vulnerable?",
+        options: [
+          "a) Se trata de un invertebrado, dentro del Plan de Recuperación y Conservación de Altas Cumbres",
+          "b) Se trata de un invertebrado, dentro del Plan de Recuperación y Conservación de Dunas, Arenales y Acantilados Costeros",
+          "c) Se trata de una especie de flora, dentro del Plan de Recuperación y Conservación de Helechos",
+          "d) Se trata de un invertebrado, dentro del Plan de Recuperación y Conservación de peces e invertebrados epicontinentales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Invertebrado en Plan de Dunas, Arenales y Acantilados Costeros)[cite: 169]."
+      },
+      {
+        question: "28. ¿A qué especie de ave corresponde esta silueta en vuelo?",
+        options: [
+          "a) Gypaetus barbatus",
+          "b) Milvus milvus",
+          "c) Neophron percnopterus",
+          "d) Aquila adalberti"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Neophron percnopterus - Alimoche)[cite: 169]."
+      },
+      {
+        question: "29. ¿Cuál es el nombre científico de la especie que aparece en la imagen (Focha cornuda)?",
+        options: [
+          "a) Aythya niroca",
+          "b) Fulica cristata",
+          "c) Otis tarda",
+          "d) Tetrax tetrax"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Fulica cristata)[cite: 169]."
+      },
+      {
+        question: "30. Indique la respuesta correcta sobre la especie de la fotografía (Cigüeña negra - Ciconia nigra):",
+        options: [
+          "a) Está catalogada como vulnerable en el Catálogo Español de Especies Amenazadas",
+          "b) No está incluida en ningún Plan de Recuperación y Conservación aprobados por la Junta de Andalucía",
+          "c) En Andalucía está catalogada en peligro de extinción",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)[cite: 169]."
+      },
+      {
+        question: "31. ¿Cuál de los siguientes nombres científicos de reptiles corresponde con el galápago europeo?",
+        options: [
+          "a) Caretta caretta",
+          "b) Testudo graeca",
+          "c) Emys orbicularis",
+          "d) Mauremys leprosa"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Emys orbicularis)[cite: 169]."
+      },
+      {
+        question: "32. ¿Cuál de las siguientes especies está catalogada en peligro de extinción y ha sido declarada en situación crítica por el Ministerio competente en medio ambiente?",
+        options: [
+          "a) Pinna nobilis",
+          "b) Limonium stevei",
+          "c) Marmaronetta angustirostris",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)[cite: 169]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions,
+      ...test3Questions,
+      ...test4Questions,
+      ...test5Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 20),
+      "t1_b2": test1Questions.slice(20, 40),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 20),
+      "t2_b2": test2Questions.slice(20, 40),
+      "t3_all": test3Questions,
+      "t4_all": test4Questions,
+      "t4_b1": test4Questions.slice(0, 20),
+      "t4_b2": test4Questions.slice(20, 40),
+      "t5_all": test5Questions
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 4 - PROTECCIÓN DE FLORA, FAUNA Y BIODIVERSIDAD (UNIFICADO COMPLETO 177 PREGUNTAS)",
+        "t1_all": "TEST 4-1 - COMPLETO (40 PREGUNTAS)",
+        "t1_b1": "TEST 4-1 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t1_b2": "TEST 4-1 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t2_all": "TEST 4-2 - COMPLETO (40 PREGUNTAS)",
+        "t2_b1": "TEST 4-2 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t2_b2": "TEST 4-2 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t3_all": "TEST 4-3 ESPECIES - COMPLETO (25 PREGUNTAS)",
+        "t4_all": "TEST 4-4 - COMPLETO (40 PREGUNTAS)",
+        "t4_b1": "TEST 4-4 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t4_b2": "TEST 4-4 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t5_all": "TEST 4-5 ESPECIES - COMPLETO (32 PREGUNTAS)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

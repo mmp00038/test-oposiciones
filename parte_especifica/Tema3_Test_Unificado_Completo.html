@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Tema 3 (Test 3-1)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Test Completo (40 preguntas)</option>
+        <option value="b1">Bloque 1 (Preguntas 1 - 20)</option>
+        <option value="b2">Bloque 2 (Preguntas 21 - 40)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEST 3-1 - TEMA 3</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. Los Programas de Acción Plurianuales en materia de Medio Ambiente (PMA) desarrollados por la Unión Europea tiene su origen en el año:",
+        options: [
+          "a) 1990",
+          "b) 1973",
+          "c) 1985",
+          "d) 1978"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1973)."
+      },
+      {
+        question: "2. Integrar la protección del medio ambiente en todas las políticas sectoriales de la Unión Europea para promover el desarrollo sostenible pasó a ser obligatorio a través del:",
+        options: [
+          "a) Tratado de Ámsterdam",
+          "b) Tratado de Maastricht",
+          "c) Acta Única Europea",
+          "d) Tratado de Lisboa"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Tratado de Ámsterdam)."
+      },
+      {
+        question: "3. ¿De cuántos objetivos prioritarios temáticos consta el último Programa General de Acción en materia de Medio Ambiente aprobado por la Unión Europea?",
+        options: [
+          "a) 7",
+          "b) 10",
+          "c) 6",
+          "d) 8"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 objetivos temáticos prioritarios)."
+      },
+      {
+        question: "4. El 6 de abril de 2022, a través de la Decisión (UE) 2022/591, del Parlamento Europeo y del Consejo, se aprobó el último Programa General de Acción de la Unión en materia de Medio Ambiente (PMA) hasta 2030. ¿A qué número corresponde?",
+        options: [
+          "a) VI PMA",
+          "b) VIII PMA",
+          "c) V PMA",
+          "d) IX PMA"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: VIII PMA)."
+      },
+      {
+        question: "5. El Informe Brundtland, \"Nuestro futuro común\", formuló una de las definiciones de referencia del desarrollo sostenible. ¿En qué año fue publicado?",
+        options: [
+          "a) 1987",
+          "b) 1982",
+          "c) 1992",
+          "d) 1995"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1987)."
+      },
+      {
+        question: "6. La Conferencia de Naciones Unidas sobre el Desarrollo Sostenible celebrada en Nueva York, aprobó una nueva y ambiciosa agenda para el desarrollo sostenible, la Agenda 2030 para el desarrollo sostenible. ¿En qué año se celebró esta Conferencia?",
+        options: [
+          "a) 1992",
+          "b) 2002",
+          "c) 2012",
+          "d) 2015"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 2015)."
+      },
+      {
+        question: "7. EL concepto de desarrollo sostenible ha adquirido un significado más profundo con la Agenda 2030, basándose ahora en cinco pilares o dimensiones fundamentales, también conocidas como las \"5 P\". Indique cuál de las siguientes NO corresponde con una de ellas:",
+        options: [
+          "a) Publicidad",
+          "b) Personas",
+          "c) Pactos o Alianzas",
+          "d) Planeta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Publicidad)."
+      },
+      {
+        question: "8. ¿Cuántos son los Objetivos de Desarrollo Sostenible (ODS) establecidos por la Agenda 2030?",
+        options: [
+          "a) 19",
+          "b) 17",
+          "c) 16",
+          "d) 20"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 17 ODS)."
+      },
+      {
+        question: "9. ¿Cuántas son las metas establecidas junto a los ODS por la Agenda 2030?",
+        options: [
+          "a) 159",
+          "b) 175",
+          "c) 169",
+          "d) 148"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 169 metas)."
+      },
+      {
+        question: "10. Conforme a la lista de los ODS establecida por la Agenda 2030, indique cuál de los siguientes NO pertenece a dicha lista:",
+        options: [
+          "a) Garantizar la disponibilidad de agua y su gestión sostenible y el saneamiento para todos",
+          "b) Lograr la contaminación cero",
+          "c) Poner fin al hambre, lograr la seguridad alimentaria y promover una agricultura sostenible",
+          "d) Adoptar medidas urgentes para combatir el cambio climático y sus efectos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "11. La implementación de la Agenda 2030 y de la EDS 2030 se articula mediante un sistema de gobernanza multinivel y multiactor. Entre sus órganos y estructuras se encuentran:",
+        options: [
+          "a) Comisión Delegada del Gobierno para la Agenda 2030, Conferencia Sectorial para la Agenda 2030, Consejo de Desarrollo Sostenible y Dirección General de Agenda 2030",
+          "b) Comité para la Agenda 2030, Conferencia Sectorial de Medio Ambiente, Consejo de Desarrollo Sostenible, y Dirección General de Desarrollo Sostenible",
+          "c) Comisión Delegada del Gobierno para el Desarrollo Sostenible, Conferencia Sectorial de Medio Ambiente, Comisión Estatal para la Agenda 2030 y Dirección General de Agenda 2030",
+          "d) Comité Estatal para el Desarrollo Sostenible, Conferencia Sectorial para la Agenda 2030 y el Consejo Delegado de Medio Ambiente"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "12. Tras su revisión aprobada en febrero de 2026, la Estrategia de Desarrollo Sostenible 2030 se estructura en:",
+        options: [
+          "a) 8 Retos País, 8 políticas aceleradoras y sus prioridades de actuación",
+          "b) 4 Retos País, 24 temáticas y 100 metas asociadas a indicadores",
+          "c) 4 Objetivos País, 25 políticas aceleradoras y 100 medidas",
+          "d) 8 Retos País, 24 ámbitos temáticos y 169 metas asociadas a indicadores"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4 Retos País, 24 temáticas y 100 metas)."
+      },
+      {
+        question: "13. ¿En qué año fue aprobada la Estrategia Andaluza de Desarrollo Sostenible 2030 (EADS 2030)?",
+        options: [
+          "a) 2023",
+          "b) 2022",
+          "c) 2020",
+          "d) 2018"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 2018)."
+      },
+      {
+        question: "14. Los principios de carácter ético, conforme a la noción moral del concepto de desarrollo sostenible, que sustentan las políticas e instrumentos técnicos que han de concretar las iniciativas públicas y privadas, se han denominado 'Principios Guía' en la EADS 2030. ¿Cuál de los siguientes NO es uno de estos principios guía?",
+        options: [
+          "a) Actuación solidaria",
+          "b) Responsabilidad compartida",
+          "c) Compromiso intergeneracional",
+          "d) Armonía con la naturaleza"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "15. ¿Cuál de los siguientes constituye uno de los cuatro Retos País de la EDS 2030 revisada?",
+        options: [
+          "a) Un sistema económico circular generador de bienestar y justicia social, laboral y ambiental",
+          "b) Poner fin a la injusticia global y a las amenazas a los derechos humanos",
+          "c) Revitalizar el medio rural y afrontar la crisis climática",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)."
+      },
+      {
+        question: "16. ¿Cuántos Retos País establece la Estrategia de Desarrollo Sostenible 2030 tras su revisión de 2026?",
+        options: [
+          "a) 5",
+          "b) 8",
+          "c) 4",
+          "d) 7"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 4 Retos País)."
+      },
+      {
+        question: "17. Entre las metas ambientales de la EDS 2030 revisada se establece que, para 2030, deberá estar protegido al menos:",
+        options: [
+          "a) El 30% del territorio terrestre nacional y el 30% de la superficie marina bajo jurisdicción nacional",
+          "b) El 20% del territorio terrestre y el 30% de la superficie marina",
+          "c) El 20% del territorio terrestre nacional y el 20% de la superficie marina bajo jurisdicción nacional",
+          "d) El 40% del territorio terrestre y el 20% de la superficie marina"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 30% terrestre y 30% marino)."
+      },
+      {
+        question: "18. ¿Qué reducción de las emisiones de gases de efecto invernadero respecto a 1990 establece como meta para 2030 la EDS 2030 revisada?",
+        options: [
+          "a) 23%",
+          "b) 30%",
+          "c) 42%",
+          "d) 32%"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 32%)."
+      },
+      {
+        question: "19. ¿Cuántos objetivos se han establecido en el marco de la Estrategia Andaluza de Desarrollo Sostenible 2030 (EADS 2030)?",
+        options: [
+          "a) 1 objetivo general y 10 objetivos específicos",
+          "b) 2 objetivos principales y 8 objetivos generales",
+          "c) 3 objetivos generales y 10 objetivos específicos",
+          "d) 1 objetivo principal y 8 objetivos generales"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 1 objetivo principal y 8 objetivos generales)."
+      },
+      {
+        question: "20. En consonancia con los objetivos de los principales instrumentos estratégicos y financieros de la UE y partiendo de una consideración equilibrada de las tres dimensiones del desarrollo sostenible, ¿en cuántas áreas temáticas se ha estructurado la EADS 2030?",
+        options: [
+          "a) 11",
+          "b) 13",
+          "c) 9",
+          "d) 7"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 13 áreas temáticas)."
+      },
+      {
+        question: "21. Asimismo, la EADS 2030 ha agrupado las áreas estratégicas en tres bloques conforme a las dimensiones del desarrollo sostenible. Estos bloques son:",
+        options: [
+          "a) Social, cultural y económico",
+          "b) Ambiental, empleo y producción",
+          "c) Social, económico y ambiental",
+          "d) Económico, ambiental y clima"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Social, económico y ambiental)."
+      },
+      {
+        question: "22. Conforme al sistema de evaluación y seguimiento de la EADS 2030, la Consejería competente en materia de medio ambiente, como órgano promotor de la Estrategia, realizará una memoria de seguimiento con carácter:",
+        options: [
+          "a) Anual",
+          "b) Bienal",
+          "c) Semestral",
+          "d) Trienal"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Bienal)."
+      },
+      {
+        question: "23. De acuerdo con la estructura de la EADS 2030, el área estratégica 'Energía' forma parte del bloque o dimensión:",
+        options: [
+          "a) Económica",
+          "b) Ambiental",
+          "c) Producción",
+          "d) Social"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ambiental)."
+      },
+      {
+        question: "24. 'Depurar el 100% de las aguas residuales y eliminar los vertidos incontrolados o sin autorización' es una de los objetivos planteados dentro del área estratégica...",
+        options: [
+          "a) Calidad ambiental",
+          "b) Recursos naturales",
+          "c) Salud",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Calidad ambiental)."
+      },
+      {
+        question: "25. El Plan de Medio Ambiente de Andalucía (PMA) es un documento de planificación aprobado mediante:",
+        options: [
+          "a) Orden de la Consejería con competencias en medio ambiente",
+          "b) Acuerdo del Consejo de Gobierno",
+          "c) Decreto del Consejo de Gobierno",
+          "d) Aprobación de la Conferencia Sectorial de Medio Ambiente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Acuerdo del Consejo de Gobierno)."
+      },
+      {
+        question: "26. El último PMA aprobado corresponde al periodo:",
+        options: [
+          "a) 2012-2017",
+          "b) 2011-2017",
+          "c) 2010-2015",
+          "d) 2011-2016"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2012-2017)."
+      },
+      {
+        question: "27. ¿Cuál de los siguientes NO es un principio inspirador del PMA de Andalucía?",
+        options: [
+          "a) Freno al cambio climático",
+          "b) Participación pública",
+          "c) Gobernanza",
+          "d) Paisaje"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "28. De los siguientes objetivos generales del PMA ¿cuál NO es correcto?:",
+        options: [
+          "a) Mejorar la administración y gestión del medio ambiente bajo los principios de transparencia, modernización, participación, responsabilidad, eficacia y coherencia",
+          "b) Reforzar el carácter horizontal de la política ambiental fomentando la integración en el resto de políticas y favoreciendo el compromiso social ante los problemas ambientales",
+          "c) Contribuir a la consolidación y desarrollo de la red de espacios naturales protegidos",
+          "d) Contribuir a la lucha contra el cambio climático reduciendo la emisión de gases de efecto invernadero y aumentando la capacidad sumidero en Andalucía"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "29. ¿En cuántas áreas de actuación se articula el PMA de Andalucía?:",
+        options: [
+          "a) 4 áreas",
+          "b) 6 áreas",
+          "c) 7 áreas",
+          "d) 5 áreas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 áreas)."
+      },
+      {
+        question: "30. El PMA incluye varias materias horizontales. Señala la respuesta correcta:",
+        options: [
+          "a) Cooperación territorial e institucional",
+          "b) Formación, educación y divulgación",
+          "c) Investigación e innovación",
+          "d) Todas las anteriores son materias horizontales del PMA"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son materias horizontales)."
+      },
+      {
+        question: "31. ¿Cuál de las siguientes áreas de actuación NO forma parte del PMA?",
+        options: [
+          "a) Mantenimiento y mejora de los servicios administrativos",
+          "b) Gestión integral del medio natural",
+          "c) Información ambiental",
+          "d) Movilidad sostenible"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Movilidad sostenible)."
+      },
+      {
+        question: "32. Conforme al art. 10 de la Ley 2/2026, de 12 de marzo, para la Gestión Ambiental de Andalucía, la Estrategia Marco de Medio Ambiente constituye:",
+        options: [
+          "a) El instrumento de planificación de referencia para todas las políticas ambientales en Andalucía",
+          "b) El instrumento general de planificación ambiental, de carácter sectorial, que concreta las líneas estratégicas establecidas por el Plan de Medio Ambiente de Andalucía",
+          "c) Una estrategia general de carácter ambiental dependiente del Plan Andaluz de Acción por el Clima",
+          "d) Un instrumento de referencia en materia ambiental aprobado mediante Decreto de la Consejería competente en medio ambiente"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "33. La estructura de planificación del PMA consta de varias áreas de actuación, que se desarrollan a través de:",
+        options: [
+          "a) Planes, programas y actuaciones",
+          "b) Planes, objetivos y medidas",
+          "c) Programas, subprogramas, líneas de actuación y medidas",
+          "d) Programas operativos y estrategias"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Programas, subprogramas, líneas de actuación y medidas)."
+      },
+      {
+        question: "34. El Plan Andaluz de Acción por el Clima que está actualmente en vigor, ha sido aprobado mediante:",
+        options: [
+          "a) Orden de la Consejería",
+          "b) Decreto del Consejo de Gobierno",
+          "c) Acuerdo del Consejo de Gobierno",
+          "d) Resolución de la Dirección General competente en calidad ambiental"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Decreto del Consejo de Gobierno)."
+      },
+      {
+        question: "35. ¿Cuál es el horizonte del último Plan Andaluz de Acción por el Clima aprobado en Andalucía?",
+        options: [
+          "a) 2022-2030",
+          "b) 2021-2030",
+          "c) 2020-2025",
+          "d) 2021-2027"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2021-2030)."
+      },
+      {
+        question: "36. Conforme a la EDS 2030 revisada en 2026, dentro de la temática relativa a la descarbonización de la economía, ¿cuál de las siguientes metas establecidas para 2030 es correcta?",
+        options: [
+          "a) Mejorar la eficiencia energética un 43% y reducir la dependencia energética hasta el 20%",
+          "b) Mejorar la eficiencia energética un 43% y reducir la dependencia energética hasta el 50%",
+          "c) Mejorar la eficiencia energética un 60% y reducir la dependencia energética hasta el 20%",
+          "d) Mejorar la eficiencia energética un 60% y reducir la dependencia energética hasta el 50%"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Eficiencia 43% y dependencia 50%)."
+      },
+      {
+        question: "37. Conforme al artículo 10 de la Ley 2/2026, de 12 de marzo, para la Gestión Ambiental de Andalucía, la Estrategia Marco de Medio Ambiente será aprobada por:",
+        options: [
+          "a) Orden de la Consejería competente en medio ambiente, previo informe del Consejo Andaluz de Medio Ambiente",
+          "b) Decreto del Consejo de Gobierno, previa consulta al Consejo Asesor de Medio Ambiente de Andalucía",
+          "c) Acuerdo del Consejo de Gobierno, previo informe favorable del Consejo Asesor de Medio Ambiente de Andalucía",
+          "d) Acuerdo del Consejo de Gobierno, previo informe vinculante del Consejo Asesor de Medio Ambiente y presentación ante el Parlamento de Andalucía"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Acuerdo del Consejo de Gobierno, previo informe favorable del Consejo Asesor)."
+      },
+      {
+        question: "38. De acuerdo con la Estrategia de Desarrollo Sostenible 2030 revisada en 2026, el Sistema Integral de Coherencia de Políticas de Desarrollo Sostenible (CPDS) tiene como finalidad principal:",
+        options: [
+          "a) Sustituir el sistema de seguimiento basado en metas e indicadores por una evaluación presupuestaria de las políticas públicas en materia de la Agenda 2030",
+          "b) Favorecer que las políticas públicas sean coherentes con los objetivos del desarrollo sostenible mediante distintas herramientas de coherencia, seguimiento y evaluación",
+          "c) Coordinar las actuaciones de la Administración General del Estado y las CCAA relacionadas con el ODS 17",
+          "d) Evaluar cada 4 años el cumplimiento de las políticas aceleradoras asociadas a los Retos País"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "39. Conforme al artículo 6 de la Decisión (UE) 2022/591, de 6 de abril, relativa al VIII Programa General de Acción de la Unión en materia de Medio Ambiente hasta 2030, la Comisión deberá realizar una evaluación del VIII PMA, a más tardar...",
+        options: [
+          "a) El 31 de diciembre de 2028",
+          "b) El 31 de diciembre de 2030",
+          "c) El 31 de marzo de 2029",
+          "d) El 31 de marzo de 2027"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 31 de marzo de 2029)."
+      },
+      {
+        question: "40. Conforme a la Ley 8/2018, de 8 de octubre, y al Decreto 234/2021, de 13 de octubre, por el que se aprueba el Plan Andaluz de Acción por el Clima 2021-2030, las líneas estratégicas del PAAC se concretan en tres Programas. ¿Cuáles son?",
+        options: [
+          "a) Mitigación de emisiones para la transición energética, Adaptación, y Comunicación y participación",
+          "b) Mitigación de emisiones, Transición energética y Comunicación y participación",
+          "c) Mitigación y adaptación, Transición energética, e Información ambiental",
+          "d) Mitigación y transición energética, Adaptación, y Gobernanza climática"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 20),
+      "b2": allQuestions.slice(20, 40)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEST 3-1 - TEMA 3 (COMPLETO 40 PREGUNTAS)",
+        "b1": "TEST 3-1 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "b2": "TEST 3-1 - BLOQUE 2 (PREGUNTAS 21 A 40)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 22 (Dominio Público Marítimo-Terrestre y Costas)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 22 Unificado Completo (55 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Básico Nº 1 (30 Preguntas)">
+          <option value="t1_all">Test Básico Nº 1 - Completo (1 - 30)</option>
+          <option value="t1_b1">Test Básico Nº 1 - Bloque 1 (1 - 15)</option>
+          <option value="t1_b2">Test Básico Nº 1 - Bloque 2 (16 - 30)</option>
+        </optgroup>
+        <optgroup label="Test de Autoevaluación Nº 1 (25 Preguntas)">
+          <option value="t2_all">Test Autoevaluación - Completo (1 - 25)</option>
+          <option value="t2_b1">Test Autoevaluación - Bloque 1 (1 - 12)</option>
+          <option value="t2_b2">Test Autoevaluación - Bloque 2 (13 - 25)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 22 - DOMINIO PÚBLICO MARÍTIMO-TERRESTRE Y COSTAS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- ¿A través de que normativa se nos transfirió a la Comunidad Autónoma de Andalucía la competencia para el otorgamiento de las concesiones demaniales en Dominio Público Marítimo Terrestre?",
+        options: [
+          "a) Ley 22/1988, de 28 de julio",
+          "b) Real Decreto 62/2011 de 21 de enero",
+          "c) Decreto 66/2011, de 29 de marzo",
+          "d) Real Decreto 2803/1983, de 25 de agosto"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Decreto 66/2011, de 29 de marzo)[cite: 194]."
+      },
+      {
+        question: "2.- De las siguientes opciones, ¿Qué no se encontraría dentro de dominio público marítimo-terrestre estatal, en virtud de lo establecido en los artículos 3 y 4 de la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) La ribera del mar y de las rías",
+          "b) El mar territorial y las aguas interiores",
+          "c) Las aguas de la zona económica y la plataforma continental",
+          "d) Los terrenos acantilados sensiblemente verticales, que estén en contacto con el mar o con espacios de dominio público marítimo-terrestre, hasta su coronación."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las aguas de la zona económica y la plataforma continental)[cite: 194]."
+      },
+      {
+        question: "3.- ¿Quién practicará los deslindes para la determinación del dominio público marítimo-terrestre según lo establecido en el artículo 11 de la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) La Administración del Estado",
+          "b) La Administración de las Comunidades Autónomas",
+          "c) El Servicio de Costas",
+          "d) Los Municipios"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La Administración del Estado)[cite: 194]."
+      },
+      {
+        question: "4.- ¿Cuál será la anchura mínima de la Zona de Servidumbre de protección en las márgenes de los ríos hasta donde sean sensibles las mareas, según lo enunciado en el artículo 23 de la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) 200 metros",
+          "b) 20 metros",
+          "c) 100 metros",
+          "d) 10 metros"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 20 metros)[cite: 194]."
+      },
+      {
+        question: "5.- La alteración de hitos de los deslindes, a efectos de los establecido en la Ley 22/1988, de 28 de julio, de Costas, se tipificará como:",
+        options: [
+          "a) Infracción grave",
+          "b) Infracción muy grave",
+          "c) Infracción leve",
+          "d) No viene tipificado en dicha Ley"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Infracción grave)[cite: 194]."
+      },
+      {
+        question: "6.- ¿A cuánto ascenderán como máximo las multas coercitivas establecidas en la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) El 10% de la multa fijada para la infracción cometida.",
+          "b) El 20% de la multa fijada para la infracción cometida.",
+          "c) El 30% de la multa fijada para la infracción cometida.",
+          "d) El 50% de la multa fijada para la infracción cometida."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El 20% de la multa fijada)[cite: 194]."
+      },
+      {
+        question: "7.- El artículo 4 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que para fijar el límite hasta donde alcanzan las olas en los mayores temporales cometidos dicho límite será alcanzado al menos:",
+        options: [
+          "a) En 5 ocasiones en un periodo de 10 años.",
+          "b) En 10 ocasiones en un periodo de 5 años.",
+          "c) En 5 ocasiones en un periodo de 5 años.",
+          "d) En 10 ocasiones en un periodo de 10 años."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: En 5 ocasiones en un periodo de 5 años)[cite: 194]."
+      },
+      {
+        question: "8.- El artículo 47 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que solo se autorizarán cerramientos relativos a:",
+        options: [
+          "a) Las paredes de las edificaciones debidamente autorizadas",
+          "b) Los Vallados perimetrales de cierre de parcelas colindantes con el dominio público marítimo-terrestre...",
+          "c) Los vinculados a las concesiones en dominio público marítimo-terrestre...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 194]."
+      },
+      {
+        question: "9.- Señale la opción incorrecta en lo relativo a la realización de proyectos y obras que puedan afectar al dominio público marítimo-terrestre, según lo establecido en el artículo 44 de la Ley 22/1988, de 28 de julio, de Costas:",
+        options: [
+          "a) Los paseos marítimos se localizarán fuera de la ribera del mar y serán preferentemente peatonales.",
+          "b) Las instalaciones de tratamiento de aguas residuales se emplazarán fuera de la ribera del mar...",
+          "c) Solo se autorizarán colectores paralelos a la costa dentro de la ribera del mar por causas debidamente justificadas de interés particular.",
+          "d) Los proyectos se formularán conforme al planeamiento que, en su caso, desarrollen..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 194]."
+      },
+      {
+        question: "10.- El artículo 51 de la Ley 22/1988, de 28 de julio, de Costas establece que las actividades en las que, aun sin requerir obras o instalaciones de ningún tipo, concurran circunstancias especiales de intensidad, peligrosidad o rentabilidad, y asimismo la ocupación del dominio público marítimo-terrestre con instalaciones desmontables o con bienes muebles, necesitarán la previa:",
+        options: [
+          "a) Reserva",
+          "b) Adscripción",
+          "c) Autorización administrativa",
+          "d) Concesión de ocupación"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Autorización administrativa)[cite: 194]."
+      },
+      {
+        question: "11.- Las autorizaciones y concesiones reguladas en la Ley 22/1988, de 28 de julio, de costas podrán ser modificadas, a tenor de lo establecido en el artículo 77:",
+        options: [
+          "a) Cuando se hayan alterado los supuestos determinantes de su otorgamiento.",
+          "b) En casos de fuerza mayor a petición del titular.",
+          "c) Cuando lo exija su adecuación a los planes o normas correspondientes",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 194]."
+      },
+      {
+        question: "12.- El artículo 131 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que necesitará el otorgamiento de concesión la ocupación del dominio público marítimo-terrestre por instalaciones desmontables que, por su naturaleza, finalidad u otras circunstancias requieran un plazo de ocupación superior a:",
+        options: [
+          "a) 4 años",
+          "b) 1 año",
+          "c) 1 mes",
+          "d) 1 día"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 4 años)[cite: 194]."
+      },
+      {
+        question: "13.- ¿Cuál será el plazo máximo de duración de una concesión de ocupación de dominio público marítimo terrestre para usos que presten un servicio público o al público que, por la configuración física del tramo de costa en que resulte necesario su emplazamiento, no puedan ubicarse en los terrenos colindantes... según lo establecido en el artículo 135 del Real Decreto 876/2014, de 10 de octubre?",
+        options: [
+          "a) 15 años",
+          "b) 30 años",
+          "c) 50 años",
+          "d) 75 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30 años)[cite: 194]."
+      },
+      {
+        question: "14.- Señale la opción correcta en lo relativo a la transmisión de las concesiones en dominio público marítimo terrestre. Artículo 141 del Real Decreto 876/2014 de 10 de octubre, por el que se aprueba el Reglamento General de Costas:",
+        options: [
+          "a) Las concesiones serán transmisibles por actos ínter vivos y mortis causa",
+          "b) Las concesiones no serán transmisibles por actos ínter vivos, si por mortis causa",
+          "c) En caso de fallecimiento del concesionario, sus causahabientes... podrán subrogarse...",
+          "d) La constitución de hipotecas y otros derechos de garantía..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Transmisibles por actos ínter vivos y mortis causa)[cite: 194]."
+      },
+      {
+        question: "15.- El artículo 152 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que el plazo máximo para resolver y notificar los expedientes de concesión será de:",
+        options: [
+          "a) 3 meses",
+          "b) 4 meses",
+          "c) 6 meses",
+          "d) 12 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 meses)[cite: 194]."
+      },
+      {
+        question: "16.- El artículo 110 de la Ley 22/1988, de 28 de julio, de Costa establece que el deslinde de los bienes de dominio público marítimo-terrestre, así como su afectación y desafectación, y la adquisición y expropiación de terrenos para su incorporación a dicho dominio, corresponde a:",
+        options: [
+          "a) La Administración del Estado",
+          "b) Las Comunidades Autónomas",
+          "c) Las Comunidades Autónomas según lo establezcan en sus Estatutos de Autonomía",
+          "d) Los Municipios dentro de su ámbito territorial"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La Administración del Estado)[cite: 194]."
+      },
+      {
+        question: "17.- Según lo establecido en el artículo 3 de la Ley 22/1988, de 28 de julio, de Costas, el espacio comprendido entre la línea de bajamar escorada o máxima viva equinoccial, y el límite hasta donde alcancen las olas en los mayores temporales conocidos... se corresponde con:",
+        options: [
+          "a) Dominio público marítimo-terrestre",
+          "b) Zona de servidumbre de tránsito",
+          "c) Marisma",
+          "d) La zona marítimo-terrestre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La zona marítimo-terrestre)[cite: 194]."
+      },
+      {
+        question: "18.- ¿Cuál de las siguientes definiciones establecidas en el artículo 3 de la Ley 22/1988, de 28 de julio, de Costas, se corresponde con el término \"marisma\"?",
+        options: [
+          "a) Escalón vertical en la playa formado por la erosión de la berma",
+          "b) Terreno muy llano y bajo que se inunda periódicamente como consecuencia del flujo y reflujo de las mareas o de la filtración del agua del mar",
+          "c) Cuerpo de agua costera que queda físicamente separado del océano...",
+          "d) Terreno bajo cubierto por un manto de agua que da soporte a abundante vegetación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Terreno muy llano y bajo que se inunda periódicamente...)[cite: 194]."
+      },
+      {
+        question: "19.- El artículo 4 de la Ley 22/1988, de 28 de julio, de Costas establece que pertenece al dominio público marítimo terrestre (señale la opción correcta):",
+        options: [
+          "a) Los terrenos acantilados sensiblemente verticales, que estén en contacto con el mar...",
+          "b) Los islotes en aguas interiores y mar territorial",
+          "c) Las obras e instalaciones de iluminación de costas y señalización marítima...",
+          "d) Todas las opciones anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones anteriores son correctas)[cite: 194]."
+      },
+      {
+        question: "20.- El artículo 14 de la Ley 22/1988, de 28 de julio, de Costas establece que las acciones civiles sobre derechos relativos a terrenos incluidos en el dominio público deslindado prescriben a los:",
+        options: [
+          "a) 5 años computados a partir de la fecha de la aprobación del deslinde.",
+          "b) 75 años desde la entrada en vigor de esta Ley.",
+          "c) 30 años si están amparados por resolución judicial firme.",
+          "d) Las acciones civiles sobre bienes de dominio público no se prevén en esta Ley."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 años a partir de la aprobación del deslinde)[cite: 194]."
+      },
+      {
+        question: "21.- Dentro de las servidumbres legales establecidas en el Capítulo II de la Ley 22/1988, de 28 de julio, de Costas, aquella zona que recae sobre una zona de 100 metros medida tierra adentro desde el límite interior de la ribera del mar... se corresponde con:",
+        options: [
+          "a) Zona de dominio público marítimo-terrestre",
+          "b) Zona de servidumbre de tránsito",
+          "c) Zona de servidumbre de protección",
+          "d) Zona de influencia"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Zona de servidumbre de protección)[cite: 194]."
+      },
+      {
+        question: "22.- A tenor de lo establecido en el artículo 27 de la Ley 22/1988, de 28 de julio, de Costas, ¿cuál serán, como norma general, la anchura de la zona de servidumbre de tránsito?",
+        options: [
+          "a) 100 metros",
+          "b) 20 metros",
+          "c) 6 metros",
+          "d) 500 metros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 metros)[cite: 194]."
+      },
+      {
+        question: "23.- El artículo 85 de la Ley 22/1988, de 28 de julio, de Costas, establece que se entiende por unidad de contaminación a:",
+        options: [
+          "a) Un patrón convencional de medida... correspondiente a 10.000 habitantes...",
+          "b) Un patrón convencional de medida, que se fijará reglamentariamente, referido a la carga contaminante producida por el vertido tipo de aguas domésticas, correspondiente a 1.000 habitantes, y al período de un año",
+          "c) Un patrón convencional de medida... correspondiente a 10.000 habitantes-equivalentes...",
+          "d) Un patrón convencional de medida... correspondiente a 1 habitante..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Correspondiente a 1.000 habitantes al año)[cite: 194]."
+      },
+      {
+        question: "24.- ¿Cuál es el plazo de prescripción de las infracciones graves según la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) 5 años",
+          "b) 3 años",
+          "c) 2 años",
+          "d) 1 año"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 2 años)[cite: 194]."
+      },
+      {
+        question: "25.- Señale la opción correcta según lo establecido en el Capítulo I del Título III de la Ley 22/1988, de 28 de julio, de Costas:",
+        options: [
+          "a) La utilización del dominio público marítimo-terrestre y, en todo caso, del mar y su ribera será libre...",
+          "b) Las edificaciones de servicio de playa se ubicarán, preferentemente, fuera de ella, con las dimensiones y distancias que reglamentariamente se determinen...",
+          "c) Las solicitudes de utilización... que se opongan de manera notoria a lo dispuesto... se denegarán y archivarán...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 194]."
+      },
+      {
+        question: "26.- El artículo 51 de la Ley 22/1988, de 28 de julio, de Costas, establece que se entenderán por instalaciones desmontables aquellas que: (señale la opción incorrecta).",
+        options: [
+          "a) Presten un servicio público o al público que, por la configuración física del tramo de costa en que resulte necesario su emplazamiento, no puedan ubicarse en los terrenos colindantes con dicho dominio.",
+          "b) Precisen a lo sumo obras puntuales de cimentación, que en todo caso no sobresaldrán del terreno.",
+          "c) Estén constituidas por elementos de serie prefabricados, módulos, paneles o similares...",
+          "d) Se monten y desmonten mediante procesos secuenciales..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 194]."
+      },
+      {
+        question: "27.- El artículo 73 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que: (señale la opción correcta)",
+        options: [
+          "a) En los tramos de costa que no estén balizados como zona de baño se entenderá que ésta ocupa una franja de mar contigua a la costa de una anchura de 100 metros en las playas...",
+          "b) En los tramos de costa que no estén balizados como zona de baño se entenderá que ésta ocupa una franja de mar contigua a la costa de una anchura de 200 metros en las playas...",
+          "c) En los tramos de costa que no estén balizados como zona de baño se entenderá que ésta ocupa una franja de mar contigua a la costa de una anchura de 100 metros en las playas y 50 metros...",
+          "d) En los tramos de costa que no estén balizados como zona de baño se entenderá que ésta ocupa una franja de mar contigua a la costa de una anchura de 200 metros en las playas y 50 metros en el resto de la costa. Dentro de estas zonas no se podrá navegar a una velocidad superior a tres nudos..."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 200 m en playas, 50 m en el resto, velocidad máx. 3 nudos)[cite: 194]."
+      },
+      {
+        question: "28.- El artículo 113 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece, en lo relativo a autorizaciones de explotación de servicios de temporada: (señale la opción incorrecta)",
+        options: [
+          "a) Los servicios de temporada podrán contar con una autorización por un plazo máximo de dos años, si bien las instalaciones deberán desmontarse una vez finalizada cada una de las temporadas...",
+          "b) Las autorizaciones cuyo objeto sea la explotación de servicios de temporada en las playas...",
+          "c) En el último trimestre del año, el Servicio Periférico de Costas...",
+          "d) El Servicio Periférico de Costas podrá otorgar la autorización a otras personas físicas o jurídicas..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El plazo máximo puede ser de hasta 4 años, no 2)[cite: 194]."
+      },
+      {
+        question: "29.- Señale la opción correcta según lo establecido en el Capítulo V (Concesiones) del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas:",
+        options: [
+          "a) Toda ocupación de los bienes de dominio público marítimo-terrestre estatal con obras e instalaciones no desmontables estará sujeta a previa concesión...",
+          "b) Asimismo, necesitará el otorgamiento de concesión la ocupación... por instalaciones desmontables que requieran un plazo superior a cuatro años.",
+          "c) El otorgamiento de la concesión no exime a su titular de la obtención de las concesiones y autorizaciones que sean exigibles...",
+          "d) Todas las opciones son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)[cite: 194]."
+      },
+      {
+        question: "30.- ¿Cuál de los siguientes no es un supuesto de modificación de las autorizaciones y concesiones según lo recogido en el artículo 162 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas?",
+        options: [
+          "a) Cuando se hayan alterado los supuestos determinantes de su otorgamiento.",
+          "b) En casos de fuerza mayor, a petición del titular.",
+          "c) Cuando se produzca un cambio de titularidad",
+          "d) Cuando lo exija su adecuación a los planes o normas correspondientes."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cuando se produzca un cambio de titularidad)[cite: 194]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Conforme a lo establecido en el artículo 132.1 de la Constitución Española, los bienes de Dominio Público marítimo-terrestre son:",
+        options: [
+          "a) Inalienables, indivisibles e inembargables",
+          "b) Imprescriptibles, indivisibles e inembargables",
+          "c) Inalienables, imprescriptibles e inembargables",
+          "d) Indivisibles, inalienables e imprescriptibles."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Inalienables, imprescriptibles e inembargables)[cite: 195]."
+      },
+      {
+        question: "2.- El artículo 5 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas, determina que se considerará que un acantilado es sensiblemente vertical cuando, como promedio, pueda ser asimilado a un plano que forme un ángulo con el plano horizontal:",
+        options: [
+          "a) Igual o superior a 45 grados sexagesimales",
+          "b) Igual o inferior a 90 grados sexagesimales",
+          "c) Igual o superior a 75 grados sexagesimales",
+          "d) Igual o superior a 60 grados sexagesimales"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Igual o superior a 60 grados sexagesimales)[cite: 195]."
+      },
+      {
+        question: "3.- El plazo para notificar la resolución del procedimiento por el que se declare la extinción del derecho a la Ocupación del Dominio Público marítimo-terrestre se establece en el artículo 78 de la Ley 22/1988, de 28 de julio, de Costas, y será como máximo de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 12 meses",
+          "d) 18 meses"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 18 meses)[cite: 195]."
+      },
+      {
+        question: "4.- A tenor de lo establecido en el artículo 25 de la Ley 22/1988, de 28 de julio, de Costas, en la Zona de Servidumbre de Protección estarán prohibidos: (señale la INCORRECTA)",
+        options: [
+          "a) Las edificaciones destinadas a residencia o habitación.",
+          "b) Las actividades que impliquen la destrucción de yacimiento de áridos naturales o no consolidados...",
+          "c) El tendido aéreo de líneas eléctricas",
+          "d) El vertido de residuos sólidos, escombros y aguas residuales sin depuración."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 195]."
+      },
+      {
+        question: "5.- El artículo 44 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas, establece que la Zona de Servidumbre de protección podrá reducirse por parte de la Administración General del Estado... hasta un mínimo de 20m... Señale cuál de los siguientes sería uno de ellos:",
+        options: [
+          "a) Sólo se podrá reducir la servidumbre de protección en aquellos terrenos que estén ubicados a más de 100 metros...",
+          "b) No podrá aplicarse dicha reducción, cuando se trate de zonas sujetas a cualquier régimen de protección, zonas que contengan playas o zonas de depósito de arenas o zonas con vegetación halófila o subhalófila",
+          "c) La servidumbre de protección reducida será como mínimo 5 veces la anchura del cauce...",
+          "d) Nunca podrá realizarse tal reducción cuando existan evidencias de la existencia de especies"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 195]."
+      },
+      {
+        question: "6.- ¿El Otorgamiento de Concesiones Demaniales para la Ocupación del Dominio público marítimo-terrestre estatal con obras o instalaciones no desmontables, es una Competencia que asume la Comunidad Autónoma de Andalucía a tenor de qué normativa?",
+        options: [
+          "a) Real Decreto 2803/1983 de 25 de agosto",
+          "b) Real Decreto 62/2011, de 21 de enero",
+          "c) Ley 22/1988, de 28 de julio",
+          "d) Decreto 66/2011, de 29 de marzo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Real Decreto 62/2011, de 21 de enero)[cite: 195]."
+      },
+      {
+        question: "7.- El artículo 68 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas, con respecto a las Ocupaciones en tramos Naturales de playas, establece que la ocupación de los establecimientos expendedores de comidas y bebidas: (señale la CORRECTA)",
+        options: [
+          "a) No excederá de 100 metros cuadrados, de los cuales, 70, como máximo, podrán destinarse a instalación cerrada.",
+          "b) No excederá de 100 metros cuadrados, de los cuales, 20, como máximo, podrán destinarse a instalación cerrada",
+          "c) No excederá de 70 metros cuadrados, de los cuales, 20, como máximo, podrán destinarse a instalación cerrada",
+          "d) No excederá de 50 metros cuadrados, de los cuales, 20, como máximo, podrán destinarse a instalación cerrada"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: No excederá de 70 m², con un máximo de 20 m² cerrados)[cite: 195]."
+      },
+      {
+        question: "8.- La extracción no autorizada de áridos estará tipificada, según se establece en el Capítulo I, Título V, de la Ley 22/1988 de 28 de julio, de Costas, como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Infracción muy grave cuando el daño supere los 200.000€."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Infracción grave)[cite: 195]."
+      },
+      {
+        question: "9.- El plazo máximo de Autorización administrativa para la ocupación del Dominio Público marítimo-terrestre con instalaciones desmontables, según establece el artículo 52 de la Ley 22/1988, de 28 de julio, de Costas, será de con carácter general de:",
+        options: [
+          "a) 4 años",
+          "b) 30 años",
+          "c) 50 años",
+          "d) 75 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 4 años)[cite: 195]."
+      },
+      {
+        question: "10.- ¿Cuál de las siguientes definiciones de las establecidas en el artículo 3 de la Ley 22/1988, de 28 de julio, de Costas, correspondería con Marisma?",
+        options: [
+          "a) Cuerpos de aguas costeras que quedan físicamente separados del océano...",
+          "b) Terreno muy llano y bajo que se inunda periódicamente como consecuencia del flujo y reflujo de las mareas o de la filtración del agua del mar",
+          "c) Terreno bajo cubierto por un manto de agua que da soporte a abundante vegetación",
+          "d) Parte casi horizontal de la playa, interior al escarpe..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Terreno muy llano y bajo que se inunda periódicamente...)[cite: 195]."
+      },
+      {
+        question: "11.- ¿Cuán de las siguientes competencias NO corresponde a la Administración del Estado (artículo 110 de la Ley 22/1988, de 28 de julio, de costas)?",
+        options: [
+          "a) El ejercicio de los derechos de tanteo y retracto en las transmisiones de los yacimientos de áridos...",
+          "b) Las autorizaciones de vertido industriales y contaminantes desde tierra al mar.",
+          "c) La iluminación de costas y señales marítimas.",
+          "d) La realización de mediciones y aforos, estudios de hidráulica marítima..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las autorizaciones de vertido industriales y contaminantes desde tierra al mar)[cite: 195]."
+      },
+      {
+        question: "12.- ¿Cuál de las siguientes competencias no se traspasa a la Comunidad autónoma de Andalucía a través del Real Decreto 62/2011, de 21 de enero, sobre traspaso de funciones y servicios de la Administración del Estado a la Comunidad Autónoma de Andalucía en materia de ordenación y gestión del litoral?",
+        options: [
+          "a) La gestión y otorgamiento de autorizaciones en zonas de servidumbre de tránsito y acceso al mar...",
+          "b) La gestión de las concesiones demaniales a que se refiere el Art 64 de la Ley de Costas...",
+          "c) Autorizar las obras e instalaciones de vertidos industriales y contaminantes en las aguas del litoral andaluz, así como la inspección de las mismas, sin perjuicio de las competencias en orden al otorgamiento de concesiones de ocupación del dominio público marítimo, que corresponde a la Administración Central del Estado.",
+          "d) La gestión del registro de concesiones en dominio público marítimo-terrestre en el ámbito de la Comunidad Autónoma de Andalucía."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 195]."
+      },
+      {
+        question: "13.- ¿Cuál de los siguientes NO es uno de los fines establecidos en el artículo 2 de la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) Determinar el dominio público marítimo-terrestre y asegurar su integridad...",
+          "b) Garantizar el uso público del mar, de su ribera y del resto del dominio público marítimo-terrestre, sin más excepciones que las derivadas de razones de interés público o privado debidamente justificadas.",
+          "c) Regular la utilización racional de estos bienes...",
+          "d) Conseguir y mantener un adecuado nivel de calidad de las aguas y de la ribera del mar."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las excepciones se derivan únicamente de razones de interés público)[cite: 195]."
+      },
+      {
+        question: "14.- El artículo 5 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que serán bienes de dominio público marítimo-terrestre por determinación legal: (señale la opción correcta)",
+        options: [
+          "a) Los islotes en aguas costeras y mar territorial.",
+          "b) Los terrenos incorporados por los concesionarios para completar la superficie de una concesión de dominio público marítimo-terrestre...",
+          "c) Los puertos e instalaciones portuarias de titularidad estatal y autonómica...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 195]."
+      },
+      {
+        question: "15.- Teniendo en cuenta el artículo 44 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas (Extensión de la zona de servidumbre de protección), ¿Cuál será la anchura mínima de esta zona de servidumbre en un tramo de río situado a 200 metros de la desembocadura, donde es sensible el efecto de las mareas y que tiene una anchura de 8 metros?. Téngase en cuenta que la zona no cuenta con ningún régimen de protección, no existe playa o zona de depósito de arenas ni contiene vegetación halófila o subhalófila.",
+        options: [
+          "a) 100 metros",
+          "b) Un mínimo de 20 metros",
+          "c) 40 metros",
+          "d) 25 metros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 100 metros)[cite: 195]."
+      },
+      {
+        question: "16.- Según el artículo 52 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas, ¿quién tendrá la competencia para ampliar o sustituir la zona afectada por la servidumbre de tránsito o autorizar su ocupación con paseos marítimos?",
+        options: [
+          "a) La Comunidad autónoma, previo informe del Ministerio...",
+          "b) La Comunidad autónoma previo informe de los Ayuntamientos...",
+          "c) El Ministerio de Agricultura, Alimentación y Medio Ambiente, previo informe de la Comunidad autónoma.",
+          "d) La Comunidad autónoma, previo informe del Ministerio de Agricultura, Alimentación y Medio Ambiente y de los Ayuntamientos de los municipios afectados."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Ministerio, previo informe de la Comunidad Autónoma)[cite: 195]."
+      },
+      {
+        question: "17.- Señale la opción correcta en lo referente al Capítulo III (Fianzas) del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas:",
+        options: [
+          "a) Los peticionarios de concesiones y autorizaciones... acreditarán la prestación de la fianza provisional por un importe del 5 por ciento...",
+          "b) Otorgada la concesión o autorización, se constituirá la fianza definitiva, elevando la provisional al 10 por ciento...",
+          "c) La fianza definitiva será devuelta al año de la aprobación del reconocimiento de las obras, en caso de concesión o de autorización con plazo de vencimiento superior al año...",
+          "d) El derecho a la devolución de la fianza prescribirá si no ha sido solicitada en el plazo de dos años..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 195]."
+      },
+      {
+        question: "18.- Señale la opción incorrecta en lo relativo a la utilización del dominio público marítimo terrestre según lo establecido en el Título II de la Ley 22/1988, de 28 de julio, de Costas:",
+        options: [
+          "a) La ocupación del dominio público implicará cesión de éste, su utilización significará la cesión de las facultades demaniales de la Administración del Estado.",
+          "b) Las playas no serán de uso privado, sin perjuicio de lo establecido en la presente Ley sobre las reservas demaniales...",
+          "c) Las solicitudes de utilización... que se opongan de manera notoria a lo dispuesto en la normativa en vigor, se denegarán y archivarán en el plazo máximo de dos meses...",
+          "d) La Administración competente llevará, actualizado, el Registro de usos del dominio público marítimo-terrestre..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La ocupación NO implica cesión del dominio público ni de las facultades demaniales)[cite: 195]."
+      },
+      {
+        question: "19.- El artículo 79 de la Ley 22/1988, de 28 de julio, de Costas establece que la Administración, previa audiencia del titular, declarará la caducidad de la autorización o concesión en los siguientes casos: (señale la opción incorrecta)",
+        options: [
+          "a) No iniciación, paralización o no terminación de las obras injustificadamente durante el plazo que se fije...",
+          "b) Abandono o falta de utilización durante un año, sin que medie justa causa.",
+          "c) Invasión del dominio público no otorgado.",
+          "d) Ninguna de las respuestas anteriores dará lugar a la caducidad del título."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores sí son causa legal de caducidad)[cite: 195]."
+      },
+      {
+        question: "20.- El artículo 68 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que la ocupación en tramos naturales de playas con establecimientos expendedores de comidas y bebidas:",
+        options: [
+          "a) No excederá de 300 metros cuadrados...",
+          "b) No excederá de 70 metros cuadrados, de los cuales, 20, como máximo, podrán destinarse a instalación cerrada",
+          "c) No excederá de 100 metros cuadrados...",
+          "d) No excederá de 150 metros cuadrados..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: No excederá de 70 m², con un máximo de 20 m² cerrados)[cite: 195]."
+      },
+      {
+        question: "21.- El mismo artículo citado anteriormente establece que la distancia entre estos establecimientos no podrá ser inferior a:",
+        options: [
+          "a) 100 metros",
+          "b) 150 metros",
+          "c) 200 metros",
+          "d) 300 metros"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 300 metros)[cite: 195]."
+      },
+      {
+        question: "22.- Según el artículo 69 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas, ¿cuál sería la distancia mínima para dos instalaciones desmontables situadas en un tramo urbano de playa teniendo en cuenta que se trata de actividades no similares?",
+        options: [
+          "a) 50 metros",
+          "b) 75 metros",
+          "c) 100 metros",
+          "d) 200 metros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 50 metros)[cite: 195]."
+      },
+      {
+        question: "23.- El artículo 81 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece que está prohibida la publicidad permanente a través de carteles o vallas o por medios acústicos o audiovisuales en dominio público marítimo terrestre, sin embargo el mismo artículo establece que se podrá permitir, con carácter excepcional:",
+        options: [
+          "a) Rótulos indicadores de establecimientos debidamente autorizados, siempre que se coloquen en su fachada...",
+          "b) En las vallas cuya colocación resulte necesaria para la funcionalidad de la instalación...",
+          "c) Elementos publicitarios de los patrocinadores de las actividades lúdicas o deportivas...",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 195]."
+      },
+      {
+        question: "24.- El artículo 162 del Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas establece: La Administración otorgante... podrá autorizar modificaciones... Se considerará, en todo caso, modificación sustancial:",
+        options: [
+          "a) El aumento en más de un 10 por ciento del volumen o superficie sobre lo reconocido en el título otorgado...",
+          "b) El cambio de uso para el que se le otorgó dicho título.",
+          "c) La extinción de la autorización de vertido inherente a la concesión de ocupación.",
+          "d) Las opciones a) y b) son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las opciones a y b son correctas)[cite: 195]."
+      },
+      {
+        question: "25.- Señale la opción incorrecta en lo relativo a las autorizaciones en dominio público marítimo-terrestre según lo establecido en el Real Decreto 876/2014, de 10 de octubre, por el que se aprueba el Reglamento General de Costas:",
+        options: [
+          "a) Las solicitudes podrán ser sometidas a información pública.",
+          "b) Las autorizaciones se otorgarán con carácter personal e intransferible inter vivos, salvo en el caso de vertidos, y serán inscribibles en el Registro de la Propiedad",
+          "c) El plazo de vencimiento será el que se determine en el título correspondiente, y no podrá exceder de cuatro años",
+          "d) Las autorizaciones podrán ser revocadas unilateralmente por la Administración General del Estado..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las autorizaciones NO son inscribibles en el Registro de la Propiedad)[cite: 195]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 15),
+      "t1_b2": test1Questions.slice(15, 30),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 12),
+      "t2_b2": test2Questions.slice(12, 25)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 22 - DOMINIO PÚBLICO MARÍTIMO-TERRESTRE Y COSTAS (COMPLETO 55 PREGUNTAS)",
+        "t1_all": "TEST BÁSICO Nº 1 - COMPLETO (30 PREGUNTAS)",
+        "t1_b1": "TEST BÁSICO Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t1_b2": "TEST BÁSICO Nº 1 - BLOQUE 2 (PREGUNTAS 16 A 30)",
+        "t2_all": "TEST DE AUTOEVALUACIÓN Nº 1 - COMPLETO (25 PREGUNTAS)",
+        "t2_b1": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 12)",
+        "t2_b2": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 2 (PREGUNTAS 13 A 25)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

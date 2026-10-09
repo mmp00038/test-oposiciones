@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 2 (Ilícito Penal, Sancionador y Policía Judicial)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 2 Unificado Completo (66 preguntas)</option>
+        </optgroup>
+        <optgroup label="Exámenes Individuales">
+          <option value="t1_all">Test Nº 1 - General (25 preguntas)</option>
+          <option value="t2_all">Test Nº 2.2 - Penal y Sancionador (21 preguntas)</option>
+          <option value="t3_all">Test Nº 2.3 - Especies, Incendios y LECrim (20 preguntas)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 2 - ILÍCITO PENAL, PROCEDIMIENTO SANCIONADOR Y POLICÍA JUDICIAL (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. El artículo de la Constitución Española donde se recoge la obligación de reparar el daño causado al medio ambiente es el:",
+        options: [
+          "a) 44",
+          "b) 45",
+          "c) 46",
+          "d) 47"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Art. 45 CE)."
+      },
+      {
+        question: "2. El Código Penal, aprobado por Ley Orgánica 10/1995 de 23 de Noviembre, recoge en su Título XVI los delitos relativos a la ordenación del territorio y el urbanismo, la protección del patrimonio histórico y el medio ambiente. Dentro de este título ¿dónde encontramos los delitos contra los recursos naturales y el medio ambiente?",
+        options: [
+          "a) En el capítulo II",
+          "b) En el capítulo III",
+          "c) En el capítulo IV",
+          "d) En el capítulo V"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Capítulo III)."
+      },
+      {
+        question: "3. El artículo 330 establece una pena de prisión de 1 a 4 años y multa de 12 a 24 meses para quien:",
+        options: [
+          "a) Haya informado favorablemente instrumento de planeamiento, proyectos de urbanización, parcelación, reparcelación, construcción o edificación o concedido licencias contrarias a la normativa vigente",
+          "b) Traslade una cantidad no desdeñable de residuos, tanto en el caso de uno como en el de varios traslados que aparezcan vinculados, en alguno de los supuestos a que se refiere el Derecho de la Unión Europea relativo a los traslados de residuos.",
+          "c) En un espacio natural protegido, dañare gravemente alguno de los elementos que hayan servido para calificarlo.",
+          "d) Ninguna respuesta es correcta."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "4. Para quien cace, pesque, adquiera, posea o destruya especies protegidas de fauna silvestre se impondrán penas de:",
+        options: [
+          "a) Prisión de 6 a 18 meses, multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio e inhabilitación especial para el ejercicio del derecho de cazar o pescar por tiempo de 1 a 3 años",
+          "b) Prisión de 6 a 18 meses o multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio e inhabilitación especial para el ejercicio del derecho de cazar o pescar por tiempo de 1 a 3 años",
+          "c) Prisión de 6 a 2 años, multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio e inhabilitación especial para el ejercicio del derecho de cazar o pescar por tiempo de 2 a 4 años",
+          "d) Prisión de 6 a 2 años o multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio e inhabilitación especial para el ejercicio del derecho de cazar o pescar por tiempo de 2 a 4 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "5. ¿En qué artículo del Código Penal se recogen una serie de circunstancias que resultan agravantes de los delitos contra los recursos naturales y el medio ambiente?",
+        options: [
+          "a) Art 326",
+          "b) Art 326 bis",
+          "c) Art 327",
+          "d) Art 328"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Art. 327 CP)."
+      },
+      {
+        question: "6. Si se dieran las circunstancias agravantes a las que hace referencia la pregunta anterior ¿qué conllevará?",
+        options: [
+          "a) La aplicación de las penas previstas en su mitad superior",
+          "b) La aplicación de las penas previstas superiores en grado",
+          "c) Las penas de prisión se incrementarán de 2 a 5 años, las penas multa de 8 a 24 meses y la inhabilitación de 1 a 3 años",
+          "d) Las penas de prisión se incrementarán de 2 a 5 años, las penas multa de 8 a 12 meses y la inhabilitación de 1 a 3 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La aplicación de las penas previstas superiores en grado)."
+      },
+      {
+        question: "7. ¿Cuándo los responsables de los delitos contra los recursos naturales y el medio ambiente sean personas jurídicas, que penas se impondrán?",
+        options: [
+          "a) Multa de 1 a 3 años, o del triple al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada, si el delito cometido por la persona física tiene prevista una pena de más de 2 años de privación de libertad.",
+          "b) Multa de 1 a 3 años, o del doble al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada, si el delito cometido por la persona física tiene prevista una pena de más de 2 años de privación de libertad.",
+          "c) Multa de 1 a 3 años, o del tanto al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada, si el delito cometido por la persona física tiene prevista una pena de más de 2 años de privación de libertad.",
+          "d) Multa de 1 a 3 años, o del doble al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada, si el delito cometido por la persona física tiene prevista una pena de más de 3 años de privación de libertad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "8. Según el artículo 335, cazar o pescar especies de fauna no protegidas, cuando esté expresamente prohibido por las normas específicas sobre caza o pesca será castigado con penas:",
+        options: [
+          "a) Penas de prisión de 1 a 3 años",
+          "b) Penas multa de 8 a 12 meses",
+          "c) Penas de inhabilitación especial para el ejercicio del derecho de cazar o pescar por tiempo de 2 a 4 años",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Multa de 8 a 12 meses)."
+      },
+      {
+        question: "9. Para quien introdujera o liberara especies de flora o fauna no autóctona, de modo que perjudique el equilibrio biológico, contraviniendo las leyes o disposiciones de carácter general protectoras de las especies de flora o fauna, serán castigados con:",
+        options: [
+          "a) Penas de prisión de 1 a 2 años o multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de 1 a 4 años.",
+          "b) Penas de prisión de 6 meses a 2 años o multa de 8 a 12 meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de 1 a 3 años.",
+          "c) Penas de prisión de 4 meses a 2 años o multa de 8 a 24 meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de 1 a 3 años.",
+          "d) Penas de prisión de 8 meses a 2 años o multa de 6 a 12 meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de 1 a 4 años."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "10. El art. 330 del Código Penal establece que quien, en un espacio natural protegido dañare gravemente alguno de los elementos que hayan servido para calificarlo, incurrirá en:",
+        options: [
+          "a) Pena de prisión de 1 a 4 años y multa de 12 a 24 meses",
+          "b) Pena de prisión de 4 a 6 años y multa de 12 a 24 meses",
+          "c) Pena de prisión de 1 a 2 años y multa de 6 a 12 meses",
+          "d) Pena de prisión de 6 meses a 1 año y multa de 6 a 12 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Prisión de 1 a 4 años y multa de 12 a 24 meses)."
+      },
+      {
+        question: "11. En caso que las conductas definidas en el capítulo referente a delitos contra los recursos naturales y el medio ambiente afecten a un espacio natural protegidos ¿qué recoge el código penal?",
+        options: [
+          "a) El código penal no recoge este supuesto de manera específica",
+          "b) Que se aplicarán las penas previstas en su mitad superior",
+          "c) Que se aplicarán las penas previstas superiores en grado",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Que se aplicarán las penas previstas superiores en grado)."
+      },
+      {
+        question: "12. ¿Qué artículo del código penal recoge la posibilidad de aplicar la pena en su mitad inferior si, por parte del culpable, se procede a la reparación voluntaria del daño causado?",
+        options: [
+          "a) Art 338",
+          "b) Art 339",
+          "c) Art 340",
+          "d) Esto no viene contemplado en el código penal."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La atenuante específica de reparación voluntaria para estos delitos está en el art. 340, pero de forma atenuada según la escala del mismo)."
+      },
+      {
+        question: "13. ¿En qué título recoge en Código Penal los delitos contra la seguridad colectiva?",
+        options: [
+          "a) En su título XV",
+          "b) En su título XIV",
+          "c) En su título XVIII",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Se recogen en el Título XVII del Código Penal)."
+      },
+      {
+        question: "14. Para los que incendiaran montes o masas forestales, según el artículo 352 del código penal, se aplicarán penas de:",
+        options: [
+          "a) 1 a 5 años de prisión y multa de 12 a 18 meses",
+          "b) 1 a 5 años de prisión y multa de 8 a 12 meses",
+          "c) 1 a 5 años de prisión o multa de 8 a 12 meses",
+          "d) 1 a 5 años de prisión o multa de 12 a 18 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1 a 5 años de prisión y multa de 12 a 18 meses)."
+      },
+      {
+        question: "15. ¿Cuál de las siguientes afirmaciones acerca del Procedimiento Sancionador en cierta?",
+        options: [
+          "a) Es una especialidad dentro del Procedimiento Administrativo Común",
+          "b) Generalmente, los procedimientos sancionadores se inician de oficio por parte de la Administración",
+          "c) Se regula en la Ley 39/2015 de 1 de Octubre, del Procedimiento Administrativo Común de las Administraciones Públicas",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "16. Según el artículo 56 de la ley que regula el Procedimiento administrativo Común, le corresponde la adopción de medidas provisionales, una vez iniciado el procedimiento a:",
+        options: [
+          "a) Al órgano competente para iniciar el procedimiento",
+          "b) Al órgano administrativo competente para resolver el procedimiento",
+          "c) Al órgano competente para instruir el procedimiento",
+          "d) A cualquiera de los tres órganos anteriores, dependiendo de la fase del procedimiento en que nos encontremos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Al órgano administrativo competente para resolver)."
+      },
+      {
+        question: "17. Si las medidas provisionales se adoptan antes de iniciar el procedimiento, señale la respuesta INCORRECTA:",
+        options: [
+          "a) Se podrán adoptar, de forma motivada, por el órgano competente para iniciar el procedimiento",
+          "b) Deberán ser confirmadas, modificadas o levantadas en el acuerdo de iniciación del procedimiento, que deberá efectuarse dentro de los 15 días siguientes a su adopción, sin que quepa recurso contra esta decisión.",
+          "c) Su finalidad será asegurar la eficacia de la resolución que pudiera recaer.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "18. En cuanto al inicio de los procedimientos sancionadores por petición razonada de otros órganos, señale la respuesta CORRECTA:",
+        options: [
+          "a) La petición no vincula al órgano competente para iniciar, pero éste podrá comunicar al órgano que la hubiera formulado, cuando lo considere conveniente, los motivos, por los que, en su caso, no procede la iniciación.",
+          "b) Las peticiones deberán especificar, en la medida de lo posible, la persona o personas presuntamente responsables; las conductas o hechos que pudieran constituir infracción administrativa y la sanción que le correspondería; así como el lugar, la fecha, fechas o periodo de tiempo continuado en que los hechos se produjeron.",
+          "c) Las peticiones deberán especificar, en la medida de lo posible, la persona o personas presuntamente responsables; las conductas o hechos que pudieran constituir infracción administrativa y su tipificación; así como el lugar, la fecha, fechas o periodo de tiempo continuado en que los hechos se produjeron.",
+          "d) Las respuestas a y b son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "19. Señale la respuesta CORRECTA con respecto a los procedimientos iniciados por denuncia:",
+        options: [
+          "a) La presentación de una denuncia no confiere, por sí sola, la condición de interesado en el procedimiento.",
+          "b) Cuando el denunciante haya participado en la comisión de una infracción de esta naturaleza y existan otros infractores, el órgano competente para resolver el procedimiento podrá eximir al denunciante del pago de la multa que le correspondería u otro tipo de sanción de carácter no pecuniario, cuando sea el primero en aportar elementos de prueba que permitan iniciar el procedimiento o comprobar la infracción, siempre y cuando en el momento de aportarse aquellos no se disponga de elementos suficientes para ordenar la misma y se repare el perjuicio causado.",
+          "c) El órgano competente para resolver podrá reducir el importe del pago de la multa que le correspondería o, en su caso, la sanción de carácter no pecuniario, cuando no cumpliéndose alguna de las condiciones anteriores, el denunciante facilite elementos de prueba que aporten un valor añadido significativo respecto de aquellos de los que se disponga.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "20. Según el artículo 90 de la ley 39/2015 de 1 de Octubre, ¿qué plazo se establece para presentar alegaciones en los casos en los que el órgano competente para resolver considere que la infracción o sanción reviste mayor gravedad que la determinada en la propuesta de resolución?",
+        options: [
+          "a) 10 días",
+          "b) 15 días",
+          "c) 20 días",
+          "d) 30 días"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 15 días)."
+      },
+      {
+        question: "21. ¿Cuál de las siguientes afirmaciones acerca de la tramitación simplificada en los procedimientos administrativos NO es CORRECTA?",
+        options: [
+          "a) Salvo que reste menos para su tramitación ordinaria, los procedimientos administrativos tramitados de manera simplificada deberán ser resueltos en 20 días, a contar desde el siguiente al que se notifique al interesado el acuerdo de tramitación simplificada del procedimiento.",
+          "b) Cuando razones de interés público o la falta de complejidad del procedimiento así lo aconsejen, las Administraciones Públicas podrán acordar, de oficio, la tramitación simplificada del procedimiento.",
+          "c) Constará, únicamente, de una serie de trámites recogidos en el artículo 96, estableciéndose un plazo para formular alegaciones de 10 días.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "22. ¿Cuál de los siguientes principios NO es uno de los recogidos en la ley 40/2015 de 1 de Octubre sobre el Régimen Jurídico del Sector Público?",
+        options: [
+          "a) Prescripción",
+          "b) Concurrencia de infracciones",
+          "c) Responsabilidad",
+          "d) Todos son principios de la potestad sancionadora"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El principio es el de 'Concurrencia de sanciones' o 'Non bis in idem', no 'Concurrencia de infracciones')."
+      },
+      {
+        question: "23. Según el art. 64.2 de la LPAC, en los procedimientos de naturaleza sancionadora, el acuerdo de iniciación NO es obligatorio que contenga:",
+        options: [
+          "a) Lugar y fecha",
+          "b) Identificación de la persona o personas presuntamente responsables",
+          "c) Identificación del instructor y, en su caso, Secretario del procedimiento, con expresa indicación del régimen de recusación de los mismos",
+          "d) Medidas de carácter provisional que se hayan acordado por el órgano competente para iniciar el procedimiento sancionador"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Lugar y fecha no es un contenido imperativo señalado expresamente en dicho artículo)."
+      },
+      {
+        question: "24. Según el artículo 30 de la Ley 40/2015, de Régimen Jurídico de Sector Público, donde se recoge el principio de Prescripción. Señale la respuesta CORRECTA:",
+        options: [
+          "a) Las infracciones leves prescriben a los 6 meses",
+          "b) El plazo de prescripción de las sanciones comenzará a contarse desde el día en que sea ejecutable la resolución por la que se impone la sanción o haya transcurrido el plazo para recurrirla",
+          "c) Las sanciones muy graves prescriben a los dos años",
+          "d) Las respuestas a y b son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Las infracciones leves prescriben a los 6 meses)."
+      },
+      {
+        question: "25. Señale la respuesta INCORRECTA con respecto a la denuncia:",
+        options: [
+          "a) Es la forma de iniciación básica del proceso penal y administrativo",
+          "b) El denunciante adquiere la condición de parte interesada en el momento en que interpone la denuncia.",
+          "c) Las denuncias podrán hacerse por escrito o de palabra y siempre se deberá personar quien la interponga",
+          "d) Las respuestas b y c son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Tanto B como C son incorrectas)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. ¿Qué recoge el Titulo XVI, del libro II del Código Penal?",
+        options: [
+          "a) De los delitos relativos a la ordenación del territorio y el urbanismo, la protección del patrimonio histórico, el medio ambiente y la seguridad colectiva.",
+          "b) De los delitos relativos a la ordenación del territorio, la protección del patrimonio histórico y el medio ambiente.",
+          "c) De los delitos relativos a la ordenación del territorio y el urbanismo, la protección del patrimonio histórico y el medio ambiente.",
+          "d) De los delitos relativos a la ordenación del territorio, la protección del patrimonio histórico, el medio ambiente y la seguridad colectiva."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "2. ¿En qué artículo del Código Penal se recoge que: \"A la autoridad o funcionario público que, a sabiendas de su injusticia, dictare una resolución arbitraria en un asunto administrativo se le castigará con la pena de inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de nueve a quince años?",
+        options: [
+          "a) Artículo 401",
+          "b) Artículo 402",
+          "c) Artículo 403",
+          "d) Artículo 404"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Art. 404 CP)."
+      },
+      {
+        question: "3. Señale la respuesta CORRECTA, según lo recogido en el artículo 324:",
+        options: [
+          "a) El que por imprudencia grave cause daños, en cuantía superior a 400 euros, en un archivo, registro, museo, biblioteca, centro docente, gabinete científico, institución análoga o en bienes de valor artístico, histórico, cultural, científico o monumental, así como en yacimientos arqueológicos, será castigado con la pena de multa de tres a 12 meses, atendiendo a la importancia de los mismos.",
+          "b) El que por imprudencia grave cause daños, en cuantía superior a 4000 euros, en un archivo, registro, museo, biblioteca, centro docente, gabinete científico, institución análoga o en bienes de valor artístico, histórico, cultural, científico o monumental, así como en yacimientos arqueológicos, será castigado con la pena de multa de tres a 18 meses, atendiendo a la importancia de los mismos.",
+          "c) El que por imprudencia grave cause daños, en cuantía superior a 4000 euros, en un archivo, registro, museo, biblioteca, centro docente, gabinete científico, institución análoga o en bienes de valor artístico, histórico, cultural, científico o monumental, así como en yacimientos arqueológicos, será castigado con la pena de multa de tres a 12 meses, atendiendo a la importancia de los mismos.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "4. Según el artículo 326, quien traslade una cantidad no desdeñable de residuos, tanto en el caso de uno como en el de varios traslados que aparezcan vinculados, en alguno de los supuestos a que se refiere el Derecho de la Unión Europea relativo a los traslados de residuos, será castigado con:",
+        options: [
+          "a) Una pena de tres meses a un año de prisión, o multa de seis a dieciocho meses e inhabilitación especial para profesión u oficio por tiempo de tres meses a un año.",
+          "b) Una pena de tres meses a un año de prisión, multa de seis a dieciocho meses e inhabilitación especial para profesión u oficio por tiempo de tres meses a un año.",
+          "c) Una pena de seis meses a un año de prisión, o multa de seis a dieciocho meses e inhabilitación especial para profesión u oficio por tiempo de tres meses a un año.",
+          "d) Una pena de seis meses a un año de prisión, multa de seis a dieciocho meses e inhabilitación especial para profesión u oficio por tiempo de tres meses a un año."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "5. Si, según establece el artículo 328, el responsable del delito es una persona jurídica, le corresponderá, si el delito cometido por la persona física tiene prevista una pena de más de dos años de privación de libertad:",
+        options: [
+          "a) Multa de uno a tres años, o del doble al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada.",
+          "b) Multa de seis meses a dos años, o del doble al triple del perjuicio causado si la cantidad resultante fuese más elevada.",
+          "c) Multa de uno a tres años, o del triple al cuádruple del perjuicio causado cuando la cantidad resultante fuese más elevada.",
+          "d) Multa de seis meses a dos años, o del doble al cuádruple del perjuicio causado si la cantidad resultante fuese más elevada."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "6. ¿Qué ocurrirá para quien, según el artículo 332, corte, tale, arranque, recolecte, adquiera, posea o destruya especies protegidas de flora silvestre, o trafique con ellas, sus partes, derivados de las mismas o con sus propágulos y esta acción afecte a especies catalogadas como en peligro de extinción?",
+        options: [
+          "a) En el artículo 332 no se contempla una pena diferente si el delito afecta a especies catalogadas como en peligro de extinción",
+          "b) El artículo 332 si contempla esta posibilidad, pero se refiere a todas las especies catalogadas, también a las vulnerables, y en estos supuestos la pena se impondrá en su mitad superior",
+          "c) La pena se impondrá en su mitad superior",
+          "d) Se aplicará la pena superior en grado"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La pena se impondrá en su mitad superior)."
+      },
+      {
+        question: "7. Según el artículo 334.4, cuando se cace, pesque, adquiera, posea o destruya especies protegidas de fauna silvestre o se realicen actividades que impidan o dificulten su reproducción o migración y éstas se hubieran cometido utilizando armas, en actividades relacionadas o no con la caza:",
+        options: [
+          "a) Se impondrá la pena de privación del derecho a la tenencia y porte de armas por un periodo de entre uno a cuatro años.",
+          "b) Se impondrá la pena de privación del derecho a la tenencia y porte de armas por un periodo de entre uno a tres años.",
+          "c) Se impondrá la pena de privación del derecho a la tenencia y porte de armas por un periodo de entre dos a tres años.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "8. ¿Qué ocurrirá si, según el artículo 340, el culpable de cualquiera de los hechos tipificados en el Título XVI, hubiera procedido voluntariamente a reparar el daño causado?",
+        options: [
+          "a) Los Jueces y Tribunales le impondrán la pena inferior en grado a las respectivamente previstas.",
+          "b) Los Jueces y Tribunales le podrán imponer la pena inferior en grado a las respectivamente previstas.",
+          "c) Los Jueces y Tribunales le impondrán la pena en su mitad inferior a las respectivamente previstas.",
+          "d) Los Jueces y Tribunales le podrán imponer la pena en su mitad inferior a las respectivamente previstas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "9. Según el artículo 340 ter, ¿qué penas se impondrán para quien abandone a un animal vertebrado que se encuentre bajo su responsabilidad en condiciones en que pueda peligrar su vida o integridad?",
+        options: [
+          "a) Pena de multa de uno a seis meses o de trabajos en beneficio de la comunidad de treinta y uno a noventa días y la pena de inhabilitación especial de uno a tres años para el ejercicio de profesión, oficio o comercio que tenga relación con los animales y para la tenencia de animales.",
+          "b) Pena de multa de uno a seis meses o de trabajos en beneficio de la comunidad de treinta a noventa días y la pena de inhabilitación especial de uno a tres años para el ejercicio de profesión, oficio o comercio que tenga relación con los animales y para la tenencia de animales.",
+          "c) Pena de multa de uno a seis meses o de trabajos en beneficio de la comunidad de treinta a ochenta días y la pena de inhabilitación especial de uno a tres años para el ejercicio de profesión, oficio o comercio que tenga relación con los animales y para la tenencia de animales.",
+          "d) Pena de multa de uno a seis meses o de trabajos en beneficio de la comunidad de veinte a ochenta días y la pena de inhabilitación especial de uno a tres años para el ejercicio de profesión, oficio o comercio que tenga relación con los animales y para la tenencia de animales."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "10. ¿Dónde se recoge, en el Código Penal, los delitos relativos a los incendios forestales?",
+        options: [
+          "a) Título XVI, capítulo V",
+          "b) Título XVI, capítulo VI",
+          "c) Título XVII, capítulo I",
+          "d) Título XVII, capítulo II"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Título XVII, capítulo II)."
+      },
+      {
+        question: "11. Según el artículo 353, las penas impuestas para los que incendiaren montes o masas forestales cuando el incendio alcance especial gravedad, serán de:",
+        options: [
+          "a) Pena de prisión de cuatro a seis años y multa de doce a veinticuatro meses",
+          "b) Pena de prisión de tres a seis años y multa de doce a veinticuatro meses",
+          "c) Pena de prisión de tres a seis años y multa de dieciocho a veinticuatro meses",
+          "d) Pena de prisión de cuatro a seis años y multa de dieciocho a veinticuatro meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Prisión de 3 a 6 años y multa de 18 a 24 meses)."
+      },
+      {
+        question: "12. Siguiendo con la pregunta anterior, para que se considere la \"especial gravedad\" a la que se hace referencia, se tendrán que dar alguna de las circunstancias que el artículo recoge. ¿Cuál de las siguientes circunstancias NO está incluida en el artículo 353?",
+        options: [
+          "a) cuando el autor actúe para obtener un beneficio económico con los efectos derivados del incendio",
+          "b) cuando se ocasione grave deterioro o destrucción de los recursos afectados.",
+          "c) Que afecte a una superficie de considerable importancia.",
+          "d) Que el incendio afecte a núcleos de población o a lugares habitados"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "13. ¿Qué pena se impondrá para el que prendiere fuego a montes o masas forestales sin que llegue a propagarse el incendio de los mismos por la acción voluntaria de su autor?",
+        options: [
+          "a) Será castigado con la pena de prisión de seis meses a un año y multa de seis a doce meses.",
+          "b) Será castigado con la pena de prisión de seis meses a un año y multa de ocho a doce meses",
+          "c) Será castigado con la pena de multa de seis a doce meses",
+          "d) Quedará exenta de pena"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Quedará exento de pena)."
+      },
+      {
+        question: "14. El que incendiare zonas de vegetación no forestales perjudicando gravemente el medio natural, según el artículo 356, será castigado con:",
+        options: [
+          "a) La pena de prisión de seis meses a dos años y multa de seis a veinticuatro meses.",
+          "b) La pena de prisión de seis meses a un año y multa de seis a veinticuatro meses.",
+          "c) La pena de prisión de seis meses a dos años y multa de doce a veinticuatro meses.",
+          "d) La pena de prisión de seis meses a dos años y multa de seis a doce meses."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "15. ¿Qué se aplicará al que provocare alguno de los delitos de incendio penados en las diferentes secciones recogidas en el código penal, por imprudencia grave?",
+        options: [
+          "a) La pena en su mitad inferior a las respectivamente previstas para cada supuesto.",
+          "b) La pena inferior en grado a las respectivamente previstas para cada supuesto.",
+          "c) La pena en su mitad superior a las respectivamente previstas para cada supuesto.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La pena inferior en grado)."
+      },
+      {
+        question: "16. ¿Qué artículo de la LECrim determina quien constituye la policía judicial, estableciendo que serán auxiliares de los Jueces y Tribunales competentes en materia penal y del Ministerio fiscal?",
+        options: [
+          "a) El artículo 282",
+          "b) El artículo 283",
+          "c) El artículo 284",
+          "d) El artículo 285"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Art. 283 LECrim)."
+      },
+      {
+        question: "17. ¿Qué se entiende por primeras diligencias, según el artículo 13 de la LECrim?",
+        options: [
+          "a) Se consideran como primeras diligencias la de consignar las pruebas del delito que puedan desaparecer, la de recoger y poner en custodia cuanto conduzca a su comprobación y a la identificación del delincuente y la de proteger a los ofendidos o perjudicados por el mismo, a sus familiares o a otras personas.",
+          "b) Se consideran como primeras diligencias la de consignar las pruebas del delito que puedan desaparecer, la de recoger y poner en custodia cuanto conduzca a su comprobación y a la identificación del delincuente y la de detener, en su caso, a los presuntos responsables del delito.",
+          "c) Se consideran como primeras diligencias la de consignar las pruebas del delito que puedan desaparecer, la de detener, en su caso, a los presuntos responsables del delito, y la de proteger a los ofendidos o perjudicados por el mismo, a sus familiares o a otras personas.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "18. ¿En qué normativa se recoge el procedimiento sancionador, como una especialidad del procedimiento administrativo?",
+        options: [
+          "a) Ley 40/2015, de 1 de Octubre",
+          "b) Ley 39/2015, de 1 de Octubre",
+          "c) Ley 9/2007, de 22 de Octubre",
+          "d) Ley 9/2017, de 8 de Noviembre"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ley 39/2015)."
+      },
+      {
+        question: "19. ¿Cuál de las siguientes afirmaciones, acerca de la iniciación del procedimiento sancionador, NO es correcta?",
+        options: [
+          "a) Los procedimientos sancionadores se iniciarán siempre de oficio",
+          "b) En el inicio del procedimiento por petición razonada de otros órganos, la petición no vincula al órgano competente para iniciar el procedimiento, pudiendo comunicar al órgano que la hubiera formulado los motivos por los que, en su caso, no procede la iniciación.",
+          "c) Se entiende por orden superior para iniciar un procedimiento, la emitida por un órgano administrativo superior jerárquico del competente para la iniciación del procedimiento.",
+          "d) Las respuestas a y b son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "20. ¿Cuál de las siguientes afirmaciones, acerca de la denuncia, recogidas en el artículo 62, es CORRECTA?",
+        options: [
+          "a) Las denuncias deberán expresar la identidad de la persona o personas que las presentan, el relato de los hechos que se ponen en conocimiento de la Administración y la identificación de los presuntos responsables.",
+          "b) La presentación de una denuncia no confiere, por si sola, la condición de interesado en el procedimiento.",
+          "c) Se entiende por denuncia, el acto por el que cualquier persona, en cumplimiento o no de una obligación legal, pone en conocimiento de un órgano administrativo la existencia de un determinado hecho que pudiera justificar la iniciación de oficio de un procedimiento judicial.",
+          "d) Todas las afirmaciones son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "21. El artículo 85 establece la posibilidad de aplicar, en los supuestos que establece la Ley, reducciones a las sanciones pecuniarias propuestas. Estas reducciones serán de:",
+        options: [
+          "a) Al menos, el 20% sobre el importe de la sanción propuesta",
+          "b) Del 20% sobre el importe de la sanción propuesta",
+          "c) Como máximo, del 20% sobre el importe de la sanción propuesta",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Al menos, el 20% sobre el importe de la sanción propuesta)."
+      }
+    ];
+
+    const test3Questions = [
+      {
+        question: "1. ¿Qué penas se impondrán a los promotores, constructores o técnicos directores que lleven a cabo obras de urbanización, construcción o edificación no autorizables en suelo no urbanizable, según el artículo 319 del Código Penal?",
+        options: [
+          "a) La pena de prisión de uno a tres años, multa de doce a veinticuatro meses, salvo que el beneficio obtenido por el delito fuese superior a la cantidad resultante en cuyo caso la multa será del tanto al triplo del montante de dicho beneficio, e inhabilitación especial para profesión u oficio por tiempo de uno a cuatro años",
+          "b) La pena de prisión de seis meses a tres años, multa de doce a veinticuatro meses, salvo que el beneficio obtenido por el delito fuese superior a la cantidad resultante en cuyo caso la multa será del tanto al triplo del montante de dicho beneficio, e inhabilitación especial para profesión u oficio por tiempo de uno a cuatro años",
+          "c) Penas de prisión de un año y seis meses a cuatro años, multa de doce a veinticuatro meses, salvo que el beneficio obtenido por el delito fuese superior a la cantidad resultante en cuyo caso la multa será del tanto al triplo del montante de dicho beneficio, e inhabilitación especial para profesión u oficio por tiempo de uno a cuatro años",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Prisión de 1 a 3 años y multa de 12 a 24 meses...)."
+      },
+      {
+        question: "2. ¿Con qué pena será castigada la persona que cause daños en yacimientos arqueológicos?",
+        options: [
+          "a) Con la pena de prisión de seis meses a tres años o multa de doce a veinticuatro meses",
+          "b) Con la pena de prisión de seis meses a tres años o multa de doce a veinticuatro meses, pudiendo aplicarse la pena en su mitad superior si hubiese causado daños de especial gravedad",
+          "c) Con la pena de prisión de seis meses a tres años o multa de doce a veinticuatro meses, pudiendo aplicarse la pena superior en grado si hubiese causado daños de especial gravedad",
+          "d) Con la pena de prisión de uno a tres años o multa de doce a veinticuatro meses, pudiendo aplicarse la pena en su mitad superior si hubiese causado daños de especial gravedad."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Pena superior en grado en caso de daños de especial gravedad)."
+      },
+      {
+        question: "3. El capítulo III, donde se recogen los delitos contra los recursos naturales y el medio ambiente comprende los artículos:",
+        options: [
+          "a) Del 324 al 331",
+          "b) Del 325 al 330",
+          "c) Del 325 al 331",
+          "d) Del 324 al 330"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Del 325 al 331)."
+      },
+      {
+        question: "4. El artículo 327 recoge una serie de circunstancias que serán apreciadas como agravante en los delitos ambientales y que su concurrencia, supondrán la aplicación de las penas superiores en grado a las establecidas, NO siendo una de esas circunstancias:",
+        options: [
+          "a) Que se produzca una extracción ilegal de aguas en período de restricciones.",
+          "b) Que se haya producido un riesgo de deterioro irreversible o catastrófico.",
+          "c) Que la industria o actividad funcione clandestinamente, sin haber obtenido la preceptiva autorización o aprobación administrativa de sus instalaciones.",
+          "d) Que se haya puesto en peligro la salud o seguridad de las personas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "5. ¿Qué recoge el artículo 330 del Código penal?",
+        options: [
+          "a) Quien, en un espacio natural protegido dañare gravemente alguno de los elementos que hayan servido para calificarlo, incurrirá en la pena de prisión de uno a cuatro años y multa de doce a veinticuatro meses.",
+          "b) Quien, en un espacio natural dañare gravemente alguno de los elementos que hayan servido para calificarlo, incurrirá en la pena de prisión de uno a cuatro años y multa de doce a veinticuatro meses.",
+          "c) Quien, en un espacio natural protegido dañare gravemente alguno de los elementos que hayan servido para calificarlo, incurrirá en la pena de prisión de dos a cuatro años y multa de doce a veinticuatro meses.",
+          "d) Quien, en un espacio natural dañare gravemente alguno de los elementos que hayan servido para calificarlo, incurrirá en la pena de prisión de dos a cuatro años y multa de doce a veinticuatro meses."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "6. Señale la respuesta CORRECTA en relación al artículo 333:",
+        options: [
+          "a) El que introdujera o liberara especies de flora o fauna no autóctona, de modo que perjudique el equilibrio biológico, contraviniendo las leyes o disposiciones de carácter general protectoras de las especies de flora o fauna, será castigado con la pena de prisión de seis meses a dos años o multa de ocho a doce meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de uno a tres años.",
+          "b) El que introdujera o liberara especies de flora o fauna no autóctona, de modo que perjudique el equilibrio biológico, contraviniendo las leyes o disposiciones de carácter general protectoras de las especies de flora o fauna, será castigado con la pena de prisión de cuatro meses a dos años o multa de ocho a veinticuatro meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de uno a tres años.",
+          "c) El que introdujera o liberara especies de flora o fauna no autóctona, de modo que perjudique el equilibrio biológico, contraviniendo las leyes o disposiciones de carácter general protectoras de las especies de flora o fauna, será castigado con la pena de prisión de cuatro meses a tres años o multa de doce a veinticuatro meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de uno a tres años.",
+          "d) El que introdujera o liberara especies de flora o fauna no autóctona, de modo que perjudique el equilibrio biológico, contraviniendo las leyes o disposiciones de carácter general protectoras de las especies de flora o fauna, será castigado con la pena de prisión de cuatro meses a dos años o multa de ocho a veinticuatro meses y, en todo caso, inhabilitación especial para profesión u oficio por tiempo de uno a dos años."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "7. ¿En qué artículo se recogen las penas impuestas para quienes, sin estar legalmente autorizados, empleen para la caza o pesca veneno, medios explosivos u otros instrumentos o artes de similar eficacia destructiva o no selectiva para la fauna?",
+        options: [
+          "a) Artículo 335",
+          "b) Artículo 336",
+          "c) Artículo 337",
+          "d) Artículo 338"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Art. 336 CP)."
+      },
+      {
+        question: "8. ¿En qué título del Código Penal se recoge los delitos contra los animales?",
+        options: [
+          "a) Título XVI",
+          "b) Título XVI Bis",
+          "c) Título XVII",
+          "d) Título XVII Bis"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Título XVI Bis)."
+      },
+      {
+        question: "9. ¿Qué pena se impondrá, según el artículo 352, para los que incendiaren montes o masas forestales, si ha existido peligro para la vida o integridad física de las personas?",
+        options: [
+          "a) Serán castigados con las penas de prisión de uno a cinco años y multa de doce a dieciocho meses",
+          "b) Serán castigados con la pena de prisión de diez a veinte años, imponiéndose, en todo caso, la pena de multa de doce a veinticuatro meses.",
+          "c) Serán castigados con las penas de prisión de uno a cinco años y multa de doce a veinticuatro meses",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Prisión de 10 a 20 años y multa de 12 a 24 meses)."
+      },
+      {
+        question: "10. El que incendiare zonas de vegetación no forestales perjudicando gravemente el medio natural, según el artículo 356, será castigado con:",
+        options: [
+          "a) La pena de prisión de seis meses a dos años y multa de seis a veinticuatro meses.",
+          "b) La pena de prisión de seis meses a un año y multa de seis a veinticuatro meses.",
+          "c) La pena de prisión de seis meses a dos años y multa de doce a veinticuatro meses.",
+          "d) La pena de prisión de seis meses a dos años y multa de seis a doce meses."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "11. ¿Cuál de las siguientes afirmaciones, acerca de la policía judicial, recogidas en el artículo 282 de la Ley de enjuiciamiento criminal (LECrim) es CORRECTA?",
+        options: [
+          "a) La Policía Judicial tiene por objeto y será obligación de todos los que la componen, averiguar los delitos públicos que se cometieren en su territorio o demarcación; practicar, según sus atribuciones, las diligencias necesarias para comprobarlos y recoger todos los efectos, instrumentos o pruebas del delito de cuya desaparición hubiere peligro, poniéndolos a disposición de la autoridad judicial.",
+          "b) La Policía Judicial tiene por objeto y será obligación de todos los que la componen, practicar, según sus atribuciones, las diligencias necesarias para comprobarlos y descubrir a los delincuentes, y recoger todos los efectos, instrumentos o pruebas del delito de cuya desaparición hubiere peligro, poniéndolos a disposición de la autoridad judicial.",
+          "c) La Policía Judicial tiene por objeto y será obligación de todos los que la componen, averiguar los delitos públicos que se cometieren en su territorio o demarcación; practicar, según sus atribuciones, las diligencias necesarias para comprobarlos y descubrir a los delincuentes, y recoger todos los efectos, instrumentos o pruebas del delito de cuya desaparición hubiere peligro, poniéndolos a disposición de la autoridad judicial.",
+          "d) La Policía Judicial tiene por objeto y será obligación de todos los que la componen, practicar, según sus atribuciones, las diligencias necesarias para comprobarlos y recoger todos los efectos, instrumentos o pruebas del delito de cuya desaparición hubiere peligro, poniéndolos a disposición de la autoridad judicial."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "12. ¿En cuál de las siguientes actuaciones un Agente de Medio Ambiente estaría actuando es su papel de policía judicial?",
+        options: [
+          "a) Levantando el cadáver de un buitre caído en las inmediaciones de un tendido eléctrico",
+          "b) Investigando la causa de un incendio forestales",
+          "c) Levantando un cepo encontrado en un coto de caza",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)."
+      },
+      {
+        question: "13. ¿Cuál de las siguientes afirmaciones acerca del atestado es CORRECTA?",
+        options: [
+          "a) Los funcionarios de Policía judicial extenderán, en papel sellado, un atestado de las diligencias que practiquen, en el cual especificarán con la mayor exactitud los hechos por ellos averiguados, insertando las declaraciones e informes recibidos y anotando todas las circunstancias que hubiesen observado y pudiesen ser prueba o indicio del delito.",
+          "b) Los atestados que redactaren y las manifestaciones que hicieren los funcionarios de Policía judicial, a consecuencia de las averiguaciones que hubiesen practicado, se considerarán denuncias para los efectos legales.",
+          "c) Las personas presentes, peritos y testigos que hubieren intervenido en las diligencias relacionadas en el atestado deberán firmarlo en la parte a ellos referente.",
+          "d) las respuestas a y b son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tienen la consideración de denuncias a efectos legales)."
+      },
+      {
+        question: "14. ¿Cuál es el plazo máximo, según el artículo 56 de la ley que establece el procedimiento administrativo, para iniciar éste después de adoptar medidas provisionales?",
+        options: [
+          "a) 5 días hábiles.",
+          "b) 10 días hábiles",
+          "c) 15 días hábiles",
+          "d) No existe un plazo establecido."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 15 días)."
+      },
+      {
+        question: "15. El acuerdo de iniciación en los procedimientos de naturaleza sancionadora NO contendrá, según el artículo 64:",
+        options: [
+          "a) Los hechos que motivan la incoación del procedimiento, su posible calificación y las sanciones que pudieran corresponder, sin perjuicio de lo que resulte de la instrucción.",
+          "b) Medidas de carácter provisional que se hayan acordado por el órgano competente para resolver el procedimiento sancionador",
+          "c) Identificación del instructor y, en su caso, Secretario del procedimiento, con expresa indicación del régimen de recusación de los mismos.",
+          "d) Indicación del derecho a formular alegaciones y a la audiencia en el procedimiento y de los plazos para su ejercicio."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El órgano competente para adoptarlas antes del inicio es el competente para iniciar, no para resolver)."
+      },
+      {
+        question: "16. Según el artículo 30 de la Ley 40/2015 de 1 de octubre, el principio de prescripción recoge que las sanciones leves prescriben a:",
+        options: [
+          "a) Los 6 meses",
+          "b) Los 12 meses",
+          "c) Los 2 años",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las sanciones leves prescriben al año/12 meses)."
+      },
+      {
+        question: "17. Según este mismo artículo, ¿cuándo comenzará a contarse el plazo de prescripción de las sanciones?",
+        options: [
+          "a) Desde el día en que sea ejecutable la resolución por la que se impone la sanción o haya transcurrido el plazo para recurrirla.",
+          "b) Desde el día en que sea ejecutable la resolución por la que se impone la sanción",
+          "c) Desde el día siguiente a aquel en que sea ejecutable la resolución por la que se impone la sanción o haya transcurrido el plazo para recurrirla.",
+          "d) Desde el día siguiente a aquel en que sea ejecutable la resolución por la que se impone la sanción."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Desde el día siguiente a aquel en que sea ejecutable...)."
+      },
+      {
+        question: "18. Según establece el artículo 90, cuando el órgano competente para resolver considere que la infracción o la sanción revisten mayor gravedad que la determinada en la propuesta de resolución, se notificará al inculpado para que aporte cuantas alegaciones estime convenientes en el plazo de:",
+        options: [
+          "a) 10 días",
+          "b) 15 días",
+          "c) 20 días",
+          "d) 30 días"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 15 días)."
+      },
+      {
+        question: "19. Según la Ley 40/2015 de 1 de Octubre, ¿cuántos principios rigen el procedimiento sancionador?",
+        options: [
+          "a) 5",
+          "b) 6",
+          "c) 7",
+          "d) 8"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 7 principios)."
+      },
+      {
+        question: "20. Según el principio de legalidad, recogido en el artículo 25 de la Ley 40/2015; señale la CORRECTA:",
+        options: [
+          "a) La potestad sancionadora de las Administraciones Públicas se ejercerá cuando haya sido expresamente reconocida por una norma.",
+          "b) El ejercicio de la potestad sancionadora corresponde a los órganos administrativos que la tengan expresamente atribuida, por disposición reglamentaria.",
+          "c) La potestad sancionadora, cuando se trate de Entidades Locales, se ejercerá de conformidad con lo dispuesto en el Título XI de la Ley 7/1985, de 2 de abril.",
+          "d) Todas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions,
+      ...test3Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t2_all": test2Questions,
+      "t3_all": test3Questions
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 2 - ILÍCITO PENAL, PROCEDIMIENTO SANCIONADOR Y POLICÍA JUDICIAL (COMPLETO 66 PREGUNTAS)",
+        "t1_all": "TEST Nº 1 - GENERAL (25 PREGUNTAS)",
+        "t2_all": "TEST Nº 2.2 - PENAL Y SANCIONADOR (21 PREGUNTAS)",
+        "t3_all": "TEST Nº 2.3 - ESPECIES, INCENDIOS Y LECRIM (20 PREGUNTAS)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

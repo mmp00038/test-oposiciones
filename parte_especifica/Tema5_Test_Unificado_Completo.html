@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 5 (Montes y Política Forestal)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 5 Unificado Completo (120 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 5-1 (40 Preguntas)">
+          <option value="t1_all">Test 5-1 - Completo (1 - 40)</option>
+          <option value="t1_b1">Test 5-1 - Bloque 1 (1 - 20)</option>
+          <option value="t1_b2">Test 5-1 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+        <optgroup label="Test 5-2 (40 Preguntas)">
+          <option value="t2_all">Test 5-2 - Completo (1 - 40)</option>
+          <option value="t2_b1">Test 5-2 - Bloque 1 (1 - 20)</option>
+          <option value="t2_b2">Test 5-2 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+        <optgroup label="Test 5-3 (40 Preguntas)">
+          <option value="t3_all">Test 5-3 - Completo (1 - 40)</option>
+          <option value="t3_b1">Test 5-3 - Bloque 1 (1 - 20)</option>
+          <option value="t3_b2">Test 5-3 - Bloque 2 (21 - 40)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 5 - MONTES Y POLÍTICA FORESTAL (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. De acuerdo con el art. 148.1.8º de la Constitución Española, la Comunidad Autónoma de Andalucía...",
+        options: [
+          "a) Tiene competencia exclusiva en la legislación básica sobre montes, aprovechamientos forestales y vías pecuarias",
+          "b) Deberá asumir las competencias en materia de montes y aprovechamientos forestales",
+          "c) Tendrá la competencia compartida con el Estado en materia de montes y aprovechamientos forestales",
+          "d) Ninguna es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "2. El Estatuto de Autonomía de Andalucía, regulado por la Ley Orgánica 2/2007, de 19 de marzo, atribuye a la Comunidad Autónoma, en materia de montes explotaciones, aprovechamientos y servicios forestales...",
+        options: [
+          "a) Competencia exclusiva, sin perjuicio de los dispuesto en el art. 149.1.23º de la Constitución",
+          "b) Competencia exclusiva en legislación básica",
+          "c) Competencia compartida con el Estado",
+          "d) Competencia ejecutiva"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "3. Respecto a la Ley 43/2003, de 21 de noviembre, de Montes...",
+        options: [
+          "a) Es una norma estatal de desarrollo en materia de montes",
+          "b) Es una norma estatal de legislación básica en materia de montes",
+          "c) Ha sido modificada por la Ley 10/2006, de 28 de abril, y por la Ley 21/2015, de 20 de julio",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)."
+      },
+      {
+        question: "4. En base al concepto de monte establecido en el art. 4 de la Ley de Montes de Andalucía (Ley 3/2026, de 13 de marzo) y el art. 5 de Ley 43/2003, de Montes ¿cuál de los siguientes es considerado monte o terreno forestal?",
+        options: [
+          "a) Un terreno urbano donde existen especies arbóreas",
+          "b) Un terreno ocupado por un vivero forestal",
+          "c) Un roquedo desprovisto de vegetación",
+          "d) Todos los anteriores son considerados terrenos forestales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un roquedo desprovisto de vegetación)."
+      },
+      {
+        question: "5. La Ley 43/2003, de 21 de noviembre, define 'Reforestación' en su art. 6 como:",
+        options: [
+          "a) Establecimiento de especies forestales en un terreno mediante siembra o plantación",
+          "b) Repoblación, mediante siembra o plantación, de un terreno que era agrícola o estaba dedicado a otros usos no forestales",
+          "c) Reintroducción de especies forestales, mediante siembra o plantación, en terrenos que estuvieron poblados forestalmente hasta épocas recientes, pero que quedaron rasos a causa de talas, incendios, vendavales, plagas, enfermedades u otros motivos",
+          "d) Conjunto de técnicas que tratan de conservar, mejorar, regenerar, y en su caso, restaurar, las masas forestales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "6. El art. 2 de la Ley 43/2003, de Montes, establece su ámbito de aplicación, que comprenderá:",
+        options: [
+          "a) Todos los montes públicos españoles",
+          "b) Todos los montes españoles, a excepción de los montes vecinales en mano común",
+          "c) Todos los montes españoles",
+          "d) Todos los montes españoles de dominio público, incluidos los montes comunales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Todos los montes españoles)."
+      },
+      {
+        question: "7. Sobre el Consejo Forestal Nacional, señala la respuesta INCORRECTA:",
+        options: [
+          "a) Fue creado a través del art. 10 de la Ley 43/2003, de Montes",
+          "b) Es un órgano consultivo del Ministerio competente en materia de Medio Ambiente",
+          "c) La duración del mandato de sus miembros es de 3 años",
+          "d) Su presidente es el titular de la Secretaría de Estado de Medio Ambiente"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "8. ¿Cuál de los siguientes es un objetivo general de la Ley 3/2026, de 13 de marzo, conforme a lo dispuesto en su artículo 6?",
+        options: [
+          "a) La adaptación de los montes a los previsibles nuevos escenarios climáticos y el fomento de su papel como sumideros de carbono",
+          "b) La consolidación del régimen jurídico de los montes públicos",
+          "c) El fomento de la colaboración público-privada",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)."
+      },
+      {
+        question: "9. Sobre el ámbito de aplicación de la Ley de Montes de Andalucía, regulado en su artículo 3, indique cuál de las siguientes respuestas es CORRECTA:",
+        options: [
+          "a) Esta ley se aplica sobre las vías pecuarias que atraviesen o linden con montes, y aquellas que reúnan las características de monte",
+          "b) Esta ley se aplica sobre las plantaciones forestales de turno inferior a treinta años para la producción de madera o biomasa en régimen intensivo sobre superficies agrícolas",
+          "c) Esta ley se aplica sobre todos los montes de la Comunidad Autónoma de Andalucía, salvo los montes vecinales en mano común",
+          "d) Esta ley se aplica sólo sobre montes o partes de ellos que se encuentren incluidos en espacios naturales protegidos declarados por la Comunidad Autónoma de Andalucía"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "10. Según lo dispuesto en los Capítulos III y IV del Título I del Decreto 208/1997 de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, los Planes de Ordenación de los Recursos Naturales (PORN):",
+        options: [
+          "a) Son aprobados por Acuerdo del Consejo de Gobierno",
+          "b) Serán elaborados por las Delegaciones Provinciales y aprobados por el titular de la CMA.",
+          "c) Serán revisados cada 5 años, y la vigencia será la que establezca el propio Plan",
+          "d) Se publicarán en BOJA una vez aprobados mediante Decreto del Consejo de Gobierno"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "11. En relación al contenido de los PORN, el Capítulo II del Título I del Reglamento Forestal de Andalucía, establece que estos instrumentos incluirán (señala la respuesta INCORRECTA):",
+        options: [
+          "a) Estudio y adaptación al planeamiento urbanístico y territorial del ámbito de aplicación",
+          "b) Definición de objetivos",
+          "c) Análisis económico, financiero y de generación de empleo",
+          "d) Normas de aplicación directa, y directrices, orientaciones o criterios para la elaboración o aplicación de proyectos y programas forestales u otros instrumentos y políticas ambientales, territoriales o sectoriales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "12. A tenor de las definiciones del art. 5 de la Ley de Montes de Andalucía, indique cuál de las siguientes respuestas es CORRECTA sobre las fuentes de información forestal:",
+        options: [
+          "a) Son fuentes de información originaria cuando el acceso a estos datos es directo o inmediato a través de referencias originales",
+          "b) Son fuentes de información consolidada si los contenidos que suministran provienen de la combinación de datos de múltiples orígenes, procesados previamente y verificados",
+          "c) Las fuentes de información pueden ser primaria y procesada",
+          "d) Las respuestas A y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "13. El Plan Forestal Español, es un instrumento de planificación forestal que...",
+        options: [
+          "a) Se deberá revisar cada 10 años",
+          "b) Tiene una vigencia de 50 años",
+          "c) Fue aprobado en 1999",
+          "d) A y C son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Se deberá revisar cada 10 años)."
+      },
+      {
+        question: "14. Los montes públicos, según el art. 11 de la Ley 3/2026, de 13 de marzo, se clasifican en:",
+        options: [
+          "a) Demaniales, patrimoniales y vecinales en mano común",
+          "b) Patrimoniales y de dominio público",
+          "c) Patrimoniales, comunales y de dominio público",
+          "d) Todos los montes públicos en Andalucía son demaniales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Patrimoniales y de dominio público)."
+      },
+      {
+        question: "15. La desafectación del dominio público, regulada en el art. 15 de la Ley de Montes de Andalucía, se producirán mediante:",
+        options: [
+          "a) Resolución de la Dirección General competente en materia forestal",
+          "b) Acuerdo del titular de la CMA",
+          "c) Decreto del Consejo de Gobierno",
+          "d) Acuerdo del Consejo de Gobierno"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Acuerdo del Consejo de Gobierno)."
+      },
+      {
+        question: "16. Según el art. 12 de la Ley 43/2003, de 21 de noviembre, los montes comunales son:",
+        options: [
+          "a) Montes privados de naturaleza especial, cuya titularidad pertenece al común de los vecinos",
+          "b) Montes públicos, de dominio público, perteneciente a entidades locales",
+          "c) Montes públicos, de carácter patrimonial, pertenecientes a los vecinos",
+          "d) Los montes comunales son también llamados montes vecinales en mano común"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "17. El régimen jurídico y de usos en el dominio público forestal, regulado en los art. 14 y 15 de la Ley estatal de Montes, establece que los montes de dominio público:",
+        options: [
+          "a) Serán inalienables, imprescriptibles, e inembargables y se les aplicarán tributos que graven su titularidad",
+          "b) Puede ocurrir la usucapión o prescripción adquisitiva sólo mediante la posesión en concepto de dueño, pública, pacífica y no interrumpida durante 30 años",
+          "c) La duración de las autorizaciones y concesiones en estos montes serán como máximo de 75 años",
+          "d) Todas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "18. De acuerdo con el art. 12 de la Ley de Montes de Andalucía, tendrán la condición de suelo rústico especialmente protegido, a efectos urbanísticos...",
+        options: [
+          "a) Todos los montes públicos",
+          "b) Sólo los montes patrimoniales",
+          "c) Sólo los montes de dominio público",
+          "d) Los públicos y los protectores"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Todos los montes públicos)."
+      },
+      {
+        question: "19. El Registro de Montes Públicos de Andalucía (RMPA), regulado en el art. 12 de la Ley 2/2026, de 13 de marzo, incluirá...",
+        options: [
+          "a) Todos los montes públicos de Andalucía",
+          "b) Los montes de utilidad pública de Andalucía",
+          "c) Todos los montes de dominio público y los protectores",
+          "d) Los montes públicos de Andalucía, salvo los patrimoniales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Todos los montes públicos de Andalucía)."
+      },
+      {
+        question: "20. Quedarán incluidos en el RMPA, según establece el art. 47 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía:",
+        options: [
+          "a) Los montes de los Catálogos de Montes de Utilidad Pública de cada provincia andaluza",
+          "b) Los montes públicos del Inventario General de Bienes y Derechos de la Comunidad Autónoma de Andalucía, de los inventarios de Bienes y derechos de las Entidades Locales y del Inventario de Bienes Naturales del Estado",
+          "c) Todos los anteriores, excepto los del Inventario de Bienes Naturales del Estado",
+          "d) A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y B son correctas)."
+      },
+      {
+        question: "21. En el marco de la legislación básica del Estado y de la legislación autonómica, y tal y como queda establecido en el art. 9 de la Ley 43/2003, de 21 de noviembre, las Entidades Locales (EELL) ejercen las siguientes competencias:",
+        options: [
+          "a) En todo caso, gestión de todos los montes de su titularidad",
+          "b) Disposición del rendimiento económico de los aprovechamientos forestales de todos los montes de su titularidad, siempre que no se encuentren consorciados con la Administración Forestal",
+          "c) Gestión de todos los montes de su titularidad no incluidos en el Catálogo de Montes de Utilidad Pública",
+          "d) Ninguna es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "22. La inclusión de montes en el Catálogo de Montes de Utilidad Pública, de acuerdo con el art. 16 de la Ley de Montes estatal, se realiza por:",
+        options: [
+          "a) La Administración competente en materia forestal de cada Comunidad Autónoma",
+          "b) El Ministerio competente en materia de Medio Ambiente",
+          "c) Acuerdo del máximo órgano de gobierno de cada Comunidad Autónoma",
+          "d) Mediante Orden de la Consejería de Medio Ambiente"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Acuerdo del máximo órgano de gobierno de cada CCAA)."
+      },
+      {
+        question: "23. Respecto a los montes protectores, la Ley estatal de Montes establece que:",
+        options: [
+          "a) Son montes públicos que cumplen alguna de las características de los montes de utilidad pública recogidas en el art. 13",
+          "b) Deberán contar con un proyecto de ordenación de montes, plan dasocrático u otro instrumento de gestión equivalente",
+          "c) Su gestión corresponderá a la Administración con competencias en materia forestal, a través de una planificación específica",
+          "d) Todas son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "24. El proceso de elaboración de un PORN, a tenor de lo dispuesto en el art. 15 del Reglamento Forestal de Andalucía, se iniciará mediante:",
+        options: [
+          "a) Acuerdo del titular de la Consejería competente en materia forestal",
+          "b) Orden de la Consejería",
+          "c) Acuerdo del Consejo de Gobierno de la Junta de Andalucía",
+          "d) Decreto del Consejo de Gobierno de la Junta de Andalucía"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Acuerdo del Consejo de Gobierno)."
+      },
+      {
+        question: "25. El trámite de información pública al que se deberá someter el anteproyecto del PORN está establecido, según el art. 16 del Reglamento Forestal de Andalucía, en el plazo de:",
+        options: [
+          "a) Mínimo 1 mes",
+          "b) Máximo 1 mes",
+          "c) Mínimo 2 meses",
+          "d) Máximo 2 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Mínimo 1 mes)."
+      },
+      {
+        question: "26. La Ley 3/2026, de 13 de marzo, establece en su art. 19 que la duración de las concesiones será como máximo de:",
+        options: [
+          "a) 10 años, prorrogables por iguales periodos hasta un máximo de 50 años",
+          "b) 75 años, no prorrogables",
+          "c) 10 años, prorrogables por iguales periodos hasta un máximo de 75 años",
+          "d) 50 años, no prorrogables"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "27. El procedimiento de deslinde ordinario, según dispone el art. 63 del Decreto 208/1997 de 9 de septiembre, se resolverá:",
+        options: [
+          "a) Por acuerdo del Consejo de Gobierno en el plazo máximo de 12 meses",
+          "b) Por resolución del Consejero de Medio Ambiente en el plazo máximo de 24 meses",
+          "c) Por resolución del Delegado Provincial en el plazo máximo de 24 meses",
+          "d) Por resolución del Delegado Provincial en el plazo máximo de 12 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Por resolución del Consejero en un plazo máximo de 24 meses)."
+      },
+      {
+        question: "28. La regulación de las ocupaciones en montes públicos mediante el art. 67 y 68 del Decreto 208/1997 dispone que éstas:",
+        options: [
+          "a) Deberán ser compatibles con las funciones del monte, en todo caso",
+          "b) No podrán exceder de 50 años, prorrogables por iguales periodos",
+          "c) La resolución corresponde al titular de la DG en materia de gestión del medio natural",
+          "d) Plazo de resolución será de 9 meses y el silencio estimatorio"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "29. El derecho de adquisición preferente de las AAPP podrá ejercerse en los siguientes casos de transmisiones onerosas, según lo dispuesto en la Ley de Montes de Andalucía (Ley 3/2026):",
+        options: [
+          "a) Montes protectores",
+          "b) Montes de superficie superior a 250 ha",
+          "c) Montes enclavados o colindantes con montes públicos",
+          "d) Sólo A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Sólo A y C son correctas)."
+      },
+      {
+        question: "30. El artículo 104 del Reglamento Forestal de Andalucía establece que la circulación de vehículos de cualquier clase por pistas y caminos que discurran por montes públicos queda limitada con carácter general a:",
+        options: [
+          "a) 40 km/h",
+          "b) 50 km/h",
+          "c) 30 km/h",
+          "d) Ninguna es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 40 km/h)."
+      },
+      {
+        question: "31. De acuerdo con el art. 80 de la Ley 3/2026, de Montes de Andalucía, las solicitudes de cambio de uso forestal se resolverán en un plazo máximo de:",
+        options: [
+          "a) 6 meses, transcurridos los cuales, si no ha recaído resolución expresa, se entenderán desestimadas",
+          "b) 6 meses, transcurridos los cuales, si no ha recaído resolución expresa, se entenderán estimadas",
+          "c) 3 meses, transcurridos los cuales, si no ha recaído resolución expresa, se entenderán desestimadas",
+          "d) 3 meses, transcurridos los cuales, si no ha recaído resolución expresa, se entenderán estimadas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6 meses, silencio desestimatorio)."
+      },
+      {
+        question: "32. Indique cuál de las siguientes actuaciones de modificación de la cubierta vegetal NO podría autorizar la Consejería competente en materia forestal conforme al art. 81 de la Ley 3/2026, de 13 de marzo:",
+        options: [
+          "a) Plantaciones, en régimen de secano, de nogales, avellanos, algarrobos, castaños, almendros, cerezos o pistachos",
+          "b) Repoblaciones forestales que contemplen cambio de especies principales",
+          "c) Repoblaciones asociadas a proyectos de absorción de emisiones",
+          "d) Instalación o recuperación de huertos para autoabastecimiento, hasta una superficie máxima de 0,5 hectáreas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "33. La Ley 3/2026, de 13 de marzo, clasifica las infracciones en materia forestal en función de:",
+        options: [
+          "a) La valoración ambiental de los daños y/o la superficie afectada del monte",
+          "b) La valoración económica de los daños y/o plazo de tiempo para la recuperación del monte",
+          "c) El valor ecológico y las especies dañadas y/o la superficie afectada del monte",
+          "d) La repercusión de los daños producidos y/o el tiempo necesario para su recuperación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "34. La alteración de hitos o mojones de montes públicos, de forma que impida la determinación sobre el terreno de los lindes legalmente establecidos, según la Ley 43/2003, es una infracción:",
+        options: [
+          "a) Especialmente grave",
+          "b) Muy graves",
+          "c) Grave",
+          "d) Leve"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Muy grave)."
+      },
+      {
+        question: "35. Las sanciones establecidas en base al art. 137 de la Ley 3/2026, de 13 de marzo, para las infracciones graves alcanzan la cuantía:",
+        options: [
+          "a) 1.001 a 100.000 euros",
+          "b) 10.001 a 100.000 euros",
+          "c) 5.001 a 200.000 euros",
+          "d) 50.001 a 200.000 euros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1.001 a 100.000 euros)."
+      },
+      {
+        question: "36. De acuerdo con el Anexo del Reglamento Forestal de Andalucía, el melojo (Quercus pyrenaica) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 250 años",
+          "b) 200 años",
+          "c) 400 años",
+          "d) 450 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 250 años)."
+      },
+      {
+        question: "37. De acuerdo con el Anexo del Reglamento Forestal de Andalucía, el castaño (Castanea sativa) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 50 años",
+          "b) 80 años",
+          "c) 100 años",
+          "d) 70 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 70 años)."
+      },
+      {
+        question: "38. De acuerdo con el Anexo del Reglamento Forestal de Andalucía, cualquiera de las dos especies de tarajes (Tamarix africana y Tamarix gallica) tienen un ciclo vegetativo de:",
+        options: [
+          "a) Menor de 20 años",
+          "b) 40 años",
+          "c) 50 años",
+          "d) 80 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 40 años)."
+      },
+      {
+        question: "39. Las sanciones impuestas por la comisión de infracciones graves prescribirán a los _____ de acuerdo con lo dispuesto en el art. 80 de la Ley 43/2003, de Montes.",
+        options: [
+          "a) 3 años",
+          "b) 2 años",
+          "c) 1 año",
+          "d) 6 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2 años)."
+      },
+      {
+        question: "40. Conforme al art. 139 de la Ley 3/2026, de Montes de Andalucía, habrá reincidencia si, en el momento de cometerse la infracción, no hubieran transcurrido _____ desde la imposición por resolución firme en vía administrativa de otra sanción por infracción análoga.",
+        options: [
+          "a) 1 año",
+          "b) 2 años",
+          "c) 3 años",
+          "d) 5 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 5 años)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. Según la normativa forestal autonómica, la gestión de los montes se basará en los criterios de:",
+        options: [
+          "a) Integralidad y sostenibilidad",
+          "b) Multifuncionalidad y sostenibilidad",
+          "c) Conservación y biodiversidad",
+          "d) Usos sostenible e multifuncionalidad"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Integralidad y sostenibilidad)."
+      },
+      {
+        question: "2. El art. 7 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, establece los tipos de PORN. Estos pueden ser:",
+        options: [
+          "a) Ordinario y Especial",
+          "b) Territorial y Especial",
+          "c) General y Específico",
+          "d) Territorial y Singular"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Territorial y Especial)."
+      },
+      {
+        question: "3. El art. 19 de la Ley estatal de Montes, establece que la usucapión o prescripción adquisitiva en montes públicos sólo se dará mediante la posesión en concepto de dueño, pública, pacífica y no interrumpida durante 30 años. ¿A qué tipo de montes afectará esta prescripción?",
+        options: [
+          "a) A todos los montes públicos",
+          "b) A los montes demaniales",
+          "c) A los montes patrimoniales",
+          "d) A los montes protectores"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: A los montes patrimoniales)."
+      },
+      {
+        question: "4. En la Comunidad Autónoma de Andalucía, la mayor parte de los montes son de propiedad:",
+        options: [
+          "a) Privada",
+          "b) Pública",
+          "c) Pública, propiedad de los Ayuntamientos",
+          "d) Pública, propiedad de la Comunidad Autónoma"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Privada)."
+      },
+      {
+        question: "5. A tenor de los datos de la última actualización del Registro de Montes Públicos de Andalucía, el mayor número de montes públicos pertenecen a:",
+        options: [
+          "a) La Comunidad Autónoma",
+          "b) Los Ayuntamientos",
+          "c) Otras Entidades Públicas",
+          "d) Fincas del Ministerio ubicadas en Andalucía"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Los Ayuntamientos)."
+      },
+      {
+        question: "6. Y la provincia con mayor superficie de montes públicos corresponde con:",
+        options: [
+          "a) Almería",
+          "b) Huelva",
+          "c) Granada",
+          "d) Jaén"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Granada)."
+      },
+      {
+        question: "7. El Plan Forestal Español fue aprobado en:",
+        options: [
+          "a) 2002",
+          "b) 1989",
+          "c) 1992",
+          "d) 1999"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2002)."
+      },
+      {
+        question: "8. La iniciación del proceso de elaboración de los PORN, de acuerdo con el art. 15 del Reglamento Forestal de Andalucía, le corresponderá a:",
+        options: [
+          "a) El titular de la Consejería",
+          "b) El titular de la Dirección General en materia forestal",
+          "c) El Consejo de Gobierno por acuerdo",
+          "d) Resolución del titular de la Consejería"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Consejo de Gobierno por acuerdo)."
+      },
+      {
+        question: "9. Sobre el derecho de adquisición preferente de la administración (derechos de tanteo y retracto), el art. 25 de la Ley 43/2003, de Montes, establece que en el caso de montes colindantes con otros montes pertenecientes a distintas Administraciones públicas, tendrá prioridad en el ejercicio del derecho de adquisición preferente:",
+        options: [
+          "a) La Administración de la Comunidad Autónoma",
+          "b) La Administración Local",
+          "c) La Administración cuyo monte tenga mayor linde común con el monte en cuestión",
+          "d) La Administración que cuente con menor patrimonio en la provincia"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La Administración cuyo monte tenga mayor linde común)."
+      },
+      {
+        question: "10. El procedimiento de deslinde abreviado, según dispone el art. 64 del Decreto 208/1997 (Reglamento Forestal de Andalucía), se resolverá en un máximo de:",
+        options: [
+          "a) Por resolución del Consejero de Medio Ambiente en el plazo máximo de 24 meses",
+          "b) Por resolución del Consejero de Medio Ambiente en el plazo máximo de 12 meses",
+          "c) Por resolución del Delegado Territorial en el plazo máximo de 24 meses",
+          "d) Por resolución del Delegado Territorial en el plazo máximo de 12 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Por resolución del Consejero en el plazo máximo de 12 meses)."
+      },
+      {
+        question: "11. La competencia para el deslinde y amojonamiento de los montes públicos, regulada en el art. 21 de la Ley 3/2026, de Montes de Andalucía, le corresponderá a:",
+        options: [
+          "a) La Consejería competente en materia forestal, previa audiencia al titular del monte",
+          "b) La Administración pública propietaria, previo informe preceptivo de la Consejería",
+          "c) La Administración titular del monte público",
+          "d) Sólo le corresponderá a la Consejería en caso de que exista un Convenio de cooperación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "12. El uso público de los terrenos forestales, según establece el art. 103 del Reglamento Forestal de Andalucía, se canalizará preferentemente a través de las siguientes figuras:",
+        options: [
+          "a) Parque Forestal",
+          "b) Camping",
+          "c) Área de descanso",
+          "d) Todas son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Parque Forestal)."
+      },
+      {
+        question: "13. La Ley 43/2003, de 21 de noviembre, de Montes, clasifica las infracciones en:",
+        options: [
+          "a) Graves y Leves",
+          "b) Muy graves, Graves y Leves",
+          "c) Especialmente Graves, Muy Graves, Graves y Leves",
+          "d) Graves y Menos Graves"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Muy graves, Graves y Leves)."
+      },
+      {
+        question: "14. La realización de un camino de acceso a una parcela cuando no esté previsto en el instrumento de ordenación forestal o, en su caso, en el PORF, o sin estar expresamente autorizado por el órgano forestal autonómico ¿podría constituir una infracción a la Ley de Montes de Andalucía?",
+        options: [
+          "a) Sí, es una infracción leve siempre que la pendiente sea menor del 20%",
+          "b) No, siempre que se le haya concedido una licencia urbanística",
+          "c) Sí, sería una infracción grave si la longitud es mayor de 500 metros",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna de las anteriores es correcta)."
+      },
+      {
+        question: "15. En el caso de que la sanción a imponer alcance los 200.000 euros, ¿a qué órgano le corresponde la potestad sancionadora según el art. 138 de la Ley 3/2026, de Montes de Andalucía?",
+        options: [
+          "a) A la persona titular de la Dirección General competente en materia forestal",
+          "b) A la persona titular de la Consejería competente en materia forestal",
+          "c) A la persona titular del órgano periférico de la Consejería competente en materia forestal",
+          "d) Al Consejo de Gobierno de la Junta de Andalucía"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Titular de la Dirección General)."
+      },
+      {
+        question: "16. La Ley 43/2003, de Montes, para las infracciones graves establece una sanción comprendida en el siguiente intervalo:",
+        options: [
+          "a) 100-10.000 €",
+          "b) 1001-10.000 €",
+          "c) 1001-100.000 €",
+          "d) Ninguna es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 1.001 a 100.000 €)."
+      },
+      {
+        question: "17. Según el art. 144 de la Ley 3/2026, las sanciones graves en materia forestal prescribirán a los:",
+        options: [
+          "a) 2 años",
+          "b) 3 años",
+          "c) 1 año",
+          "d) Ninguna es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2 años)."
+      },
+      {
+        question: "18. En base a lo dispuesto en el Anexo del Reglamento Forestal, el algarrobo (Ceratonia siliqua) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 100 años",
+          "b) 70 años",
+          "c) 200 años",
+          "d) 150 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 100 años)."
+      },
+      {
+        question: "19. En base a lo dispuesto en el Anexo del Reglamento Forestal, las jaras y jaguarzas (Cistus sp.) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 100 años",
+          "b) 80 años",
+          "c) 40 años",
+          "d) Menor de 20 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Menor de 20 años)."
+      },
+      {
+        question: "20. En base a lo dispuesto en el Anexo del Reglamento Forestal, la cornicabra (Pistacia terebinthus) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 80 años",
+          "b) 60 años",
+          "c) 40 años",
+          "d) Menor de 20 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Menor de 20 años)."
+      },
+      {
+        question: "21. En base a lo dispuesto en el Anexo del Reglamento Forestal, el aliso (Alnus glutinosa) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 70 años",
+          "b) 60 años",
+          "c) 50 años",
+          "d) 30 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 50 años)."
+      },
+      {
+        question: "22. En base a lo dispuesto en el Anexo del Reglamento Forestal, el pino piñonero (Pinus pinea) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 100 años",
+          "b) 80 años",
+          "c) 50 años",
+          "d) 30 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 80 años)."
+      },
+      {
+        question: "23. En base a lo dispuesto en el Anexo del Reglamento Forestal, los sauces (género Salix) tienen un ciclo vegetativo de:",
+        options: [
+          "a) 80 años",
+          "b) 60 años",
+          "c) 40 años",
+          "d) Menor de 20 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 40 años)."
+      },
+      {
+        question: "24. Atendiendo a lo dispuesto en el art. 27 de la Ley de Montes de Andalucía sobre el límite a la segregación de montes, serán indivisibles, salvo por causa no imputable a la propiedad, las parcelas de monte cuya superficie sea:",
+        options: [
+          "a) Inferior a 100 hectáreas",
+          "b) Inferior o igual a 50 hectáreas",
+          "c) Inferior o igual a 40 hectáreas",
+          "d) Inferior a 20 hectáreas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Inferior a 20 hectáreas)."
+      },
+      {
+        question: "25. De acuerdo con el art. 43 de la Ley 3/2026, de Montes de Andalucía, la red de montes andaluces públicos o privados, con gestión forestal sostenible y que superen el estándar establecido, a los únicos efectos de divulgar los valores y servicios que prestan los ecosistemas forestales, se denomina:",
+        options: [
+          "a) Red de Áreas de Reserva no intervenidas",
+          "b) Red de montes protectores",
+          "c) Red de muestra",
+          "d) Red andaluza de referencia"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Red de muestra)."
+      },
+      {
+        question: "26. Conforme al art. 51 de la Ley 3/2026, el grado de cumplimiento de las previsiones del Plan Forestal de Andalucía se evaluará:",
+        options: [
+          "a) Cada 5 años, como máximo, realizándose las adecuaciones correspondientes",
+          "b) Al menos cada 10 años, realizándose las adecuaciones correspondientes",
+          "c) Periódicamente, como mínimo cada 10 años, realizándose las revisiones correspondientes",
+          "d) Al menos cada 5 años, realizándose las modificaciones correspondientes"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Al menos cada 10 años)."
+      },
+      {
+        question: "27. La aprobación de los Planes de Ordenación de Recursos Forestales regulados en el art. 52 de la Ley 3/2026, de Montes de Andalucía, le corresponderá:",
+        options: [
+          "a) Al Consejo de Gobierno, a propuesta de la Consejería competente en materia forestal",
+          "b) A Consejo de Gobierno, a propuesta del Consejo Andaluz de Política Forestal y Biodiversidad",
+          "c) Al titular de la Consejería, a propuesta del Consejo Andaluz de Política Forestal y Biodiversidad",
+          "d) Al titular de la Consejería competente en material forestal"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Al Consejo de Gobierno, a propuesta de la Consejería)."
+      },
+      {
+        question: "28. Aquella figura \"destinada a proporcionar servicios básicos a los usuarios recreativos del monte, incluyendo, entre otros, suministro de agua, servicios higiénicos, mesas y asientos, estacionamiento de vehículos y circuitos para ejercicio físico\", corresponde, conforme a las figuras de uso público establecidas en el art. 103 del Reglamento Forestal, con:",
+        options: [
+          "a) Parque Forestal",
+          "b) Zona de acampada",
+          "c) Parque periurbano",
+          "d) Adecuación recreativa"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Adecuación recreativa)."
+      },
+      {
+        question: "29. En las ocupaciones de interés particular, según el art. 69.3 del Reglamento Forestal, cuando de los informes técnicos se desprenda la conveniencia de autorizar la ocupación o servidumbre, se procederá a abrir un trámite de información pública mediante anuncio en BOJA, invitando a cuántas personas estén interesadas a presentar solicitudes concurrentes por espacio de:",
+        options: [
+          "a) Al menos 20 días",
+          "b) 20 días",
+          "c) 30 días",
+          "d) Más de 30 días"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 30 días)."
+      },
+      {
+        question: "30. La aprobación de las Instrucciones relativas al laboreo y conservación de suelos le corresponde, según el art. 72 del Reglamento Forestal, a:",
+        options: [
+          "a) El titular de la Dirección General competente en materia forestal",
+          "b) El titular de la Delegación Territorial en cada provincia",
+          "c) El titular de la Consejería competente en Medio Ambiente",
+          "d) El Consejo de Gobierno mediante Acuerdo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El titular de la Consejería)."
+      },
+      {
+        question: "31. Conforme a lo recogido en el art. 16 del Reglamento Forestal, el anteproyecto de un PORN será sometido a un trámite de información pública y otro de audiencia. Recogidas las alegaciones, la Administración Forestal elabora el proyecto de Plan que remite a Corporaciones Locales, al órgano competente en ordenación del territorio, y al Consejo Provincial de Medio Ambiente y Biodiversidad, para que formulen las observaciones que consideren necesarias, en un plazo de:",
+        options: [
+          "a) 15 días",
+          "b) Mínimo 30 días",
+          "c) Al menos 1 mes",
+          "d) 2 meses"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 2 meses)."
+      },
+      {
+        question: "32. Según lo dispuesto en los art. 63-67 de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía, los usos del monte son los siguientes:",
+        options: [
+          "a) Uso selvícola, cinegético, silvopastoral y uso público",
+          "b) Uso forestal, cinegético, ganadero, y recreativo",
+          "c) Uso forestal, cinegético, agrosilvopastoril, recreativo y ambiental",
+          "d) Uso selvícola, ganadero, cinegético y ambiental"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Uso selvícola, cinegético, silvopastoral y uso público)."
+      },
+      {
+        question: "33. En relación con el fondo de mejoras regulado en el art. 38 de la Ley 43/2003, de 12 de noviembre, de Montes, señale cuál de las siguientes afirmaciones es CORRECTA:",
+        options: [
+          "a) Tienen la obligación de aplicar a este fondo los titulares de montes públicos demaniales",
+          "b) La cuantía destinada al fondo no será inferior al 10% de los rendimientos obtenidos",
+          "c) Las inversiones se realizan conforme a un Plan de Mejoras",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las inversiones se realizan conforme a un Plan de Mejoras)."
+      },
+      {
+        question: "34. El art. 75 de la Ley 3/2026, de Montes de Andalucía establece que serán considerados aprovechamiento forestal, aquellos servicios ambientales que:",
+        options: [
+          "a) Sean resultado de ejecutar un proyecto voluntario de prevención, mitigación o corrección de impactos",
+          "b) Tengan valor de mercado y su aprovechamiento se realice con ánimo de lucro",
+          "c) Tengan un valor histórico y cultural",
+          "d) Sean capaces de crear y conservar el suelo, mejorando su rendimiento"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "35. En supuestos de erosión grave o desertificación, el art. 79.4 del Reglamento Forestal dispone que se podrán establecer zonas de intervención, mediante:",
+        options: [
+          "a) Decreto del Consejo de Gobierno",
+          "b) Acuerdo del Consejo de Gobierno",
+          "c) Resolución del Consejero",
+          "d) Resolución del Director General"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Decreto del Consejo de Gobierno)."
+      },
+      {
+        question: "36. El régimen de autorizaciones para la modificación de la cubierta vegetal viene regulado en el art. 82 de la Ley 3/2026, de 13 de marzo, donde dispone que:",
+        options: [
+          "a) El plazo máximo de resolución será de 6 meses",
+          "b) El silencio administrativo será estimatorio, salvo que se trate de repoblaciones",
+          "c) Si la actuación solicitada está contemplada en un instrumento de ordenación forestal en vigor, no será necesaria la autorización, sino una comunicación previa",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "37. La Ley 43/2003, de 21 de noviembre, de Montes, clasifica las infracciones graves en su art. 68, siendo estas clasificadas como tal cuando...",
+        options: [
+          "a) Se hayan causado al monte daños con unos costes de reposición iguales o superiores a 100.000 euros e inferiores a 1.000.000 euros",
+          "b) Se necesite un plazo de reparación o restauración inferior a 10 años y superior a seis meses",
+          "c) La alteración de señales y mojones no impida la identificación de los límites reales del monte público deslindado",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)."
+      },
+      {
+        question: "38. En base al art. 37.2 de la Ley de Montes (Ley 43/2003), se considerarán aprovechamientos de turno corto, a aquellos cuyo turno sea:",
+        options: [
+          "a) Inferior a 12 años",
+          "b) Inferior a 20 años",
+          "c) Inferior a 30 años",
+          "d) Entre 20 y 30 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Inferior a 20 años)."
+      },
+      {
+        question: "39. El art. 6 de la Ley 43/2003, de Montes, define \"repoblación forestal\" como:",
+        options: [
+          "a) La repoblación, mediante siembra o plantación, de un terreno que era agrícola o estaba dedicado a otros usos no forestales",
+          "b) La reintroducción de especies forestales, mediante siembra o plantación, en terrenos que estuvieron poblados forestalmente hasta épocas recientes, pero que quedaron rasos a causa de talas, incendios, vendavales, plagas, enfermedades u otros motivos",
+          "c) Establecimiento de especies forestales en un terreno mediante siembra o plantación. Puede ser forestación o reforestación",
+          "d) Conjunto de técnicas utilizadas para implantar especies arbóreas de carácter forestal en una zona con vegetación herbácea o degradada."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "40. De acuerdo con lo dispuesto en el art. 11 de la Ley 43/2003, de Montes, los montes vecinales en mano común...",
+        options: [
+          "a) Son montes privados",
+          "b) Son montes públicos que pertenecen al común de los vecinos y tienen su legislación propia",
+          "c) Se incluyen en el Catálogo de Montes de Utilidad Pública",
+          "d) Todas son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Son montes privados)."
+      }
+    ];
+
+    const test3Questions = [
+      {
+        question: "1. El Plan Forestal Andaluz (PFA) fue aprobado por....",
+        options: [
+          "a) Acuerdo del Consejo de Gobierno el 7 de febrero de 1989, y Resolución del Pleno del Parlamento, el 14 y 15 de noviembre",
+          "b) Decreto del Consejo de Gobierno el 7 de febrero de 1989, y Resolución del Pleno del Parlamento, el 14 y 15 de noviembre",
+          "c) Acuerdo del Consejo de Gobierno de 7 de febrero de 1989, previo informe favorable de la Conferencia Sectorial de Medio Ambiente",
+          "d) Decreto del Consejo de Gobierno el 7 de febrero de 1989, previo informe del Consejo Andaluz de Biodiversidad"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "2. Los objetivos y directrices del PFA serán",
+        options: [
+          "a) Vinculantes para las administraciones públicas con competencias en el sector forestal, y de carácter orientador para las actuaciones que los propietarios particulares realicen en sus montes",
+          "b) Orientadoras para las administraciones públicas con competencias en el sector forestal, y para las actuaciones que los propietarios particulares realicen en sus montes",
+          "c) Vinculantes para las administraciones públicas con competencias en el sector forestal, así como para las actuaciones que los propietarios particulares realicen en sus montes",
+          "d) Orientadoras para aquellos montes que dispongan de instrumento de ordenación"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "3. ¿Cuál es la vigencia del PFA?",
+        options: [
+          "a) Indefinida, con revisiones decenales",
+          "b) La que defina el propio plan",
+          "c) 30 años",
+          "d) 60 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 60 años)."
+      },
+      {
+        question: "4. La ejecución del PFA se realizará:",
+        options: [
+          "a) En fases quinquenales",
+          "b) En fases decenales",
+          "c) En fases anuales",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: En fases decenales)."
+      },
+      {
+        question: "5. Señala cuál de los siguientes objetivos principales del PFA NO es correcto:",
+        options: [
+          "a) Contribuir a la lucha contra el cambio climático",
+          "b) Compatibilizar el uso social, recreativo y cultural del monte con su conservación",
+          "c) Restaurar los ecosistemas forestales degradados",
+          "d) Contribuir a la mejora de la industrialización y comercialización de productos forestales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "6. Actualmente, ¿cuántas adecuaciones del PFA se han aprobado?",
+        options: [
+          "a) 2",
+          "b) 3",
+          "c) 4",
+          "d) 5"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 4)."
+      },
+      {
+        question: "7. La última adecuación del PFA aprobada abarca el siguiente periodo desde su aprobación:",
+        options: [
+          "a) 2022-2030",
+          "b) 2022-2049",
+          "c) 2023-2030",
+          "d) 2021-2049"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 2023-2030)."
+      },
+      {
+        question: "8. La última Adecuación del Plan Forestal Andaluz ha sido aprobada mediante:",
+        options: [
+          "a) Orden de la Consejería",
+          "b) Decreto del Consejo de Gobierno de la Junta de Andalucía",
+          "c) Acuerdo del Consejo de Gobierno de la Junta de Andalucía",
+          "d) Resolución del titular de la Consejería"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Acuerdo del Consejo de Gobierno)."
+      },
+      {
+        question: "9. Las Revisiones del PFA se realizarán cada:",
+        options: [
+          "a) 10 años",
+          "b) 5 años",
+          "c) 2 años",
+          "d) Anualmente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5 años)."
+      },
+      {
+        question: "10. ¿Cuál es el ámbito de aplicación del Plan Forestal Andaluz?",
+        options: [
+          "a) Los montes de titularidad pública de Andalucía",
+          "b) Toda la superficie forestal de Andalucía",
+          "c) Toda la superficie forestal de Andalucía, salvo los Parques Nacionales",
+          "d) Los montes públicos de Andalucía y los privados que no formen parte de terrenos cinegéticos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Toda la superficie forestal de Andalucía)."
+      },
+      {
+        question: "11. ¿De cuántas categorías consta el sistema de clasificación de formaciones vegetales establecido por el PFA?:",
+        options: [
+          "a) 50",
+          "b) 30",
+          "c) 19",
+          "d) 35"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30)."
+      },
+      {
+        question: "12. La estructura programática establecida en la Adecuación del PFA Horizonte 2030 cuenta con:",
+        options: [
+          "a) Programas Operativos y Horizontales",
+          "b) Programas Operativos Específicos y Transversales",
+          "c) Programas Operativos Específicos y Medidas transversales",
+          "d) Áreas de Actuación y Programas Operativos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Programas Operativos Específicos y Transversales)."
+      },
+      {
+        question: "13. ¿Cuántos Objetivos Generales se han establecido en esta última Adecuación Horizonte 2030?",
+        options: [
+          "a) 17",
+          "b) 15",
+          "c) 12",
+          "d) 16"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 17)."
+      },
+      {
+        question: "14. En relación con la distribución y estructura de la propiedad forestal, señale la respuesta CORRECTA de acuerdo con lo establecido en el epígrafe 'Situación actual de los terrenos forestales de Andalucía' de la Adecuación Horizonte 2030:",
+        options: [
+          "a) La superficie de montes públicos en Andalucía asciende a unas 2,7 millones de hectáreas",
+          "b) La superficie forestal de gestión particular alcanza aproximadamente un 74% de toda la superficie forestal de Andalucía",
+          "c) La administración pública sólo gestionará montes públicos",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "15. Según lo recogido en la Adecuación Horizonte 2030 sobre la evolución de la superficie forestal, en el periodo 1999-2013, la superficie con usos forestales en Andalucía",
+        options: [
+          "a) Ha aumentado notablemente",
+          "b) Se ha mantenido más o menos estable, si bien ha experimentado notables transformaciones internas",
+          "c) Ha disminuido drásticamente",
+          "d) Se ha mantenido más o menos estable, sin grandes cambios internos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "16. El número de Programas Operativos Específicos que vertebran la última Adecuación del PFA es:",
+        options: [
+          "a) 5",
+          "b) 8",
+          "c) 7",
+          "d) 6"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 7)."
+      },
+      {
+        question: "17. De acuerdo con los datos de la última adecuación del PFA, de los 8,7 millones de hectáreas del territorio andaluz, el porcentaje aproximado que corresponde con terrenos forestales alcanza el:",
+        options: [
+          "a) 42%",
+          "b) 53%",
+          "c) 65%",
+          "d) 70%"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 53%)."
+      },
+      {
+        question: "18. Y dentro de la superficie forestal de Andalucía, el porcentaje de terreno arbolado corresponde aproximadamente a:",
+        options: [
+          "a) 45%",
+          "b) 20%",
+          "c) 55%",
+          "d) 35%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 55%)."
+      },
+      {
+        question: "19. Para el seguimiento de la Planificación del PFA, se utilizarán...",
+        options: [
+          "a) Memorias anuales",
+          "b) Memorias quinquenales",
+          "c) Evaluaciones bienales",
+          "d) A y C son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Memorias anuales)."
+      },
+      {
+        question: "20. ¿Cuál de los siguientes NO es uno de los Programas Operativos Específicos establecidos en la Adecuación del PFA Horizonte 2030?",
+        options: [
+          "a) Gestión de la Red de Espacios Naturales Protegidos",
+          "b) Ordenación de montes, planificación de aprovechamientos forestales y cinegéticos, y desarrollo de la bioeconomía para favorecer el arraigo de la población del medio rural",
+          "c) Gobernanza, investigación, formación y sensibilización",
+          "d) Defensa del patrimonio forestal"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "21. Según la clasificación de formaciones vegetales del PFA, dentro de las formaciones arboladas, tienen la consideración de formaciones claras o huecas, aquellas cuya cobertura arbórea:",
+        options: [
+          "a) Es mayor del 5%",
+          "b) Se encuentra en el intervalo 5-25%",
+          "c) Se encuentra en el intervalo 5-50%",
+          "d) Es menor del 60%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Intervalo 5-50%)."
+      },
+      {
+        question: "22. De las formaciones vegetales establecidas en el PFA Horizonte 2030 ¿cuál de las siguientes NO es una de ellas?",
+        options: [
+          "a) Eucaliptal",
+          "b) Mezcla de Pinus y Quercus",
+          "c) Otros pinares",
+          "d) Vegetación rupícola"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Vegetación rupícola)."
+      },
+      {
+        question: "23. Según la clasificación de formaciones vegetales del PFA, se consideran formaciones de matorral aquellas que tienen:",
+        options: [
+          "a) Cobertura de matorral mayor del 50%",
+          "b) Cobertura de matorral mayor del 25%, y cobertura arbórea inferior al 5%",
+          "c) Cobertura de matorral mayor del 50%, y cobertura arbórea inferior al 5%",
+          "d) Cobertura de matorral mayor del 25%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "24. Según la clasificación de formaciones vegetales del PFA, dentro de los matorrales encontramos varias categorías:",
+        options: [
+          "a) Matorral mediterráneo noble, otros matorrales mediterráneos y matorral de alta montaña",
+          "b) Matorral mediterráneo noble, matorral serial y matorral tipo piornal",
+          "c) Matorral mediterráneo noble, matorral de media montaña, y matorral de alta montaña",
+          "d) Matorral mediterráneo noble, matorral xerófito y matorral tipo piornal"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "25. Las especies del género Cupressus ¿en qué tipo de formación vegetal se incluyen dentro del sistema de clasificación establecido por el PFA?",
+        options: [
+          "a) Cupresáceas",
+          "b) Otras coníferas",
+          "c) Pináceas",
+          "d) Pinar mixto"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Otras coníferas)."
+      },
+      {
+        question: "26. Indique cuál de los siguientes NO es un objetivo general de la Adecuación Horizonte 2030:",
+        options: [
+          "a) Conseguir un nivel de calidad ambiental tal que las concentraciones de contaminantes de origen humano, incluidos distintos tipos de radiación, no tengan efectos ni riesgos significativos sobre la salud humana",
+          "b) Contribuir a la mejora de la infraestructura verde y los procesos de conectividad ecológica mediante soluciones basadas en la naturaleza, a través de la gestión integrada, entre otras, de áreas forestales, espacios naturales protegidos, vías pecuarias y red hídrica superficial",
+          "c) Promover un uso público social, recreativo y cultural basado en el respeto mutuo entre usuarios y que evite la derivación de riesgos para la conservación del medio natural",
+          "d) Favorecer actuaciones de mitigación del cambio climático, apoyando el papel de los ecosistemas forestales mediante su gestión sostenible como sumideros de CO2"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "27. ¿Cuál de los siguientes Programas Operativos del PFA es de tipo transversal?",
+        options: [
+          "a) Uso público y ecoturismo",
+          "b) Gobernanza, investigación, formación y sensibilización",
+          "c) Prevención y lucha contra incendios forestales",
+          "d) Investigación, desarrollo y transferencia tecnológica"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Uso público y ecoturismo)."
+      },
+      {
+        question: "28. ¿Cuál de los siguientes NO es un Programa Operativo Específico de la última Adecuación del PFA?",
+        options: [
+          "a) Conservación de la biodiversidad y la geodiversidad y la mejora de la infraestructura verde y la conectividad ecológica",
+          "b) Control y seguimiento de plagas, enfermedades, y otros agentes nocivos para las masas forestales",
+          "c) Defensa del patrimonio forestal",
+          "d) Control de la erosión y desertificación y restauración hidrológica y ambiental"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "29. ¿Qué instrumento de planificación aborda específicamente los sistemas de dehesas en Andalucía?",
+        options: [
+          "a) Estrategia Forestal de Andalucía",
+          "b) Planes de Gestión Integral de montes públicos",
+          "c) Plan Director de las Dehesas de Andalucía",
+          "d) Plan de Ordenación Integrada de la Dehesa"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Plan Director de las Dehesas de Andalucía)."
+      },
+      {
+        question: "30. ¿Cuál es la función principal de los Planes de Gestión Integral (PGI) de los montes públicos?",
+        options: [
+          "a) Implantar un nuevo modelo de gestión con especial incidencia en la economía local, incidiendo en la reinversión de los beneficios económicos de los aprovechamientos forestales en los propios montes",
+          "b) Fomentar la gestión parcelada de los terrenos forestales",
+          "c) Mejorar y priorizar la productividad de los montes públicos y su uso recreativo",
+          "d) Todas son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "31. Actualmente, ¿cuántos PGI de montes públicos han sido aprobados?",
+        options: [
+          "a) 7",
+          "b) 9",
+          "c) 10",
+          "d) 5"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 7)."
+      },
+      {
+        question: "32. Cuál de los siguientes NO es un PGI para montes públicos aprobado por la Junta de Andalucía:",
+        options: [
+          "a) PGI de los Montes Públicos de las Sierras de Tejeda, Almijara y Alhama",
+          "b) PGI de los Montes Públicos del Parque Natural de Doñana",
+          "c) PGI de los Montes Públicos de la Sierra Morena jiennense",
+          "d) PGI de los Montes Públicos de la Sierra Occidental de Córdoba y Alcornocosas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "33. El PFA Horizonte 2030 clasifica la vegetación andaluza en unidades de vegetación, entre las que NO se incluyen:",
+        options: [
+          "a) Sabinar/enebral",
+          "b) Matorral xerófito",
+          "c) Zonas de escasa vegetación",
+          "d) Chopera"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Matorral xerófito)."
+      },
+      {
+        question: "34. Tampoco se encuentran incluidas como formaciones vegetales...",
+        options: [
+          "a) Playas, dunas y arenales",
+          "b) Pinar mixto",
+          "c) Saucedas",
+          "d) Acebuchal"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Saucedas)."
+      },
+      {
+        question: "35. Conforme a la clasificación del PFA, se definen 'formaciones arboladas de coníferas' a todas aquellas que presentan:",
+        options: [
+          "a) Cobertura arbórea mayor del 25%, cuando el matorral supere el 50%",
+          "b) Cobertura arbórea mayor del 5%, siempre que el matorral no supere el 25%",
+          "c) Cobertura arbórea mayor del 5%",
+          "d) Cobertura arbórea entre el 5-50%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cobertura arbórea mayor del 5%)."
+      },
+      {
+        question: "36. A efectos de la caracterización del grado de protección del suelo, la clasificación del PFA establece las \"formaciones de arbolado ralo con cobertura de matorral escasa o media\", como aquellas que presenten los siguientes porcentajes de cobertura:",
+        options: [
+          "a) Cobertura arbórea entre 5-25%, y cobertura de matorral menor del 50%",
+          "b) Cobertura arbórea entre el 5-50%, y matorral menor del 25%",
+          "c) Cobertura arbórea mayor del 25%, cuando el matorral supere el 50%",
+          "d) Cobertura arbórea mayor del 5%, siempre que el matorral no supere el 25%"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "37. Es un Programa Operativo Específico del PFA..... (Señala la INCORRECTA):",
+        options: [
+          "a) Prevención y lucha contra incendios forestales",
+          "b) Gestión de la vegetación para la adaptación y mitigación del cambio climático",
+          "c) Defensa del patrimonio forestal",
+          "d) Gestión e interconexión de espacios naturales"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "38. El Plan Director de las Dehesas de Andalucía tiene objetivos...",
+        options: [
+          "a) Globales y específicos",
+          "b) Generales y Horizontales",
+          "c) Principales y secundarios",
+          "d) Fundamentales y Sectoriales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Generales y Horizontales)."
+      },
+      {
+        question: "39. ¿Cuántas líneas estratégicas se han establecido en el Plan Director de las Dehesas?",
+        options: [
+          "a) 17",
+          "b) 20",
+          "c) 15",
+          "d) 12"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 17)."
+      },
+      {
+        question: "40. El Plan Director de la Dehesas de Andalucía fue aprobado mediante:",
+        options: [
+          "a) Acuerdo del Consejo de Gobierno del 24 de octubre de 2017",
+          "b) Decreto 172/2017, de 24 de octubre",
+          "c) Orden del 24 de octubre de 2017",
+          "d) Resolución de la DG de Gestión del Medio Natural"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Decreto 172/2017, de 24 de octubre)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions,
+      ...test3Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 20),
+      "t1_b2": test1Questions.slice(20, 40),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 20),
+      "t2_b2": test2Questions.slice(20, 40),
+      "t3_all": test3Questions,
+      "t3_b1": test3Questions.slice(0, 20),
+      "t3_b2": test3Questions.slice(20, 40)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 5 - MONTES Y POLÍTICA FORESTAL (UNIFICADO COMPLETO 120 PREGUNTAS)",
+        "t1_all": "TEST 5-1 - COMPLETO (40 PREGUNTAS)",
+        "t1_b1": "TEST 5-1 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t1_b2": "TEST 5-1 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t2_all": "TEST 5-2 - COMPLETO (40 PREGUNTAS)",
+        "t2_b1": "TEST 5-2 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t2_b2": "TEST 5-2 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t3_all": "TEST 5-3 - COMPLETO (40 PREGUNTAS)",
+        "t3_b1": "TEST 5-3 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t3_b2": "TEST 5-3 - BLOQUE 2 (PREGUNTAS 21 A 40)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

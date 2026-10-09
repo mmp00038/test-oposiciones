@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 19 (Prevención y Control Ambiental)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 19 Unificado Completo (100 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Básico Nº 1 (60 Preguntas)">
+          <option value="t1_all">Test Básico Nº 1 - Completo (1 - 60)</option>
+          <option value="t1_b1">Test Básico Nº 1 - Bloque 1 (1 - 20)</option>
+          <option value="t1_b2">Test Básico Nº 1 - Bloque 2 (21 - 40)</option>
+          <option value="t1_b3">Test Básico Nº 1 - Bloque 3 (41 - 60)</option>
+        </optgroup>
+        <optgroup label="Test de Autoevaluación (40 Preguntas)">
+          <option value="t2_all">Test Autoevaluación - Completo (1 - 40)</option>
+          <option value="t2_b1">Test Autoevaluación - Bloque 1 (1 - 20)</option>
+          <option value="t2_b2">Test Autoevaluación - Bloque 2 (21 - 40)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 19 - PREVENCIÓN Y CONTROL AMBIENTAL (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- ¿Qué Ley, a nivel Estatal, se encarga de regular el procedimiento de Evaluación Ambiental?",
+        options: [
+          "a) Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental",
+          "b) Ley 7/2007 de 9 de agosto, de Gestión Integrada de la Calidad Ambiental",
+          "c) Ley 21/2013, de 9 de diciembre",
+          "d) Ley 26/2007, de 23 de octubre"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Ley 21/2013, de 9 de diciembre)[cite: 188]."
+      },
+      {
+        question: "2.- ¿Qué Ley tiene por objeto establecer un marco normativo adecuado para el desarrollo de la política ambiental de la Comunidad Autónoma de Andalucía, a través de los instrumentos que garanticen la incorporación de criterios de sostenibilidad en la toma de decisiones sobre planes, programas y proyectos, la prevención de los impactos ambientales concretos que puedan generar y el establecimiento de mecanismos eficaces de corrección o compensación de sus efectos adversos, para alcanzar un elevado nivel de protección del medio ambiente?",
+        options: [
+          "a) Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental",
+          "b) Real Decreto 815/2013, de 18 de octubre, por el que se aprueba el Reglamento de Emisiones Industriales y de desarrollo de la Ley 16/2002 de 1 de julio, de Prevención y Control Integrados de la Contaminación.",
+          "c) Ley 18/2003, de 29 de diciembre, por la que se aprueban medidas fiscales y administrativas.",
+          "d) Real Decreto Legislativo 1/2016 de 16 de diciembre, por el que se aprueba el Texto Refundido de la Ley de Prevención y Control Integrados de la Contaminación."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley 7/2007, de 9 de julio)[cite: 188]."
+      },
+      {
+        question: "3.- Señale la opción incorrecta en relación con la investigación, desarrollo e innovación en materia de medio ambiente, según lo establecido en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental:",
+        options: [
+          "a) La Administración de la Junta de Andalucía fomentará la formación, educación, investigación, el desarrollo tecnológico y la innovación en la generación y aplicación de nuevos conocimientos sobre el medio ambiente en el marco de los planes aprobados en esta materia.",
+          "b) La generación y aplicación de nuevos conocimientos en materia de medio ambiente tendrá como uno de sus objetivos minimizar las actividades dirigidas a la educación y concienciación ambiental.",
+          "c) La generación y aplicación de nuevos conocimientos en materia de medio ambiente tendrá como uno de sus objetivos favorecer la introducción de mejoras tecnológicas que permitan una mayor racionalización de la utilización de recursos y una menor generación de impactos sobre el medio ambiente",
+          "d) La generación y aplicación de nuevos conocimientos en materia de medio ambiente tendrá como uno de sus objetivos mejorar los procedimientos de prevención y control ambiental."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 188]."
+      },
+      {
+        question: "4.- Señale la opción correcta en lo relativo a las medidas de mejora de la calidad ambiental, a tenor de lo dispuesto en el artículo 48 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental:",
+        options: [
+          "a) Las Administraciones públicas competentes adoptarán y fomentarán cuantas medidas sean necesarias para la mejora de la calidad ambiental del aire, el agua y el suelo.",
+          "b) La calidad ambiental se garantizará mediante la aplicación de normas de calidad, de valores límites de emisión y de cualquier otra medida que se establezca por las Administraciones públicas competentes con el mismo fin.",
+          "c) La Consejería competente en materia de medio ambiente podrá elaborar planes de mejora de la calidad ambiental cuya aprobación corresponderá al Consejo de Gobierno.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 188]."
+      },
+      {
+        question: "5.- ¿Cuál de los siguientes no es un instrumento de prevención y gestión ambiental de los reflejados en el artículo 16 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) Evaluación del Impacto Ambiental",
+          "b) Autorización Ambiental Integrada",
+          "c) Evaluación Ambiental de Planes y Programas",
+          "d) Autorizaciones de Control de la Contaminación Ambiental"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "6.- Señale la opción incorrecta de las siguientes afirmaciones a tenor de lo establecido en el artículo 16 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental:",
+        options: [
+          "a) La Calificación ambiental contendrá la evaluación de impacto ambiental de la actuación en cuestión.",
+          "b) En los casos en que la evaluación ambiental sea competencia de la Administración General del Estado, el condicionado de la resolución del procedimiento de evaluación ambiental de proyectos establecido en el capítulo II de la Ley 21/2013, de 9 de diciembre, de evaluación ambiental, deberá incorporarse en la autorización ambiental integrada que en su caso se otorgue.",
+          "c) El Promotor de la actuación, a propuesta del órgano sustantivo, en circunstancias excepcionales y mediante acuerdo motivado, podrá excluir un proyecto determinado de la evaluación de impacto ambiental, cuando su aplicación pueda tener efectos perjudiciales para la finalidad del proyecto.",
+          "d) Las autorizaciones de control de la contaminación ambiental no contendrán la evaluación de impacto ambiental de la actuación en cuestión."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "7.- Según las definiciones establecidas en el artículo 19 de la Ley 7/2007 de Gestión Integrada de la Calidad Ambiental, \"los planes y programas, las obras y actividades y sus proyectos regulados en esta ley\", se corresponde con la definición de:",
+        options: [
+          "a) Análisis de riesgos",
+          "b) Actuación",
+          "c) Evaluación ambiental estratégica",
+          "d) Actividad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Actuación)[cite: 188]."
+      },
+      {
+        question: "8.- Según las definiciones establecidas en el artículo 19 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, cuando habla del \"informe preceptivo y determinante del órgano ambiental con el que concluye la evaluación ambiental estratégica simplificada\", se está refiriendo a:",
+        options: [
+          "a) Declaración del impacto ambiental",
+          "b) Declaración ambiental estratégica",
+          "c) Informe ambiental estratégico",
+          "d) Informe de impacto ambiental"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Informe ambiental estratégico)[cite: 188]."
+      },
+      {
+        question: "9.- Según las definiciones establecidas en el artículo 19 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, ¿Cuál de las siguientes modificaciones no se entenderá como modificación sustancial a efectos de la autorización ambiental unificada y calificación ambiental?",
+        options: [
+          "a) Incremento del consumo de energía",
+          "b) Incremento significativo de las emisiones a la atmósfera",
+          "c) Incremento significativo en la generación de residuos",
+          "d) Todas las opciones anteriores se considerarán modificaciones sustanciales."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Incremento del consumo de energía)[cite: 188]."
+      },
+      {
+        question: "10.- Según las definiciones establecidas en el artículo 19 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, señale la opción incorrecta:",
+        options: [
+          "a) El órgano ambiental será el órgano que tiene la competencia de resolver los procedimientos de prevención y control ambiental regulados en esta Ley.",
+          "b) El órgano sustantivo será el órgano que tiene la competencia por razón de la materia para la aprobación de una actuación",
+          "c) El titular o promotor será aquella persona física o jurídica, privada o pública, que inicie un procedimiento de los previstos en la presente ley, no considerándose como tal al que explote dicha actividad.",
+          "d) El documento de alcance será el pronunciamiento del órgano ambiental dirigido al promotor que tiene por objeto delimitar la amplitud, nivel de detalle y grado de especificación que debe tener el estudio ambiental estratégico y el estudio de impacto ambiental."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "11.- Según lo establecido en el Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, cuando habla de \"la resolución escrita del órgano competente de la comunidad autónoma en la que se ubique la instalación, por la que se permite, a los efectos de la protección del medio ambiente y de la salud de las personas, explotar la totalidad o parte de una instalación, bajo determinadas condiciones destinadas a garantizar que la misma cumple el objeto y las disposiciones de esta ley. Tal autorización podrá ser válida para una o más instalaciones o partes de instalaciones que tengan la misma ubicación\" se está refiriendo a:",
+        options: [
+          "a) Evaluación del impacto ambiental",
+          "b) Autorización Ambiental Integrada",
+          "c) Autorización Ambiental Unificada",
+          "d) Autorización sustantiva"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Autorización Ambiental Integrada)[cite: 188]."
+      },
+      {
+        question: "12.- De las obligaciones a los titulares de las instalaciones enunciadas en el artículo 5 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, señale cuál de las siguientes no es una de ellas:",
+        options: [
+          "a) Prestar la asistencia y colaboración necesarias a quienes realicen las actuaciones de vigilancia, inspección y control.",
+          "b) Cumplir las obligaciones de control y suministro de información previstas por la legislación sectorial aplicable y por la propia autorización ambiental integrada.",
+          "c) Disponer de la autorización ambiental unificada y cumplir las condiciones establecidas en la misma.",
+          "d) Comunicar al órgano competente para otorgar la autorización ambiental integrada la trasmisión de su titularidad."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "13.- El artículo 7 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación establece que el órgano competente para otorgar la autorización ambiental integrada podrá fijar, en determinados casos, valores límite de emisión menos estrictos. Esta excepción podrá invocarse solamente si se pone de manifiesto mediante una evaluación que la consecución de los niveles de emisión asociados con las mejores técnicas disponibles tal y como se describen en las conclusiones relativas a las MTD daría lugar a unos costes desproporcionadamente más elevados en comparación con el beneficio ambiental debido a:",
+        options: [
+          "a) La ubicación geográfica o la situación del entorno local de la instalación de que se trate",
+          "b) Las características técnicas de la instalación de que se trate",
+          "c) Las opciones a) y b) son correctas",
+          "d) Bajo ningún concepto se podrán fijar valores límite de emisión menos estrictos que los fijados por el órgano competente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las opciones a y b son correctas)[cite: 188]."
+      },
+      {
+        question: "14.- Según lo establecido en el artículo 10 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, el titular de una instalación que pretenda llevar a cabo una modificación no sustancial de la misma deberá solicitar autorización al órgano competente para otorgar la autorización ambiental integrada, indicando razonadamente por qué considera que se trata de una modificación no sustancial. El titular podrá llevar a cabo la modificación siempre que el órgano competente para otorgar la autorización ambiental integrada no manifieste lo contrario en el plazo de:",
+        options: [
+          "a) Un mes",
+          "b) Tres meses",
+          "c) Un año",
+          "d) El enunciado no es correcto."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: El enunciado no es correcto)[cite: 188]."
+      },
+      {
+        question: "15.- Señale la opción incorrecta según lo establecido en el artículo 11 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación:",
+        options: [
+          "a) Una de las finalidades de la autorización ambiental integrada es establecer todas aquellas condiciones que garanticen el cumplimiento del objeto de esta ley por parte de las instalaciones sometidas a la misma...",
+          "b) Otra finalidad sería disponer de un sistema de prevención y control de la contaminación que integre en un solo acto de intervención administrativa todas las autorizaciones ambientales existentes...",
+          "c) Las autorizaciones de vertidos a las aguas continentales y al dominio público marítimo terrestre, desde tierra al mar, no se incluirán en la autorización ambiental integrada, de acuerdo con esta ley, debiendo solicitarse al organismo de cuenca o administración hidráulica correspondiente.",
+          "d) Las comunidades autónomas dispondrán lo necesario para posibilitar la inclusión en el procedimiento de otorgamiento de la autorización ambiental integrada las actuaciones de los órganos que, en su caso, deban intervenir..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "16.- El artículo 12 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación establece la documentación que habrá de presentarse, junto a la solicitud de autorización ambiental integrada. ¿Cuál de los siguientes no será uno de dichos documentos?",
+        options: [
+          "a) Proyecto básico",
+          "b) Informe urbanístico del Ayuntamiento en cuyo territorio se ubique la instalación",
+          "c) La determinación de los datos que, a juicio del solicitante, gocen de confidencialidad.",
+          "d) Todas las opciones anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones anteriores son correctas)[cite: 188]."
+      },
+      {
+        question: "17.- ¿Cuál será el plazo máximo para que un ayuntamiento en el cual se pretenda ubicar una actividad sometida a autorización ambiental integrada emita el informe urbanístico necesario para la tramitación de dicho procedimiento, según lo establecido en el artículo 15 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación?",
+        options: [
+          "a) 30 días",
+          "b) 45 días",
+          "c) 15 días",
+          "d) 20 días"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 30 días)[cite: 188]."
+      },
+      {
+        question: "18.- El artículo 19 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación establece que el informe del organismo de cuenca, en caso de ser necesario:",
+        options: [
+          "a) Deberá emitirse en el plazo máximo de 4 meses desde la fecha de entrada en el registro del organismo de cuenca de la documentación preceptiva sobre vertidos.",
+          "b) Dicho informe será facultativo y vinculante",
+          "c) Si dicho informe considerase que es inadmisible el vertido, el órgano ambiental evaluará la posibilidad de dictar resolución motivadora denegatoria.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "19.- El plazo para la resolución y el silencio administrativo de la autorización ambiental integrada, según lo establecido en el artículo 21 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, será de:",
+        options: [
+          "a) 9 meses, estimado.",
+          "b) 9 meses, desestimado.",
+          "c) 6 meses, desestimado.",
+          "d) 6 meses, estimado."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 meses, desestimado)[cite: 188]."
+      },
+      {
+        question: "20.- El artículo 22 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, establece el contenido mínimo que contendrá la Autorización Ambiental Integrada. ¿Cuál de las siguientes opciones no se incluye en dicho contenido mínimo?",
+        options: [
+          "a) Los valores límite de emisión aconsejados para las sustancias contaminantes enumeradas en el anejo 2...",
+          "b) Las prescripciones que garanticen, en su caso, la protección del suelo y de las aguas subterráneas.",
+          "c) Las condiciones en que debe llevarse a cabo el cierre de la instalación.",
+          "d) Las medidas relativas a las condiciones de explotación en situaciones distintas a las normales..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "21.- ¿Qué podemos encontrar en el Anejo II del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación?",
+        options: [
+          "a) Una lista de sustancias contaminantes a la atmósfera y al agua",
+          "b) Todas las actividades obligadas a obtener la Autorización Ambiental Integrada para su puesta en funcionamiento.",
+          "c) Todas las actividades y actuaciones obligadas a obtener la Autorización Ambiental Integrada para su puesta en funcionamiento.",
+          "d) Ninguna respuesta es correcta."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "22.- El artículo 22 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que la Consejería competente en materia de medio ambiente tendrá la siguiente competencia:",
+        options: [
+          "a) La tramitación y resolución del procedimiento de autorización ambiental integrada",
+          "b) La vigilancia y control del cumplimiento de las condiciones establecidas en la autorización ambiental integrada...",
+          "c) La recopilación de los datos sobre las emisiones que los titulares deben notificar periódicamente...",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 188]."
+      },
+      {
+        question: "23.- En el procedimiento para la obtención de la Autorización Ambiental Integrada, establecido en el artículo 24 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, no se incluirá la siguiente documentación junto con la solicitud:",
+        options: [
+          "a) La documentación exigida en el artículo 12 del texto refundido...",
+          "b) Informe preceptivo y vinculante del organismo de cuenca en caso de cuencas intercomunitarias.",
+          "c) El estudio del impacto ambiental",
+          "d) La valoración de impacto en la salud"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 188]."
+      },
+      {
+        question: "24.- En lo relativo al ámbito de aplicación de la Autorización Ambiental Integrada, recogido en el artículo 2 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada. Señale la opción correcta:",
+        options: [
+          "a) Se encuentra sometida a Autorización Ambiental Integrada la construcción de una instalación privada...",
+          "b) Se encuentra sometida a Autorización Ambiental Integrada la modificación sustancial...",
+          "c) Se encuentra sometida a Autorización Ambiental Integrada la construcción, montaje, explotación o traslado de las instalaciones a las que se refiere el artículo 2 del texto refundido de la Ley de prevención y control integrados de la contaminación...",
+          "d) Se encuentra sometida a Autorización Ambiental Integrada el traslado de una instalación privada..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "25.- ¿Quién será competente para la instrucción y resolución de una autorización ambiental integrada en Andalucía según lo establecido en el artículo 5 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada?",
+        options: [
+          "a) La Delegación Provincial de la Consejería competente en materia de medio ambiente en cuyo ámbito territorial vaya a estar ubicada la instalación sometida a dicho procedimiento.",
+          "b) La Dirección General competente en materia de prevención ambiental...",
+          "c) El Consejero competente en materia de medio ambiente.",
+          "d) El Consejero competente en materia de medio ambiente cuando la instalación proyectada se vaya a ubicar en más de una provincia."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "26.- Se considerará modificación sustancial de una instalación sometida a Autorización Ambiental Integrada, según lo establecido en el artículo 6 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada:",
+        options: [
+          "a) Un incremento superior al 15% del caudal de vertido autorizado",
+          "b) Cualquier modificación que suponga un incremento de más de 3 dB(A) en la potencia acústica total de la instalación.",
+          "c) Un incremento de más del 25% de residuos no peligrosos generados...",
+          "d) Un incremento en el consumo de recursos naturales superior al 25%."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 188]."
+      },
+      {
+        question: "27.- En el procedimiento para la obtención de la Autorización Ambiental Integrada, regulado en el Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada, se establece que si la solicitud no reúne los requisitos previstos, el órgano ambiental competente requerirá a la persona o entidad solicitante para que subsane la falta o acompañe los documentos preceptivos, con indicación de que, si así no lo hiciera, se le tendrá por desistido de su petición, en el plazo de:",
+        options: [
+          "a) 5 días hábiles",
+          "b) 10 días",
+          "c) 15 días",
+          "d) 15 días hábiles"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 10 días)[cite: 188]."
+      },
+      {
+        question: "28.- El artículo 19 del Decreto 5/2012 de 17 de enero, por el que se regula la Autorización Ambiental Integrada establece que en el supuesto de que la actividad afecte a alguna cuenca de competencia autonómica, recabará informe de la administración hidráulica andaluza, que tendrá carácter:",
+        options: [
+          "a) Facultativo y vinculante",
+          "b) Facultativo y no vinculante",
+          "c) Preceptivo y vinculante",
+          "d) Preceptivo y no vinculante"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Preceptivo y vinculante)[cite: 188]."
+      },
+      {
+        question: "29.- En lo relativo al informe necesario en caso a afección de cuenca intercomunitaria, el Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada establece que:",
+        options: [
+          "a) El órgano ambiental remitirá copia del expediente completo al organismo de cuenca intercomunitario...",
+          "b) Si este informe considerase que es inadmisible el vertido...",
+          "c) Transcurridos los plazos previstos en los párrafos anteriores sin que el organismo de cuenca hubiese emitido el informe requerido...",
+          "d) Las respuestas a) y c) son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas a y c son correctas)[cite: 188]."
+      },
+      {
+        question: "30.- En cuanto a la comprobación previa a la puesta en marcha e inicio de una actividad sometida a autorización ambiental integrada, el artículo 31 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada establece que:",
+        options: [
+          "a) La instalación no podrá iniciar su actividad sin que el titular presente una declaración responsable...",
+          "b) La administración ambiental realizará una visita de inspección en el plazo de 6 meses...",
+          "c) Obligatoriamente será necesaria una comprobación previa a la puesta en marcha que deberá ser llevada a cabo por una Entidad Colaboradora...",
+          "d) Las respuestas a) y b) son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "31.- ¿Cuál será la caducidad de la autorización ambiental integrada desde que se produzca la notificación a la persona o entidad titular de la actividad para la que se ha obtenido autorización ambiental integrada de la resolución de otorgamiento, salvo que en la autorización se establezca un plazo distinto, a tenor de lo dispuesto en el artículo 34 del Decreto 5/2012 de 17 de enero, por el que se regula la Autorización Ambiental Integrada?",
+        options: [
+          "a) 5 años",
+          "b) 4 años",
+          "c) 10 años",
+          "d) La autorización ambiental integrada no tiene plazo de caducidad."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 años)[cite: 188]."
+      },
+      {
+        question: "32.- En lo relativo al cierre definitivo de la instalación, el artículo 41 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada, establece que junto a la comunicación de cese, la persona o entidad titular de la instalación presentará para su aprobación por parte del órgano ambiental competente, un proyecto suscrito por persona técnica competente en el que se especificarán las medidas y precauciones a tomar para la clausura y desmantelamiento de la instalación. El proyecto deberá contemplar, al menos, los siguientes aspectos (señale la opción correcta):",
+        options: [
+          "a) Informe describiendo el estado del emplazamiento...",
+          "b) Medidas tomadas para la retirada de materias primas no utilizadas...",
+          "c) Fecha prevista de finalización de la clausura y desmantelamiento.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 188]."
+      },
+      {
+        question: "33.- ¿Cuál de las siguientes autorizaciones ambientales no se integrará, en su caso, en la Autorización Ambiental Integrada, según lo recogido en el Anexo II del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada?",
+        options: [
+          "a) Autorización de uso u ocupación de dominio público marítimo-terrestre.",
+          "b) Autorización de emisiones a la atmósfera",
+          "c) Autorizaciones de usos y aprovechamientos de terrenos forestales.",
+          "d) Autorización de ocupación de vías pecuarias."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "34.- Señale la opción correcta a tenor de lo establecido en el artículo 31 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, relativo a la tramitación de la Autorización Ambiental Unificada:",
+        options: [
+          "a) El informe de compatibilidad con el planeamiento urbanístico deberá emitirse en el plazo máximo de 30 días.",
+          "b) En el caso de proyectos de infraestructuras lineales que afecten a más de un municipio...",
+          "c) La autorización se acompañará de una valoración de impacto en salud.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "35.- El artículo 34 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental determina que la Autorización Ambiental Unificada perderá su vigencia y cesará en la producción de los efectos que le son propios si, una vez publicada en la forma que reglamentariamente se determine, no se hubiera comenzado la ejecución del proyecto o actividad en el plazo de:",
+        options: [
+          "a) 5 años",
+          "b) 4 años",
+          "c) 10 años",
+          "d) La Autorización Ambiental Unificada no tiene plazo de caducidad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4 años)[cite: 188]."
+      },
+      {
+        question: "36.- Dentro del ámbito de aplicación de la Autorización Ambiental Unificada establecido en el Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada, no se encontraría sometido a dicho instrumento de prevención y control ambiental:",
+        options: [
+          "a) Las actuaciones, de titularidad pública o privada, que se vayan a ejecutar o instalar en la Comunidad Autónoma Andaluza...",
+          "b) Cualquier modificación de las características de una actuación consignada en el Anexo II de la Ley 21/2013...",
+          "c) Una actuación sometida a Calificación Ambiental que se extienda a más de un municipio.",
+          "d) Todas estas actividades estarían sometidas a autorización ambiental unificada."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "37.- El Decreto 356/2010, de 3 de agosto establece que se encuentran sometidas a autorización ambiental unificada simplificada:",
+        options: [
+          "a) Las actuaciones, de titularidad pública o privada, en las que se desarrolle alguna de las actividades incluidas en el anexo II de la Ley 21/2013...",
+          "b) Las actuaciones no incluidas ni en el anexo I ni en el anexo II de la Ley 21/2013...",
+          "c) Las respuestas a) y b) son verdaderas",
+          "d) Todas las respuestas son falsas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las respuestas a y b son verdaderas)[cite: 188]."
+      },
+      {
+        question: "38.- El artículo 11 del Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada establece que, en el caso de solicitarse secreto industrial y comercial, el órgano ambiental competente dictará y notificará resolución motivadora en el plazo de:",
+        options: [
+          "a) 1 mes",
+          "b) 2 meses",
+          "c) 3 meses",
+          "d) 6 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1 mes)[cite: 188]."
+      },
+      {
+        question: "39.- De la siguiente documentación, ¿Cuál no será preceptiva entregar junto a la solicitud para la obtención de la autorización ambiental unificada, según el artículo 16 del Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada?",
+        options: [
+          "a) Un proyecto básico, conforme a las indicaciones del anexo V.",
+          "b) Estudio de impacto ambiental, que contendrá, al menos, la información recogida en el artículo 35 de la Ley 21/2013...",
+          "c) En su caso, el justificante del pago de las tasas que resulten de aplicación...",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "40.- En lo relativo al trámite de consulta establecido en el artículo 20 del Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada, se establece que se recabará de los distintos organismos e instituciones, los informes que tengan carácter preceptivo de acuerdo con la normativa aplicable, así como aquellos otros que se consideren necesarios. Dichos informes habrán de ser remitidos en un plazo máximo de:",
+        options: [
+          "a) 15 días",
+          "b) 30 días",
+          "c) 45 días",
+          "d) No se establece un plazo concreto para la evacuación de dichos informes."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30 días)[cite: 188]."
+      },
+      {
+        question: "41.- El artículo 24 del Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada establece que el órgano ambiental competente dictará y notificará a las personas interesadas la resolución de autorización ambiental unificada que ponga fin al procedimiento en el plazo máximo de:",
+        options: [
+          "a) Ocho meses desde la fecha de entrada de la solicitud en el registro...",
+          "b) Ocho meses desde la fecha de entrada... la solicitud podrá entenderse estimada.",
+          "c) Seis meses desde la fecha de entrada... Transcurrido dicho plazo... desestimada...",
+          "d) Seis meses desde la fecha de entrada... estimada."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ocho meses, desestimada)[cite: 188]."
+      },
+      {
+        question: "42.- En lo relativo al cese de la actividad en actuaciones sometidas a autorización ambiental unificada, el Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada establece en su artículo 38 que:",
+        options: [
+          "a) ...antelación mínima de seis meses... resolución, en un plazo máximo de dos meses...",
+          "b) ...antelación mínima de seis meses... resolución, en un plazo máximo de tres meses...",
+          "c) ...antelación mínima de tres meses... resolución, en un plazo máximo de un mes...",
+          "d) ...antelación mínima de tres meses a la fecha prevista de cese. Dicho órgano deberá dictar y notificar resolución, en un plazo máximo de dos meses..."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 188]."
+      },
+      {
+        question: "43.- El artículo 36 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental establece que serán objeto de una evaluación ambiental estratégica simplificada:",
+        options: [
+          "a) Las modificaciones menores de los planes y programas previstos en el apartado anterior.",
+          "b) Los planes y programas mencionados en el apartado anterior que establezcan el uso de zonas de reducida extensión a nivel municipal.",
+          "c) Los planes y programas que, estableciendo un marco para la autorización en el futuro de proyectos, no cumplan los demás requisitos...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 188]."
+      },
+      {
+        question: "44.- Señale la respuesta correcta en lo relativo al procedimiento de la evaluación ambiental estratégica según lo previsto en la Ley 7/2007 de Gestión Integrada de la Calidad Ambiental:",
+        options: [
+          "a) Tras el procedimiento de la evaluación ambiental estratégica ordinaria se formulará el informe ambiental estratégico",
+          "b) Tras el procedimiento de la evaluación ambiental estratégica simplificada se formulará la declaración ambiental estratégica",
+          "c) El órgano ambiental formulará el informe ambiental estratégico en el plazo de cuatro meses contados desde la recepción de la solicitud de inicio y de los documentos que la deben acompañar.",
+          "d) El informe ambiental estratégico perderá su vigencia y cesará en la producción de los efectos que le son propios si, una vez publicado en el Boletín Oficial de la Junta de Andalucía, no se hubiera procedido a la aprobación del plan o programa en el plazo máximo de dos años desde su publicación."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 188]."
+      },
+      {
+        question: "45.- ¿A quién corresponderá la tramitación y resolución de los procedimientos de calificación ambiental, así como la vigilancia, control y ejercicio de la potestad sancionadora con respecto a las actividades sometidas a dichos instrumentos, según lo establecido en el artículo 43 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) A la Delegación Territorial de la Consejería competente en materia de medio ambiente.",
+          "b) A la Dirección General competente en materia de aguas.",
+          "c) A la Dirección General competente en materia de prevención y control ambiental.",
+          "d) Ninguna respuesta es correcta."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna respuesta es correcta - Corresponde a los Ayuntamientos)[cite: 188]."
+      },
+      {
+        question: "46.- Según el Decreto 297/1995, de 19 de diciembre, por el que se aprueba el Reglamento de Calificación Ambiental, el plazo de resolución y el silencio administrativo para el procedimiento de calificación ambiental será de:",
+        options: [
+          "a) 3 meses, transcurrido el plazo previsto en el párrafo anterior sin haberse dictado resolución expresa de calificación, podrá entenderse que equivale a una calificación ambiental favorable.",
+          "b) 3 meses, transcurrido el plazo previsto en el párrafo anterior sin haberse dictado resolución expresa de calificación, en ningún caso podrá entenderse que equivale a una calificación ambiental favorable.",
+          "c) 6 meses, transcurrido el plazo...",
+          "d) 8 meses, transcurrido el plazo..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3 meses, en ningún caso silencio favorable)[cite: 188]."
+      },
+      {
+        question: "47.- ¿Cuál de los siguientes no es un incentivo para la inversión de los previstos en el artículo 120 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) Incentivos para superar de modo significativo los objetivos fijados por obligaciones establecidas en la normativa ambiental.",
+          "b) Incentivos para alcanzar los objetivos ambientales establecidos en acuerdos voluntarios...",
+          "c) Incentivos para la utilización de las mejores técnicas disponibles...",
+          "d) Incentivos para la formación técnica, servicios de asesoramiento y prácticas medioambientales."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 188]."
+      },
+      {
+        question: "48.- La cuantía para sanciones graves en el Real Decreto Legislativo 1/2016 de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación, será de:",
+        options: [
+          "a) Multa de hasta 24.000 euros",
+          "b) Multa desde 200.001 hasta 2.000.000 de euros",
+          "c) Multa desde 20.001 hasta 200.000 euros",
+          "d) Multa desde 20.401 hasta 240.400 euros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Multa desde 20.001 hasta 200.000 euros)[cite: 188]."
+      },
+      {
+        question: "49.- El inicio, la ejecución parcial o total o la modificación sustancial de las actuaciones sometidas por esta Ley a calificación ambiental, incluidas las sujetas a presentación de declaración responsable de los efectos ambientales, sin el cumplimiento de dicho requisito, a efectos de la tipificación establecida en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, respecto de las actuaciones sometidas a calificación ambiental que no deban incluir el resultado de la evaluación de impacto ambiental simplificada de acuerdo a lo establecido en la Ley 21/2013, de 9 de diciembre o a declaración responsable de los efectos ambientales, se considerará infracción:",
+        options: [
+          "a) Muy Grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Grave si se alcanzan unos daños al medio ambiente por un valor superior a 150.000 euros."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 188]."
+      },
+      {
+        question: "50.- Sin perjuicio de las multas previstas en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, la comisión de las infracciones muy graves tipificadas en la misma podrá llevar aparejada la imposición de la siguiente sanción accesoria:",
+        options: [
+          "a) Clausura temporal, total o parcial, de las instalaciones por un periodo no inferior a dos años ni superior a cinco años.",
+          "b) Inhabilitación para el ejercicio de la actividad por un periodo máximo de un año",
+          "c) Revocación de la autorización o suspensión de la misma por un periodo máximo de un año.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 188]."
+      },
+      {
+        question: "51.- ¿Qué órgano será competente para la resolución de un procedimiento sancionador de los tipificados en la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental cuando la sanción alcance una cuantía de 240.700 euros?",
+        options: [
+          "a) El titular de la Delegación provincial de la Consejería competente en materia de medio ambiente.",
+          "b) El Director General competente por razón de la materia",
+          "c) El Consejero competente en materia de medio ambiente",
+          "d) El Consejo de Gobierno"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Consejero competente en materia de medio ambiente)[cite: 188]."
+      },
+      {
+        question: "52.- Las infracciones graves previstas en la Ley 7/2007 de 9 de julio de Gestión Integrada de la Calidad Ambiental prescribirán en el plazo de:",
+        options: [
+          "a) 5 años",
+          "b) 3 años",
+          "c) 2 años",
+          "d) 1 año"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3 años)[cite: 188]."
+      },
+      {
+        question: "53.- El Registro de Autorizaciones de actuaciones sometidas a Instrumentos de Prevención Ambiental, de las actividades Potencialmente Contaminadoras de la Atmósfera y de las actividades que usan Disolventes Orgánicos no incluirá:",
+        options: [
+          "a) Autorizaciones de actuaciones públicas sometidas a autorización ambiental integrada",
+          "b) Autorizaciones de actuaciones privadas sometidas a autorización ambiental unificada",
+          "c) Resolución de Concesiones para uso privativo de aguas",
+          "d) Personas o entidades gestoras de residuos no peligrosos"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Resolución de Concesiones para uso privativo de aguas)[cite: 188]."
+      },
+      {
+        question: "54.- ¿Cuántas categorías podemos encontrar en el Anexo I de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) 121",
+          "b) 120",
+          "c) 112",
+          "d) 11.250"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 112)[cite: 188]."
+      },
+      {
+        question: "55.- Según las definiciones establecidas en el artículo 5 de la Ley 21/2013, de 9 de diciembre, de Evaluación Ambiental, el \"proceso a través del cual se analizan los efectos significativos que tienen o pueden tener los planes, programas y proyectos...\", se corresponde con la definición de:",
+        options: [
+          "a) Dictamen Ambiental",
+          "b) Evaluación Ambiental",
+          "c) Autorización Sustantiva",
+          "d) Análisis de efectos adversos de la actividad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Evaluación Ambiental)[cite: 188]."
+      },
+      {
+        question: "56.- La Ley 21/2013, de 9 de diciembre, de Evaluación Ambiental establece que, en el procedimiento de evaluación de impacto ambiental ordinaria, el plazo máximo para la resolución de dicho procedimiento con la formulación de la declaración de impacto ambiental correspondiente será de:",
+        options: [
+          "a) 6 meses",
+          "b) 8 meses",
+          "c) 4 meses",
+          "d) No se establece ningún plazo máximo para la resolución de dicho procedimiento."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 4 meses)[cite: 188]."
+      },
+      {
+        question: "57.- La Ley 21/2013, de 9 de diciembre, de Evaluación Ambiental establece que, en el procedimiento de evaluación de impacto ambiental simplificada, el plazo máximo para la resolución de dicho procedimiento con la formulación del informe de impacto ambiental correspondiente será de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 8 meses",
+          "d) No se establece ningún plazo máximo para la resolución de dicho procedimiento."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 3 meses)[cite: 188]."
+      },
+      {
+        question: "58.- El artículo 27 sexies del Decreto 356/2010, por el que se regula la autorización ambiental unificada, establece que la Consejería competente en materia de medio ambiente dictará y notificará la resolución que ponga fin al procedimiento de autorización ambiental unificada simplificada en el plazo máximo de:",
+        options: [
+          "a) 3 meses",
+          "b) 4 meses",
+          "c) 5 meses",
+          "d) 8 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5 meses)[cite: 188]."
+      },
+      {
+        question: "59.- A tenor de lo establecido en la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, el inicio, la ejecución parcial o total, la modificación sustancial o el traslado de las actuaciones, actividades e instalaciones sometidas por esta ley a autorización ambiental unificada simplificada, sin haberla obtenido, se tipificará como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Menos grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 188]."
+      },
+      {
+        question: "60.- A tenor de lo establecido en la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, el inicio, la ejecución parcial o total o la modificación sustancial de una actuación, sin haber obtenido la calificación ambiental, en caso de que se trate de actuaciones sometidas a calificación ambiental que deban incluir el resultado de la evaluación de impacto ambiental simplificada, de acuerdo a lo established en la Ley 21/2013, de 9 de diciembre, con las adaptaciones establecidas en esta ley, se tipificará como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Menos Grave",
+          "d) Muy grave"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Muy grave)[cite: 188]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Según lo establecido en el artículo 57.3 de la Ley Orgánica 2/2007, de 19 de marzo, de Reforma del Estatuto de Autonomía para Andalucía, El establecimiento y la regulación de los instrumentos de planificación ambiental y del procedimiento de tramitación y aprobación de estos instrumentos, la competencia que ostenta nuestra Comunidad Autónoma es:",
+        options: [
+          "a) Exclusiva",
+          "b) Compartida",
+          "c) Ejecutiva",
+          "d) Administrativa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Compartida)[cite: 189]."
+      },
+      {
+        question: "2.- El artículo 5 del Decreto 5/2012 de 17 de enero, por el que se regula la Autorización Ambiental Integrada y se modifica el Decreto 356/2010, de 3 de agosto, por el que se regula la Autorización Ambiental Unificada, establece cual es el órgano ambiental competente para la instrucción y resolución del Procedimiento de Autorización Ambiental Integrada, siendo este:",
+        options: [
+          "a) La Delegación Provincial de la Consejería competente en materia de Medio Ambiente en cuyo ámbito territorial vaya a estar ubicada la instalación",
+          "b) La Delegación Provincial competente en materia de prevención y control ambiental en el caso de que la instalación se ubique en más de una provincia",
+          "c) Las respuestas a) y b) son correctas",
+          "d) La Delegación del Gobierno de la provincia en la que se ubique la instalación"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 189]."
+      },
+      {
+        question: "3.- Según lo establecido en el artículo 19 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de Prevención y Control Integrados de la Contaminación, en caso de que la Autorización Ambiental Integrada precise de autorización de vertido al dominio público hidráulico de cuencas gestionadas por la Administración General del Estado, el Organismo de cuenca deberá emitir un informe que tendrá un carácter y un plazo de emisión de:",
+        options: [
+          "a) Preceptivo y no vinculante, 6 meses",
+          "b) Facultativo y vinculante, 4 meses",
+          "c) Preceptivo y vinculante, 6 meses (+1 mes con carácter urgente)",
+          "d) Preceptivo y Vinculante, 4 meses"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Preceptivo y Vinculante, 4 meses)[cite: 189]."
+      },
+      {
+        question: "4.- Según lo establecido en el artículo 16.2 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, ¿cuál de los siguientes instrumentos de prevención y control ambiental no deberá contener una Evaluación del Impacto Ambiental de la actuación en cuestión?",
+        options: [
+          "a) Autorizaciones de Control de la Contaminación Ambiental",
+          "b) Calificación Ambiental",
+          "c) Autorización ambiental unificada simplificada",
+          "d) Ninguna de las anteriores contendrá Evaluación del Impacto Ambiental"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Autorizaciones de Control de la Contaminación Ambiental)[cite: 189]."
+      },
+      {
+        question: "5.- El artículo 27 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que las actividades sometidas a Calificación Ambiental que se extiendan a más de un Municipio quedarán sometidas al siguiente instrumento de prevención y control ambiental:",
+        options: [
+          "a) Autorización Ambiental Integrada",
+          "b) Autorización Ambiental Unificada Simplificada",
+          "c) Calificación Ambiental: Se tramitará por el mismo procedimiento, si bien las administraciones locales afectadas deberán adoptar los oportunos mecanismos de colaboración",
+          "d) Autorización Ambiental Unificada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Autorización Ambiental Unificada Simplificada)[cite: 189]."
+      },
+      {
+        question: "6.- Señale la opción Correcta, según lo establecido en el artículo 26 del Decreto 356/2010 de 3 de agosto, por el que se regula la Autorización Ambiental Unificada:",
+        options: [
+          "a) La obtención de la Autorización Ambiental Unificada eximirá a las personas o entidades titulares o promotoras de la obtención del resto de autorizaciones",
+          "b) La Autorización Ambiental Unificada podrá obtenerse con carácter previo a cualquier otra licencia o autorización que resulte exigible a la correspondiente actuación",
+          "c) La resolución positiva de la Autorización Ambiental Unificada será requisito indispensable para la obtención del Informe de Compatibilidad Urbanística.",
+          "d) Todas las opciones anteriores son falsas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones anteriores son falsas)[cite: 189]."
+      },
+      {
+        question: "7.- El artículo 3 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, establece una serie de principios que inspiran esta Ley, ¿cuál de los siguientes NO es uno de ellos?",
+        options: [
+          "a) Principio de Responsabilidad Compartida de las Administraciones Públicas",
+          "b) Principio de Cautela",
+          "c) Principio de delegación de competencias",
+          "d) Principio de Prevención"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Principio de delegación de competencias)[cite: 189]."
+      },
+      {
+        question: "8.- Según lo establecido en el artículo 36 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, no estarán sometidos a Evaluación Ambiental Estratégica los planes o programas:",
+        options: [
+          "a) Los que tengan como único objeto la Defensa Nacional",
+          "b) Los que tenga como único objeto la Protección Civil en casos de Emergencia",
+          "c) Los de carácter financiero o presupuestario",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 189]."
+      },
+      {
+        question: "9.- En el artículo 6 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada, que nos habla sobre la Modificación de instalaciones con AAI, en su punto número 5 nos dice que se considerará Modificación Sustancial cualquier cambio o ampliación de actuaciones ya autorizadas que, representando una mayor incidencia sobre la seguridad, la salud de las personas o el medio ambiente, implique alguna de una serie de actuaciones que enumera. A la vista de dicho artículo, ¿cuál de las siguientes se consideraría Modificación Sustancial?:",
+        options: [
+          "a) Un incremento del 55% de la emisión másica de uno de los contaminantes atmosféricos que la actividad tiene autorizado.",
+          "b) Un incremento del 25% del caudal de vertido autorizado, a un cauce público.",
+          "c) Un incremento de 4 dB(A) de la potencia acústica total de la instalación",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un incremento de 4 dB(A) de la potencia acústica total de la instalación)[cite: 189]."
+      },
+      {
+        question: "10.- Según lo establecido en el artículo 31.6 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, la Consejería competente en materia de Medio Ambiente dictará y notificará la resolución que ponga fin al procedimiento de Autorización Ambiental Unificada en el plazo máximo de ocho meses desde la presentación de la solicitud, transcurrido dicho plazo sin haberse notificado resolución expresa, los interesados podrán entender que su solicitud ha sido:",
+        options: [
+          "a) Estimada",
+          "b) Desestimada",
+          "c) Caducada",
+          "d) Resuelta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Desestimada)[cite: 189]."
+      },
+      {
+        question: "11.- Según lo establecido en el artículo 13 del Decreto 5/2012, de 17 de enero, por el que se regula la Autorización Ambiental Integrada, ¿a qué órgano debe dirigirse la solicitud de la Autorización Ambiental Integrada?",
+        options: [
+          "a) Al órgano sustantivo por razón de la materia",
+          "b) Al órgano ambiental competente",
+          "c) A la Secretaría General técnica de la Consejería competente en materia de Medio Ambiente",
+          "d) Al Ayuntamiento donde se vaya a situar la actividad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Al órgano ambiental competente)[cite: 189]."
+      },
+      {
+        question: "12.- ¿Cuál de los siguientes NO es una Autorización de Control de la Contaminación ambiental, según lo establecido en el artículo 46 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) Autorización de Emisiones a la Atmósfera",
+          "b) Autorización de Vertidos a Aguas litorales y continentales",
+          "c) Autorización de Gestión de Residuos",
+          "d) Concesión de Ocupación del Dominio Público Marítimo Terrestre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Concesión de Ocupación del Dominio Público Marítimo Terrestre)[cite: 189]."
+      },
+      {
+        question: "13.- ¿Cuál, de la siguiente normativa, establece las bases que deben regir la evaluación ambiental de los planes, programas y proyectos que puedan tener efectos significativos sobre el medio ambiente, garantizando en todo el territorio del Estado un elevado nivel de protección ambiental, con el fin de promover un desarrollo sostenible?",
+        options: [
+          "a) Real Decreto Legislativo 1/2016 de 16 de diciembre, por el que se aprueba el Texto Refundido de la Ley de Prevención y Control Integrados de la Contaminación.",
+          "b) Real Decreto 815/2013 de 18 de octubre, por el que se aprueba el Reglamento de Emisiones Industriales y de desarrollo de la Ley 16/2002 de 1 de julio, de Prevención y Control Integrados de la Contaminación.",
+          "c) Ley 21/2013 de 9 de diciembre, de Evaluación Ambiental.",
+          "d) Ley 26/2007 de 23 de octubre, de Responsabilidad Medioambiental."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Ley 21/2013 de 9 de diciembre, de Evaluación Ambiental)[cite: 189]."
+      },
+      {
+        question: "14.- Según lo establecido en las definiciones recogidas en el artículo 19 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, la siguiente definición: \"Documento elaborado por el promotor que acompaña al proyecto e identifica, describe, cuantifica y analiza los posibles efectos significativos sobre el medio ambiente derivados o que puedan derivarse del proyecto...\", se corresponde con:",
+        options: [
+          "a) Evaluación del Impacto Ambiental",
+          "b) Estudio del Impacto Ambiental",
+          "c) Estudio Ambiental Estratégico",
+          "d) Informe Ambiental Estratégico"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Estudio del Impacto Ambiental)[cite: 189]."
+      },
+      {
+        question: "15.- ¿Cuál sería el plazo para la tramitación y resolución, y el sentido del silencio administrativo, de la Calificación Ambiental, según viene determinado en el artículo 16 del Decreto 297/1995, de 19 de diciembre, por el que se aprueba el Reglamento de Calificación Ambiental?",
+        options: [
+          "a) 6 meses, transcurrido el plazo previsto sin haberse dictado resolución expresa de calificación, en ningún caso podrá entenderse que equivale a una calificación ambiental favorable.",
+          "b) 6 meses, transcurrido el plazo previsto sin haberse dictado resolución expresa de calificación, podrá entenderse que equivale a una calificación ambiental favorable.",
+          "c) 3 meses, transcurrido el plazo previsto sin haberse dictado resolución expresa de calificación, podrá entenderse que equivale a una calificación ambiental favorable.",
+          "d) 3 meses, transcurrido el plazo previsto sin haberse dictado resolución expresa de calificación, en ningún caso podrá entenderse que equivale a una calificación ambiental favorable"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 3 meses, en ningún caso silencio favorable)[cite: 189]."
+      },
+      {
+        question: "16.- El artículo 32 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que el plazo para dictar y notificar la resolución que pone fin al procedimiento de Autorización Ambiental Unificada Simplificadas será de:",
+        options: [
+          "a) 5 meses",
+          "b) 6 meses",
+          "c) 8 meses",
+          "d) 8 meses, excepcional y motivadamente dicho plazo podrá verse ampliado hasta un máximo de 10 meses."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 meses)[cite: 189]."
+      },
+      {
+        question: "17.- Según lo establecido en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, quedarán excluidas del sometimiento a Autorización Ambiental Unificada: (señale la opción Incorrecta)",
+        options: [
+          "a) Cualquier modificación de las características de una actuación consignada en el Anexo II de la Ley 21/2013, de 9 de diciembre, cuando dicha modificación cumple, por sí sola, los umbrales establecidos en el Anexo I de dicha ley.",
+          "b) Las actuaciones, de titularidad pública o privada, en las que se desarrolle alguna de las actividades incluidas en el Anexo I de la Ley 21/2013, de 9 de diciembre...",
+          "c) Las actuaciones, de titularidad pública o privada, en las que se desarrolle alguna de las actividades incluidas en el Anexo I de la Ley 21/2013...",
+          "d) Cualquier modificación de las características de una actuación consignada en el Anexo II de la Ley 21/2013..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 189]."
+      },
+      {
+        question: "18.- El artículo 159 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental determina cuáles serán los órganos competentes para la imposición de las sanciones previstas en esta Ley. En caso de una sanción en materia de Autorización Ambiental Unificada cuya cuantía asciende a 150.001 €, ¿quién sería el encargado de la imposición de dicha sanción?",
+        options: [
+          "a) El Titular de la Delegación Provincial de la Consejería competente en materia de Medio Ambiente.",
+          "b) El Titular de la Dirección General competente por razón de la materia.",
+          "c) El Titular de la Consejería competente en materia de Medio Ambiente",
+          "d) El Consejo de Gobierno"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El Titular de la Dirección General competente por razón de la materia)[cite: 189]."
+      },
+      {
+        question: "19.- El artículo 38.6 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que, contra la Declaración Ambiental Estratégica:",
+        options: [
+          "a) Procederá Recurso de Alzada ante el Titular de la Consejería competente en materia de Medio Ambiente",
+          "b) Procederá Recurso potestativo de reposición",
+          "c) Procederá Recurso extraordinario de revisión",
+          "d) No procederá recurso administrativo alguno"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: No procederá recurso administrativo alguno)[cite: 189]."
+      },
+      {
+        question: "20.- El artículo 43 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece, con respecto a la tramitación y resolución de los procedimientos de Calificación Ambiental, que será competencia de:",
+        options: [
+          "a) Los Ayuntamientos",
+          "b) La Delegación Provincial de la Consejería Competente en materia de Medio Ambiente",
+          "c) La respuesta anterior es correcta, además será compatible la Dirección General competente...",
+          "d) Todas las respuestas anteriores son falsas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Los Ayuntamientos)[cite: 189]."
+      },
+      {
+        question: "21.- Según lo establecido en el artículo 38 del Decreto 5/2012 de 17 de enero, por el que se regula la Autorización Ambiental Integrada, en caso de cierre definitivo de una actividad sometida a Autorización Ambiental Integrada, el titular deberá comunicarlos al órgano ambiental competente y al Ayuntamiento con una antelación mínima de?:",
+        options: [
+          "a) 1 mes",
+          "b) 3 meses",
+          "c) El citado artículo no establece ningún plazo ni la necesidad de comunicación previa al órgano ambiental competente en caso de cierre definitivo de la instalación.",
+          "d) 6 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El citado artículo no establece ningún plazo ni la necesidad de comunicación previa)[cite: 189]."
+      },
+      {
+        question: "22.- El artículo 22 del Decreto 356/2010 de 3 de agosto, por el que se regula la Autorización Ambiental Unificada determina que con carácter previo a la elaboración de la propuesta de resolución de la Autorización Ambiental Unificada se dará trámite a las personas interesadas durante un plazo máximo de:",
+        options: [
+          "a) 30 días",
+          "b) 30 días hábiles",
+          "c) 10 días",
+          "d) 15 días"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 10 días)[cite: 189]."
+      },
+      {
+        question: "23.- Según lo establecido en las definiciones recogidas en el artículo 19 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, la definición correcta para \"Informe Ambiental Estratégico\", sería: (Señale la Correcta)",
+        options: [
+          "a) Informe preceptivo y determinante del órgano ambiental con el que concluye la evaluación ambiental estratégica ordinaria...",
+          "b) Estudio elaborado por el promotor, que, siendo parte integrante del plan o programa...",
+          "c) Análisis predictivo que tiene por objeto identificar, describir y evaluar de forma apropiada...",
+          "d) Informe preceptivo y determinante del órgano ambiental con el que concluye la evaluación ambiental estratégica simplificada."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 189]."
+      },
+      {
+        question: "24.- ¿Cuál de las siguientes autorizaciones no quedará integrada en la Resolución de Autorización Ambiental Integrada, según se establece en el artículo 16 del Decreto 5/2012 de 17 de enero, por el que se regula la Autorización Ambiental Integrada y en el Anexo II de este mismo Decreto?",
+        options: [
+          "a) Autorización de vertidos a dominio público marítimo-terrestre",
+          "b) Autorización de depósito directo de residuos en vertedero",
+          "c) Autorización de usos compatibles en Vías Pecuarias",
+          "d) Concesión de Ocupación del Dominio Público Marítimo Terrestre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Concesión de Ocupación del Dominio Público Marítimo Terrestre)[cite: 189]."
+      },
+      {
+        question: "25.- ¿Cuál de las siguientes NO es una sanción accesoria por la comisión de una infracción Muy Grave según se establece en el artículo 155 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) Clausura definitiva, total o parcial, de una instalación",
+          "b) Revocación de la autorización o suspensión de la misma por un tiempo no inferior a 1 año y un día ni superior a 5 años.",
+          "c) Imposibilidad de hacer uso del distintivo de calidad ambiental de la Administración de la Junta de Andalucía por un periodo mínimo de 2 años y máximo de 5 años.",
+          "d) La prohibición, temporal o definitiva, del desarrollo de actividades"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 189]."
+      },
+      {
+        question: "26.- Según lo establecido en el artículo 21 del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de Prevención y Control Integrados de la Contaminación, el órgano competente en otorgar la Autorización Ambiental Integrada dictará Resolución poniendo fin al procedimiento en un plazo que será como máximo de:",
+        options: [
+          "a) 10 meses",
+          "b) 9 meses",
+          "c) 6 meses",
+          "d) 3 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 meses)[cite: 189]."
+      },
+      {
+        question: "27.- Según lo established en el artículo 26.1 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, una vez otorgada la Autorización Ambiental Integrada, el titular dispondrá de un plazo determinado para iniciar la actividad que, salvo que en la autorización se establezca un plazo distinto, será de?",
+        options: [
+          "a) 2 años",
+          "b) 4 años",
+          "c) 5 años",
+          "d) 10 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5 años)[cite: 189]."
+      },
+      {
+        question: "28.- ¿Cuál de las siguientes no es una sustancia contaminante de la atmósfera según lo establecido en el Anejo II del Real Decreto Legislativo 1/2016, de 16 de diciembre, por el que se aprueba el texto refundido de la Ley de prevención y control integrados de la contaminación?",
+        options: [
+          "a) Dióxido de Carbono",
+          "b) Compuestos Orgánicos Volátiles",
+          "c) Amianto (partículas en suspensión, fibras)",
+          "d) Cianuros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Dióxido de Carbono)[cite: 189]."
+      },
+      {
+        question: "29.- Según la Sección 1.ª. (Infracciones y sanciones en materia de autorización ambiental integrada y autorización ambiental unificada) del Capítulo III de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, \"No informar inmediatamente a la Consejería competente en materia de medio ambiente de cualquier incidente o accidente ocurrido en actividades sometidas a autorización ambiental unificada o autorización ambiental integrada, que afecte de forma significativa al medio ambiente\", será sancionado con una cuantía de:",
+        options: [
+          "a) Hasta 24.000 €",
+          "b) Desde 24.001 hasta 240.400 €",
+          "c) Desde 240.401 hasta 2,404.000€",
+          "d) Esta infracción no aparece como sancionable en la citada Ley."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Desde 24.001 hasta 240.400 €)[cite: 189]."
+      },
+      {
+        question: "30.- ¿Cuál de los siguientes no es un Acuerdo Voluntario de los establecidos en el artículo 111 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) Acuerdos celebrados entre los agentes económicos y sociales y la Consejería competente en materia de medio ambiente u otros órganos de la Administración de la Junta de Andalucía.",
+          "b) Compromisos del sector industrial con alguno de los órganos que integran la Administración de la Junta de Andalucía...",
+          "c) Compromisos del sector económico con alguno de los órganos que integran la Administración de la Junta de Andalucía u organismos asociados",
+          "d) Acuerdos que tengan como objeto la protección del medio ambiente celebrados entre personas físicas o jurídicas y la Consejería competente..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 189]."
+      },
+      {
+        question: "31.- Instalación destinada a la cría intensiva de aves de corral, de cerdos y de otros animales en explotaciones ganaderas reguladas por el Real Decreto 348/2000, de 10 de marzo, por el que se incorpora al ordenamiento jurídico la Directiva 98/58/CE relativa a la protección de los animales en las explotaciones ganaderas; y que no se destinen a autoconsumo, con una capacidad de 500 plazas para cerdas reproductoras.",
+        options: [
+          "a) Autorización Ambiental Integrada (en adelante AAI)",
+          "b) Autorización Ambiental Unificada (en adelante AAU)",
+          "c) Autorización Ambiental Unificada simplificada (en adelante AAUs)",
+          "d) Calificación Ambiental (en adelante CA)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Calificación Ambiental - Epígrafe 33)[cite: 189]."
+      },
+      {
+        question: "32.- Instalaciones para limpieza y lavado de aceituna, así como los puestos de compra de aceituna al por mayor.",
+        options: [
+          "a) CA-DR",
+          "b) CA",
+          "c) CA (Anexo II)",
+          "d) AAUS"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: CA-DR - Epígrafe 41)[cite: 189]."
+      },
+      {
+        question: "33.- Fundición de metales ferrosos con una capacidad de producción de 39 toneladas por día.",
+        options: [
+          "a) AAI",
+          "b) AAU",
+          "c) AAUS",
+          "d) CA (Anexo II)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: AAI - Epígrafe 2.4)[cite: 189]."
+      },
+      {
+        question: "34.- Transformación de un área sin cultivar para la explotación agrícola, con una superficie de 55 hectáreas.",
+        options: [
+          "a) AAI",
+          "b) AAU",
+          "c) AAUS",
+          "d) CA"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: AAU - Grupo I)[cite: 189]."
+      },
+      {
+        question: "35.- Vertedero de todo tipo de residuos que recibe más de 10 toneladas al día, no tratándose de un vertedero de residuos inertes.",
+        options: [
+          "a) AAU",
+          "b) AAUS",
+          "c) AAI",
+          "d) CA-DR"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: AAI - Epígrafe 5.5)[cite: 189]."
+      },
+      {
+        question: "36.- Estación de tratamiento para potabilización de aguas para una población de 4.500 habitantes.",
+        options: [
+          "a) CA-DR",
+          "b) CA",
+          "c) AAUS",
+          "d) No estará sometida a ningún Instrumento de Prevención y Control Ambiental."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: CA - Epígrafe 28)[cite: 189]."
+      },
+      {
+        question: "37.- Instalación para la desalación de agua con un volumen superior a 3000 m³ al día.",
+        options: [
+          "a) AAI",
+          "b) AAUs",
+          "c) AAU",
+          "d) CA (Anexo II)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: AAUs - Grupo 8)[cite: 189]."
+      },
+      {
+        question: "38.- Instalación para el sacrificio, despiece o descuartizamiento de animales, con capacidad de producción de canales de 25 toneladas por día.",
+        options: [
+          "a) AAI",
+          "b) AAU",
+          "c) AAUS",
+          "d) CA (Anexo II)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: CA Anexo II - Epígrafe 31.2)[cite: 189]."
+      },
+      {
+        question: "39.- Instalación para el tratamiento y transformación a partir de materia prima vegetal, no sometida a AAI y no incluida en el Anexo II de la Ley 21/2013, de 9 de diciembre, con una superficie de 250 m².",
+        options: [
+          "a) AAU",
+          "b) CA (Anexo II)",
+          "c) CA-DR",
+          "d) CA"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: CA-DR - Epígrafe 10.10)[cite: 189]."
+      },
+      {
+        question: "40.- Punto Limpio.",
+        options: [
+          "a) CA (Anexo II)",
+          "b) AAU",
+          "c) AAUS",
+          "d) CA-DR"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: CA Anexo II - Epígrafe 43.1)[cite: 189]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 20),
+      "t1_b2": test1Questions.slice(20, 40),
+      "t1_b3": test1Questions.slice(40, 60),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 20),
+      "t2_b2": test2Questions.slice(20, 40)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 19 - PREVENCIÓN Y CONTROL AMBIENTAL (COMPLETO 100 PREGUNTAS)",
+        "t1_all": "TEST BÁSICO Nº 1 - COMPLETO (60 PREGUNTAS)",
+        "t1_b1": "TEST BÁSICO Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t1_b2": "TEST BÁSICO Nº 1 - BLOQUE 2 (PREGUNTAS 21 A 40)",
+        "t1_b3": "TEST BÁSICO Nº 1 - BLOQUE 3 (PREGUNTAS 41 A 60)",
+        "t2_all": "TEST DE AUTOEVALUACIÓN - COMPLETO (40 PREGUNTAS)",
+        "t2_b1": "TEST DE AUTOEVALUACIÓN - BLOQUE 1 (PREGUNTAS 1 A 20)",
+        "t2_b2": "TEST DE AUTOEVALUACIÓN - BLOQUE 2 (PREGUNTAS 21 A 40)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

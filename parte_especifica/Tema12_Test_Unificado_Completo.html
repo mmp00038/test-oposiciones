@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Tema 12 (Test 12-1)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Test Completo (50 preguntas)</option>
+        <option value="b1">Bloque 1 (Preguntas 1 - 25)</option>
+        <option value="b2">Bloque 2 (Preguntas 26 - 50)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEST 12-1 - TEMA 12</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. La competencia exclusiva en legislación básica sobre montes, aprovechamientos forestales y vías pecuarias, corresponderá, de acuerdo con la Constitución Española:",
+        options: [
+          "a) A las Comunidades Autónomas, conforme a sus Estatutos de Autonomía",
+          "b) Al Estado, en base al artículo 149.1.23ª de la Constitución",
+          "c) A la Junta de Andalucía",
+          "d) La competencia en materia de montes es compartida entre el Estado y las CCAA"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Al Estado, en base al artículo 149.1.23ª de la Constitución)."
+      },
+      {
+        question: "2. Conforme al art. 23 de la Ley 43/2003, de 21 de noviembre, de Montes, la gestión de los montes privados se realizará:",
+        options: [
+          "a) Ajustándose a los instrumentos de gestión o planificación forestal",
+          "b) En la forma que disponga el titular",
+          "c) Mediante la aprobación de Planes Técnicos de Ordenación, exclusivamente",
+          "d) A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y B son correctas)."
+      },
+      {
+        question: "3. Según el artículo 33.2 de la Ley de Montes, deberán contar con un proyecto de ordenación de montes, plan dasocrático u otro instrumento de gestión equivalente, los montes:",
+        options: [
+          "a) Privados declarados como montes protectores y los montes públicos",
+          "b) Sólo los públicos",
+          "c) De utilidad pública; para montes privados es opcional",
+          "d) Privados declarados como protectores y montes de utilidad pública"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Privados declarados como protectores y montes de utilidad pública)."
+      },
+      {
+        question: "4. Según el art. 32.3 de la Ley de Montes, la aprobación de las instrucciones de ordenación y aprovechamiento de montes corresponde a:",
+        options: [
+          "a) Las Comunidades Autónomas",
+          "b) La Administración General del Estado, mediante Real Decreto",
+          "c) El Gobierno",
+          "d) La Conferencia Sectorial de Agricultura y Desarrollo Rural"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Las Comunidades Autónomas)."
+      },
+      {
+        question: "5. La elaboración de los instrumentos de gestión, de acuerdo con el art. 33.3 de la Ley 43/2003, se hará a instancias de:",
+        options: [
+          "a) El órgano forestal de la Comunidad Autónoma",
+          "b) El titular del monte",
+          "c) Sólo el titular del monte, pues al órgano forestal les corresponde la aprobación",
+          "d) A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y B son correctas)."
+      },
+      {
+        question: "6. Cuando la Ley de Montes habla de un PORF, se está refiriendo a:",
+        options: [
+          "a) Planes de Ordenación de Recursos Forestales, que sustituyen a los antiguos Planes de Ordenación de Recursos Naturales (PORN)",
+          "b) Planes de Ordenación de Recursos Forestales, como nueva figura de planificación",
+          "c) Programas de Ordenamiento de Redes Forestales",
+          "d) Programas de Ordenación de los Recursos Forestales a nivel estatal"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Planes de Ordenación de Recursos Forestales, como nueva figura de planificación)."
+      },
+      {
+        question: "7. Según el art. 55.4 de la Ley 3/2026, de Montes de Andalucía, el plazo máximo del procedimiento de aprobación de los IOF será de:",
+        options: [
+          "a) 6 meses",
+          "b) 3 meses",
+          "c) 2 meses",
+          "d) Ninguna de las anteriores es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6 meses)."
+      },
+      {
+        question: "8. Conforme al art. 25 de la Orden de 13 de mayo de 2022 (IGOMCA), el inicio de las actuaciones y aprovechamientos autorizados en un IOF deberá comunicarse a la Consejería competente en materia forestal, con carácter general, con una antelación mínima de:",
+        options: [
+          "a) 10 días",
+          "b) 30 días",
+          "c) 20 días",
+          "d) 15 días"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 15 días)."
+      },
+      {
+        question: "9. En base a los art. 83.4 y 84.3 del Reglamento forestal (Decreto 208/1997), el contenido de los Proyectos de Ordenación de Montes y de los Planes Técnicos, se establecerá mediante:",
+        options: [
+          "a) Decreto del Consejo de Gobierno",
+          "b) Orden de la Consejería",
+          "c) Resolución de la Dirección General de Medio Natural, Biodiversidad y Espacios Protegidos",
+          "d) Resolución de las Delegaciones Territoriales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Orden de la Consejería)."
+      },
+      {
+        question: "10. De acuerdo con el art. 83.2 del Reglamento Forestal, se requerirán Proyectos de Ordenación de Montes para la gestión de montes de titularidad pública:",
+        options: [
+          "a) Con un mínimo de 400 ha",
+          "b) Con un máximo de 400 ha",
+          "c) Con una superficie superior a 400 ha",
+          "d) Los PO son obligatorios para todos los montes públicos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Con un mínimo de 400 ha)."
+      },
+      {
+        question: "11. Conforme a los datos publicados en la web de la Consejería competente en materia de medio ambiente, ¿qué provincia andaluza tiene el mayor número de hectáreas ordenadas en montes gestionados por dicha Consejería?",
+        options: [
+          "a) Huelva",
+          "b) Almería",
+          "c) Jaén",
+          "d) Málaga"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Jaén)."
+      },
+      {
+        question: "12. ¿Para qué tipo de montes se pueden aprobar los Proyectos de Ordenación de Montes (POM) y Planes Técnicos (PT)?",
+        options: [
+          "a) Sólo para montes públicos",
+          "b) Sólo para montes privados",
+          "c) Tanto para montes públicos como privados",
+          "d) Para montes públicos y para aquellos incluidos en un Espacio Natural Protegido"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tanto para montes públicos como privados)."
+      },
+      {
+        question: "13. De acuerdo con lo dispuesto en la Orden del 13 de mayo de 2022 (IGOMCA) ¿Qué tipo de instrumento de ordenación forestal (IOF) será obligatorio presentar en los montes privados de más de 400 hectáreas?",
+        options: [
+          "a) Deberá tratarse de un Proyecto de Ordenación de Montes (POM)",
+          "b) El titular tendrá que elegir entre POM o PT (Plan Técnico)",
+          "c) Sólo requiere un PT, y sólo cuando lo exija un PORN",
+          "d) No es obligatorio ningún tipo de IOF, salvo que se trate de un monte protector o un PORN exija su elaboración"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "14. ¿Y qué tipo de IOF, según el art. 4 de las IGOMCA, se requiere en los montes públicos de menos de 400 hectáreas?",
+        options: [
+          "a) Proyecto de Ordenación de Montes (POM)",
+          "b) Un PTOS (Simplificado), independientemente de la superficie",
+          "c) Es suficiente con un PT",
+          "d) No se requiere ningún tipo de planificación"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Es suficiente con un PT)."
+      },
+      {
+        question: "15. ¿Cuántos tipos de Planes Técnicos se establecen en el art. 4 de las nuevas Instrucciones Generales para la Ordenación de Montes de la Comunidad Autónoma Andaluza (IGOMCA), aprobadas mediante la Orden de 13 de mayo de 2022?",
+        options: [
+          "a) Uno",
+          "b) Dos",
+          "c) Tres",
+          "d) Cuatro"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tres)."
+      },
+      {
+        question: "16. ¿Cuándo entraron en vigor las nuevas instrucciones de la IGOMCA?",
+        options: [
+          "a) Enero de 2004",
+          "b) Mayo de 2022",
+          "c) Noviembre de 2022",
+          "d) Marzo de 2023"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Noviembre de 2022)."
+      },
+      {
+        question: "17. ¿Cuál es el objeto de la Orden de 13 de mayo de 2022, que aprueba las Instrucciones Generales para la Ordenación de Montes de la Comunidad Autónoma de Andalucía (IGOMCAA)?",
+        options: [
+          "a) Aprobar las IGOMCAA",
+          "b) Regular la estructura y contenidos mínimos de los IOF de montes públicos y privados",
+          "c) Recoger el procedimiento administrativo para las solicitudes asociadas a IOF de montes no gestionados por la Consejería",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)."
+      },
+      {
+        question: "18. De acuerdo con el art. 4 de las IGOMCA ¿Qué son los Planes técnicos de ordenación simplificados (PTOS)?",
+        options: [
+          "a) Es un documento consistente en un formulario de formato normalizado, en el que se incorpora el contenido esencial para asegurar la correcta ordenación de la superficie forestal, al que pueden acogerse los montes de superficie superior a 400 hectáreas",
+          "b) Es un documento similar en estructura a un Proyecto de ordenación, pero con requerimientos adaptados a una gestión más sencilla",
+          "c) Es un documento consistente en un formulario de formato normalizado, en el que se incorpora el contenido esencial para asegurar la correcta ordenación de la superficie forestal, al que pueden acogerse los montes de superficie inferior o igual a 400 hectáreas",
+          "d) Es un documento que permite la adhesión por escrito a uno de los modelos aprobados de gestión forestal"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "19. ¿Qué terrenos están excluidos del ámbito de aplicación de la Orden de 13 de mayo de 2022, por la que se aprueban las IGOMCA?",
+        options: [
+          "a) Los terrenos cuya producción forestal se destine exclusivamente a la venta comercial",
+          "b) Los terrenos cuya producción forestal se destine exclusivamente al consumo doméstico privado",
+          "c) Los terrenos cuya producción forestal se destine exclusivamente a la exportación",
+          "d) Todos los terrenos deben cumplir con estas instrucciones sin excepción"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Los terrenos cuya producción forestal se destine exclusivamente al consumo doméstico privado)."
+      },
+      {
+        question: "20. Respecto a la vigencia de los IOF, el art. 9 de las IGOMCA establece que:",
+        options: [
+          "a) Los IOF establecidos en la presente orden tendrán, al menos, la vigencia del Plan Especial",
+          "b) Los PTOS (simplificados) tendrán una vigencia de 10 años",
+          "c) Los modelos-tipo de gestión forestal tendrán una vigencia indefinida, y serán revisados cuando así lo establezca el órgano forestal competente",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Los PTOS simplificados tendrán una vigencia de 10 años)."
+      },
+      {
+        question: "21. De acuerdo con la Revisión de los IOF, regulada en los art. 10 y 11 de las IGOMCA, señale cuál de las siguientes afirmaciones es CORRECTA:",
+        options: [
+          "a) En el caso de ampliación del ámbito territorial, se procederá a realizar una Revisión ordinaria",
+          "b) En el caso de las AMGF no se contempla la Revisión ordinaria, sino una nueva solicitud",
+          "c) Las Revisiones se denominarán por el número arábigo correlativo correspondiente comenzando desde la siguiente a la redacción del mismo",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "22. Según el art. 12 de las IGOMCA, la prórroga....",
+        options: [
+          "a) Se deberá solicitar cuando resten menos de 3 meses para la finalización de la vigencia del IOF",
+          "b) Se solicitará como máximo por la mitad del plazo de la vigencia inicial",
+          "c) En el caso de PTOS (simplificados) y AMGF (adhesión a modelos-tipo de gestión forestal) no se contempla prórroga, debiéndose realizar una nueva solicitud",
+          "d) Excepcionalmente, se podrá solicitar la prórroga de un IOF que ha perdido su vigencia, si no han pasado más de 3 meses y aún quedan actuaciones por realizar"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Se solicitará como máximo por la mitad del plazo de la vigencia inicial)."
+      },
+      {
+        question: "23. Conforme al art. 14 de las IGOMCA, la resolución de los procedimientos asociados a IOF en montes no gestionados por la Consejería de Medio Ambiente, como la aprobación de POM y PT, le corresponderá con carácter general:",
+        options: [
+          "a) Al titular de la Delegación Territorial",
+          "b) Al titular de la Dirección General competente en materia forestal",
+          "c) Al titular de la Consejería competente en materia forestal",
+          "d) Al titular de la Dirección General cuando el ámbito de aplicación supera el de una provincia"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Al titular de la Delegación Territorial)."
+      },
+      {
+        question: "24. El Anexo I de la Orden de 13 de mayo de 2022 recoge las instrucciones generales para la redacción de Proyectos de Ordenación de Montes (POM). De acuerdo con el art. 1 de dicho Anexo, la estructura de los POM constará de:",
+        options: [
+          "a) Memoria General, Inventario, y Cartografía",
+          "b) Antecedentes, Inventario, Planificación y Cartografía",
+          "c) Antecedentes, Planificación, Cartografía, y la Información geográfica digital",
+          "d) Memoria General, Cartografía y la Información geográfica digital"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Memoria General, Cartografía y la Información geográfica digital)."
+      },
+      {
+        question: "25. Teniendo en cuenta la estructura del POM según establece el Anexo I de las IGOMCA, el Capítulo 1 (Descripción del ámbito de ordenación) del Título Primero (Inventario) consta de los apartados siguientes:",
+        options: [
+          "a) Estado legal, forestal y socioeconómico",
+          "b) Estado legal y natural",
+          "c) Estado legal, natural y socioeconómico",
+          "d) Estado legal, natural y forestal"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Estado legal, natural y socioeconómico)."
+      },
+      {
+        question: "26. Para la elaboración de un POM o un PTOM (Plan Técnico de Ordenación de Montes), cuyas instrucciones de redacción se incluyen en los Anexos I y II de las IGOMCA, respectivamente, ¿en qué apartado del Capítulo 1 del título Inventario (Descripción del ámbito de ordenación), encontraremos la información sobre las servidumbres y ocupaciones del monte?",
+        options: [
+          "a) Estado natural",
+          "b) Estado socioeconómico",
+          "c) Estado legal",
+          "d) Estado social"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Estado legal)."
+      },
+      {
+        question: "27. El estado natural del Inventario se materializará en una zonificación del ámbito del POM (o del PTOM) en unidades homogéneas, que conforme al art. 16, se realizará sobre bases cartográficas de escala adecuada para el detalle requerido, preferentemente:",
+        options: [
+          "a) 1:10.000",
+          "b) 1:25.000",
+          "c) 1:50.000",
+          "d) 1:100.000"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1:10.000)."
+      },
+      {
+        question: "28. ...y cuando se realice sobre la base de fuentes de información tipo ráster, la resolución o tamaño de cuadrícula apropiado será:",
+        options: [
+          "a) Mínimo 25 metros de lado",
+          "b) No excederá de 25 metros de lado",
+          "c) Mínimo 50 metros de lado",
+          "d) No excederá de 50 metros de lado"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: No excederá de 25 metros de lado)."
+      },
+      {
+        question: "29. El art. 39 del Anexo I de las IGOMCA, incluido en el capítulo segundo (División territorial) del título Primero (Inventario) del POM, establece las unidades territoriales que se podrán formar. Indica cuál de las siguientes NO es una unidad territorial de carácter temporal:",
+        options: [
+          "a) Pastadero",
+          "b) Cantón",
+          "c) Rodal",
+          "d) Unidad inventarial"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cantón)."
+      },
+      {
+        question: "30. Las unidades territoriales cuya misión es la de servir de referencia geográfica para la gestión de los montes, así como permitir la comparativa de los diferentes aspectos relativos a la ordenación del sistema forestal en escalas temporales superiores a la vigencia del Plan Especial, se denominan como:",
+        options: [
+          "a) Unidad de ordenación",
+          "b) Sección",
+          "c) Unidad territorial permanente",
+          "d) Cuartel"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Unidad territorial permanente)."
+      },
+      {
+        question: "31. Señale cuál de las siguientes afirmaciones sobre el \"cantón\" es CORRECTA conforme a lo dispuesto en el art. 43 del Anexo I (o el art. 34 del Anexo II) de las IGOMCA:",
+        options: [
+          "a) La superficie de los cantones deberá ser, en general, superior a 50 hectáreas",
+          "b) Se numerarán empleando letras minúsculas comenzando por la \"a\"",
+          "c) Son áreas forestales homogéneas en las que se aplica un mismo método de ordenación",
+          "d) Es una unidad básica de referencia espacial de carácter permanente"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Es una unidad básica de referencia espacial de carácter permanente)."
+      },
+      {
+        question: "32. A tenor de lo dispuesto en el art. 42 del Anexo I (o el art. 33 del Anexo II) ¿Cuál es la superficie recomendada para los cuarteles?",
+        options: [
+          "a) Mayor de 400 hectáreas",
+          "b) Entre 400-1000 hectáreas",
+          "c) Hasta un máximo de 500 hectáreas",
+          "d) Entre 100-400 hectáreas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Entre 400-1000 hectáreas)."
+      },
+      {
+        question: "33. Una vez formadas y cartografiadas las formaciones vegetales o sus subdivisiones, se deben describir detalladamente mediante fichas individualizadas, que contendrán, según al art. 54 del Anexo I (o el art. 43 del Anexo II), la siguiente información (indique la opción INCORRECTA):",
+        options: [
+          "a) Informe selvícola",
+          "b) Información descriptiva",
+          "c) Información del sistema forestal",
+          "d) Información cuantitativa"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Información del sistema forestal)."
+      },
+      {
+        question: "34. Conforme al art. 57 del Anexo I, las unidades inventariales:",
+        options: [
+          "a) Se formarán por agregación de unidades territoriales permanentes con cubiertas similares",
+          "b) Su tamaño dependerá de la intensidad de la gestión, no debiendo superarse las 1000 hectáreas",
+          "c) A ellas se referirán los valores medios y los errores de inventario para las variables de estudio",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)."
+      },
+      {
+        question: "35. De acuerdo con la elección del tipo de inventario recogida en el art. 48 del Anexo II, ¿cuál de los siguientes tipos de inventario NO está incluido en un PTOM, pero sí lo está en un POM según el art. 59 del Anexo I?",
+        options: [
+          "a) Estimación pericial",
+          "b) Muestreo estadístico de otros recursos y singularidades",
+          "c) Inventario apoyado en tecnologías de teledetección",
+          "d) Muestreo estadístico del recurso madera, biomasa u otros productos leñosos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "36. Conforme a la codificación de las unidades inventariales recogida en el art. 57 del Anexo I, ¿a qué tipo de inventario corresponden las letras \"MC\"?",
+        options: [
+          "a) Método de conteo pie a pie",
+          "b) Muestreo pericial",
+          "c) Muestreo estadístico de corcho",
+          "d) Muestreo cuantitativo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muestreo estadístico de corcho)."
+      },
+      {
+        question: "37. El art. 64 del Anexo I (y el art. 53 del Anexo II), en el que se regulan los elementos medibles en el inventario, establece que el diámetro mínimo inventariable, será, en términos generales, de:",
+        options: [
+          "a) 5 cm",
+          "b) 10 cm",
+          "c) 12,5 cm",
+          "d) 15 cm"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 10 cm)."
+      },
+      {
+        question: "38. Conforme al art. 68 del Anexo I, el error máximo de muestreo que se admite para la variable \"número de pies mayores\", cuando se aplica el muestreo estadístico para la caracterización de masas arboladas, será:",
+        options: [
+          "a) 30% (con probabilidad fiducial del 95%)",
+          "b) 20% (con probabilidad fiducial del 95%)",
+          "c) 15% (con probabilidad fiducial del 95%)",
+          "d) Ninguna es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 30% con probabilidad fiducial del 95%)."
+      },
+      {
+        question: "39. Para estimar el número de pies menores de cada especie arbórea, y el número de pies que forman el regenerado de cada especie en masas arboladas, las IGOMCA establecen en el art. 69 del Anexo I, que se utilizará una subparcela concéntrica a la parcela de inventario, con un radio de:",
+        options: [
+          "a) 5-20 metros",
+          "b) 14-20 metros",
+          "c) 2-10 metros",
+          "d) 1-5 metros"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 1-5 metros)."
+      },
+      {
+        question: "40. A tenor de lo dispuesto en el art. 73 del Anexo I, para el cálculo de la muestra extendida para la estimación de madera, biomasa u otros productos leñosos, cada clase diamétrica deberá estar representada por al menos árboles, debiendo haber al menos árboles distribuidos por todas las clases diamétricas para cada tarifa que se construya. Señala el número correcto en cada caso:",
+        options: [
+          "a) 5; 40",
+          "b) 3; 30",
+          "c) 5; 20",
+          "d) 3; 50"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3; 30)."
+      },
+      {
+        question: "41. Para el inventario del recurso \"resina\", de acuerdo con el art. 78 del Anexo I de las IGOMCA, en las unidades inventariales en las que se va a resinar se establece un sistema mixto de inventario. Para el grupo de cantones o rodales que se resinarán durante el Plan Especial, se aplicará:",
+        options: [
+          "a) El muestreo estadístico",
+          "b) La estimación pericial",
+          "c) El conteo pie a pie",
+          "d) El muestreo aleatorio"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El conteo pie a pie)."
+      },
+      {
+        question: "42. Conforme al art. 62 del Anexo I (y el art. 51 del Anexo II) de las IGOMCA, se podrán realizar inventarios apoyados en tecnologías de teledetección, en los que se utilicen datos procedentes de sensores remotos. En particular, para el inventario de variables cuantitativas, ¿qué tipo de tecnologías se recomiendan?",
+        options: [
+          "a) Fotogrametría 3D",
+          "b) Escáneres láser",
+          "c) Radar",
+          "d) Todas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)."
+      },
+      {
+        question: "43. En la elección de las formas fundamentales de la masa arbolada, el art. 124 del Anexo I considera unos casos especiales de monte bajo. Señala la respuesta CORRECTA:",
+        options: [
+          "a) Monte bajo con resalvos",
+          "b) Monte a matarrasa",
+          "c) Monte en trasmocho",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)."
+      },
+      {
+        question: "44. De acuerdo con las IGOMCA aprobadas por Orden de 13 de mayo de 2022, la planificación táctica, que contiene el desarrollo cuantificado y localizado espacial y temporalmente de las indicaciones de la estrategia general, mediante propuestas de actuación concretas sobre las distintas unidades de ordenación, se denomina:",
+        options: [
+          "a) Plan Especial",
+          "b) Plan General",
+          "c) Estado final",
+          "d) Programa de usos y aprovechamientos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Plan Especial)."
+      },
+      {
+        question: "45. Según los métodos de ordenación establecidos en el art. 161 del Anexo I (Métodos de ordenación para masas regulares, semirregulares de primer grado, semirregulares de segundo grado o irregulares incompletas), el método de \"división en tranzones\" se aplicará cuando el turno o turnos de corta propuestos sean:",
+        options: [
+          "a) Inferior a 20 años",
+          "b) Superior a 50 años",
+          "c) Inferior a 30 años",
+          "d) Superior a 20 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Inferior a 30 años)."
+      },
+      {
+        question: "46. ¿Cuántos Programas de usos y aprovechamientos componen la Sección 1ª del Capítulo 3 (Plan Especial) del Título II (Planificación) en un POM o PTOM?",
+        options: [
+          "a) 7",
+          "b) 9",
+          "c) 5",
+          "d) 8"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 9)."
+      },
+      {
+        question: "47. ¿Cuántos Programas de mejora y defensa componen la Sección 2ª del Capítulo 3 (Plan Especial) del Título Segundo (Planificación) de un PTOM, conforme al art. 180 del Anexo II?:",
+        options: [
+          "a) 10",
+          "b) 8",
+          "c) 9",
+          "d) 7"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 8)."
+      },
+      {
+        question: "48. El art. 194 del Anexo I establece la vigencia del Plan Especial en:",
+        options: [
+          "a) 10 años",
+          "b) Entre 10-20 años",
+          "c) 20 años",
+          "d) Entre 20-40 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Entre 10-20 años)."
+      },
+      {
+        question: "49. Respecto a los Planes Técnicos de Ordenación Simplificados (PTOS) ¿Cuál de las siguientes afirmaciones es INCORRECTA?",
+        options: [
+          "a) Consta de un formulario de formato normalizado, cartografía, y la información geográfica digital",
+          "b) El formulario estará compuesto por 2 títulos: Inventario y Planificación",
+          "c) No se realiza una división territorial permanente; la planificación se materializa sobre las unidades de vegetación",
+          "d) No se definen unidades de ordenación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "50. ¿Cuál sería la superficie máxima establecida para la adhesión a los modelos de gestión forestal de eucaliptar para producción de madera o de biomasa, aprobados por la Orden de 13 de mayo de 2022?",
+        options: [
+          "a) 100 ha",
+          "b) 200 ha",
+          "c) 400 ha",
+          "d) No hay establecida una superficie máxima, sino una superficie mínima"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 100 ha)."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEST 12-1 - TEMA 12 (COMPLETO 50 PREGUNTAS)",
+        "b1": "TEST 12-1 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "b2": "TEST 12-1 - BLOQUE 2 (PREGUNTAS 26 A 50)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

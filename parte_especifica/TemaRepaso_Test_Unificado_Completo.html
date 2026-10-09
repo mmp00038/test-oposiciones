@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Agentes de Medio Ambiente (Test de Repaso-1)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Test Completo (75 preguntas)</option>
+        <option value="b1">Bloque 1 (Preguntas 1 - 25)</option>
+        <option value="b2">Bloque 2 (Preguntas 26 - 50)</option>
+        <option value="b3">Bloque 3 (Preguntas 51 - 75)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMAS 3, 4, 5, 12, 16 Y 18 - TEST DE REPASO-1</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1. En el contexto de la política medioambiental de la Unión Europea, el Tratado de Maastricht supuso:",
+        options: [
+          "a) La incorporación de un título específico sobre medio ambiente en el TFUE",
+          "b) La consolidación de la política medioambiental como uno de los ámbitos políticos oficiales de la Unión",
+          "c) La obligación de integrar la protección del medio ambiente en todas las políticas sectoriales de la UE para promover el desarrollo sostenible",
+          "d) Que la lucha contra el cambio climático pasara a ser un objetivo específico de la UE"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "2. Indique cuál de los siguientes NO es uno de los principios fundamentales de la Agenda 2030 para el Desarrollo sostenible:",
+        options: [
+          "a) Interconexión e indivisibilidad",
+          "b) Inclusión",
+          "c) Solidaridad",
+          "d) No dejar a nadie atrás"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "3. ¿Cuándo aprobó el Consejo de Ministros la Estrategia Española de Desarrollo Sostenible 2030?",
+        options: [
+          "a) 5 de junio de 2021",
+          "b) 28 de junio de 2018",
+          "c) 5 de junio de 2020",
+          "d) 28 de junio de 2022"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 de junio de 2021)."
+      },
+      {
+        question: "4. Según establece el art. 57.3 del Estatuto de Autonomía de Andalucía, el establecimiento y la regulación de los instrumentos de planificación ambiental y del procedimiento de tramitación y aprobación de estos instrumentos, es una competencia de la Comunidad Autónoma de Andalucía del tipo:",
+        options: [
+          "a) Ejecutiva",
+          "b) Exclusiva",
+          "c) Compartida",
+          "d) Básica del Estado"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Compartida)."
+      },
+      {
+        question: "5. Uno de los objetivos generales del Plan de Medio Ambiente Horizonte 2017 es:",
+        options: [
+          "a) Proteger y conservar los paisajes andaluces como herramienta para una mejor integración del territorio andaluz",
+          "b) Conservar la biodiversidad y la geodiversidad",
+          "c) Defender el patrimonio forestal",
+          "d) Cooperación internacional para el desarrollo del monte mediterráneo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "6. ¿Cuál de las siguientes NO es un área de actuación del PMA Horizonte 2017?",
+        options: [
+          "a) Mantenimiento y mejora de los servicios administrativos",
+          "b) Integración ambiental de la actividad económica",
+          "c) Mejora de la gobernanza",
+          "d) Información ambiental"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "7. El objeto y ámbito de la aplicación de la Ley 8/2003, de 28 de octubre, abarca:",
+        options: [
+          "a) La protección, conservación y recuperación de la flora y fauna silvestres",
+          "b) La protección, conservación y recuperación de los hábitats",
+          "c) La regulación de los aprovechamientos de las especies silvestres",
+          "d) Todas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son correctas)."
+      },
+      {
+        question: "8. La Ley 42/2007, de 13 de diciembre, en su art. 3.38, define el \"Patrimonio geológico\" como:",
+        options: [
+          "a) Territorios delimitados que presentan formas geológicas únicas...",
+          "b) Variedad de elementos geológicos, incluidos rocas, minerales...",
+          "c) Conjunto de recursos naturales geológicos de valor científico, cultural y/o educativo, ya sean formaciones y estructuras geológicas...",
+          "d) Ninguna es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "9. ¿Cuántos Anexos tiene la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y la Biodiversidad?:",
+        options: [
+          "a) 6",
+          "b) 7",
+          "c) 8",
+          "d) 9"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 8 anexos)."
+      },
+      {
+        question: "10. Conforme al art. 13 de la Ley 42/2007, de 13 de diciembre, el Plan Estratégico del Patrimonio Natural y la Biodiversidad, tendrá una vigencia de:",
+        options: [
+          "a) 10 años",
+          "b) En todo caso, no podrá ser superior a 10 años",
+          "c) 6 años",
+          "d) En cualquier caso, un mínimo de 5 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: No podrá ser superior a 10 años)."
+      },
+      {
+        question: "11. En relación con el aprovechamiento de especies silvestres regulado en el art. 31 de la Ley 8/2003, de 28 de octubre, la recogida esporádica en pequeñas cantidades de ejemplares de especies silvestres de invertebrados, plantas y hongos en los lugares y fechas tradicionales... requerirá:",
+        options: [
+          "a) Autorización de la CMA",
+          "b) Comunicación previa a la CMA",
+          "c) Declaración responsable",
+          "d) No requiere autorización"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: No requiere autorización)."
+      },
+      {
+        question: "12. El Decreto 23/2012, de 14 de febrero, por el que se regula la conservación y el uso sostenible de la flora y la fauna silvestres y sus hábitats, crea el...",
+        options: [
+          "a) Catálogo Andaluz de Especies Amenazadas",
+          "b) Catálogo Andaluz de Especies Exóticas Invasoras",
+          "c) Registro Andaluz de Aprovechamientos de la Flora y la Fauna Silvestres",
+          "d) B y C son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Catálogo Andaluz de Especies Exóticas Invasoras)."
+      },
+      {
+        question: "13. La Ley 8/2003, de 28 de octubre, crea el/la:",
+        options: [
+          "a) Registro de Especies Amenazadas en Cautividad",
+          "b) Red Andaluza de Centros de Conservación, Recuperación y Reintroducción de Especies Silvestres",
+          "c) Inventario de Corredores Ecológicos Prioritarios y otros elementos de conexión",
+          "d) Catálogo Andaluz de Especies Amenazadas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Catálogo Andaluz de Especies Amenazadas)."
+      },
+      {
+        question: "14. Una de las excepciones al régimen general de protección establecido en la Ley 42/2007, de 13 de diciembre, es la siguiente:",
+        options: [
+          "a) Si de su aplicación se derivaran efectos perjudiciales para la salud y seguridad de las personas",
+          "b) Por razones imperiosas de interés público de primer orden, excepto las de carácter socioeconómico",
+          "c) Para proteger la flora y la fauna silvestres y los hábitats naturales",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)."
+      },
+      {
+        question: "15. El buitre negro (Aegypius monachus) en Andalucía lo podemos encontrar preferentemente en...",
+        options: [
+          "a) Sierra Morena",
+          "b) Doñana",
+          "c) Sierra Nevada",
+          "d) Subbéticas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Sierra Morena)."
+      },
+      {
+        question: "16. De las ocho especies recogidas en el Plan de Recuperación y Conservación de Aves de Humedales, señale cuál de ellas está catalogada como vulnerable:",
+        options: [
+          "a) Fumarel común (Chlidonias niger)",
+          "b) Águila pescadora (Pandion haliaetus)",
+          "c) Porrón pardo (Aythya niroca)",
+          "d) Avetoro común (Botaurus stellaris)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Águila pescadora)."
+      },
+      {
+        question: "17. El Decreto 23/2012, de 14 de febrero, establece en su art. 14 el plazo máximo de resolución y silencio administrativo para el procedimiento de autorización para las excepciones al régimen general de protección de las especies silvestres. Este plazo es:",
+        options: [
+          "a) 2 meses, silencio desestimatorio",
+          "b) 3 meses, silencio desestimatorio",
+          "c) 2 meses, silencio estimatorio",
+          "d) 3 meses, silencio estimatorio"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2 meses, silencio desestimatorio)."
+      },
+      {
+        question: "18. La Red Andaluza de Centros de Recuperación, Conservación está compuesta por centros de las diferentes categorías, entre los que se encuentran los Centros de gestión de fauna amenazada. Atendiendo a la clasificación recogida en el art. 33 del Decreto 23/2012 de 14 de febrero, estos centros pueden ser... (señala la INCORRECTA):",
+        options: [
+          "a) Laboratorios de especies silvestres",
+          "b) Centros de recuperación de especies amenazadas",
+          "c) Muladares",
+          "d) Centros de gestión del medio marino"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "19. Cuando hablamos de \"un dispositivo externo colocado sobre las crucetas para evitar que se posen las aves\", según establece el artículo 2 del Real Decreto 1432/2008, de 29 de agosto, nos referimos a:",
+        options: [
+          "a) Disuasor de posada",
+          "b) Salvapájaros",
+          "c) Aislador",
+          "d) Ahuyentador"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Disuasor de posada)."
+      },
+      {
+        question: "20. Las medidas anticolisión reguladas en el art. 5 del Decreto 178/2006, de 10 de octubre, establecen que los salvapájaros o señalizadores estarán dispuestos cada:",
+        options: [
+          "a) 5 metros cuando el cable de tierra sea único",
+          "b) 10 metros, en todo caso",
+          "c) Se podrá prescindir de los salvapájaros en los cables de tierra cuando lleven adosado un cable de fibra óptica o similar, siempre que su sección no sea inferior a 20 mm",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)."
+      },
+      {
+        question: "21. El criterio seguido por el régimen sancionador que establece la Ley 42/2007, de 13 de diciembre, en su art. 80, para la clasificación de las infracciones tiene en cuenta:",
+        options: [
+          "a) El plazo de tiempo necesario para la recuperación del daño ocasionado",
+          "b) La superficie afectada y el ciclo de vida de las especies afectadas",
+          "c) El valor de los daños ocasionados y de los beneficios obtenidos",
+          "d) Ninguna es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "22. El plazo de prescripción de las infracciones muy graves, graves y leves que establece la Ley 42/2007, de 13 de diciembre en su art. 83, será:",
+        options: [
+          "a) 5, 2 y 1 año, respectivamente",
+          "b) 5, 3 y 1 año, respectivamente",
+          "c) 3, 2 y 1 año, respectivamente",
+          "d) 3, 2 y 6 meses, respectivamente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5, 3 y 1 año)."
+      },
+      {
+        question: "23. Según el art. 83 la Ley 8/2003, de flora y fauna silvestres, se pueden considerar como sanciones accesorias:",
+        options: [
+          "a) Las multas coercitivas",
+          "b) Las indemnizaciones por daños causados",
+          "c) La ocupación de los medios empleados para la ejecución de las infracciones",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La ocupación de los medios empleados)."
+      },
+      {
+        question: "24. De acuerdo con el art. 6 de la Ley 43/2003, de 21 de noviembre, de Montes, \"la repoblación, mediante siembra o plantación, de un terreno que era agrícola o estaba dedicado a otros usos no forestales\", se denomina:",
+        options: [
+          "a) Reforestación",
+          "b) Forestación",
+          "c) Repoblación Forestal",
+          "d) Cambio de uso"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Forestación)."
+      },
+      {
+        question: "25. A tenor de lo establecido en el art. 5 de la Ley de Montes estatal, las plantaciones de especies forestales de turno corto en régimen intensivo sobre terrenos agrícolas:",
+        options: [
+          "a) Se les aplica esta ley durante la vigencia de los turnos",
+          "b) Se les aplica esta ley durante la vigencia de los turnos, a menos que la comunidad autónoma decida expresamente un periodo más corto",
+          "c) Al ser terrenos agrícolas, lo dispuesto en esta Ley no les será de aplicación",
+          "d) Al ser terrenos agrícolas, lo dispuesto en esta Ley no les será de aplicación, salvo que la Delegación Territorial decida lo contrario"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "26. La ley 2/1992, de 15 de junio, Forestal de Andalucía, en su art. 1, excluye de la consideración legal de monte o terreno forestal:",
+        options: [
+          "a) Las construcciones e infraestructuras destinadas al servicio del monte",
+          "b) Terrenos que excluyan las CCAA",
+          "c) Terrenos con cultivos de plantas ornamentales y viveros",
+          "d) Todas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Terrenos con cultivos de plantas ornamentales y viveros)."
+      },
+      {
+        question: "27. Conforme al art. 27 de la Ley 2/1992, Forestal de Andalucía, serán considerados \"suelo no urbanizable de especial protección\":",
+        options: [
+          "a) Los montes públicos",
+          "b) Los montes protectores",
+          "c) Los montes dentro de espacios naturales protegidos",
+          "d) Los montes demaniales"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Los montes demaniales)."
+      },
+      {
+        question: "28. Los procedimientos de afectación y desafectación al dominio público son, conforme a los artículos 41 y 42 del Reglamento Forestal (Decreto 208/1997), y la Ley 9/2001, iniciados por la Consejería competente en Medio Ambiente, y resueltos por:",
+        options: [
+          "a) El titular de la Consejería, en plazo de 12 meses",
+          "b) El Consejo de Gobierno, en plazo de 12 meses",
+          "c) El titular de la Consejería, en plazo de 10 meses",
+          "d) El Consejo de Gobierno, en plazo de 10 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El Consejo de Gobierno, en plazo de 12 meses)."
+      },
+      {
+        question: "29. A tenor de la normativa forestal autonómica, deberán ajustarse a lo previsto en los PORN:",
+        options: [
+          "a) El planeamiento urbanístico",
+          "b) Los planes, programas y proyectos sectoriales, se ajustarán sólo a las normas de aplicación directa",
+          "c) Los instrumentos de ordenación forestal sólo cuando pertenecen a montes públicos",
+          "d) A y B son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y B son correctas)."
+      },
+      {
+        question: "30. Conforme a lo dispuesto en el art. 69 del Reglamento Forestal sobre ocupaciones en monte público, cuando sean de interés particular, es CIERTO que:",
+        options: [
+          "a) En el caso de comporte una actividad en el monte, sólo será posible si la Administración Forestal considera que dicha actividad es necesaria para la satisfacción del interés público",
+          "b) Si es incompatible con las funciones del monte, sólo podrá autorizarse a través de la declaración de interés general prevalente sobre el forestal por el Consejo de Gobierno",
+          "c) Cuando de los informes técnicos se desprenda la conveniencia de autorizar la ocupación se procederá a abrir un trámite de información pública...",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)."
+      },
+      {
+        question: "31. La Ley 43/2003, de 21 de noviembre, de Montes, determina la gravedad de las infracciones atendiendo a:",
+        options: [
+          "a) La valoración económica de los daños y/o plazo de tiempo necesario para la recuperación del monte",
+          "b) La valoración económica de los daños y superficie afectadas",
+          "c) La superficie afectada y la especie dañada",
+          "d) El tiempo necesario para la recuperación del daño y tipo de especie afectada"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "32. Según la Ley 2/1992, las infracciones graves en materia forestal prescribirán a los:",
+        options: [
+          "a) 2 años",
+          "b) 3 años",
+          "c) 1 año",
+          "d) Ninguna es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 1 año)."
+      },
+      {
+        question: "33. En base a lo dispuesto en el Anexo del Reglamento Forestal, el almez (Celtis australis) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 100 años",
+          "b) 70 años",
+          "c) 250 años",
+          "d) 450 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 450 años)."
+      },
+      {
+        question: "34. En base a lo dispuesto en el Anexo del Reglamento Forestal, el sauce (Salix sp.) tiene un ciclo vegetativo de:",
+        options: [
+          "a) 40 años",
+          "b) 60 años",
+          "c) 80 años",
+          "d) 100 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 40 años)."
+      },
+      {
+        question: "35. ¿Qué normativa regula y desarrolla actualmente la figura de Monumento Natural en Andalucía?",
+        options: [
+          "a) Decreto 95/2003, de 8 de abril",
+          "b) Decreto 239/1997, de 15 de octubre",
+          "c) Decreto 225/1999, de 9 de noviembre",
+          "d) Decreto 24/2007, de 30 de enero"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Decreto 225/1999, de 9 de noviembre)."
+      },
+      {
+        question: "36. Según la Ley 2/1989, de 18 de julio, el director-conservador de los EENNPP será nombrado por:",
+        options: [
+          "a) La Junta Rectora",
+          "b) El Consejo de Gobierno",
+          "c) El titular de la Consejería competente en medio ambiente",
+          "d) El titular de la Delegación Territorial de la provincia donde se ubique el EENNP"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El titular de la Consejería competente en medio ambiente)."
+      },
+      {
+        question: "37. ¿Cuántas Reservas Naturales Concertadas se han declarado hasta el momento en Andalucía?",
+        options: [
+          "a) 3",
+          "b) 4",
+          "c) 5",
+          "d) 6"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5)."
+      },
+      {
+        question: "38. Forman parte de la Red de Espacios Naturales Protegidos de Andalucía (RENPA) figuras de protección declaradas por normativa autonómica, estatal e internacional. Indique cuál de las siguientes categorías se encuentra representada en la RENPA:",
+        options: [
+          "a) Patrimonio de la Humanidad",
+          "b) Reserva Biogenética",
+          "c) Área protegida OSPAR",
+          "d) Todas son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Patrimonio de la Humanidad)."
+      },
+      {
+        question: "39. Conforme a lo dispuesto en el art. 36 de la Ley 42/2007, de 13 de diciembre, ¿en qué tipo de EENNPP es necesaria la previa elaboración y aprobación del correspondiente PORN?",
+        options: [
+          "a) Parque Nacional y Parque Natural",
+          "b) Parque Natural y Monumento Natural",
+          "c) Parque Natural y Reserva Natural",
+          "d) Reserva Natural y Parques Nacionales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Parque Natural y Reserva Natural)."
+      },
+      {
+        question: "40. Según establece el art. 6 de la Ley 30/2014, de 3 de diciembre, un Parque Nacional terrestre o marítimo terrestre insular, deberá cumplir los siguientes requerimientos territoriales:",
+        options: [
+          "a) Proporción relevante de las especies y comunidades propias del sistema natural",
+          "b) No puede existir suelo susceptible de transformación urbanística ni suelo urbanizado",
+          "c) Debe tener mínimo 5.000 Ha",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)."
+      },
+      {
+        question: "41. El art. 9 de la Ley 30/2014, de Parques Nacionales, establece un régimen de protección preventiva... Este régimen preventivo supone que no podrá otorgarse ninguna autorización, licencia o concesión adicional a las preexistentes sin informe previo favorable de la Adm. Ambiental, en el plazo de:",
+        options: [
+          "a) 2 meses",
+          "b) 3 meses",
+          "c) 4 meses",
+          "d) 6 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3 meses)."
+      },
+      {
+        question: "42. ¿Cuál de los siguientes espacios está declarado como Paraje Natural en Andalucía?",
+        options: [
+          "a) Desfiladero de los Gaitanes",
+          "b) Cañón de las Buitreras",
+          "c) Acantilado del Asperillo",
+          "d) Peñón del Zaframagón"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Desfiladero de los Gaitanes)."
+      },
+      {
+        question: "43. ¿Cuántos Parques Naturales tiene la provincia de Málaga?",
+        options: [
+          "a) 3",
+          "b) 4",
+          "c) 5",
+          "d) 6"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5)."
+      },
+      {
+        question: "44. Indique cuál de los siguientes espacios NO es una Reserva Natural:",
+        options: [
+          "a) Laguna Honda",
+          "b) Marismas de Isla Cristina",
+          "c) Laguna del Portil",
+          "d) Complejo Endorreico de Espera"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Marismas de Isla Cristina es Paraje Natural)."
+      },
+      {
+        question: "45. ¿En qué año se declaró el Parque Natural de la Sierra de Tejeda, Almijara y Alhama?",
+        options: [
+          "a) 1999",
+          "b) 1989",
+          "c) 2003",
+          "d) 1987"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1999)."
+      },
+      {
+        question: "46. La Laguna del Chinche es una Reserva Natural ubicada en la provincia de:",
+        options: [
+          "a) Málaga",
+          "b) Córdoba",
+          "c) Jaén",
+          "d) Almería"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Jaén)."
+      },
+      {
+        question: "47. El Parque Nacional de Doñana se extiende por las provincias de:",
+        options: [
+          "a) Sevilla y Huelva",
+          "b) Huelva y Cádiz",
+          "c) Sevilla, Huelva y Cádiz",
+          "d) Huelva"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Sevilla y Huelva)."
+      },
+      {
+        question: "48. ¿Cuál de los siguientes espacios NO es una reserva de la Biosfera?",
+        options: [
+          "a) Sierra de Cazorla, Segura y las Villas",
+          "b) Laguna de Fuente de Piedra",
+          "c) Marismas del Odiel",
+          "d) Dehesas de Sierra Morena"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Laguna de Fuente de Piedra)."
+      },
+      {
+        question: "49. Los Acantilados de Maro-Cerro Gordo han sido declarados como:",
+        options: [
+          "a) ZEPIM",
+          "b) ZEPA",
+          "c) Paraje Natural",
+          "d) Todas las anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las anteriores son correctas)."
+      },
+      {
+        question: "50. ¿Qué dos espacios naturales protegidos de Andalucía forman parte de la Lista Verde de Áreas Protegidas y Conservadas de la UICN?",
+        options: [
+          "a) Parque Natural de Grazalema y Parque Nacional de la Sierra de las Nieves",
+          "b) Parque Nacional de Doñana y Sierra Nevada",
+          "c) Espacio Natural de Doñana y Marismas del Odiel",
+          "d) Laguna de Fuente de Piedra y Parque Natural de Cazorla, Segura y las Villas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Doñana y Sierra Nevada)."
+      },
+      {
+        question: "51. De acuerdo con el artículo 57 del Estatuto de Autonomía de Andalucía, la competencia en materia de montes, explotaciones, aprovechamientos y servicios forestales, corresponde a la Comunidad Autónoma, y es:",
+        options: [
+          "a) Ejecutiva",
+          "b) Exclusiva",
+          "c) Compartida",
+          "d) Exclusiva, respecto a la legislación básica"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Exclusiva)."
+      },
+      {
+        question: "52. Según el art. 85.4 del Decreto 208/1997 (Reglamento forestal), la aprobación de los Proyectos de Ordenación y Planes Técnicos le corresponde a:",
+        options: [
+          "a) Al Consejero/a de medio ambiente",
+          "b) Al titular del monte cuando sean de titularidad pública...",
+          "c) Al titular de la Delegación Territorial con competencias en medio ambiente",
+          "d) Al titular de la Dirección General de Medio Natural, Biodiversidad y Espacios Protegidos"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Al titular de la Delegación Territorial)."
+      },
+      {
+        question: "53. En el art. 42 del Anexo I de las IGOMCA (y el art. 33 del Anexo II), dispone que los cuarteles se designarán por:",
+        options: [
+          "a) Números arábigos",
+          "b) Letras mayúsculas, empezando por la \"A\"",
+          "c) Letras minúsculas, comenzando por la \"a\"",
+          "d) Números ordinales correlativos, a partir del 1º"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Letras mayúsculas, empezando por la 'A')."
+      },
+      {
+        question: "54. En relación con las parcelas de muestreo que se utilizan cuando se aplica el muestreo estadístico, el art. 61 del Anexo I de las IGOMCA (y el art. 50 del Anexo II) dispone que:",
+        options: [
+          "a) Las parcelas deberán ser circulares de radio variable",
+          "b) Cuando la masa proceda de repoblaciones con marco de plantación cuadrado o rectangular...",
+          "c) Preferible que sean parcelas circulares de radio fijo",
+          "d) A y B son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Preferible que sean parcelas circulares de radio fijo)."
+      },
+      {
+        question: "55. Conforme a lo dispuesto en el art. 43 del Anexo I (y el art. 34 del Anexo II) de las IGOMCA, ¿Cuál de las siguientes es considerada como la unidad básica de referencia espacial de carácter permanente?",
+        options: [
+          "a) Cantón",
+          "b) Unidad de ordenación",
+          "c) Cuartel",
+          "d) Rodal"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cantón)."
+      },
+      {
+        question: "56. ¿De cuántos años disponen los titulares de los montes que tengan la obligación de tener un instrumento de gestión forestal, para dotarse de él, según la Disposición transitoria segunda de la Ley 43/2003, de Montes?",
+        options: [
+          "a) 15 años desde la entrada en vigor de dicha Ley",
+          "b) 25 años desde la entrada en vigor de dicha Ley",
+          "c) 20 años desde la entrada en vigor de dicha Ley",
+          "d) A y B son correctas, dependiendo de si son montes públicos o privados protectores"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 25 años)."
+      },
+      {
+        question: "57. En relación con los incentivos por externalidades ambientales que establece la Ley de Montes en su artículo 65, las Administraciones Públicas podrán aportar dichos incentivos por las siguientes vías (señala la INCORRECTA):",
+        options: [
+          "a) Subvenciones al propietario de los trabajos dirigidos a la gestión forestal sostenible",
+          "b) Establecimiento de una relación contractual con el propietario",
+          "c) Apoyo y colaboración de las Agencias Públicas de la Administración en trabajos técnicos requeridos",
+          "d) Inversión directa por la Administración"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "58. La organización de las actuaciones y los aprovechamientos de los terrenos forestales se realizarán, según el art. 83.1 del Reglamento Forestal, preferentemente por:",
+        options: [
+          "a) Planes de Aprovechamientos",
+          "b) Planes Técnicos de Ordenación",
+          "c) Proyectos de Ordenación de Montes",
+          "d) Convenios con la Administración Forestal"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Proyectos de Ordenación de Montes)."
+      },
+      {
+        question: "59. Conforme al art. 71 del Anexo I, el error relativo admisible para la variable \"volumen maderable\" o \"biomasa\", cuando se aplica el muestreo estadístico para el inventario del recurso madera... será:",
+        options: [
+          "a) Del 30% (con una probabilidad fiducial del 95%)",
+          "b) Inferior al 25% (con una probabilidad fiducial del 95%)",
+          "c) Igual al 20% (con una probabilidad fiducial del 95%)",
+          "d) Inferior al 15% (con una probabilidad fiducial del 95%)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Inferior al 15%)."
+      },
+      {
+        question: "60. ¿Qué tipo de inventario se podría utilizar para una Unidad Inventarial (UI) de categoría G: 'Masas cuyas especies principales son de crecimiento lento y los métodos de regeneración no incluyen la realización de cortas'...?",
+        options: [
+          "a) Muestreo estadístico para masas arboladas",
+          "b) Muestreo estadístico para recurso piña",
+          "c) Estimación pericial",
+          "d) A y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: A y C son correctas)."
+      },
+      {
+        question: "61. En relación con el Título Segundo (Planificación), ¿cómo se denomina el paso del Estado inicial al Estado final elegido para el monte, según el art. 109 del Anexo I de las IGOMCA?",
+        options: [
+          "a) Plan General",
+          "b) Plan Especial",
+          "c) Horizonte temporal de la ordenación",
+          "d) Determinación del modelo de usos"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Horizonte temporal de la ordenación)."
+      },
+      {
+        question: "62. Los Programas anuales de aprovechamientos serán redactados, conforme al art. 66 de la Ley Forestal de Andalucía, para:",
+        options: [
+          "a) Todos los montes que tengan un instrumento de gestión aprobado",
+          "b) Todos los montes, independientemente de la titularidad",
+          "c) Todos los montes públicos",
+          "d) A y B son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Todos los montes públicos)."
+      },
+      {
+        question: "63. ¿Qué especies se encuentran recogidas en el Anexo III de la Directiva Aves?",
+        options: [
+          "a) Especies de aves vulnerables",
+          "b) Especies de aves migratorias no incluidas en el Anexo I, de paso regular por el territorio de la UE",
+          "c) Especies de aves comercializables",
+          "d) Especies de aves objeto de caza"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Especies de aves comercializables)."
+      },
+      {
+        question: "64. La Directiva Hábitat define los tipos de hábitats naturales prioritarios como:",
+        options: [
+          "a) Aquellos que constituyen ejemplos representativos...",
+          "b) Aquellos de distribución natural reducida",
+          "c) Los amenazados de desaparición",
+          "d) Todos los anteriores"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Los amenazados de desaparición)."
+      },
+      {
+        question: "65. La declaración de Zonas de Especial Protección para las Aves, se realiza para (señalar la respuesta CORRECTA):",
+        options: [
+          "a) Para las especies del Anexo I de la Directiva Aves, exclusivamente",
+          "b) Para las especies del Anexo I, y las migratorias de paso regular por el territorio de los Estados miembros",
+          "c) Para todas las especies del ámbito de aplicación de la Directiva Aves",
+          "d) Para las especies incluidas en el Anexo I, con especial atención a las migratorias"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "66. El Anexo III de la Directiva 92/43/CEE, relativa a la conservación de los hábitats naturales y la flora y fauna silvestres, recoge:",
+        options: [
+          "a) Los criterios de selección de los lugares que pueden clasificarse como lugares de interés comunitario y designarse como zonas de especial conservación",
+          "b) Los criterios de selección de los espacios que pueden declararse como hábitats naturales...",
+          "c) Las especies de interés comunitario de carácter prioritario",
+          "d) Las especies y hábitats de interés comunitario de carácter prioritario"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "67. Mediante la Decisión (UE) 2022/591, del Parlamento Europeo y del Consejo, se ha aprobado el VIII Programa General de Acción de la Unión en materia de Medio Ambiente hasta 2030, que recoge 6 objetivos prioritarios temáticos. Señale cuál de los siguientes, NO es uno de ellos:",
+        options: [
+          "a) Reducción rápida y predecible de las emisiones de gases de efecto invernadero",
+          "b) Evolución hacia una economía del bienestar...",
+          "c) Consecución del objetivo de contaminación cero",
+          "d) Todos los anteriores son objetivos prioritarios temáticos del VIII PMA"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todos los anteriores son objetivos prioritarios temáticos)."
+      },
+      {
+        question: "68. ¿Qué Anexo de la Directiva Hábitat recoge las especies animales y vegetales de interés comunitario que requieren una protección estricta?",
+        options: [
+          "a) Anexo II",
+          "b) Anexo IV",
+          "c) Anexo V",
+          "d) Anexo VI"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Anexo IV)."
+      },
+      {
+        question: "69. Según establece la Ley 42/2007, de 13 de diciembre, cualquier plan, programa o proyecto que pueda afectar de forma apreciable a las especies o hábitats de los ZEC y ZEPAS, se someterá a una adecuada evaluación... Conforme al art. 46, la \"concurrencia de razones imperiosas de interés público de primer orden\" sólo podrá declararse para cada supuesto concreto:",
+        options: [
+          "a) Mediante aprobación de la Comisión Europea",
+          "b) Mediante Acuerdo del Consejo de Ministros cuando se trate de planes, programas o proyectos que deban ser aprobados o autorizados por la AGE o del órgano de Gobierno de la comunidad autónoma",
+          "c) Mediante una ley",
+          "d) B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: B y C son correctas)."
+      },
+      {
+        question: "70. El reparto justo y equitativo de los beneficios derivados de la utilización de los recursos genéticos es uno de los objetivos principales del/de la...",
+        options: [
+          "a) Conferencia de Estocolmo",
+          "b) Agenda 2030 de Naciones Unidas",
+          "c) Convenio sobre la Diversidad Biológica",
+          "d) Convenio de Barcelona"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Convenio sobre la Diversidad Biológica)."
+      },
+      {
+        question: "71. De acuerdo con el Reglamento (CE) 338/1997, para la importación en la UE de especies incluidas en CITES, será necesaria la obtención de un permiso de importación:",
+        options: [
+          "a) Este permiso será necesario para especímenes del Anexo A, B o C",
+          "b) Para especies incluidas en el Apéndice I del Convenio CITES, el país exportador requerirá un permiso previo de importación",
+          "c) Si los especímenes del Anexo A han sido criados en cautividad, no será necesario el proyecto justificativo...",
+          "d) Sólo B y C son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Sólo B y C son correctas)."
+      },
+      {
+        question: "72. El/la depositario/a del Convenio CITES es:",
+        options: [
+          "a) La UICN",
+          "b) La UNESCO",
+          "c) El PNUMA de Naciones Unidas",
+          "d) Suiza"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Suiza)."
+      },
+      {
+        question: "73. La sede de la Agencia Europea de Medio Ambiente está ubicada en:",
+        options: [
+          "a) París",
+          "b) Copenhague",
+          "c) Bruselas",
+          "d) Estrasburgo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Copenhague)."
+      },
+      {
+        question: "74. ¿Cuántas regiones biogeográficas establece la Directiva Hábitat?:",
+        options: [
+          "a) 5",
+          "b) 7",
+          "c) 9",
+          "d) 11"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 9 regiones)."
+      },
+      {
+        question: "75. El nuevo Programa LIFE, aprobado mediante el Reglamento (UE) 2021/783, abarca el periodo:",
+        options: [
+          "a) 2022-2030",
+          "b) 2021-2027",
+          "c) 2021-2025",
+          "d) 2022-2026"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2021-2027)."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50),
+      "b3": allQuestions.slice(50, 75)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMAS 3, 4, 5, 12, 16 Y 18 - TEST DE REPASO-1 (COMPLETO 75 PREGUNTAS)",
+        "b1": "TEMAS 3, 4, 5, 12, 16 Y 18 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "b2": "TEMAS 3, 4, 5, 12, 16 Y 18 - BLOQUE 2 (PREGUNTAS 26 A 50)",
+        "b3": "TEMAS 3, 4, 5, 12, 16 Y 18 - BLOQUE 3 (PREGUNTAS 51 A 75)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

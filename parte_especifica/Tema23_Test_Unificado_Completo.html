@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 23 (Residuos y Suelos Contaminados)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 23 Unificado Completo (80 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Básico Nº 1 (50 Preguntas)">
+          <option value="t1_all">Test Básico Nº 1 - Completo (1 - 50)</option>
+          <option value="t1_b1">Test Básico Nº 1 - Bloque 1 (1 - 25)</option>
+          <option value="t1_b2">Test Básico Nº 1 - Bloque 2 (26 - 50)</option>
+        </optgroup>
+        <optgroup label="Test de Autoevaluación Nº 1 (30 Preguntas)">
+          <option value="t2_all">Test Autoevaluación - Completo (1 - 30)</option>
+          <option value="t2_b1">Test Autoevaluación - Bloque 1 (1 - 15)</option>
+          <option value="t2_b2">Test Autoevaluación - Bloque 2 (16 - 30)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 23 - RESIDUOS Y SUELOS CONTAMINADOS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- ¿Cuál es la normativa Estatal básica en materia de residuos y suelos contaminados?",
+        options: [
+          "a) Ley 7/2022 de 8 de abril",
+          "b) Ley 22/2011 de 28 de julio",
+          "c) Ley 7/2007, de 9 de julio",
+          "d) Ley 42/2007, de 13 de diciembre"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley 7/2022 de 8 de abril)[cite: 196]."
+      },
+      {
+        question: "2.- Según las definiciones establecidas en el artículo 2 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, toda persona física o jurídica que organice la valorización o la eliminación de residuos por encargo de terceros, incluidas aquellas que no tomen posesión física de los residuos, se corresponde con la definición de:",
+        options: [
+          "a) Negociante",
+          "b) Agente",
+          "c) Productor",
+          "d) Poseedor"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Agente)[cite: 196]."
+      },
+      {
+        question: "3.- Según las definiciones establecidas en el artículo 2 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, la gestión de residuos sería:",
+        options: [
+          "a) La recogida, el transporte, la valorización y la eliminación de los residuos, incluida la clasificación y otras operaciones previas; así como la vigilancia de estas operaciones y el mantenimiento posterior al cierre de los vertederos. Se incluyen también las actuaciones realizadas en calidad de negociante o agente.",
+          "b) La primera comercialización de un producto en el mercado nacional.",
+          "c) Cualquier operación que no sea la valorización...",
+          "d) La operación de valorización consistente en la comprobación, limpieza o reparación..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 196]."
+      },
+      {
+        question: "4.- Según el artículo 3 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, dicha Ley será de aplicación a:",
+        options: [
+          "a) Todo tipo de residuos, teniendo en cuenta las exclusiones recogidas en los apartados 2, 3 y 4.",
+          "b) Los productos de plástico de un solo uso enumerados en el anexo IV...",
+          "c) Los suelos contaminados, que se regirán por el título VIII.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 196]."
+      },
+      {
+        question: "5.- Señale la respuesta correcta en lo relativo a la jerarquía de residuos establecida en el artículo 8 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular:",
+        options: [
+          "a) Dentro del orden de prioridad de la jerarquía de residuos la preparación para la reutilización irá antes que la prevención.",
+          "b) Dentro del orden de prioridad de la jerarquía de residuos el reciclado irá antes que la preparación para la reutilización.",
+          "c) Si para conseguir el mejor resultado medioambiental global en determinados flujos de residuos fuera necesario apartarse de dicha jerarquía, se podrá adoptar un orden distinto de prioridades previa justificación",
+          "d) La valorización será la última opción dentro de la jerarquía de residuos."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 196]."
+      },
+      {
+        question: "6.- Según el artículo 12 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, ¿quién será competente para ejercer la potestad de autorización, vigilancia, inspección y sanción de las actividades de producción y gestión de residuos y de las competencias establecidas en el título VIII sobre suelos contaminados?",
+        options: [
+          "a) El Estado",
+          "b) Las Comunidades autónomas",
+          "c) Los municipios",
+          "d) El productor o poseedor inicial de los residuos."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las Comunidades autónomas)[cite: 196]."
+      },
+      {
+        question: "7.- El artículo 14 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular establece que la evaluación de los programas de prevención de residuos se llevará a cabo como mínimo cada:",
+        options: [
+          "a) 2 años",
+          "b) 4 años",
+          "c) 5 años",
+          "d) 6 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 6 años)[cite: 196]."
+      },
+      {
+        question: "8.- El artículo 17 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular establece que con la finalidad de romper el vínculo entre el crecimiento económico y los impactos sobre la salud humana y el medio ambiente asociados a la generación de residuos, las políticas de prevención de residuos se encaminarán a lograr un objetivo de reducción en peso de los residuos generados:",
+        options: [
+          "a) Un 13% respecto a los generados en 2010, para el año 2025",
+          "b) Un 15% respecto a los generados en 2010, para el año 2025",
+          "c) Un 15% respecto a los generados en 2010, para el año 2030",
+          "d) Las respuestas a) y c) son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas a y c son correctas)[cite: 196]."
+      },
+      {
+        question: "9.- El artículo 18, Medidas de prevención, de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular obliga a que, a partir del 1 de julio de 2022, los productores iniciales de residuos peligrosos estarán obligados a disponer de un plan de minimización... los productores deberán informar de los resultados a la comunidad autónoma donde esté ubicado el centro productor:",
+        options: [
+          "a) Cada año",
+          "b) Cada 2 años",
+          "c) Cada 4 años",
+          "d) Cada 5 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cada 4 años)[cite: 196]."
+      },
+      {
+        question: "10.- ¿Cuál de las siguientes no será una obligación del productor inicial u otro poseedor relativas a la gestión de sus residuos según lo establecido en el artículo 20 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular?",
+        options: [
+          "a) Realizar el tratamiento de los residuos por sí mismo...",
+          "b) Encargar el tratamiento de sus residuos a un negociante registrado...",
+          "c) Entregar los residuos a una entidad pública o privada de recogida...",
+          "d) Todas las opciones son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)[cite: 196]."
+      },
+      {
+        question: "11.- El mismo artículo establece que para facilitar la gestión de los residuos, el productor inicial u otro poseedor de residuos, estará obligado a: (señalar la respuesta incorrecta)",
+        options: [
+          "a) Suministrar a las empresas autorizadas para llevar a cabo la gestión de residuos la información necesaria...",
+          "b) Proporcionar a las entidades locales información sobre los residuos que les entreguen...",
+          "c) Informar en el plazo máximo de 24 horas a la administración ambiental competente en caso de desaparición, pérdida o escape de residuos peligrosos...",
+          "d) Identificar los residuos, antes de la entrega para su gestión..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La obligación de informar es 'inmediatamente', no en el plazo máximo de 24 horas)[cite: 196]."
+      },
+      {
+        question: "12.- A tenor de lo establecido en el artículo 21 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, relativo a las obligaciones del productor inicial u otro poseedor relativas al almacenamiento, mezcla, envasado y etiquetado de residuos, la duración máxima del almacenamiento en el lugar de producción de residuos peligrosos será:",
+        options: [
+          "a) Inferior a 2 años cuando se destinen a valorización y a 1 año cuando se destinen a eliminación.",
+          "b) Inferior a 1 año cuando se destinen a valorización y a 2 años cuando se destinen a eliminación.",
+          "c) Inferior a 6 meses en todos los casos.",
+          "d) Ninguna de las respuestas anteriores es correcta."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Es de 6 meses como norma general, ampliable motivadamente por la C.A. hasta un máximo de 1 año)[cite: 196]."
+      },
+      {
+        question: "13.- Señale la respuesta incorrecta en lo relativo a la autorización de las operaciones de recogida y tratamiento de residuos, según lo recogido en el artículo 33 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular:",
+        options: [
+          "a) Las instalaciones móviles de tratamiento de residuos serán autorizadas por la comunidad autónoma donde tenga la sede social...",
+          "b) La persona física o jurídica que tenga intención de llevar a cabo una operación de valorización o eliminación de residuos sin instalación (relleno, tratamiento de los suelos, entre otros) no necesitará solicitar la autorización contemplada en el apartado 2, pero deberá realizar una comunicación previa...",
+          "c) Quedan sometidas al régimen de autorización... las instalaciones de almacenamiento en el ámbito de la recogida con carácter profesional...",
+          "d) Quedan sometidas al régimen de autorización... las instalaciones fijas donde vayan a realizarse operaciones de tratamiento..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Las operaciones sin instalación sí requieren autorización previa, no mera comunicación)[cite: 196]."
+      },
+      {
+        question: "14.- Señale la respuesta correcta relativa a la reducción del impacto de determinados productos de plástico en el medio ambiente, según lo recogido en el Título V de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular:",
+        options: [
+          "a) Para los productos de plástico de un solo uso, incluidos en la parte A del anexo IV, se establece un calendario de reducción de la comercialización, de manera que para 2030 se ha de conseguir una reducción del 70% en peso, con respecto a 2022",
+          "b) Para la recogida separada de botellas de plástico, se establece un objetivo de recogida separada...",
+          "c) Queda prohibida la introducción en el mercado de cualquier producto de plástico...",
+          "d) Queda prohibida la introducción en el mercado de microesferas de plástico de más de 55 milímetros..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Reducción del 70% en peso para 2030 respecto a 2022)[cite: 196]."
+      },
+      {
+        question: "15.- ¿Cuál es el tipo impositivo del impuesto especial sobre envases de plástico no reutilizables establecido en el Capítulo I del Título VII de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular?",
+        options: [
+          "a) 5 euros por tonelada",
+          "b) 0,45 euros por kilogramo",
+          "c) La cantidad de plástico no reciclado, expresada en toneladas...",
+          "d) El tipo impositivo se determinará reglamentariamente."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 0,45 euros por kilogramo)[cite: 196]."
+      },
+      {
+        question: "16.- Según el Anexo I de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, un residuo que, generalmente liberando oxígeno, pueden provocar o facilitar la combustión de otras sustancias, se clasifica como:",
+        options: [
+          "a) Explosivo",
+          "b) Inflamable",
+          "c) Comburente",
+          "d) Corrosivo"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Comburente)[cite: 196]."
+      },
+      {
+        question: "17.- Dentro de las operaciones a las que pueden someterse los distintos tipos de residuos, según lo recogido en los Anexos II y III de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, ¿Cuál de las siguientes consiste en una operación de valorización?",
+        options: [
+          "a) R1204 Mezclas para obtener una materia homogénea y estable de residuos para su valorización posterior.",
+          "b) D0906 Desorción térmica.",
+          "c) D0102 Depósito en el interior del suelo.",
+          "d) Todas son operaciones de valorización"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Las operaciones con código R son de valorización)[cite: 196]."
+      },
+      {
+        question: "18.- Según el artículo 98 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, será competencia de los entes locales:",
+        options: [
+          "a) La autorización de la eliminación directa de residuos peligrosos en vertedero",
+          "b) Promover la participación de los agentes económicos y sociales en la gestión de residuos",
+          "c) La autorización de los sistemas integrados de gestión de residuos...",
+          "d) La prestación de los servicios públicos de recogida, transporte y, en su caso, la eliminación de los residuos urbanos en la forma que se establezca en sus respectivas ordenanzas y de acuerdo con los objetivos establecidos por la Administración de la Junta de Andalucía en los instrumentos de planificación"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 196]."
+      },
+      {
+        question: "19.- El artículo 101 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que estarán sometidas al régimen de autorización administrativa las actividades de gestión de residuos, estableciéndose un plazo de resolución y notificación de esta autorización de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 9 meses",
+          "d) 10 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 meses)[cite: 196]."
+      },
+      {
+        question: "20.- Señale la respuesta correcta en lo relativo a admisión de residuos en las distintas clases de vertederos, según el artículo 107 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental:",
+        options: [
+          "a) Los residuos que se vayan a depositar en un vertedero deberán cumplir con los criterios de admisión para cada tipo de vertedero...",
+          "b) Sólo podrán depositarse en un vertedero aquellos residuos que hayan sido objeto de tratamiento...",
+          "c) La Consejería competente en materia de medio ambiente podrá autorizar el depósito en vertedero de los residuos peligrosos...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 196]."
+      },
+      {
+        question: "21.- Según las definiciones establecidas en el artículo 3 del Decreto 73/2012 de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, se considerarán residuos no municipales:",
+        options: [
+          "a) Los neumáticos fuera de uso aunque estén en posesión del usuario o propietario del vehículo que los utiliza.",
+          "b) Los residuos de construcción y demolición generados en las obras mayores y menores.",
+          "c) Los residuos producidos en explotaciones agrícolas y en particular, los plásticos agrícolas.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Los plásticos agrícolas)[cite: 196]."
+      },
+      {
+        question: "22.- El artículo 4 del Decreto 73/2012 de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece una clasificación de los residuos siguiendo distintos criterios. Dependiendo de su origen los residuos podrán ser:",
+        options: [
+          "a) Domésticos, Industriales, Comerciales o Agrícolas",
+          "b) Municipales o no municipales",
+          "c) Peligrosos o no peligrosos",
+          "d) Municipales, regionales, nacionales o comunitarios."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Domésticos, Industriales, Comerciales o Agrícolas)[cite: 196]."
+      },
+      {
+        question: "23.- ¿Dónde podremos encontrar los tratamientos finales obligatorios de valorización y eliminación que tienen que recibir los residuos producidos o gestionados en Andalucía en función de la categoría a la que pertenezcan de acuerdo con la Lista Europea de Residuos?, según lo established en el artículo 7 del Decreto 73/2012 de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía.",
+        options: [
+          "a) En el Anexo VIII del Decreto 73/2012...",
+          "b) En los reglamentos de desarrollo para cada flujo de residuos...",
+          "c) En el Catálogo de residuos de Andalucía",
+          "d) En la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: En el Catálogo de residuos de Andalucía)[cite: 196]."
+      },
+      {
+        question: "24.- El artículo 10 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que quedan exentas de la condición de persona o entidad productora de residuos peligrosos:",
+        options: [
+          "a) Cualquier persona física o jurídica que genere o importe residuos peligrosos.",
+          "b) Las administraciones locales cuando asuman la producción de los residuos domésticos peligrosos.",
+          "c) Las personas o entidades titulares de las instalaciones en las que tengan lugar actividades de gestión de residuos peligrosos...",
+          "d) Las personas o entidades titulares de las industrias o actividades que no superen los 500 kilogramos/año de producción de residuos peligrosos, siempre y cuando suscriban un contrato de cesión con una persona o entidad gestora de residuos peligrosos autorizada..."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 196]."
+      },
+      {
+        question: "25.- ¿Cuál de las siguientes no es una obligación de las establecidas en el artículo 13 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía para las personas o entidades productoras de residuos peligrosos?",
+        options: [
+          "a) Solicitar autorización administrativa para llevar a cabo su actividad.",
+          "b) Entregar los residuos a una persona o entidad negociante o a una empresa autorizada...",
+          "c) Suministrar a las empresas o entidades a quienes entreguen sus residuos la información necesaria...",
+          "d) Informar inmediatamente a la correspondiente Delegación provincial... en caso de desaparición, pérdida o escape..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Los productores de R.P. están sujetos a comunicación previa, no a autorización administrativa de su actividad de producción)[cite: 196]."
+      },
+      {
+        question: "26.- Según el artículo 26 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, serán objeto de inscripción registral:",
+        options: [
+          "a) Las personas o entidades titulares de las actividades en las que se produzcan residuos no municipales no peligrosos en cantidades que superen las 1.000 toneladas anuales.",
+          "b) Las instalaciones en las que se desarrollen operaciones de tratamiento de residuos...",
+          "c) Las estaciones depuradoras de aguas residuales urbanas e industriales...",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 196]."
+      },
+      {
+        question: "27.- El artículo 28 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que quedan sometidas al régimen de autorización administrativa por la Consejería con competencia en materia de medio ambiente:",
+        options: [
+          "a) Las instalaciones ubicadas en Andalucía donde vayan a desarrollarse operaciones de valorización o eliminación...",
+          "b) Las personas o entidades que realicen operaciones de tratamiento de residuos...",
+          "c) Las respuestas a) y b) son correctas.",
+          "d) Las entidades o empresas que lleven a cabo la eliminación de sus propios residuos no peligrosos..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las respuestas a y b son correctas)[cite: 196]."
+      },
+      {
+        question: "28.- El artículo 32 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que las autorizaciones reguladas en dicho reglamento se concederán por un plazo máximo de:",
+        options: [
+          "a) 10 años, pasado el cual se renovarán automáticamente...",
+          "b) 8 años, pasado el cual se renovarán automáticamente por períodos sucesivos, y se inscribirán de oficio en el registro",
+          "c) 10 años, pasado el cual se necesitará solicitar una nueva autorización.",
+          "d) 8 años, pasado el cual se necesitará solicitar una nueva autorización."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 8 años, renovables automáticamente)[cite: 196]."
+      },
+      {
+        question: "29.- El artículo 41 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que el traslado de residuos en el interior del territorio del Estado estará sometido a:",
+        options: [
+          "a) Notificación previa, con al menos diez días de antelación, a la Dirección General con competencia en residuos...",
+          "b) Notificación previa, con al menos tres días de antelación...",
+          "c) Autorización previa, con al menos diez días de antelación...",
+          "d) Autorización previa, con al menos tres días de antelación..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Notificación previa con 10 días de antelación)[cite: 196]."
+      },
+      {
+        question: "30.- El artículo 68 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, relativo a la resolución de la autorización de sistemas colectivos establece que dichas autorizaciones:",
+        options: [
+          "a) Se concederán por el periodo que se establezca en la regulación específica. En su ausencia, la autorización tendrá una duración de cuatro años...",
+          "b) Se concederán por el periodo que se establezca en la regulación específica. En su ausencia, la autorización tendrá una duración de cinco años, pudiendo ser renovable por períodos iguales previa audiencia de la persona interesada. En caso de no solicitarse dicha renovación, se entenderá expirado el plazo de vigencia de la misma",
+          "c) Se concederán por el periodo que se establezca en la regulación específica. En su ausencia, la autorización tendrá una duración de diez años...",
+          "d) Se concederá por un plazo de 8 años."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5 años renovables)[cite: 196]."
+      },
+      {
+        question: "31.- El artículo 99 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que se garantizará al menos la existencia de un punto de recogida para plásticos agrícolas:",
+        options: [
+          "a) En cada municipio que lo necesite.",
+          "b) En cada provincia donde se produzcan más de 10 toneladas año de dichos residuos.",
+          "c) Cada 10.000 hectáreas de superficie agrícola cultivada bajo plástico.",
+          "d) Todas las respuestas son falsas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cada 10.000 hectáreas de superficie agrícola cultivada bajo plástico)[cite: 196]."
+      },
+      {
+        question: "32.- A tenor de lo establecido en el artículo 109 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, los residuos punzantes y cortantes que hayan estado en contacto con fluidos corporales, con independencia de su origen, se encuadrarán dentro del grupo:",
+        options: [
+          "a) Grupo II",
+          "b) Grupo III",
+          "c) Grupo IV",
+          "d) Grupo V"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grupo III)[cite: 196]."
+      },
+      {
+        question: "33.- ¿Qué residuos no serán admisibles en los puntos limpios según lo establecido en el artículo 124 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía?",
+        options: [
+          "a) Residuos sin segregar, sin identificar o en condiciones que puedan perjudicar el almacenamiento temporal en las instalaciones",
+          "b) Animales muertos y desperdicios de origen animal",
+          "c) Residuos sanitarios de los grupos III, IV y V.",
+          "d) Todas las opciones son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)[cite: 196]."
+      },
+      {
+        question: "34.- La Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular establece que el ejercicio de una actividad descrita en esta ley sin la preceptiva comunicación o autorización... siempre que haya supuesto peligro grave o daño a la salud de las personas, se haya producido un daño o deterioro grave para el medio ambiente o cuando la actividad tenga lugar en espacios protegidos, se considerará infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Grave si se producen daños al medio ambiente por valor de más de 150.000 €"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy Grave)[cite: 196]."
+      },
+      {
+        question: "35.- La infracción descrita en el apartado anterior llevará asociada una sanción pecuniaria consistente en:",
+        options: [
+          "a) Multa desde 100.001 euros hasta 3.500.000 euros, excepto si se trata de residuos peligrosos o suelos contaminados, en cuyo caso la multa será desde 600.001 euros hasta 3.500.000 euros",
+          "b) Multa desde 2.001 euros hasta 100.000 euros...",
+          "c) Multa de hasta 2.000 euros...",
+          "d) Ninguna opción es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 196]."
+      },
+      {
+        question: "36.- Según lo establecido en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, el abandono, almacenamiento, vertido o eliminación incontrolados de cualquier tipo de residuos no peligrosos, sin que se haya producido un daño o deterioro grave... se considerará infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) Especialmente grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 196]."
+      },
+      {
+        question: "37.- Según el artículo 138 del Decreto 73/2012 de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía y el artículo 159 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, ¿cuál será el órgano competente para la imposición de una sanción en materia de residuos que asciende a 35.000 €?",
+        options: [
+          "a) A la persona titular de la correspondiente Delegación Provincial",
+          "b) A la persona titular de la Dirección General competente en materia de residuos",
+          "c) A la persona titular de la Consejería competente en materia de medio ambiente",
+          "d) Al Consejo de Gobierno"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: A la persona titular de la correspondiente Delegación Provincial)[cite: 196]."
+      },
+      {
+        question: "38.- Según la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, en su artículo 98, ¿a quién corresponde la declaración y delimitación de suelos contaminados mediante resolución expresa?",
+        options: [
+          "a) Al Estado",
+          "b) Al Gobierno",
+          "c) A las Comunidades Autónomas",
+          "d) A los Municipios"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: A las Comunidades Autónomas)[cite: 196]."
+      },
+      {
+        question: "39.- Según las definiciones que nos encontramos en el artículo 90 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, aquellas actividades de tipo industrial, comercial y de servicios en las que, ya sea por el manejo de sustancias peligrosas ya sea por la generación de residuos, se puede producir contaminación del suelo, se denominan:",
+        options: [
+          "a) Actividades contaminantes del suelo",
+          "b) Actividades peligrosas por su afección al suelo",
+          "c) Actividades potencialmente contaminantes del suelo",
+          "d) Actividades contaminantes"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Actividades potencialmente contaminantes del suelo)[cite: 196]."
+      },
+      {
+        question: "40.- Según el artículo 93 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad ambiental, ¿a quién corresponde la declaración y delimitación de un determinado suelo como contaminado?",
+        options: [
+          "a) A la Administración General del Estado",
+          "b) A la Consejería competente en materia de medio ambiente",
+          "c) A la Dirección General competente en materia de suelos contaminados",
+          "d) A los municipios."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: A la Consejería competente en materia de medio ambiente)[cite: 196]."
+      },
+      {
+        question: "41.- Según establece el artículo 5 del Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados, la declaración y delimitación de los suelos contaminados será competencia:",
+        options: [
+          "a) De la Administración General del Estado",
+          "b) De la Consejería competente en materia de medio ambiente",
+          "c) De la Dirección General competente en materia de suelos contaminados",
+          "d) De los municipios"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: De los municipios / Entes locales según plantilla oficial del test)[cite: 196]."
+      },
+      {
+        question: "42.- El artículo 14 del Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados establece que el plazo de resolución por la que se declara un suelo contaminado será de:",
+        options: [
+          "a) 3 meses",
+          "b) 4 meses",
+          "c) 6 meses",
+          "d) 8 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 meses)[cite: 196]."
+      },
+      {
+        question: "43.- Señale la opción incorrecta sobre las condiciones para la realización del proyecto de descontaminación recogidas en el artículo 22 del Decreto 18/2015 de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados:",
+        options: [
+          "a) Cuando estas técnicas impliquen excavación y traslado del suelo contaminado fuera del emplazamiento...",
+          "b) Si fuera necesario establecer zonas de acopio temporal... El período de acopio no podrá exceder de seis meses.",
+          "c) Cuando la restitución topográfica de la zona excavada requiera el aporte de suelos...",
+          "d) La descontaminación del suelo deberá realizarla una persona física o jurídica productora de residuos peligrosos autorizada para la técnica a desarrollar."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 196]."
+      },
+      {
+        question: "44.- Señale la opción correcta en lo relativo a las disposiciones comunes de la fase de Instrucción de los Procedimientos de declaración de Suelo contaminado... recogidas en el Decreto 18/2015, de 27 de enero:",
+        options: [
+          "a) El órgano competente en la instrucción del procedimiento en caso de constatarse afección al medio hídrico dará traslado a la Administración Hidráulica...",
+          "b) En caso de que se hayan detectado riesgos para la salud humana... lo pondrá en conocimiento de la Consejería competente en materia de salud.",
+          "c) El órgano competente en la instrucción del procedimiento, dará traslado a la Consejería competente en materia de minas...",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 196]."
+      },
+      {
+        question: "45.- Según lo establecido en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, el incumplimiento del plazo de ejecución y demás condiciones exigidas para las operaciones de limpieza y recuperación establecidas en la resolución de declaración de suelo contaminado, se considerará infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy Grave",
+          "d) No se considerará infracción en esta Ley."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 196]."
+      },
+      {
+        question: "46.- ¿Quién ostenta la presidencia de la Comisión de seguimiento del Plan Integral de Residuos de Andalucía, hacia una economía circular en el horizonte 2030 (PIRec 2030) aprobado mediante Decreto 131/2021, de 6 de abril?",
+        options: [
+          "a) La persona titular de la Dirección General competente en materia de residuos",
+          "b) La persona titular de la Consejería competente en materia de medio ambiente",
+          "c) La persona titular de la Dirección General competente en materia de producción agrícola y ganadera",
+          "d) La persona titular de la Presidencia de la Junta de Andalucía"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La persona titular de la Dirección General competente en materia de residuos)[cite: 196]."
+      },
+      {
+        question: "47.- ¿Cuál de los siguientes no es un tipo de vertedero según la clasificación establecida en el artículo 5 del Real Decreto 646/2020, de 7 de junio, por el que se regula la Eliminación de Residuos mediante Depósito en Vertedero?",
+        options: [
+          "a) Vertedero para residuos peligrosos",
+          "b) Vertedero para residuos de construcción y demolición",
+          "c) Vertedero para residuos no peligrosos",
+          "d) Vertedero para residuos inertes"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Vertedero para RCD no figura como categoría independiente en el art. 5)[cite: 196]."
+      },
+      {
+        question: "48.- ¿Cuáles de los siguientes no son residuos admisibles en ningún tipo de vertedero según lo establecido en el artículo 6 del Real Decreto 646/2020, de 7 de junio, por el que se regula la Eliminación de Residuos mediante Depósito en Vertedero?",
+        options: [
+          "a) Residuos líquidos",
+          "b) Residuos comburentes",
+          "c) Residuos infecciosos",
+          "d) Ninguno de los residuos mencionados anteriormente son admisibles en ningún tipo de vertedero."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguno de los mencionados es admisible)[cite: 196]."
+      },
+      {
+        question: "49.- Cuando, según lo recogido en el Anexo II del Real Decreto 646/2020 de 7 de junio, por el que se regula la Eliminación de Residuos mediante Depósito en Vertedero, se realiza un procedimiento que consiste en la averiguación completa de las características fisicoquímicas y de peligrosidad de los residuos, se estará realizando:",
+        options: [
+          "a) Una caracterización básica",
+          "b) Una caracterización completa",
+          "c) Una prueba de cumplimiento",
+          "d) Una verificación in situ"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Una caracterización básica)[cite: 196]."
+      },
+      {
+        question: "50.- El Anexo VII del Real Decreto 646/2020, de 7 de junio, por el que se regula la Eliminación de Residuos mediante Depósito en Vertedero, relativo al alcance de las inspecciones establece que durante la fase de explotación de un vertedero... se comprobará el cumplimiento... con una periodicidad:",
+        options: [
+          "a) Mínima anual",
+          "b) Mínima trienal",
+          "c) Mínima quinquenal",
+          "d) Mensual"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Mínima trienal)[cite: 196]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Según las definiciones establecidas en el artículo 96 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, cuando habla de \"Todo procedimiento que permita el aprovechamiento de los recursos contenidos en los residuos sin poner en peligro la salud humana y sin utilizar métodos que puedan causar perjuicios al medio ambiente\", se está refiriendo a:",
+        options: [
+          "a) Tratamiento",
+          "b) Valorización",
+          "c) Gestión",
+          "d) Eliminación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Valorización)[cite: 197]."
+      },
+      {
+        question: "2.- ¿A cuál de los siguientes residuos no le será de aplicación, en ningún caso, la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular?",
+        options: [
+          "a) Las Aguas Residuales",
+          "b) Los Explosivos Desclasificados",
+          "c) Los Subproductos Animales",
+          "d) Los Cadáveres de Animales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Los Explosivos Desclasificados)[cite: 197]."
+      },
+      {
+        question: "3.- El tratamiento de cualquier residuo distinto al especificado en el Catálogo de Residuos estará sometido a autorización administrativa de la Consejería competente en materia de Medio Ambiente. Las personas interesadas dirigirán su solicitud, según se establece en el artículo 7 del Decreto 73/2012 de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, a:",
+        options: [
+          "a) Al titular de la Delegación Territorial de la Consejería competente en materia de medio ambiente de la provincia donde tenga su ubicación la actividad",
+          "b) Al titular de la Delegación Territorial de la Consejería competente en materia de medio ambiente de la provincia donde tenga domicilio social el titular de la actividad",
+          "c) A la Dirección General con competencias en materia de residuos",
+          "d) En todo caso no será necesaria dicha autorización cuando pueda justificarse que no se producirán daños al medio ambiente ni se pondrá en peligro la salud o seguridad de las personas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: A la Dirección General con competencias en materia de residuos)[cite: 197]."
+      },
+      {
+        question: "4.- De acuerdo con el mismo artículo mencionado en la pregunta anterior, el plazo máximo de resolución y notificación para dicha autorización será de:",
+        options: [
+          "a) 1 mes",
+          "b) 2 meses",
+          "c) 3 meses",
+          "d) 6 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2 meses)[cite: 197]."
+      },
+      {
+        question: "5.- En el artículo 3 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía se establecen una serie de definiciones entre las cuales nos encontramos la de Pequeño productor de Residuos Peligrosos, que sería:",
+        options: [
+          "a) Persona o entidad productora cuya generación anual de residuos peligrosos es inferior a 500 Kg",
+          "b) Persona o entidad productora que produzca una cantidad de residuos insignificante",
+          "c) Persona o entidad productora cuya generación de residuos no ponga en peligro la salud humana ni afecte de forma significativa al medio ambiente",
+          "d) Persona o entidad productora cuya generación anual de residuos peligrosos es inferior a 10 toneladas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Generación anual inferior a 10 toneladas)[cite: 197]."
+      },
+      {
+        question: "6.- De las siguientes obligaciones de los Titulares de actividades de Gestión de Residuos, a tenor de lo establecido en el artículo 102 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, señale la Incorrecta:",
+        options: [
+          "a) Cumplir las obligaciones establecidas en la correspondiente autorización de gestión",
+          "b) Llevar un registro documental, en el caso de actividades autorizadas por la Consejería competente en materia de medio ambiente... y la referida a cada año natural deberá mantenerse durante los tres años siguientes",
+          "c) Establecer medidas de seguridad, autoprotección y plan de emergencia interior para prevención de riesgos, para todas las actividades propias de la gestión de residuos peligrosos",
+          "d) Disponer de un documento específico de identificación de los residuos con indicación del origen y destino del mismo..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La información debe mantenerse durante al menos 5 años, no 3 años)[cite: 197]."
+      },
+      {
+        question: "7.- De acuerdo con lo establecido en el Título VIII, Capítulo III, Sección 6ª, de la Ley 7/2007 de 9 de julio de Gestión Integrada de la Calidad Ambiental, el incumplimiento de la obligación de proporcionar documentación o la ocultación o falseamiento de datos exigidos por la normativa aplicable o por las estipulaciones contenidas en la autorización, así como el incumplimiento de la obligación de custodia y mantenimiento de dicha documentación, será una infracción:",
+        options: [
+          "a) Muy Grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Dependerá si se derivan graves daños al medio ambiente o a la salud de las personas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Infracción Grave)[cite: 197]."
+      },
+      {
+        question: "8.- A tenor de lo establecido en el artículo 8 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, para conseguir el mejor resultado ambiental global se aplicará una jerarquía de residuos que tendrá el siguiente orden de prioridad: (señalar la respuesta correcta)",
+        options: [
+          "a) Reciclado, preparación para la reutilización, prevención y eliminación",
+          "b) Reutilización, prevención, reciclado, otro tipo de valorización incluida la valorización energética y eliminación",
+          "c) Prevención, preparación para la reutilización, reciclado, otro tipo de valorización incluida la valorización energética y eliminación.",
+          "d) Dicha jerarquía de residuos no viene establecida en la Ley citada."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Prevención, preparación para la reutilización, reciclado, otro tipo de valorización y eliminación)[cite: 197]."
+      },
+      {
+        question: "9.- El artículo 14 del Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados, establece que el plazo de resolución por la que se declara un suelo contaminado será de:",
+        options: [
+          "a) 6 meses",
+          "b) 3 meses",
+          "c) 4 meses",
+          "d) 10 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6 meses)[cite: 197]."
+      },
+      {
+        question: "10.- Quedarán exentas de la condición de persona o entidad productora de residuos peligrosos, a tenor de lo establecido en el artículo 10 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía:",
+        options: [
+          "a) Las personas o entidades titulares de las instalaciones en las que tengan lugar actividades de gestión de residuos peligrosos...",
+          "b) Las personas o entidades gestoras autorizadas que asuman la titularidad de la producción...",
+          "c) Las personas o entidades titulares de las industrias o actividades que no superen los 500 kilogramos/año de producción de residuos peligrosos, siempre y cuando suscriban un contrato de cesión con una persona o entidad gestora de residuos peligrosos autorizada...",
+          "d) Las personas o entidades titulares de las estaciones depuradoras de aguas residuales urbanas e industriales..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 197]."
+      },
+      {
+        question: "11.- De acuerdo con el Anexo II del Real Decreto 646/2020, de 7 de junio, por el que se regula la eliminación de residuos mediante depósito en vertedero, las pruebas de cumplimiento de un flujo de residuos de producción regular tendrán una frecuencia mínima de:",
+        options: [
+          "a) 1 de cada 1000 toneladas de residuo enviado a vertedero o una vez al año en caso de no alcanzarse dicha cantidad.",
+          "b) 1 de cada 500 toneladas de residuo enviado a vertedero o una vez al año en caso de no alcanzarse dicha cantidad.",
+          "c) 1 de cada 500 toneladas de residuo enviado a vertedero o una vez cada 6 meses en caso de no alcanzarse dicha cantidad.",
+          "d) 1 de cada 1000 toneladas de residuo enviado a vertedero o una vez cada 6 meses en caso de no alcanzarse dicha cantidad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1 de cada 500 toneladas o una vez al año)[cite: 197]."
+      },
+      {
+        question: "12.- La aprobación del Programa Andaluz de Suelos contaminados corresponde, según se establece en el artículo 51 del Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados, a:",
+        options: [
+          "a) La persona titular de la Dirección General competente en materia de suelos contaminados",
+          "b) La persona titular de la Consejería competente en materia de Medio Ambiente",
+          "c) El Consejo de Gobierno mediante Decreto",
+          "d) El Consejo de Gobierno mediante Acuerdo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La persona titular de la Consejería competente en materia de Medio Ambiente)[cite: 197]."
+      },
+      {
+        question: "13.- El tiempo máximo de almacenamiento temporal de Residuos Peligrosos viene establecido en diversa normativa, entre ella en el Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, concretamente en el artículo 16, que establece que dicho periodo será de:",
+        options: [
+          "a) 1 año en el caso de que dichos residuos sean sometidos a valorización",
+          "b) 2 años en el caso de que dichos residuos sean sometidos a valorización",
+          "c) 6 meses, prorrogable a 1 año, previa autorización de la Delegación Provincial (Territorial) de la Consejería competente en materia de Medio Ambiente",
+          "d) 6 meses, prorrogable a 1 año, previa autorización de la Dirección General competente en materia de Residuos."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 meses prorrogable a 1 año por la Delegación Provincial/Territorial)[cite: 197]."
+      },
+      {
+        question: "14.- El artículo 4 del Decreto 18/2015 de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados establece que la declaración y delimitación de los suelos contaminados corresponde a:",
+        options: [
+          "a) Las Delegaciones Territoriales de la Consejería competente en materia de Medio Ambiente, en cualquier caso",
+          "b) Las Delegaciones Territoriales de la Consejería competente en materia de Suelos Contaminados, en cualquier caso",
+          "c) La Dirección General competente en materia de Suelos Contaminados, en cualquier caso.",
+          "d) Los municipios en el caso de suelos que estén comprendidos íntegramente en su término municipal."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Los municipios cuando el suelo esté íntegramente en su término)[cite: 197]."
+      },
+      {
+        question: "15.- El Real Decreto 646/2020 de 7 de junio, por el que se regula la eliminación de residuos mediante depósito en vertedero, en su Anexo VII determina que durante la fase de explotación de un vertedero, así como durante el periodo de vigilancia postclausura del mismo, se comprobará el cumplimiento de las condiciones de la autorización y el correcto funcionamiento de los vertederos, con una periodicidad mínima:",
+        options: [
+          "a) Anual",
+          "b) Bienal",
+          "c) Trienal",
+          "d) Semestral"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Trienal)[cite: 197]."
+      },
+      {
+        question: "16.- El artículo 12, Competencias Administrativas, de la Ley 7/2022 de 8 de abril, de residuos y suelos contaminados para una economía circular, establece que el Plan Nacional Marco de Gestión de Residuos será elaborado por:",
+        options: [
+          "a) El Consejo de Ministros mediante Real Decreto",
+          "b) El Consejo de Gobierno mediante Decreto",
+          "c) El Ministerio para la Transición Ecológica y el Reto Demográfico",
+          "d) La Dirección General de residuos y suelos contaminados."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El Ministerio para la Transición Ecológica y el Reto Demográfico)[cite: 197]."
+      },
+      {
+        question: "17.- La vigencia de las Autorizaciones de Tratamientos de Residuos viene establecida en el artículo 32 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, y ésta será de:",
+        options: [
+          "a) Las autorizaciones se concederán por un plazo máximo de 6 años, pasado el cual se renovarán automáticamente...",
+          "b) Las autorizaciones se concederán por un plazo máximo de 6 años, pasado el cual deberá obtenerse una nueva autorización",
+          "c) Las autorizaciones se concederán por un plazo máximo de 8 años, pasado el cual se renovarán automáticamente por períodos sucesivos",
+          "d) Las autorizaciones se concederán por un plazo máximo de 8 años, pasado el cual deberá obtenerse una nueva autorización"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Plazo máximo de 8 años renovables automáticamente)[cite: 197]."
+      },
+      {
+        question: "18.- En el artículo 59 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, se establecen una serie de objetivos para la recogida separada de los productos de plástico con objeto de destinarlas a su reciclado. El objetivo de reducción que se propone para el año 2025 sería de:",
+        options: [
+          "a) el 70% en peso respecto al introducido en el mercado",
+          "b) el 77% en peso respecto al introducido en el mercado",
+          "c) el 85% en peso respecto al introducido en el mercado",
+          "d) el 90% en peso respecto al introducido en el mercado"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 77% en peso)[cite: 197]."
+      },
+      {
+        question: "19.- En lo Referente a los Planes de Minimización señalados en el artículo 19 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía, será obligatorio para:",
+        options: [
+          "a) Productores de residuos peligrosos que generen más de 500 kg anuales",
+          "b) Productores de Residuos no peligrosos que superen las 1000 toneladas al año",
+          "c) Gestores de Residuos peligrosos",
+          "d) Las respuestas a y b son correctas, además dichos planes se remitirán a la Delegación Provincial..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Productores de Residuos no peligrosos que superen las 1000 t/año)[cite: 197]."
+      },
+      {
+        question: "20.- ¿Cuál de los siguientes NO es uno de los objetivos generales planteados en el Plan Integral de Residuos de Andalucía, hacia una economía circular en el Horizonte 2030 (PIRec 2030)?",
+        options: [
+          "a) Impulsar la innovación, en el ámbito de aquellas iniciativas que favorezcan las mejoras en los procesos de producción encaminadas a un uso más eficaz de los recursos y a una mayor generación de residuos...",
+          "b) Favorecer la simbiosis industrial de forma que los subproductos generados en unas actividades se conviertan en las materias primas de otras...",
+          "c) Aplicar el principio de responsabilidad del productor a los agentes que ponen en el mercado productos...",
+          "d) Reducir el vertido de los rechazos procedentes de los procesos de valorización..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El texto erróneo indica 'mayor generación de residuos' cuando debe ser menor)[cite: 197]."
+      },
+      {
+        question: "21.- El artículo 21 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, establece que los recipientes o envases que contengan residuos peligrosos deberán estar etiquetados... De las siguientes opciones, ¿cuál NO deberá figurar obligatoriamente en dicha etiqueta?:",
+        options: [
+          "a) Nombre, Asignación de Número de Identificación Medioambiental («NIMA»), dirección, postal y electrónica, y teléfono del productor o poseedor...",
+          "b) Fechas en la que se inicia el depósito de residuos",
+          "c) La naturaleza que presentan los residuos, que se indicará mediante los pictogramas...",
+          "d) Nombre, dirección, postal y electrónica, y teléfono del titular encargado de llevar a cabo la gestión de los residuos."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 197]."
+      },
+      {
+        question: "22.- Los programas de prevención de residuos, se evaluarán, de acuerdo con lo establecido en el artículo 14 de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, cada:",
+        options: [
+          "a) Cada año",
+          "b) Cada 2 años",
+          "c) Cada 5 años",
+          "d) Ninguna opción es correcta."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Se evalúan al menos cada 6 años)[cite: 197]."
+      },
+      {
+        question: "23.- El Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados, en su artículo 56, establece que las personas físicas o jurídicas titulares de una nueva actividad potencialmente contaminante del suelo deberá actualizar los datos comunicados al Inventario Andaluz de Suelos potencialmente contaminados con la siguiente periodicidad:",
+        options: [
+          "a) 2 años en el caso de que su instalación pertenezca al Grupo A (Riesgo Alto)",
+          "b) 6 años en el caso de que su instalación pertenezca al Grupo B (Riesgo Medio)",
+          "c) 12 años en el caso de que su instalación pertenezca al Grupo C (Riesgo bajo)",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 años en Grupo B)[cite: 197]."
+      },
+      {
+        question: "24.- El artículo 100 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece que el tiempo máximo de almacenamiento permitido de plásticos agrícolas en las fincas, a contar desde el inicio del almacenamiento, será de:",
+        options: [
+          "a) 1 mes",
+          "b) 2 meses",
+          "c) 6 meses",
+          "d) Será de 6 meses, pero a contar desde el inicio de la cosecha."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 2 meses)[cite: 197]."
+      },
+      {
+        question: "25.- El Anexo I de la Ley 7/2022, de 8 de abril, de residuos y suelos contaminados para una economía circular, establece cuales son las características de los residuos que permiten calificarlos como peligrosos. La definición \"corresponde a los residuos que presentan o pueden presentar riesgos inmediatos o diferidos para uno o más compartimentos del medio ambiente\", se corresponde con:",
+        options: [
+          "a) Ecotóxico",
+          "b) Explosivo",
+          "c) Inflamable",
+          "d) Contaminante"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ecotóxico)[cite: 197]."
+      },
+      {
+        question: "26.- A tenor de lo establecido en el artículo 4 del Decreto 18/2015, de 27 de enero, por el que se aprueba el Reglamento que regula el régimen aplicable a los Suelos Contaminados, ¿a quién corresponderá la Aprobación de los Proyectos Voluntarios de Recuperación de suelos?",
+        options: [
+          "a) A las Delegaciones Territoriales de la Consejería con competencias en materia de Medio Ambiente",
+          "b) A la Dirección General competente en materia de suelos contaminados, en cualquier caso",
+          "c) A los municipios donde estén comprendidos íntegramente dichos suelos",
+          "d) A la Secretaría General Técnica de la Consejería competente en materia de Suelos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Delegaciones Territoriales de la Consejería competente en materia de Medio Ambiente)[cite: 197]."
+      },
+      {
+        question: "27.- De acuerdo con lo establecido en el Título VIII, Capítulo III, Sección 5ª, de la Ley 7/2007 de 9 de julio de Gestión Integrada de la Calidad Ambiental, la no realización de las operaciones de limpieza y recuperación, cuando un suelo haya sido declarado como contaminado o el incumplimiento, en su caso, de las obligaciones derivadas de acuerdos voluntarios o convenios de colaboración, estará tipificada como infracción:",
+        options: [
+          "a) Muy Grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Se considerará grave solo en el caso de que la cuantía prevista para la recuperación de dicho suelo supere los 50.000 €."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Muy Grave)[cite: 197]."
+      },
+      {
+        question: "28.- El Plan Integral de Residuos de Andalucía, hacia una Economía Circular en el Horizonte 2030 (PIRec 2030) ha sido aprobado mediante:",
+        options: [
+          "a) Decreto 18/2015, de 27 de enero",
+          "b) Decreto 126/2030, de 1 de enero",
+          "c) Real Decreto 126/2021, de 6 de junio",
+          "d) Decreto 131/2021, de 6 de abril"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Decreto 131/2021, de 6 de abril)[cite: 197]."
+      },
+      {
+        question: "29.- De acuerdo con lo establecido en el Título VIII, Capítulo III, Sección 6ª, de la Ley 7/2007 de 9 de julio de Gestión Integrada de la Calidad Ambiental, el retraso en el suministro de la documentación que se deba de proporcionar a la Administración de acuerdo con lo establecido por la normativa aplicable o por las estipulaciones contenidas en las autorizaciones, será una infracción tipificada como:",
+        options: [
+          "a) Muy Grave",
+          "b) Grave",
+          "c) Leve",
+          "d) Dependerá de si se producen daños al medio ambiente o se pone en peligro la salud de las personas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Infracción Leve)[cite: 197]."
+      },
+      {
+        question: "30.- Los artículos 29 y 30 del Decreto 73/2012, de 20 de marzo, por el que se aprueba el Reglamento de Residuos de Andalucía establece el plazo máximo de resolución de la Autorización de Gestión de Residuos y el órgano competente para dicha resolución. Señale la respuesta correcta:",
+        options: [
+          "a) El plazo será de 10 meses y resolverá la Delegación Provincial (Territorial) de la Consejería competente en materia de Medio Ambiente como norma general",
+          "b) El plazo será de 10 meses y resolverá la Dirección General competente en materia de Residuos en todos los casos.",
+          "c) El plazo será de 6 meses y resolverá la Delegación Provincial (Territorial) de la Consejería competente en materia de Medio Ambiente como norma general",
+          "d) El plazo será de 6 meses y resolverá la Dirección General competente en materia de Residuos en todos los casos."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Plazo de 10 meses y resuelve la Delegación Territorial como norma general)[cite: 197]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 25),
+      "t1_b2": test1Questions.slice(25, 50),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 15),
+      "t2_b2": test2Questions.slice(15, 30)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 23 - RESIDUOS Y SUELOS CONTAMINADOS (COMPLETO 80 PREGUNTAS)",
+        "t1_all": "TEST BÁSICO Nº 1 - COMPLETO (50 PREGUNTAS)",
+        "t1_b1": "TEST BÁSICO Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "t1_b2": "TEST BÁSICO Nº 1 - BLOQUE 2 (PREGUNTAS 26 A 50)",
+        "t2_all": "TEST DE AUTOEVALUACIÓN Nº 1 - COMPLETO (30 PREGUNTAS)",
+        "t2_b1": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t2_b2": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 2 (PREGUNTAS 16 A 30)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

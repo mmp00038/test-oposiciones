@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 20 (Calidad del Medio Ambiente Atmosférico y Protección Contaminación Acústica y Lumínica)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 20 Unificado Completo (68 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Básico Nº 1 (38 Preguntas)">
+          <option value="t1_all">Test Básico Nº 1 - Completo (1 - 38)</option>
+          <option value="t1_b1">Test Básico Nº 1 - Bloque 1 (1 - 19)</option>
+          <option value="t1_b2">Test Básico Nº 1 - Bloque 2 (20 - 38)</option>
+        </optgroup>
+        <optgroup label="Test de Autoevaluación (30 Preguntas)">
+          <option value="t2_all">Test Autoevaluación - Completo (1 - 30)</option>
+          <option value="t2_b1">Test Autoevaluación - Bloque 1 (1 - 15)</option>
+          <option value="t2_b2">Test Autoevaluación - Bloque 2 (16 - 30)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 20 - CALIDAD ATMOSFÉRICA, ACÚSTICA Y LUMÍNICA (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Señale cual de estás definiciones establecidas en el artículo 50, en relación con la calidad del medio ambiente atmosférico, es incorrecta:",
+        options: [
+          "a) Se entiende por contaminación acústica: la presencia en el aire ambiente de ruidos o vibraciones...",
+          "b) Se entiende por contaminación atmosférica: la presencia en el aire ambiente de cualquier sustancia introducida directa o indirectamente por la actividad humana...",
+          "c) Se entiende por contaminación lumínica: la emisión de flujo luminoso por fuentes artificiales de luz...",
+          "d) Se entiende por aire ambiente: el aire exterior de la troposfera, incluidos los lugares de trabajo."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: El aire ambiente excluye los lugares de trabajo)[cite: 190]."
+      },
+      {
+        question: "2.- ¿Cuál de los siguientes no es un gas de efecto invernadero?",
+        options: [
+          "a) Metano (CH4)",
+          "b) Dióxido de nitrógeno (NO2)",
+          "c) Perfluorocarburos",
+          "d) Hexafluoruro de Azufre (SF6)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Dióxido de nitrógeno)[cite: 190]."
+      },
+      {
+        question: "3.- ¿Cuál de las siguientes respuestas sería la definición de \"Emisión\" establecida en el artículo 3 de la Ley 34/2007, de 15 de noviembre, de calidad del aire y protección de la atmósfera?",
+        options: [
+          "a) Descarga a la atmósfera continua o discontinua de materias, sustancias o formas de energía procedentes, directa o indirectamente, de cualquier fuente susceptible de producir contaminación atmosférica.",
+          "b) Presencia en la atmósfera de materias, sustancias o formas de energía...",
+          "c) Evacuación accidental de sustancias a la atmósfera...",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "4.- Señale la definición correcta de \"umbral de alerta\" definida en el artículo 3 de la Ley 34/2007, de 15 de noviembre, de calidad del aire y protección de la atmósfera:",
+        options: [
+          "a) Nivel a partir del cual una exposición de breve duración supone un riesgo para la salud de los sectores especialmente vulnerables...",
+          "b) Cuantía de uno o más contaminantes en emisión...",
+          "c) Nivel a partir del cual una exposición de breve duración supone un riesgo para la salud humana que afecta al conjunto de la población y que requiere la adopción de medidas inmediatas.",
+          "d) Cantidad de un contaminante en el aire o su depósito..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 190]."
+      },
+      {
+        question: "5.- Señale la opción incorrecta de las siguientes afirmaciones a tenor de lo establecido en el artículo 13 de la Ley 34/2007, de 15 de noviembre, de calidad del aire y protección de la atmósfera:",
+        options: [
+          "a) A los efectos de esta ley se consideran como actividades potencialmente contaminadoras de la atmósfera las incluidas en el catálogo del anexo IV.",
+          "b) El Gobierno, con la participación de las comunidades autónomas revisará, al menos cada diez años, el anexo IV y, en su caso, lo actualizará.",
+          "c) Sin perjuicio de los demás medios de intervención... quedan sometidas a procedimiento de autorización... las pertenecientes a los grupos A y B.",
+          "d) Estas autorizaciones, se concederán por un tiempo determinado que en ningún caso será superior a ocho años..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La revisión se realiza al menos cada 5 años, no cada 10 años)[cite: 190]."
+      },
+      {
+        question: "6.- El artículo 52 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental define \"emisión sistemática\" como:",
+        options: [
+          "a) Aquella que se realiza de forma continua o intermitente, con una frecuencia media superior a doce veces al año, con una duración individual superior a una hora, o con cualquier frecuencia, cuando la duración global de la emisión sea superior al cinco por ciento del tiempo de funcionamiento de la planta.",
+          "b) Aquella que se realiza de forma continua o intermitente...",
+          "c) Aquella que se realiza de forma continua o intermitente, con una frecuencia media superior a 60 veces al año...",
+          "d) Aquella que se realiza de forma continua o intermitente, con una frecuencia media superior a doce veces al año, con una duración individual superior a una hora, o con cualquier frecuencia, cuando la duración global de la emisión sea superior al cincuenta por ciento..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "7.- El artículo 55 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que los titulares de actividades potencialmente contaminadoras de la atmósfera están obligados con carácter general a:",
+        options: [
+          "a) Declarar las emisiones a la atmósfera de su actividad...",
+          "b) Llevar un registro de sus emisiones e incidencias...",
+          "c) Adoptar las medidas adecuadas para evitar las emisiones accidentales...",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 190]."
+      },
+      {
+        question: "8.- A tenor de lo establecido en el artículo 56 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, ¿cuál de las siguientes actividades no estará obligada a obtener una autorización de emisiones a la atmósfera?",
+        options: [
+          "a) Una instalación que emita contaminantes que estén sujetos a cuotas de emisión en cumplimiento de las obligaciones comunitarias...",
+          "b) El montaje de una instalación en la que se desarrollen actividades del grupo A...",
+          "c) Una modificación no sustancial de una instalación en la que se desarrollen actividades del grupo B.",
+          "d) Todas las actividades anteriormente descritas estarán obligadas a obtener la preceptiva autorización de emisiones a la atmósfera."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 190]."
+      },
+      {
+        question: "9.- ¿Cuál será el plazo de resolución de una autorización de emisiones a la atmósfera según lo establecido en el artículo 57 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) 9 meses",
+          "b) 6 meses",
+          "c) 3 meses",
+          "d) 1 mes"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 3 meses)[cite: 190]."
+      },
+      {
+        question: "10.- ¿Cuál de las siguientes será una competencia de la Consejería competente en materia de medio ambiente según lo establecido en el artículo 4 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía?",
+        options: [
+          "a) La elaboración de los inventarios de emisiones a la atmósfera y mapas de calidad del aire de la Comunidad Autónoma de Andalucía",
+          "b) La vigilancia, inspección y ejercicio de la potestad sancionadora...",
+          "c) La ejecución de las medidas incluidas en los planes de mejora...",
+          "d) Todas las competencias enunciadas anteriormente corresponden a dicha Consejería."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "11.- Señale la opción incorrecta en lo relativo al Libro-registro regulado en el artículo 13 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía:",
+        options: [
+          "a) En el libro-registro se harán constar los resultados de las mediciones manuales...",
+          "b) Las anotaciones en el libro de registro, como consecuencia del control externo...",
+          "c) Las personas o entidades titulares de las instalaciones con sistemas de gestión certificados... no siendo necesario en todo caso disponer del libro-registro.",
+          "d) El libro-registro o, en su caso, el documento del sistema de gestión certificado, podrán ser consultados por la inspección oficial..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 190]."
+      },
+      {
+        question: "12.- El artículo 15 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía establece que en el caso de actividades cuya vigilancia, inspección y ejercicio de la potestad sancionadora corresponda a la Consejería competente en materia de medio ambiente, los informes correspondientes a los controles externos se presentarán ante el órgano ambiental autonómico competente en un plazo máximo de:",
+        options: [
+          "a) Un mes desde la realización de las mediciones...",
+          "b) Dos meses desde la realización de las mediciones...",
+          "c) Tres meses desde la realización de las mediciones, pudiendo exigirse a la entidad colaboradora la presentación por vía telemática del mencionado informe.",
+          "d) Seis meses desde la realización de las mediciones..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tres meses)[cite: 190]."
+      },
+      {
+        question: "13.- El artículo 17 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía establece que el órgano ambiental competente en materia de medio ambiente podrá imponer a las personas o entidades titulares de las instalaciones en las que se realicen actividades potencialmente contaminadoras de la atmósfera la obligación de instalar instrumentos de medición... Señale la opción incorrecta",
+        options: [
+          "a) Cuando se trate de actividades del grupo A, B o C...",
+          "b) Cuando se trate de actividades pertenecientes al grupo A del Catálogo del Anexo del Real Decreto 100/2011, de 28 de enero, o actividades sometidas al procedimiento de autorización ambiental integrada o de autorización ambiental unificada.",
+          "c) Cuando, de conformidad con la normativa aplicable vigente, los contaminantes emitidos sean de naturaleza, tóxica, nociva o peligrosa",
+          "d) Cuando se trate de actividades ubicadas o que se prevea instalar en un espacio natural protegido o zona de influencia."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 190]."
+      },
+      {
+        question: "14.- ¿Cuál de los siguientes no es un plan de la calidad del aire según lo establecido en el artículo 21 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía?",
+        options: [
+          "a) Planes de mejora de la calidad del aire.",
+          "b) Planes de acción a corto plazo.",
+          "c) Otros planes de mejora de la calidad del aire.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 190]."
+      },
+      {
+        question: "15.- El artículo 23 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía establece que los Planes de Mejora de la Calidad del aire competencia de la Consejería competente en materia de medio ambiente se aprobarán:",
+        options: [
+          "a) Por resolución de la Delegación Territorial...",
+          "b) Por resolución de la Dirección General...",
+          "c) Por orden del titular de la Consejería competente en materia de medio ambiente",
+          "d) Por Decreto del Consejo de Gobierno."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Por Decreto del Consejo de Gobierno)[cite: 190]."
+      },
+      {
+        question: "16.- Señala la opción correcta en el caso instalaciones donde se realicen actividades potencialmente contaminadoras de la atmósfera sometidas a autorización ambiental integrada o autorización ambiental unificada según lo definido en el artículo 32 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía:",
+        options: [
+          "a) Las personas o entidades titulares de instalaciones donde se realicen actividades potencialmente contaminadoras de la atmósfera sometidas al procedimiento de autorización ambiental integrada o autorización ambiental unificada, deberán aportar junto con la solicitud de las citadas autorizaciones y la correspondiente documentación, como mínimo, la información que se recoge en el Anexo VIII.",
+          "b) La Consejería competente en materia de medio ambiente no incluirá en la resolución...",
+          "c) Las prescripciones establecidas en materia de emisiones atmosféricas y de calidad del aire... deberán ser renovadas cada cinco años.",
+          "d) Todas las repuestas anteriores son verdaderas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "17.- El artículo 34 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el registro de sistemas de evaluación de la calidad del aire en Andalucía establece que para la renovación de la autorización de emisiones a la atmósfera el titular deberá solicitar la renovación mediante la presentación en el órgano ambiental competente una declaración responsable... con una antelación mínima de:",
+        options: [
+          "a) Seis meses antes de la finalización del plazo de vigencia de la autorización.",
+          "b) Tres meses antes de la finalización del plazo de vigencia de la autorización.",
+          "c) Un mes antes de la finalización del plazo de vigencia de la autorización.",
+          "d) No se establece ningún plazo concreto para la solicitud de la renovación..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tres meses antes)[cite: 190]."
+      },
+      {
+        question: "18.- Según las definiciones establecidas en el artículo 2 de la Ley 1/2005, de 9 de marzo, por la que se regula el régimen del comercio de derechos de emisión de gases de efecto invernadero, el derecho subjetivo a emitir una tonelada equivalente de dióxido de carbono, desde una instalación o una aeronave que realiza una actividad de aviación incluida en el ámbito de aplicación de esta Ley, durante un período determinado, se denomina:",
+        options: [
+          "a) Expedición",
+          "b) Emisión sistemática",
+          "c) Derecho de emisión",
+          "d) Autorización de emisión de gases de efecto invernadero"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Derecho de emisión)[cite: 190]."
+      },
+      {
+        question: "19.- El artículo 7 de la Ley 1/2005 de 9 de marzo, por la que se regula el régimen del comercio de derechos de emisión de gases de efecto invernadero, establece que las autorizaciones de emisión de gases de efecto invernadero quedarán extinguidas en los supuestos de:",
+        options: [
+          "a) Cierre de la instalación.",
+          "b) Falta de puesta en funcionamiento de la instalación transcurridos seis meses...",
+          "c) Suspensión de la actividad de la instalación durante un plazo superior a seis meses...",
+          "d) Todas las respuestas enunciadas anteriormente son verdaderas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cierre de la instalación)[cite: 190]."
+      },
+      {
+        question: "20.- El artículo 41 de la Ley 8/2018, de 8 de octubre, de medidas frente al cambio climático y para la transición hacia un nuevo modelo energético en Andalucía: Red de Observatorios de Cambio Global, Sistema Andaluz de Emisiones Registradas (SAER), Sistema Andaluz de Compensación de Emisiones (SACE) y Huella de Carbono de Productos y Servicios, establece que el Sistema Andaluz de Emisiones Registradas tendrá 2 modalidades, que son:",
+        options: [
+          "a) Reducción de emisiones y Control de emisiones.",
+          "b) Reducción de emisiones y Seguimiento y notificación",
+          "c) Control de emisiones y Notificación de emisiones",
+          "d) Control de emisiones y Compensación de emisiones"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Reducción de emisiones y Seguimiento y notificación)[cite: 190]."
+      },
+      {
+        question: "21.- Como define la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, en su artículo 61, el \"flujo hemisférico superior instalado\"??",
+        options: [
+          "a) La proporción, en tanto por ciento, del flujo luminoso radiado por encima del plano horizontal, respecto al flujo total, por un dispositivo luminotécnico de alumbrado exterior instalado en su posición normal de diseño.",
+          "b) La invasión del flujo luminoso hacia zonas que exceden del área...",
+          "c) El fenómeno físico que se produce cuando la luz choca...",
+          "d) El fenómeno físico que se produce cuando la luz sufre una primera refracción..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "22.- En la zonificación lumínica establecida en el artículo 63 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, las \"zonas dotacionales con utilización en horario nocturno\" se encuentran integradas en las áreas:",
+        options: [
+          "a) E1: Áreas oscuras.",
+          "b) E2: Áreas que admiten flujo luminoso reducido.",
+          "c) E3: Áreas que admiten flujo luminoso medio.",
+          "d) E4: Áreas que admiten flujo luminoso elevado."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: E3 Áreas que admiten flujo luminoso medio)[cite: 190]."
+      },
+      {
+        question: "23.- Según las definiciones establecidas en el artículo 68 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental, el \"ámbito territorial donde se pretende que exista una calidad acústica homogénea y que coincide con la denominada por la legislación básica como área acústica\", se denomina:",
+        options: [
+          "a) Zona acústicamente saturada",
+          "b) Área o zona acústica",
+          "c) Zona de limitación acústica específica",
+          "d) Área de sensibilidad acústica"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Área de sensibilidad acústica)[cite: 190]."
+      },
+      {
+        question: "24.- El sector del territorio delimitado en los mapas de ruido, en el que la inmisión podrá superar los objetivos de calidad acústica aplicables a las correspondientes áreas de sensibilidad acústica y donde se podrán establecer restricciones para determinados usos del suelo... el artículo 68 de la Ley 7/2007, de Gestión Integrada de la Calidad Ambiental lo define como:",
+        options: [
+          "a) Área de sensibilidad acústica",
+          "b) Zona acústicamente saturada",
+          "c) Zona de servidumbre acústica",
+          "d) Zona no sujeta a limitación acústica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Zona de servidumbre acústica)[cite: 190]."
+      },
+      {
+        question: "25.- El artículo 2 del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía establece que este reglamento no será de aplicación a:",
+        options: [
+          "a) Las actividades militares, que se regirán por su legislación específica",
+          "b) Las actividades domésticas o comportamientos de la vecindad...",
+          "c) La actividad laboral, respecto de la contaminación acústica producida por ésta en el correspondiente lugar de trabajo...",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 190]."
+      },
+      {
+        question: "26.- Señale la opción correcta sobre competencias en materia de contaminación acústica, según lo establecido en el Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía:",
+        options: [
+          "a) Será competencia de la Consejería competente en materia de Medio Ambiente vigilancia, control y disciplina de la contaminación acústica en relación con las actuaciones públicas o privadas sometidas a autorización ambiental integrada o a autorización ambiental unificada...",
+          "b) Será competencia de la Consejería competente en materia de Medio Ambiente vigilancia... de las actuaciones que no estén sometidas a AAI ni AAU...",
+          "c) Será competencia de los municipios la delimitación de las reservas de sonido de origen natural...",
+          "d) Todas las respuestas son incorrectas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "27.- Señale la opción incorrecta según lo establecido en el artículo 7 del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía.",
+        options: [
+          "a) Un área de sensibilidad acústica tipo a se corresponde con sectores del territorio con predominio de suelo de uso residencial.",
+          "b) Un área de sensibilidad acústica tipo e se corresponde con sectores del territorio con predominio de suelo de uso sanitario, docente y cultural...",
+          "c) Un área de sensibilidad acústica tipo g se corresponde con sectores del territorio afectados a sistemas generales de infraestructuras de transporte...",
+          "d) Un área de sensibilidad acústica tipo b se corresponde con sectores del territorio con predominio de suelo de uso industrial."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 190]."
+      },
+      {
+        question: "28.- En relación con los mapas estratégicos y singulares de ruido regulados en los artículos 14 y siguientes del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía, señale la opción incorrecta:",
+        options: [
+          "a) Los Ayuntamientos elaborarán y aprobarán los mapas estratégicos de ruido de las aglomeraciones...",
+          "b) La Administración competente por razón de la actividad, elaborará los mapas estratégicos de ruido para los grandes ejes viarios...",
+          "c) Los Ayuntamientos o la Administración competente... elaborarán los mapas singulares de ruido en el plazo de un año...",
+          "d) Los mapas estratégicos y singulares de ruido deberán revisarse y, en su caso, modificarse cada diez años a partir de la fecha de su aprobación..."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Se revisan cada 5 años, no cada 10 años)[cite: 190]."
+      },
+      {
+        question: "29.- El artículo 16 del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía establece que los planes de acción tendrán fundamentalmente los siguientes objetivos (señale la opción incorrecta):",
+        options: [
+          "a) Afrontar globalmente las cuestiones relativas a la contaminación acústica...",
+          "b) Determinar las acciones prioritarias a realizar en caso de superación de los valores límite...",
+          "c) Proteger a las zonas de tipo a, e y g, así como las zonas tranquilas...",
+          "d) Todas las respuestas anteriores son incorrectas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 190]."
+      },
+      {
+        question: "30.- ¿Cuál de las siguientes no es una zona acústica especial de la tipología establecida en el artículo 18 del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía?",
+        options: [
+          "a) Zonas de sensibilidad acústica",
+          "b) Zonas de protección acústica especial",
+          "c) Zonas acústicamente saturadas",
+          "d) Zonas tranquilas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 190]."
+      },
+      {
+        question: "31.- ¿Cuál será el plazo de vigencia de las zonas acústicas especiales según lo establecido en el artículo 24 del Decreto 6/2012 de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía?",
+        options: [
+          "a) El que establezca el Ayuntamiento en la declaración de la zona en cuestión.",
+          "b) 10 años",
+          "c) 5 años",
+          "d) 1 año"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El que establezca el Ayuntamiento)[cite: 190]."
+      },
+      {
+        question: "32.- En lo relativo a la exigencia de estudios acústicos regulada en el artículo 42 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía, señale la opción correcta:",
+        options: [
+          "a) Los proyectos de actividades e instalaciones... que generen niveles de presión sonora iguales o superiores a 90 dBA...",
+          "b) Los proyectos de actividades e instalaciones productoras de ruidos y vibraciones que generen niveles de presión sonora iguales o superiores a 70 dBA, así como sus modificaciones y ampliaciones posteriores...",
+          "c) Los proyectos de actividades e instalaciones... que generen niveles de presión sonora iguales o superiores a 85 dBA...",
+          "d) Los proyectos de actividades e instalaciones... que generen niveles de presión sonora iguales o superiores a 60 dBA..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Umbral fijado en 70 dBA)[cite: 190]."
+      },
+      {
+        question: "33.- El mismo artículo establece que dicho umbral podrá ser disminuido por la administración correspondiente, con carácter general para actividades situadas en zonas acústicas especiales o de forma individualizada a actividades, cuando se produzca alguna de las circunstancias siguientes (Señale la opción correcta):",
+        options: [
+          "a) Cuando las actividades se ubiquen en zonas acústicamente saturadas, zonas de protección acústica especial...",
+          "b) Cuando se prevea una posible superación de los objetivos de calidad acústica...",
+          "c) Cuando se prevea una posible superación de los valores límite...",
+          "d) Todas las opciones son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)[cite: 190]."
+      },
+      {
+        question: "34.- Según lo establecido en el artículo 31 de la Ley 34/2007, de 15 de noviembre, de calidad del aire y protección de la atmósfera, las infracciones graves darán lugar a sanciones de:",
+        options: [
+          "a) Multa desde 20.001 hasta 200.000 euros",
+          "b) Multa desde 20.000 hasta 1.000.000 de euros",
+          "c) Multa desde 20.000 hasta 2.000.000 de euros",
+          "d) Multa desde 20.000 hasta 200.000 euros y la posible inhabilitación..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Multa desde 20.001 hasta 200.000 euros)[cite: 190]."
+      },
+      {
+        question: "35.- Según lo establecido en materia de disciplina ambiental en la Ley 7/2007, de 9 de marzo, de Gestión Integrada de Calidad Ambiental, el funcionamiento de instalaciones sometidas a autorización de emisiones a la atmósfera, sin haberla obtenido, se considerará infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave",
+          "d) Dicha infracción no viene tipificada en la Ley enunciada..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 190]."
+      },
+      {
+        question: "36.- Según lo establecido en materia de disciplina ambiental en la Ley 7/2007, de 9 de marzo, de Gestión Integrada de Calidad Ambiental, el incumplimiento de las restricciones y limitaciones de uso en materia de contaminación lumínica, se considerará infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave",
+          "d) Al no haber reglamento de contaminación acústica en vigor..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 190]."
+      },
+      {
+        question: "37.- Según lo establecido en materia de disciplina ambiental en la Ley 7/2007, de 9 de marzo, de Gestión Integrada de Calidad Ambiental, la superación de los valores límites establecidos de emisión de contaminantes de naturaleza química en una sola medición, estará tipificado como infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave",
+          "d) No constituye infracción administrativa."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 190]."
+      },
+      {
+        question: "38.- Según lo establecido en materia de disciplina ambiental en el Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica de Andalucía, la superación de los valores límites establecidos en dicho Decreto en más de 3 dBA y hasta 6 dBA, se tipificará como infracción:",
+        options: [
+          "a) Leve",
+          "b) Menos grave",
+          "c) Grave",
+          "d) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Grave)[cite: 190]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Según la Regulación de Competencias establecidas en la Constitución Española y en la Ley Orgánica 2/2007, de 19 de marzo, de Reforma del Estatuto de Autonomía para Andalucía, La regulación del ambiente atmosférico y de las distintas clases de contaminación del mismo, será de competencia:",
+        options: [
+          "a) Estatal",
+          "b) Compartida",
+          "c) Ejecutiva",
+          "d) Administrativa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Compartida)[cite: 191]."
+      },
+      {
+        question: "2.- Según las definiciones establecidas en el artículo 3 de la Ley 34/2007, de 15 de noviembre, de Calidad del Aire y Protección de la Atmósfera, ¿cuál de las siguientes respuestas se ajustaría a la siguiente definición?: Nivel a partir del cual una exposición de breve duración supone un riesgo para la salud humana que afecta al conjunto de la población y que requiere la adopción de medidas inmediatas:",
+        options: [
+          "a) Umbral de Alerta",
+          "b) Umbral de Información",
+          "c) Umbral de Contaminación",
+          "d) Umbral de Daño significativo de la población."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Umbral de Alerta)[cite: 191]."
+      },
+      {
+        question: "3.- El artículo 53 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, relativo a las competencias en materia de control de la contaminación atmosférica, establece que la realización de inventarios de emisiones corresponde a:",
+        options: [
+          "a) La Consejería competente en materia de Medio Ambiente",
+          "b) Las Entidades Locales",
+          "c) Las mancomunidades o entidades supramunicipales",
+          "d) La Agencia de Medio Ambiente y Agua"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La Consejería competente en materia de Medio Ambiente)[cite: 191]."
+      },
+      {
+        question: "4.- El artículo 2 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, referente al Ámbito de aplicación de dicho Decreto, establece una serie de exclusiones. Señale la respuesta más correcta",
+        options: [
+          "a) Se excluirán los ruidos y vibraciones",
+          "b) Se excluirán los contaminantes biológicos, salvo las fracciones que puedan formar parte de los contaminantes atmosféricos",
+          "c) Se excluirá la contaminación en los centros de trabajo",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 191]."
+      },
+      {
+        question: "5.- Según la zonificación lumínica establecida en el artículo 63 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, el \"Sistema General de espacios libres\" se incluirá en el área:",
+        options: [
+          "a) E1. Áreas oscuras",
+          "b) E2. Áreas que admiten flujo luminoso reducido",
+          "c) E3. Áreas que admiten flujo luminoso medio",
+          "d) E4. Áreas que admiten flujo luminoso elevado"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: E3 Áreas que admiten flujo luminoso medio)[cite: 191]."
+      },
+      {
+        question: "6.- La declaración de las Zonas Acústicas Especiales, a tenor de lo establecido en el artículo 18.2 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía, se hará por:",
+        options: [
+          "a) La Consejería competente en materia de contaminación acústica",
+          "b) La Consejería competente en materia de contaminación atmosférica",
+          "c) Los Ayuntamientos",
+          "d) No existen las Zonas acústicas especial, solo las zonas de protección acústica especial."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Los Ayuntamientos)[cite: 191]."
+      },
+      {
+        question: "7.- El plazo de resolución y notificación de los procedimientos sancionadores en materia de contaminación acústica, según se establece en el artículo 60.4 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía, de conformidad con lo dispuesto en el anexo I de la Ley 9/2010, será de:",
+        options: [
+          "a) 6 meses",
+          "b) 10 meses",
+          "c) 12 meses",
+          "d) 3 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 10 meses)[cite: 191]."
+      },
+      {
+        question: "8.- A tenor de lo establecido en el Capítulo III del Título V de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, alterar el funcionamiento normal del proceso productivo con objeto de falsear los resultados de una inspección de emisiones, se tipificará como infracción:",
+        options: [
+          "a) Muy Grave",
+          "b) Grave",
+          "c) Leve",
+          "d) No se tipifica como infracción tal hecho"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Muy Grave)[cite: 191]."
+      },
+      {
+        question: "9.- La sanción asociada a la infracción anterior podrá ser de:",
+        options: [
+          "a) Desde 600.001 a 1,200.000 €",
+          "b) Desde 60.001 a 1,200.000 €",
+          "c) Desde 600.001 a 2,000.000 €",
+          "d) Al no tipificarse como infracción no llevará una sanción asociada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Desde 60.001 a 1.200.000 €)[cite: 191]."
+      },
+      {
+        question: "10.- Las principales fuentes de origen de emisiones antropogénicas de los óxidos de Nitrógeno (NOx) son:",
+        options: [
+          "a) La fabricación de fertilizantes y disolventes",
+          "b) El smog fotoquímico",
+          "c) Escapes de vehículos motorizados y quema de combustibles",
+          "d) Degradación de residuos animales y basuras."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Escapes de vehículos motorizados y quema de combustibles)[cite: 191]."
+      },
+      {
+        question: "11.- ¿Cuál de los siguientes NO es un programa de los que desarrollan la Estrategia Andaluza ante el Cambio Climático aprobada mediante Acuerdo del Consejo de Gobierno el 3 de septiembre de 2002)",
+        options: [
+          "a) Programa de Mitigación",
+          "b) Programa de Reducción",
+          "c) Programa de Adaptación",
+          "d) Programa de Comunicación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Programa de Reducción)[cite: 191]."
+      },
+      {
+        question: "12.- El artículo 59 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, con respecto a las obligaciones de los titulares de actividades que emiten gases de efecto invernadero, define que los titulares deberán comunicar a la Consejería competente en materia de Medio Ambiente, con una antelación mínima de 15 días en el supuesto de:",
+        options: [
+          "a) Mejoras en las características del foco",
+          "b) Previsión de suspensión de la actividad de la instalación durante un plazo superior a 3 meses",
+          "c) Previsión de suspensión de la actividad de la instalación durante un plazo superior a 6 meses",
+          "d) La pregunta está mal planteada y puede inducir a error."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Previsión de suspensión de la actividad durante más de 3 meses)[cite: 191]."
+      },
+      {
+        question: "13.- Según lo establecido en el artículo 41 de la Ley 8/2018, de 8 de octubre, de medidas frente al cambio climático y para la transición hacia un nuevo modelo energético en Andalucía, el sistema andaluz de emisiones registradas (SAER) tendrá:",
+        options: [
+          "a) 2 modalidades: Disminución de Emisiones y Notificación.",
+          "b) 2 modalidades: Reducción de Emisiones y Seguimiento y Notificación.",
+          "c) 3 modalidades: Reducción de Emisiones, Seguimiento y Notificación.",
+          "d) 3 modalidades: Disminución de Emisiones, Seguimiento y Notificación."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Reducción de Emisiones y Seguimiento y Notificación)[cite: 191]."
+      },
+      {
+        question: "14.- El contaminante que más contribuye al efecto invernadero es:",
+        options: [
+          "a) CO2",
+          "b) H2SO4",
+          "c) N2O",
+          "d) SF6"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: CO2)[cite: 191]."
+      },
+      {
+        question: "15.- El artículo 54 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental establece que se consideran actividades potencialmente contaminadoras de la atmósfera las así catalogadas en la normativa vigente, así como las que emitan de forma sistemática alguna de las sustancias del anexo III de la citada Ley. ¿Cuál de las siguientes sustancias no se incluye en dicho anexo?",
+        options: [
+          "a) Monóxido de Carbono",
+          "b) Cianuros",
+          "c) Metales y sus compuestos",
+          "d) Ciclopentanos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ciclopentanos)[cite: 191]."
+      },
+      {
+        question: "16.- Según las definiciones establecidas en el artículo 3 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, la definición: \"Un nivel fijado basándose en conocimientos científicos, con el fin de evitar, prevenir o reducir los efectos nocivos para la salud humana...\", coincide con:",
+        options: [
+          "a) Valor límite de Emisión",
+          "b) Valor objetivo de Calidad del aire",
+          "c) Valor límite de calidad del aire",
+          "d) Contaminación atmosférica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Valor límite de calidad del aire)[cite: 191]."
+      },
+      {
+        question: "17.- El artículo 31 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, establece el plazo de resolución y el silencio administrativo de la solicitud de Autorización de emisiones a la atmósfera, y serán de:",
+        options: [
+          "a) 3 meses, desestimada",
+          "b) 6 meses, desestimada",
+          "c) 6 meses, estimada",
+          "d) 10 meses, desestimada"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 3 meses, desestimada)[cite: 191]."
+      },
+      {
+        question: "18.- A tenor de lo establecido en el artículo 15 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, el control externo de una actividad sometida a AAI, perteneciente al Grupo B de Actividades potencialmente contaminadoras de la atmósfera, y en cuyo condicionado no se establece una periodicidad para dichos controles externos, la periodicidad será de:",
+        options: [
+          "a) 6 meses",
+          "b) 12 meses",
+          "c) 24 meses",
+          "d) 60 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 24 meses)[cite: 191]."
+      },
+      {
+        question: "19.- De conformidad con lo establecido en el artículo 7.2 de la Ley 34/2007 de 15 de noviembre, de Calidad del Aire y Protección de la Atmósfera, los titulares de instalaciones donde se desarrollen actividades potencialmente contaminadoras de la atmósfera recogidas en los grupos A y B del anexo IV de dicha ley deberán cumplir, adicionalmente a las establecidas en el punto 1 de dicho artículo correspondientes a todas las actividades del citado anexo, con de las siguientes obligaciones: Señale la incorrecta:",
+        options: [
+          "a) Notificar al órgano competente que determine la comunidad autónoma la transmisión, cese o clausura de las actividades e instalaciones",
+          "b) Informar periódicamente de la situación de la calidad del aire en relación con los objetivos de calidad vigentes para cada contaminante en el emplazamiento de la actividad.",
+          "c) En los casos en los que reglamentariamente se haya fijado la obligación de contar con estaciones de medida de los niveles de contaminación, integrar dichas estaciones en las redes de las comunidades autónomas...",
+          "d) Mantener un registro de los controles de emisiones y niveles de contaminación..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 191]."
+      },
+      {
+        question: "20.- ¿Cuál de las siguientes no es una Reserva Starlight aprobada en Andalucía?",
+        options: [
+          "a) Reserva Starlight de Sierra Morena",
+          "b) Reserva Starlight Sierra Norte de Sevilla",
+          "c) Reserva Starlight Sierra Sur de Jaén",
+          "d) Reserva Starlight Los Pedroches"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Reserva Starlight Sierra Norte de Sevilla)[cite: 191]."
+      },
+      {
+        question: "21.- Según se establece en el artículo 71.3 de la Ley 7/2007 de 9 de julio, de Gestión Integrada de la Calidad Ambiental, los mapas estratégicos y singulares de ruido habrán de revisarse y, en su caso, modificarse:",
+        options: [
+          "a) Cada 6 meses a partir de su fecha de aprobación",
+          "b) Cada 12 meses a partir de su fecha de aprobación",
+          "c) Cada 10 años a partir de su fecha de aprobación",
+          "d) Cada 5 años a partir de su fecha de aprobación"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cada 5 años)[cite: 191]."
+      },
+      {
+        question: "22.- ¿En qué área de sensibilidad acústica se incluirían sectores del territorio con predominio de suelo de uso sanitario, docente y cultural que requieran de especial protección contra la contaminación acústica, a tenor de la clasificación establecida en el artículo 7 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía?",
+        options: [
+          "a) Tipo a",
+          "b) Tipo b",
+          "c) Tipo e",
+          "d) Tipo f"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tipo e)[cite: 191]."
+      },
+      {
+        question: "23.- A tenor de lo establecido en el Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía, la superación de 5 dBA de los valores límites de emisión aplicables establecidos en dicho reglamento, llevará asociada una sanción que podrá oscilar entre:",
+        options: [
+          "a) 12.001 y 300.000 €",
+          "b) 120.001 y 300.000 €",
+          "c) 601 y 12.000 €",
+          "d) 6001 y 12.000 €"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 601 y 12.000 €)[cite: 191]."
+      },
+      {
+        question: "24.- A tenor de lo establecido en el artículo 5 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, la Red de vigilancia y control de la calidad del aire estará coordinada por:",
+        options: [
+          "a) La Delegación Territorial...",
+          "b) La Secretaría General competente...",
+          "c) La Dirección General competente en materia de calidad del aire de la Consejería competente en materia de Contaminación atmosférica",
+          "d) La Dirección General competente en materia de calidad del aire de la Consejería competente en materia de Medio Ambiente."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La Dirección General competente en materia de calidad del aire de la Consejería competente en materia de Medio Ambiente)[cite: 191]."
+      },
+      {
+        question: "25.- ¿Cuál será el objetivo de calidad acústica aplicable a un área de sensibilidad acústica de tipo e, en periodo nocturno, perteneciente a un área urbanizada existente, en aplicación de las prescripciones establecidas en el artículo 9 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía?",
+        options: [
+          "a) 55 dBA",
+          "b) 60 dBA",
+          "c) 63 dBA",
+          "d) 50dBA"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 50 dBA)[cite: 191]."
+      },
+      {
+        question: "26.- Según lo establecido en el artículo 13.1 de la Ley 34/2007, de 15 de noviembre, de Calidad del Aire y Protección de la Atmósfera, en lo relativo a Actividades potencialmente contaminadoras de la atmósfera, se establece que el Gobierno, con la participación de las comunidades autónomas, deberá revisar el anexo IV de la citada Ley con una periodicidad de, al menos:",
+        options: [
+          "a) 2 años",
+          "b) 5 años",
+          "c) 8 años",
+          "d) 10 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5 años)[cite: 191]."
+      },
+      {
+        question: "27.- Para determinar la carga contaminante, en el impuesto sobre emisiones de gases a la atmósfera regulado en la Ley 18/2003, de 29 de diciembre, por la que se aprueban medidas fiscales y administrativas, el valor de referencia para el cálculo de las unidades contaminantes para el CO2 será de:",
+        options: [
+          "a) 100 toneladas al año",
+          "b) 150 toneladas al año",
+          "c) 200.000 toneladas al año",
+          "d) 1 tonelada equivalente"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 200.000 toneladas al año)[cite: 191]."
+      },
+      {
+        question: "28.- ¿Cuál de los siguientes no será un mapa de ruido según la tipología establecida en el artículo 12 del Decreto 6/2012, de 17 de enero, por el que se aprueba el Reglamento de Protección contra la Contaminación Acústica en Andalucía?",
+        options: [
+          "a) Mapa Singular de ruido",
+          "b) Mapa de mejora de la calidad acústica",
+          "c) Mapa estratégico de ruido",
+          "d) Otros mapas de ruido"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Mapa de mejora de la calidad acústica)[cite: 191]."
+      },
+      {
+        question: "29.- Los Planes de Mejora de la calidad del aire, según lo establecido en el artículo 23.8 del Decreto 239/2011, de 12 de julio, por el que se regula la calidad del medio ambiente atmosférico y se crea el Registro de Sistemas de Evaluación de la Calidad del Aire en Andalucía, serán aprobados:",
+        options: [
+          "a) Por Acuerdo del Consejo de Gobierno",
+          "b) Por el Consejo de Gobierno mediante Decreto",
+          "c) Por Orden del titular de la Consejería competente en materia de Medio Ambiente",
+          "d) Por Resolución del titular de la Dirección General competente en materia de contaminación atmosférica."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Por Decreto del Consejo de Gobierno)[cite: 191]."
+      },
+      {
+        question: "30.- El artículo 22 de la Ley 1/2005, de 9 de marzo, por la que se regula el Régimen del Comercio de derechos de Emisión de Gases de Efecto Invernadero, establece el plazo para la entrega al órgano autonómico competente, por parte del titular de la instalación, del informe verificado sobre las emisiones del año precedente. La fecha límite será:",
+        options: [
+          "a) El 1 de marzo",
+          "b) El 31 de diciembre",
+          "c) Antes del 31 de marzo",
+          "d) Antes del 28 de febrero"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Antes del 28 de febrero)[cite: 191]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 19),
+      "t1_b2": test1Questions.slice(19, 38),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 15),
+      "t2_b2": test2Questions.slice(15, 30)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 20 - CALIDAD ATMOSFÉRICA, ACÚSTICA Y LUMÍNICA (COMPLETO 68 PREGUNTAS)",
+        "t1_all": "TEST BÁSICO Nº 1 - COMPLETO (38 PREGUNTAS)",
+        "t1_b1": "TEST BÁSICO Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 19)",
+        "t1_b2": "TEST BÁSICO Nº 1 - BLOQUE 2 (PREGUNTAS 20 A 38)",
+        "t2_all": "TEST DE AUTOEVALUACIÓN - COMPLETO (30 PREGUNTAS)",
+        "t2_b1": "TEST DE AUTOEVALUACIÓN - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t2_b2": "TEST DE AUTOEVALUACIÓN - BLOQUE 2 (PREGUNTAS 16 A 30)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

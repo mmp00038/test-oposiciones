@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 8 (Plagas y Enfermedades Forestales)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 8 Unificado Completo (58 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 8-1 - Test Básico (33 Preguntas)">
+          <option value="t1_all">Test 8-1 - Completo (1 - 33)</option>
+          <option value="t1_b1">Test 8-1 - Bloque 1 (1 - 17)</option>
+          <option value="t1_b2">Test 8-1 - Bloque 2 (18 - 33)</option>
+        </optgroup>
+        <optgroup label="Test 8-2 - Autoevaluación (25 Preguntas)">
+          <option value="t2_all">Test 8-2 - Completo (1 - 25)</option>
+          <option value="t2_b1">Test 8-2 - Bloque 1 (1 - 13)</option>
+          <option value="t2_b2">Test 8-2 - Bloque 2 (14 - 25)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 8 - PLAGAS Y ENFERMEDADES FORESTALES (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Una plaga o enfermedad forestal se caracteriza por:",
+        options: [
+          "a) El ataque de un insecto a cualquier parte de una planta.",
+          "b) La desaparición o alteración del equilibrio natural que existe en un ecosistema determinado, creando de esta manera variaciones en él.",
+          "c) Ataques puntuales a especies forestales.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "2.- Señale la respuesta correcta:",
+        options: [
+          "a) Una plaga es toda alteración de un cultivo producida por organismos del reino animal como vertebrados, nemátodos y sobre todo insectos, que producen daños y pérdidas apreciables de producción y calidad. Por lo general son de fácil identificación y tratamiento",
+          "b) Una enfermedad es la alteración del cultivo producida por hongos, bacterias y virus que causan daños y perturbaciones en el metabolismo de las plantas. Suelen ser en cambio de difícil determinación y control.",
+          "c) Las opciones a) y b) son correctas",
+          "d) Todas las respuestas son falsas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las opciones a) y b) son correctas)."
+      },
+      {
+        question: "3.- Según la parte de la planta atacada podemos encontrar plagas provocadas por:",
+        options: [
+          "a) Defoliadores y chupadores",
+          "b) Defoliadores y barrenadores",
+          "c) Herbívoros y saprófitos",
+          "d) Defoliadores, perforadores, descortezadores y chupadores"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Defoliadores, perforadores, descortezadores y chupadores)."
+      },
+      {
+        question: "4.- Según lo establecido en el artículo 86 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, ¿a quién corresponde adoptar las medidas necesarias para cumplir lo establecido en el artículo 49 de la Ley 2/1992, Forestal de Andalucía (Los montes deben ser defendedos de los agentes nocivos que pongan en peligro el cumplimiento de sus funciones ecológicas, sociales y económicas, así como la salud humana)?",
+        options: [
+          "a) A la Administración Forestal",
+          "b) A los propietarios de los terrenos forestales",
+          "c) A las Entidades Locales",
+          "d) A la Consejería competente en materia de salud"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: A la Administración Forestal)."
+      },
+      {
+        question: "5.- El lepidóptero Thaumetopoea pityocampa es uno de los principales agentes causantes de plagas en Andalucía, y se caracteriza porque se trata de una especie:",
+        options: [
+          "a) Perforadora de especies del género Pinus",
+          "b) Defoliadora de especies del género Quercus",
+          "c) Perforadora de especies del género Populus",
+          "d) Defoliadora de especies del género Pinus"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Defoliadora de especies del género Pinus)."
+      },
+      {
+        question: "6.- ¿Por cuantas fases larvarias pasará una oruga de Thaumetopoea pityocampa antes de crisalidar?",
+        options: [
+          "a) 4 fases larvarias",
+          "b) 5 fases larvarias",
+          "c) 6 fases larvarias",
+          "d) 5 fases larvarias en el caso de insectos macho, 6 en el caso de las hembras."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5 fases larvarias)."
+      },
+      {
+        question: "7.- Dentro del ciclo de vida de Thaumetopoea pityocampa, ¿qué fase de su vida nos podemos encontrar durante los meses de invierno en Andalucía?",
+        options: [
+          "a) El imago o adulto",
+          "b) Se encuentra dentro del huevo",
+          "c) La fase larvaria",
+          "d) Únicamente se encontrarán dentro del capullo en forma de crisálida"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La fase larvaria)."
+      },
+      {
+        question: "8.- ¿Cuál de las siguientes especies es más susceptible de ser atacada por Thaumetopoea pityocampa?",
+        options: [
+          "a) Pinus sylvestris",
+          "b) Pinus pinea",
+          "c) Pinus halepensis",
+          "d) Esta especie ataca indiferentemente a las 3 especies descritas anteriormente"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Pinus sylvestris)."
+      },
+      {
+        question: "9.- Si sobre una acícula de un árbol del género Pinus nos encontramos una larva de Acantolyda hieroglyfica sabemos que este insecto es un:",
+        options: [
+          "a) Lepidóptero",
+          "b) Himenóptero",
+          "c) Coleóptero",
+          "d) Homóptero"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Himenóptero)."
+      },
+      {
+        question: "10.- Pissodes notatus (Pissodes castaneus) es un insecto:",
+        options: [
+          "a) Perforador de coníferas",
+          "b) Defoliador de coníferas",
+          "c) Defoliador de quercíneas",
+          "d) Este insecto es muy polífago y ataca a cualquier tipo de árbol causando diversos daños tanto en su superficie foliar como en el floema."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Perforador de coníferas)."
+      },
+      {
+        question: "11.- Si levantamos la corteza de un ejemplar de Pinus y encontramos una serie de galerías provocadas por las larvas de un insecto perforador, ¿Cuál de los siguientes insectos podría ser el causante?",
+        options: [
+          "a) Diprion pini",
+          "b) Tomicus destruens",
+          "c) Lymantria dispar",
+          "d) Cualquiera de ellos podría ser el causante"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tomicus destruens)."
+      },
+      {
+        question: "12.- ¿Cuál de las siguientes especies se trata de un lepidóptero perforador de frutos de coníferas?",
+        options: [
+          "a) Pissodes validirostris",
+          "b) Dioryctria mendacella",
+          "c) Thaumetopoea pityocampa",
+          "d) Ninguno de los anteriores"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Dioryctria mendacella)."
+      },
+      {
+        question: "13.- ¿Cuál es la principal especie causante de defoliaciones en especies del género Quercus, principalmente encina y alcornoque?",
+        options: [
+          "a) Thaumetopoea pityocampa",
+          "b) Cerambix cerdo",
+          "c) Lymantria dispar",
+          "d) Ophiostoma ulmi"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Lymantria dispar)."
+      },
+      {
+        question: "14.- ¿Cuál de las siguientes especies es un coleóptero defoliador de chopos y sauces?",
+        options: [
+          "a) Melasoma populi",
+          "b) Ips sexdentatus",
+          "c) Phorocante semipunctata",
+          "d) Monochamus galloprovincialis"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Melasoma populi)."
+      },
+      {
+        question: "15.- ¿Cuál de las siguientes especies es la causante de defoliaciones en olmos que conducen al debilitamiento de estos y por lo tanto a ser atacados por coleópteros perforadores?",
+        options: [
+          "a) Thaumetopoea pityocampa",
+          "b) Melasoma populi",
+          "c) Coraebus undatus",
+          "d) Galerucella luteola"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Galerucella luteola)."
+      },
+      {
+        question: "16.- ¿Cuál de las siguientes especies es un coleóptero perforador de encinas y uno de los implicados en mortandad de estos árboles en la conocida como seca de los Quercus?",
+        options: [
+          "a) Scolytus multistriatus",
+          "b) Phorocanta semipunctata",
+          "c) Cerambix cerdo",
+          "d) Ips acuminatus"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cerambix cerdo)."
+      },
+      {
+        question: "17.- ¿Cuál de los siguientes coleópteros es el causante de ataques a la capa madre del corcho de los alcornoques y por lo tanto causante de pérdidas de producción corchera?",
+        options: [
+          "a) Coraebus florentinus",
+          "b) Coraebus undatus",
+          "c) Cerambix cerdo",
+          "d) Saperda populnea"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Coraebus undatus)."
+      },
+      {
+        question: "18.- Si observamos ramas muertas en un olmo y al desprender la corteza se observa una galería más gruesa de la que parten radialmente multitud de galerías de menor diámetro que se van ensanchando a medida que se alejan de la galería principal, ¿Cuál podría ser el causante de dicho ataque?",
+        options: [
+          "a) Ophiostoma ulmi",
+          "b) Pissodes notatus",
+          "c) Scolytus scolytus",
+          "d) Galerucella ulmi"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Scolytus scolytus)."
+      },
+      {
+        question: "19.- Señale la opción correcta en relación con la influencia del clima sobre el ciclo biológico de la procesionaria del pino según lo establecido en el plan de lucha integrada Contra la Procesionaria del Pino (Traumatocampa pityocampa) (=Thaumetopoea pityocampa) en la Comunidad Autónoma de Andalucía:",
+        options: [
+          "a) Si las temperaturas en el interior del nido sobrepasan los 30ºC las orugas abandonan rápidamente las colonias y se dispersan perdiendo su comportamiento gregario.",
+          "b) Una oruga aislada soporta hasta -7º C. Si las temperaturas descienden por debajo de los -12ºC, pueden morir las colonias enteras.",
+          "c) Por debajo de los 20º C, entre 10 y 20ºC en el nido, las orugas salen a comer cada noche, tejen el bolsón, pero no avanza en su desarrollo.",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "20.- ¿Cuántos grados o niveles de infestación se distinguen en el plan de lucha integrada Contra la Procesionaria del Pino (Traumatocampa pityocampa) (=Thaumetopoea pityocampa) en la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) 4",
+          "b) 5",
+          "c) 6",
+          "d) 10"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6)."
+      },
+      {
+        question: "21.- ¿Cuál de los siguientes será un método de control contra la procesionaria del pino, a tenor de lo establecido en el plan de lucha integrada Contra la Procesionaria del Pino (Traumatocampa pityocampa) (=Thaumetopoea pityocampa) en la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) Protección y mejora de los organismos beneficiosos importantes.",
+          "b) Gestión del pinar.",
+          "c) Tratamiento preventivo mediante la colocación de cajas anidaderas.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "22.- Si tras la evaluación de un pinar se determina que el grado de ataque es 2, ¿cuál de los siguientes métodos de control se utilizaría según lo establecido en el plan de lucha integrada Contra la Procesionaria del Pino (Traumatocampa pityocampa) (=Thaumetopoea pityocampa) en la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) Colocación intensiva de trampas de feromona",
+          "b) Tratamiento preventivo mediante la colocación de cajas anidaderas",
+          "c) Tratamiento terrestre a ultra bajo volumen",
+          "d) A partir del nivel 2 se aconseja la no intervención para no perturbar el complejo parasitario-depredador."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tratamiento terrestre a ultra bajo volumen)."
+      },
+      {
+        question: "23.- Señale la respuesta correcta en cuanto al seguimiento de las poblaciones de lagarta peluda establecido en el Plan de Lucha Integrada Contra la Lagarta Peluda (Lymantria dispar) en la Comunidad Autónoma de Andalucía",
+        options: [
+          "a) El seguimiento del nivel de población se realizará utilizando dos tipos de datos procedentes de 2 tipos de fichas: una para la red de control de capturas y otra para la detección de puestas en el rodal.",
+          "b) El seguimiento de los efectos de la plaga se realizará con ortofotos aéreas que determinarán el grado de defoliación de las masas de Quercus.",
+          "c) También se realizará un seguimiento del ataque de especies no quercíneas.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "24.- ¿Cuántos grados o niveles de infestación se distinguen en el Plan de Lucha Integrada Contra la Lagarta Peluda (Lymantria dispar) en la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) 5 grados para Andalucía oriental",
+          "b) 4 grados para Andalucía occidental",
+          "c) 6 grados en ambos casos",
+          "d) Las respuestas a) y b) son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 6 grados en ambos casos)."
+      },
+      {
+        question: "25.- ¿En qué grado de infestación se encontrará una masa de Quercus atacada por la lagarta peluda si observamos que se está realizando un tratamiento aéreo a ultra bajo volumen, a tenor de lo descrito en el Plan de Lucha Integrada Contra la Lagarta Peluda (Lymantria dispar) en la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) Grado 0",
+          "b) Grado 1",
+          "c) Grado 2",
+          "d) Grados 3 o 4"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Grado 2)."
+      },
+      {
+        question: "26.- Según el Plan de Lucha Integrada Contra Insectos Perforadores floéfagos de Coníferas en la comunidad autónoma de Andalucía, ¿Cuáles son las especies más significativas actualmente involucradas en este tipo de plaga?",
+        options: [
+          "a) Tomicus minor y Pissodes castaneus",
+          "b) Ips sexdentatus y Tomicus destruens",
+          "c) Ortotomicus erosus, Ips acuminatus y Cryphalus numidicus.",
+          "d) Tomicus minor y Pissodes validirostris."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ips sexdentatus y Tomicus destruens)."
+      },
+      {
+        question: "27.- ¿Cuál de las siguientes especies de hongos provoca una enfermedad tipo chancro?",
+        options: [
+          "a) Cycloconium quercus-ilicis",
+          "b) Phytophthora cinnamomi",
+          "c) Septoria unedonis",
+          "d) Diplodia corticola"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Diplodia corticola)."
+      },
+      {
+        question: "28.- ¿Cuál de las siguientes especies de hongos provoca una enfermedad tipo mancha foliar?",
+        options: [
+          "a) Cycloconium quercus-ilicis",
+          "b) Phytophthora cinnamomi",
+          "c) Septoria unedonis",
+          "d) Diplodia corticola"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Septoria unedonis)."
+      },
+      {
+        question: "29.- ¿Cuál de las siguientes especies de hongos provoca una enfermedad tipo podredumbre radical?",
+        options: [
+          "a) Cycloconium quercus-ilicis",
+          "b) Phytophthora cinnamomi",
+          "c) Septoria unedonis",
+          "d) Diplodia corticola"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Phytophthora cinnamomi)."
+      },
+      {
+        question: "30.- ¿Cuál de las siguientes especies de hongos provoca una enfermedad tipo mancha foliar (Roña)?",
+        options: [
+          "a) Cycloconium quercus-ilicis",
+          "b) Phytophthora cinnamomi",
+          "c) Septoria unedonis",
+          "d) Diplodia corticola"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cycloconium quercus-ilicis)."
+      },
+      {
+        question: "31.- Si observamos en las hojas de un álamo durante el verano unas manchas anaranjadas que recuerdan el óxido sobre el hierro, que acaban por formar pústulas dispersas o agrupadas, ¿cuál es la posible enfermedad y el agente causante?",
+        options: [
+          "a) Defoliación primaveral del chopo negro (Venturia populina)",
+          "b) Necrosis del chopo (Dothichiza populea)",
+          "c) Roya del chopo (Melampsora alli-populina)",
+          "d) Abolladura dorada del chopo (Taphrina aurea)"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Roya del chopo - Melampsora alli-populina)."
+      },
+      {
+        question: "32.- Si observamos daños producidos por Dothidella ulmi, ¿qué nos encontraríamos?",
+        options: [
+          "a) Manchas de color negro en las hojas de los olmos que acaban provocando una defoliación prematura.",
+          "b) Aparición de costras negras y rugosas en la corteza de las ramas de pinos.",
+          "c) Curvatura y crecimiento distorsionado en ramas de álamos y olmos.",
+          "d) Capa fina de color negro en la superficie de las hojas de diversas especies de plantas donde se han depositado secreciones azucaradas de homópteros."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Manchas de color negro en las hojas de los olmos...)."
+      },
+      {
+        question: "33.- Señale la opción correcta:",
+        options: [
+          "a) La Red de Equilibrios Biológicos de la Consejería está formada por dos redes: la Red Andaluza de Seguimiento de Daños sobre Ecosistemas Forestales (Red SEDA) y la Red de Alerta Fitosanitaria Forestal (Red FIFO).",
+          "b) La Red Andaluza de Seguimiento de Daños sobre Ecosistemas Forestales (Red Seda) realiza un diagnóstico más pormenorizado que las restantes redes existentes de los agentes causales de daños presentes en el monte andaluz, especialmente aquellos de naturaleza biótica.",
+          "c) La Red de Alerta Fitosanitaria Forestal (Red FIFO) permite responder a las demandas recibidas por parte de la Consejería sobre temas variados relacionados con el estado fitosanitario y vegetativo de las masas forestales andaluzas.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Sobre la corteza de un pino nos encontramos con un coleóptero perforador perteneciente a la familia Curculionidae, ¿de cuál de las siguientes especies puede tratarse?",
+        options: [
+          "a) Hylobius abietis",
+          "b) Tomicus destruens",
+          "c) Orthotomicus erosus",
+          "d) Ips acuminatus"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Hylobius abietis)."
+      },
+      {
+        question: "2.- ¿Cuál es el principal agente causante del Chancro del álamo?",
+        options: [
+          "a) Fusicoccum aesculi",
+          "b) Diplodia corticola",
+          "c) Cytospora chrysosperma",
+          "d) Dothiorella iberica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Cytospora chrysosperma)."
+      },
+      {
+        question: "3.- ¿Cuál de las siguientes especies no encontraríamos perforando una piña de una conífera?",
+        options: [
+          "a) Pissodes validirostris",
+          "b) Dyorictria mendacella",
+          "c) Leptoglossus occidentalis",
+          "d) Todos son perforadores de frutos de coníferas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todos son perforadores de frutos de coníferas)."
+      },
+      {
+        question: "4.- Según se establece en el Plan de lucha integrada contra la Procesionaria del pino, ¿a partir de qué temperatura, en el interior del nido, las orugas abandonan la colonia y se dispersan?",
+        options: [
+          "a) 32 ºC",
+          "b) 30 ºC",
+          "c) 28 ºC",
+          "d) -12 ºC"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30 ºC)."
+      },
+      {
+        question: "5.- ¿Cuál de las siguientes afirmaciones acerca de la especie Thaumetopoea pityocampa es falsa?",
+        options: [
+          "a) La hembra adulta tiene el abdomen cubierto de escamas con las que cubre los huevos tras la puesta.",
+          "b) La hembra es mayor que el macho y es incapaz de volar",
+          "c) La oruga experimenta desde su nacimiento cuatro mudas, pasando por cinco estadios larvarios.",
+          "d) La larva, recién emergida del huevo mide unos 3 mm."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La hembra es mayor que el macho y es incapaz de volar)."
+      },
+      {
+        question: "6.- Si en una rama de un ejemplar de Populus alba observamos un engrosamiento y un orificio circular perfectamente definido, sabremos que el daño ha sido causado por:",
+        options: [
+          "a) Un coleóptero perforador de chopos y sauces de la especie Paranthene tabaniformis",
+          "b) Un lepidóptero perforador de chopos y sauces de la especie Melanophila picta",
+          "c) Un hemiptero perforador de chopos y sauces de la especie Matsucoccus feytaudi",
+          "d) Un coleóptero perforador de chopos y sauces de la especie Saperda populnea"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Saperda populnea)."
+      },
+      {
+        question: "7.- Las Instrucciones de 27 de junio de 2001, de la Consejería de Medio Ambiente, por la que se establecen Medidas de prevención de plagas de Insectos Xilófagos en la Realización de Acciones Forestales sobre Especies del Género Pinus, establecen en su artículo 3 que se considerará material leñoso de riesgo:",
+        options: [
+          "a) Todo fragmento de fuste o rama de individuos del género Pinus cuyas dimensiones superen los 5 cm de diámetro o 10 cm de longitud.",
+          "b) Los acúmulos de fustes o ramas de individuos del género Pinus que se abandonen en el monte durante más de 25 días a menos de 1000m de otros individuos del género Pinus.",
+          "c) Los acúmulos de fustes o ramas de individuos del género Pinus que se abandonen en el monte durante más de 50 días a menos de 1000m de otros individuos del género Pinus.",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna respuesta es correcta)."
+      },
+      {
+        question: "8.- Según viene establecido en el artículo 88 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, la declaración de tratamiento obligatorio corresponde:",
+        options: [
+          "a) Al titular de la Consejería competente en materia de Medio Ambiente",
+          "b) Al titular de la Viceconsejería de la Consejería competente en materia de Medio Ambiente",
+          "c) Al titular de la Dirección General competente en materia de Gestión del Medio Natural de la Consejería competente en materia de Medio Ambiente.",
+          "d) Al titular de la Dirección General competente en materia de Sanidad Animal de la Consejería competente en materia de Ganadería."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Al titular de la Consejería competente en materia de Medio Ambiente)."
+      },
+      {
+        question: "9.- ¿Cycloconium quercus-ilicis (= Fusicladium quercus-ilicis) es el agente causante de?",
+        options: [
+          "a) Podredumbre radical (colapso tardío) de Quercus ssp., en vivero",
+          "b) Podredumbre radical de la encina y el alcornoque",
+          "c) Socarrina",
+          "d) La roña o repilo de la encina"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La roña o repilo de la encina)."
+      },
+      {
+        question: "10.- Si nos encontramos un ejemplar de Neodiprion sertifer, sabremos que se trata de:",
+        options: [
+          "a) Un lepidóptero defoliador de chopos",
+          "b) Un coleóptero perforador de coníferas",
+          "c) Un hemiptero perforador de yemas de coníferas",
+          "d) Un himenóptero defoliador de coníferas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Un himenóptero defoliador de coníferas)."
+      },
+      {
+        question: "11.- Si en el interior de una trampa de feromonas que se ha colocado preventivamente, al revisarla se encuentran 2.400 mariposas, el Plan integrado de lucha contra la Lagarta peluda establece que deberá realizarse:",
+        options: [
+          "a) Una intensificación con 30 trampas de feromonas, alrededor de dicha trampa.",
+          "b) Una intensificación con 50 trampas de feromonas, alrededor de dicha trampa.",
+          "c) Una reintensificación con 30 trampas de feromonas, alrededor de dicha trampa",
+          "d) Una reintensificación con 50 trampas de feromonas, alrededor de dicha trampa"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Una intensificación con 30 trampas de feromonas, alrededor de dicha trampa)."
+      },
+      {
+        question: "12.- ¿Qué coleóptero perforador puede causar graves perjuicios económicos en aprovechamientos corcheros?",
+        options: [
+          "a) Cerambix cerdo",
+          "b) Coraebus undatus",
+          "c) Pissodes validirostris",
+          "d) Coraebus florentinus"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Coraebus undatus)."
+      },
+      {
+        question: "13.- En el Plan de lucha contra la procesionaria del pino se establecen unos grados o niveles de infestación, el grado de infestación 5 se corresponde a:",
+        options: [
+          "a) Bastantes bolsones en bordes y claros, y algunos en el centro de la masa",
+          "b) Defoliaciones muy fuertes en toda la masa",
+          "c) Defoliaciones parciales en bordes y pies aislados, y bastantes bolsones en el centro de la masa",
+          "d) Defoliaciones muy fuertes en bordes y pies aislados y parciales en el resto de la masa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Defoliaciones muy fuertes en toda la masa)."
+      },
+      {
+        question: "14.- Si en una rama de un ejemplar del género Quercus nos encontramos unos huevos color blanco sucio dispuestos de manera helicoidal envolviendo a dicha rama a modo de manguito, sabemos que dicha puesta ha sido realizada por:",
+        options: [
+          "a) Lymantria dispar",
+          "b) Tortrix viridiana",
+          "c) Thaumetopoea pityocampa",
+          "d) Malacosoma neustria"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Malacosoma neustria)."
+      },
+      {
+        question: "15.- Si en una masa de alcornoques situada en Cádiz se detecta que los árboles presentan de 50 a 200 puestas/pie en focos de más de 200 árboles o más de 200 puestas por pie en focos de menos de 200 árboles, estaremos ante un grado de infección, según se establece en el Plan de lucha integrada contra la Lagarta peluda?",
+        options: [
+          "a) Grado 3",
+          "b) Grado 4",
+          "c) Grado 5",
+          "d) El enunciado no es correcto"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grado 4)."
+      },
+      {
+        question: "16.- ¿Que coleóptero perforador es vector de la grafiosis del olmo?",
+        options: [
+          "a) Los curculiónidos del género Scolytus",
+          "b) Phorocantha semipunctata",
+          "c) Galerucella luteola",
+          "d) Curculio elephas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Los curculiónidos del género Scolytus)."
+      },
+      {
+        question: "17.- ¿Cuál de las siguientes NO es una especie defoliadora del género Pinus?",
+        options: [
+          "a) Thaumetopoea pityocampa",
+          "b) Lymantria monacha",
+          "c) Lymantria dispar",
+          "d) Acantholida hieroglyphica"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Lymantria dispar)."
+      },
+      {
+        question: "18.- En una masa de Pinus pinaster observamos exudados de resina y amarilleamiento de las acículas, y sobre la corteza encontramos ejemplares del cerambícido Monochamus galloprovincialis. ¿Cuál es la afección más probable que presenta la masa de pinar?",
+        options: [
+          "a) Los pinos están sufriendo el ataque de la larva de dicho cerambícido, que pueden llegar a anillarlo.",
+          "b) Los pinos sufren ataques de Cenangium ferruginosum",
+          "c) Sufren el ataque del nematodo Bursaphelenchus xylophilus",
+          "d) Están siendo atacados por Melapsora pinitorcua"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Sufren el ataque del nematodo Bursaphelenchus xylophilus)."
+      },
+      {
+        question: "19.- Si durante el mes de abril vamos paseando por un alcornocal que está siendo atacado por la Lagarta peluda (Lymantria dispar), ¿qué fase o fases de su ciclo biológico podemos observar?",
+        options: [
+          "a) Podemos encontrar todas las fases del ciclo: Imago, puesta, larva y pupa.",
+          "b) Solo encontraremos imagos",
+          "c) Únicamente encontraremos larvas",
+          "d) Encontraremos larvas y pupas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Únicamente encontraremos larvas)."
+      },
+      {
+        question: "20.- ¿Cuál de los siguientes tratamientos será adecuado para un Grado de infestación 2 en una masa de pinar atacada por Thaumetopoea pityocampa, según se establece en el Plan de lucha integrada contra la procesionaria del pino?",
+        options: [
+          "a) Tratamiento manual de los bolsones",
+          "b) Tratamiento terrestre ultra bajo volumen",
+          "c) Colocación intensiva de trampas de feromonas",
+          "d) Tratamiento preventivo mediante la colocación de cajas anidaderas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tratamiento terrestre ultra bajo volumen)."
+      },
+      {
+        question: "21.- Con respecto al ciclo biológico de Thaumetopoea pityocampa, si paseamos por un pinar durante el mes de mayo, que fases del insecto podemos observar?",
+        options: [
+          "a) Únicamente al imago",
+          "b) Se pueden encontrar imagos y larvas",
+          "c) Únicamente podemos encontrar crisálidas enterradas",
+          "d) Se pueden observar todas las fases del insecto."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Únicamente podemos encontrar crisálidas enterradas)."
+      },
+      {
+        question: "22.- En una masa de álamos se observa que las hojas de la parte baja y externa de la copa presentan una especie de abolladuras con la parte cóncava en el envés y color amarillo. Se trata de una enfermedad fúngica provocada por:",
+        options: [
+          "a) Taphrina aurea",
+          "b) Melampsora allii-populina",
+          "c) Venturia populina",
+          "d) Melampsora populnea"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Taphrina aurea)."
+      },
+      {
+        question: "23.- ¿Cuál de las siguientes afirmaciones acerca de Lymantria dispar es correcta?",
+        options: [
+          "a) Se trata de un lepidóptero defoliador de Quercus de la familia Lymantriidae",
+          "b) La hembra es capaz de volar largas distancias atraída por las feromonas emitidas por los machos.",
+          "c) La crisalidación de este insecto tiene lugar en el suelo a una profundidad de entre 15 y 20 cm.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Se trata de un lepidóptero defoliador de Quercus de la familia Lymantriidae)."
+      },
+      {
+        question: "24.- ¿Cuál de los siguientes NO es uno de los principales agentes desencadenantes de la muerte de encinas y alcornoques en la denominada Seca?",
+        options: [
+          "a) Coroebus florentinus",
+          "b) Phytophthora cinnamomi",
+          "c) Cerambyx cerdo",
+          "d) Botryosphaeria corticola"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Coroebus florentinus)."
+      },
+      {
+        question: "25.- ¿La larva de cuál de los siguientes insectos podríamos encontrar dentro de una bellota alimentándose de ella?",
+        options: [
+          "a) Curculio elephas",
+          "b) Cydia penkleriana",
+          "c) Pammene fasciana",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 17),
+      "t1_b2": test1Questions.slice(17, 33),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 13),
+      "t2_b2": test2Questions.slice(13, 25)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 8 - PLAGAS Y ENFERMEDADES FORESTALES (UNIFICADO COMPLETO 58 PREGUNTAS)",
+        "t1_all": "TEST 8-1 - TEST BÁSICO COMPLETO (33 PREGUNTAS)",
+        "t1_b1": "TEST 8-1 - BLOQUE 1 (PREGUNTAS 1 A 17)",
+        "t1_b2": "TEST 8-1 - BLOQUE 2 (PREGUNTAS 18 A 33)",
+        "t2_all": "TEST 8-2 - AUTOEVALUACIÓN COMPLETO (25 PREGUNTAS)",
+        "t2_b1": "TEST 8-2 - BLOQUE 1 (PREGUNTAS 1 A 13)",
+        "t2_b2": "TEST 8-2 - BLOQUE 2 (PREGUNTAS 14 A 25)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

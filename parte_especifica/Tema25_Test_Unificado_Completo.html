@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 25 (Agentes de Medio Ambiente de Andalucía)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 25 Unificado Completo (35 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Nº 1 (15 Preguntas)">
+          <option value="t1_all">Test Nº 1 - Completo (1 - 15)</option>
+          <option value="t1_b1">Test Nº 1 - Bloque 1 (1 - 8)</option>
+          <option value="t1_b2">Test Nº 1 - Bloque 2 (9 - 15)</option>
+        </optgroup>
+        <optgroup label="Test Nº 2 (20 Preguntas)">
+          <option value="t2_all">Test Nº 2 - Completo (1 - 20)</option>
+          <option value="t2_b1">Test Nº 2 - Bloque 1 (1 - 10)</option>
+          <option value="t2_b2">Test Nº 2 - Bloque 2 (11 - 20)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 25 - LOS AGENTES DE MEDIO AMBIENTE EN ANDALUCÍA (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. La normativa andaluza por la que se crea la especialidad de Agentes de Medio Ambiente de la Junta de Andalucía es el/la",
+        options: [
+          "a) Orden de la Consejería de Medio Ambiente de 15/2001 de 26 de Diciembre",
+          "b) Ley 15/2001 de 26 de Diciembre",
+          "c) Decreto del Consejo de Gobierno de 15/2001 de 26 de Diciembre",
+          "d) Resolución de la Dirección General del Gestión del Medio Natural de 15/2001 de 26 de Diciembre"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ley 15/2001 de 26 de Diciembre)[cite: 190]."
+      },
+      {
+        question: "2. ¿Cuál es el año de creación de la Consejería de Medio Ambiente de la Junta de Andalucía?",
+        options: [
+          "a) 1991",
+          "b) 1992",
+          "c) 1993",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna respuesta es correcta. Fue creada por Decreto del Presidente 132/1994, de 13 de mayo)[cite: 190]."
+      },
+      {
+        question: "3. El grupo al que pertenece la especialidad de Agentes de Medio Ambiente, dentro del Cuerpo de Ayudantes Técnicos de la Junta de Andalucía es el:",
+        options: [
+          "a) Grupo B",
+          "b) Grupo D",
+          "c) Grupo C",
+          "d) Grupo A"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Grupo C / C1)[cite: 190]."
+      },
+      {
+        question: "4. La Carta de Servicios de los Agentes de Medio Ambiente se aprobó en el año:",
+        options: [
+          "a) 2002",
+          "b) 2003",
+          "c) 2004",
+          "d) 2005"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 2005)[cite: 190]."
+      },
+      {
+        question: "5. Según la Orden por la que se aprueba la Carta de Servicios de la Secretaría General Técnica para los agentes de medio ambiente, la Unidad responsable de la coordinación operativa en los trabajos de elaboración, gestión y seguimiento de la Carta de Servicios es:",
+        options: [
+          "a) La Secretaría General Técnica al unísono con los centros directivos con competencias en materia de medio ambiente.",
+          "b) La Secretaría General Técnica al unísono con las Coordinaciones Provinciales de Agentes de Medio Ambiente.",
+          "c) La Viceconsejería al unísono con la Secretaría General Técnica.",
+          "d) La Secretaría General Técnica al unísono con el órgano directivo competente en materia de Administración Pública"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 190]."
+      },
+      {
+        question: "6. La Carta de Servicios recoge una serie de áreas de trabajo en la que se concentran los servicios que realizan los Agentes de Medio Ambiente. Entre estas áreas de trabajo NO se encuentra:",
+        options: [
+          "a) Seguridad y emergencias",
+          "b) Gestión del Uso Público",
+          "c) Prevención y calidad ambiental",
+          "d) Todas ellas son áreas de trabajo de los Agentes de Medio Ambiente"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas ellas son áreas de trabajo de los Agentes de Medio Ambiente)[cite: 190]."
+      },
+      {
+        question: "7. Según la citada Carta de Servicios, ¿a quién le corresponde llevar el control de las denuncias, quejas, sugerencias o reclamaciones que presente la ciudadanía en relación con el funcionamiento de los servicios prestados por los agentes de medio ambiente?",
+        options: [
+          "a) Al Coordinador General de los Agentes de Medio Ambiente",
+          "b) A la Inspección General de Servicios de la Junta de Andalucía",
+          "c) A los Coordinadores Provinciales, por lo interpuesto en servicios prestados en su provincia",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: A la Inspección General de Servicios de la Junta de Andalucía)[cite: 190]."
+      },
+      {
+        question: "8. La Orden de 28 de Octubre de 1999, que establece la jornada y horario de los agentes de Medio Ambiente ha sido modificada, desde su aprobación, por diversas órdenes hasta su redacción actual. ¿Cuántas han sido las normas que han modificado ésta?",
+        options: [
+          "a) 1",
+          "b) 2",
+          "c) 3",
+          "d) 4"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 3 normas)[cite: 190]."
+      },
+      {
+        question: "9. En relación con la jornada y horario de los agentes de medio ambiente, regulada por la Orden de 28 de octubre de 1999 y sus posteriores modificaciones, indique cuál de los siguientes enunciados ES correcto:",
+        options: [
+          "a) La jornada diaria ordinaria será de 7 horas. De lunes a viernes, el horario de mañana comenzará a las 8 horas y el de tarde a las 15 horas. Para los fines de semana se podrán aplicar horarios especiales, exceptuando el período comprendido entre el día 1 de mayo y el 15 de octubre",
+          "b) La jornada diaria ordinaria será de 7 horas. De lunes a viernes, el horario de mañana comenzará a las 8 horas y el de tarde a las 16 horas. Para los fines de semana se podrán aplicar horarios especiales, exceptuando el período comprendido entre el día 1 de mayo y el 15 de octubre",
+          "c) La jornada diaria ordinaria será de 7 horas. De lunes a viernes, el horario de mañana comenzará a las 8 horas y el de tarde a las 16 horas. Para los fines de semana se podrán aplicar horarios especiales, exceptuando el período comprendido entre el día 15 de junio y el 15 de septiembre",
+          "d) La jornada diaria ordinaria será de 7 horas. De lunes a viernes, el horario de mañana comenzará a las 8 horas y el de tarde a las 15 horas. Para los fines de semana se podrán aplicar horarios especiales, exceptuando el período comprendido entre el día 1 de mayo y el 30 de septiembre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Mañana a las 8h, tarde a las 15h; excepción de fin de semana entre el 1 de mayo y el 30 de septiembre)[cite: 190]."
+      },
+      {
+        question: "10. Siguiendo con la Orden de 28 de Octubre, a lo largo del año, como máximo, se incluirán como laborales:",
+        options: [
+          "a) 10 fines de semana",
+          "b) 11 fines de semana",
+          "c) 12 fines de semana",
+          "d) 13 fines de semana"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 13 fines de semana)[cite: 190]."
+      },
+      {
+        question: "11. La orden de 10 de marzo de 2011 que regula la acreditación, identificación y uniformidad de los Agentes de Medio Ambiente, determina que el Número de Identificación de Agente está compuesto por:",
+        options: [
+          "a) 4 letras y 2 números",
+          "b) 4 números y 2 letras",
+          "c) 6 letras y 3 números",
+          "d) 6 números y 3 letras"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4 números y 2 letras)[cite: 190]."
+      },
+      {
+        question: "12. En cuanto a lo recogido en el Anexo I de esta Orden, la Placa identificativa de la Especialidad de Agentes de Medio Ambiente tendrá unas dimensiones de:",
+        options: [
+          "a) 75 mm de alto y 50 mm de ancho",
+          "b) 75 mm de alto y 55 mm de ancho",
+          "c) 70 mm de alto y 55 mm de ancho",
+          "d) 70 mm de alto y 50 mm de ancho"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 70 mm de alto y 55 mm de ancho)[cite: 190]."
+      },
+      {
+        question: "13. Dentro de la actual estructura jerárquica del cuerpo de Agentes de Medio Ambiente, el acceso al cuerpo se realiza con un grado personal de nivel:",
+        options: [
+          "a) 15",
+          "b) 16",
+          "c) 18",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Nivel 16)[cite: 190]."
+      },
+      {
+        question: "14. ¿Cuál de las siguientes siglas no corresponde a una unidad o brigada especializada dentro del cuerpo de Agentes de Medio Ambiente?",
+        options: [
+          "a) UFOA",
+          "b) BIVE",
+          "c) BIIF",
+          "d) UVCO"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: UVCO)[cite: 190]."
+      },
+      {
+        question: "15. ¿En qué Ley se define la figura del Agente forestal como el funcionario que ostenta la condición de agente de la autoridad, que tiene encomendadas funciones de vigilancia, policía y custodia de los bienes jurídicos de naturaleza forestal y la de policía judicial en sentido genérico?",
+        options: [
+          "a) Ley 43/2003 de 21 de Noviembre",
+          "b) Ley 2/1992 de 15 Junio",
+          "c) Ley 8/2003 de 28 de Octubre",
+          "d) Ley 5/1999 de 29 de Junio"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Ley 43/2003 de 21 de Noviembre, de Montes)[cite: 190]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. Según el artículo 3.1 de la Ley 4/2024, ¿en qué circunstancia se extiende la protección jurídico-penal de \"agente de la autoridad\" a un agente forestal que se encuentra fuera de servicio?",
+        options: [
+          "a) Únicamente si interviene en un delito flagrante contra el patrimonio natural.",
+          "b) En supuestos de agresiones o amenazas que se realicen como consecuencia o motivación de su ámbito profesional.",
+          "c) Siempre que el agente se identifique fehacientemente con su tarjeta profesional antes del altercado.",
+          "d) La ley básica no contempla la protección fuera de servicio, dejando esta regulación a las normas autonómicas de policía."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: En supuestos de agresiones o amenazas que se realicen como consecuencia o motivación de su ámbito profesional)[cite: 191]."
+      },
+      {
+        question: "2. En relación con el valor probatorio, ¿qué requisito establece el artículo 5.2 de la Ley 4/2024 para que las actas y denuncias de los agentes ostenten presunción de certeza?",
+        options: [
+          "a) Que vayan acompañadas de un informe técnico ratificado por un superior jerárquico.",
+          "b) Que el agente esté presente en la fase instructora del expediente sancionador.",
+          "c) Su previa ratificación en el caso de haber sido negados los hechos por las personas interesadas.",
+          "d) La ley básica establece que gozan de presunción de veracidad absoluta sin necesidad de ratificación posterior."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Su previa ratificación en el caso de haber sido negados los hechos por las personas interesadas)[cite: 191]."
+      },
+      {
+        question: "3. Respecto al uso de sistemas de aeronaves no tripuladas (UAS), la Ley 4/2024 estipula que los agentes podrán utilizarlos:",
+        options: [
+          "a) Libremente en cualquier espacio, prevaleciendo la normativa ambiental sobre la de protección de datos.",
+          "b) Con respeto a las normas de protección de datos, derecho al honor e intimidad y a lo establecido en la Ley de Enjuiciamiento Criminal.",
+          "c) Solo si cuentan con una autorización judicial previa para cada vuelo de inspección.",
+          "d) Únicamente para la vigilancia de incendios forestales y búsqueda de personas desaparecidas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Con respeto a las normas de protección de datos, derecho al honor e intimidad y a lo establecido en la Ley de Enjuiciamiento Criminal)[cite: 191]."
+      },
+      {
+        question: "4. ¿Qué plazo máximo otorga el artículo 14 de la Ley 4/2024 para que las administraciones públicas elaboren un plan de igualdad específico para el colectivo de agentes?",
+        options: [
+          "a) Seis meses desde la entrada en vigor de la ley.",
+          "b) Un año.",
+          "c) Dos años, coincidiendo con la implantación del plan estratégico.",
+          "d) No establece plazo, remitiendo a los planes generales de cada administración."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Un año)[cite: 191]."
+      },
+      {
+        question: "5. La Ley 3/2025 crea el Cuerpo Técnico de Agentes Medioambientales de la Junta de Andalucía. ¿En qué grupo de clasificación se encuadra y cuáles son sus funciones principales?",
+        options: [
+          "a) Grupo A2; funciones de inspección y apoyo a la coordinación.",
+          "b) Grupo B; funciones técnicas de ejecución y de asistencia a la inspección.",
+          "c) Grupo C1; funciones básicas de custodia y auxilio operacional.",
+          "d) Grupo B; funciones de planificación y dirección de unidades territoriales."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grupo B; funciones técnicas de ejecución y de asistencia a la inspección)[cite: 191]."
+      },
+      {
+        question: "6. De acuerdo con el artículo 20 de la Ley 3/2025, ¿qué área de especialización es aplicable exclusivamente al Cuerpo Operativo?",
+        options: [
+          "a) Calidad ambiental.",
+          "b) Aguas continentales y litorales.",
+          "c) Incendios forestales.",
+          "d) Conservación de la naturaleza y biodiversidad."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Incendios forestales)[cite: 191]."
+      },
+      {
+        question: "7. Para el acceso al Cuerpo Superior de Agentes Medioambientales (A1) en Andalucía, el artículo 10 de la Ley 3/2025 exige titulación de Grado en ámbitos específicos. ¿Cuál de los siguientes NO es un ámbito habilitante según dicho artículo?",
+        options: [
+          "a) Derecho y especialidades jurídicas.",
+          "b) Ciencias agrarias y tecnologías de los alimentos.",
+          "c) Bellas Artes y Restauración de Bienes Culturales.",
+          "d) Veterinaria y Ciencias de la Educación."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Bellas Artes y Restauración de Bienes Culturales)[cite: 191]."
+      },
+      {
+        question: "8. Según la Disposición adicional primera de la Ley 3/2025, ¿qué ocurre con el personal funcionario de la antigua especialidad C1.2100 al entrar en vigor la ley?",
+        options: [
+          "a) Deben superar un curso de aptitud para integrarse en el nuevo Cuerpo Operativo.",
+          "b) Se integran en el Cuerpo Técnico (Grupo B) si poseen la titulación de Técnico Superior.",
+          "c) Se integran en el Cuerpo Operativo (C1) independientemente de su titulación.",
+          "d) Permanecen en su especialidad actual como cuerpo a extinguir."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Se integran en el Cuerpo Operativo (C1) independientemente de su titulación)[cite: 191]."
+      },
+      {
+        question: "9. El artículo 28 de la Ley 3/2025 regula la \"segunda actividad\". ¿Cuál es el presupuesto necesario para que un agente pase a esta situación?",
+        options: [
+          "a) Haber cumplido los 60 años de edad y solicitarlo voluntariamente.",
+          "b) Ser declarado \"no apto\" para el ejercicio habitual tras reconocimiento médico en un centro de prevención de riesgos laborales, sin que implique incapacidad de la Seguridad Social.",
+          "c) Haber sido objeto de una sanción disciplinaria por falta grave.",
+          "d) Por necesidades del servicio para cubrir vacantes administrativas en delegaciones provinciales."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ser declarado \"no apto\" para el ejercicio habitual tras reconocimiento médico en un centro de prevención de riesgos laborales, sin que implique incapacidad de la Seguridad Social)[cite: 191]."
+      },
+      {
+        question: "10. Conforme a la Ley 3/2025 ¿cómo se definen las Unidades Territoriales en Andalucía?",
+        options: [
+          "a) Como el ámbito de actuación de una Unidad Biogeográfica según el Decreto de 2005.",
+          "b) Como el territorio integrado por los municipios que se determinen mediante resolución del órgano directivo competente.",
+          "c) Como las demarcaciones coincidentes con los partidos judiciales de la comunidad.",
+          "d) Como las áreas de influencia de los Centros de Defensa Forestal (CEDEFO)."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Como el territorio integrado por los municipios que se determinen mediante resolución del órgano directivo competente)[cite: 191]."
+      },
+      {
+        question: "11. La Ley 4/2024 establece en su artículo 4.1.a que ciertas funciones se consideran propias de los agentes de la Administración General del Estado, salvo que la normativa autonómica disponga lo contrario. ¿A qué materias se refiere?",
+        options: [
+          "a) Prevención de incendios e investigación de causas.",
+          "b) Dominio público hidráulico, marítimo-terrestre y costas.",
+          "c) Vigilancia de espacios naturales protegidos de la Red Natura 2000.",
+          "d) Control de especies exóticas invasoras y plagas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Dominio público hidráulico, marítimo-terrestre y costas)[cite: 191]."
+      },
+      {
+        question: "12. Ante una actuación de decomiso, el artículo 5.1.d de la Ley 4/2024 obliga al agente a:",
+        options: [
+          "a) Destruir los elementos decomisados si son perecederos antes de 24 horas.",
+          "b) Poner la medida de forma inmediata en conocimiento de la unidad administrativa adscrita y del órgano sancionador competente.",
+          "c) Solicitar autorización judicial previa para proceder a la retirada de cualquier bien privado.",
+          "d) Entregar los elementos al Ayuntamiento más cercano para su custodia provisional."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Poner la medida de forma inmediata en conocimiento de la unidad administrativa adscrita y del órgano sancionador competente)[cite: 191]."
+      },
+      {
+        question: "13. Según la Ley 3/2025, los Cuerpos de Agentes Medioambientales están adscritos orgánica y funcionalmente a:",
+        options: [
+          "a) La Consejería de Presidencia e Interior, por su carácter de servicio de emergencias.",
+          "b) La Consejería con competencias en materia de medio ambiente, de manera conjunta.",
+          "c) La Agencia de Medio Ambiente y Agua (AMAYA), como personal laboral de apoyo.",
+          "d) Las Delegaciones del Gobierno de cada provincia andaluza."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La Consejería con competencias en materia de medio ambiente, de manera conjunta)[cite: 191]."
+      },
+      {
+        question: "14. Entrando en el TREBEP, el artículo 53.2 define el principio de imparcialidad. ¿Qué factor debe influir en la actuación de un empleado público?",
+        options: [
+          "a) Posiciones personales o familiares.",
+          "b) Intereses corporativos o clientelares.",
+          "c) Factores que expresen el interés común y la satisfacción de intereses generales.",
+          "d) Cualquier factor que colisione con la objetividad de su función."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Factores que expresen el interés común y la satisfacción de intereses generales)[cite: 191]."
+      },
+      {
+        question: "15. El deber de secreto profesional (Art. 53.11 TREBEP) estipula que los empleados públicos:",
+        options: [
+          "a) Pueden difundir información reservada si es para beneficio del interés público general.",
+          "b) Guardarán secreto de las materias clasificadas y mantendrán discreción sobre asuntos conocidos por razón de su cargo.",
+          "c) Solo están obligados al secreto si así se indica expresamente en su contrato o nombramiento.",
+          "d) Pueden utilizar la información obtenida para beneficio de terceros si no hay perjuicio para la Administración."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Guardarán secreto de las materias clasificadas y mantendrán discreción sobre asuntos conocidos por razón de su cargo)[cite: 191]."
+      },
+      {
+        question: "16. Dentro de los principios de conducta (Art. 54 TREBEP), ¿cómo debe actuar un agente ante una orden de un superior que constituya una infracción manifiesta del ordenamiento jurídico?",
+        options: [
+          "a) Debe cumplirla bajo el principio de jerarquía y luego impugnarla.",
+          "b) Debe obedecerla, pero dejando constancia por escrito de su disconformidad.",
+          "c) No debe obedecerla y debe ponerla inmediatamente en conocimiento de los órganos de inspección procedentes.",
+          "d) La obediencia debida es absoluta en el ámbito de la policía administrativa."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: No debe obedecerla y debe ponerla inmediatamente en conocimiento de los órganos de inspección procedentes)[cite: 191]."
+      },
+      {
+        question: "17. Según el artículo 54.5 del TREBEP, respecto a los recursos y bienes públicos, el empleado público tiene el deber de:",
+        options: [
+          "a) Utilizarlos en provecho propio solo en casos de emergencia debidamente justificados.",
+          "b) Administrarlos con austeridad y velar por su conservación, sin usarlos en provecho de personas allegadas.",
+          "c) Priorizar la eficacia sobre la economía en la gestión de materiales de campo.",
+          "d) Garantizar su renovación anual solicitando partidas presupuestarias adicionales."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Administrarlos con austeridad y velar por su conservación, sin usarlos en provecho de personas allegadas)[cite: 191]."
+      },
+      {
+        question: "18. En cuanto a la atención al ciudadano (Art. 54.11 TREBEP), el empleado público debe garantizarla:",
+        options: [
+          "a) Únicamente en castellano, como lengua oficial del Estado.",
+          "b) En la lengua que el ciudadano solicite, siempre que sea oficial en el territorio.",
+          "c) En cualquier lengua extranjera si el agente posee la titulación de idiomas correspondiente.",
+          "d) Exclusivamente a través de medios electrónicos si así lo establece la carta de servicios."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: En la lengua que el ciudadano solicite, siempre que sea oficial en el territorio)[cite: 191]."
+      },
+      {
+        question: "19. El principio ético de dedicación al servicio público (Art. 53.10 TREBEP) implica:",
+        options: [
+          "a) Abstenerse de cualquier conducta que comprometa la neutralidad en el ejercicio de los servicios públicos.",
+          "b) Trabajar exclusivamente en régimen de disponibilidad absoluta sin derecho a compensación.",
+          "c) Realizar funciones ajenas a su puesto si el interés general así lo requiere de forma puntual.",
+          "d) El derecho a la promoción profesional basado únicamente en la antigüedad."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Abstenerse de cualquier conducta que comprometa la neutralidad en el ejercicio de los servicios públicos)[cite: 191]."
+      },
+      {
+        question: "20. Según el Código de Conducta (Art. 54.9 TREBEP), es una obligación del empleado público observar las normas sobre:",
+        options: [
+          "a) Relaciones públicas y protocolo institucional.",
+          "b) Seguridad y salud laboral.",
+          "c) Transparencia y acceso a la información únicamente si es personal directivo.",
+          "d) Formación continua solo cuando se realice en horario de trabajo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Seguridad y salud laboral)[cite: 191]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 8),
+      "t1_b2": test1Questions.slice(8, 15),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 10),
+      "t2_b2": test2Questions.slice(10, 20)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 25 - LOS AGENTES DE MEDIO AMBIENTE EN ANDALUCÍA (COMPLETO 35 PREGUNTAS)",
+        "t1_all": "TEST Nº 1 - COMPLETO (15 PREGUNTAS)",
+        "t1_b1": "TEST Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 8)",
+        "t1_b2": "TEST Nº 1 - BLOQUE 2 (PREGUNTAS 9 A 15)",
+        "t2_all": "TEST Nº 2 - COMPLETO (20 PREGUNTAS)",
+        "t2_b1": "TEST Nº 2 - BLOQUE 1 (PREGUNTAS 1 A 10)",
+        "t2_b2": "TEST Nº 2 - BLOQUE 2 (PREGUNTAS 11 A 20)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

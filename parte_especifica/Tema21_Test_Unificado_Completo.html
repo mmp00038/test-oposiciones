@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 21 (Dominio Público Hidráulico, Aguas y Vertidos)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 21 Unificado Completo (57 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Básico Nº 1 (38 Preguntas)">
+          <option value="t1_all">Test Básico Nº 1 - Completo (1 - 38)</option>
+          <option value="t1_b1">Test Básico Nº 1 - Bloque 1 (1 - 19)</option>
+          <option value="t1_b2">Test Básico Nº 1 - Bloque 2 (20 - 38)</option>
+        </optgroup>
+        <optgroup label="Test de Autoevaluación Nº 1 (19 Preguntas)">
+          <option value="t2_all">Test Autoevaluación - Completo (1 - 19)</option>
+          <option value="t2_b1">Test Autoevaluación - Bloque 1 (1 - 10)</option>
+          <option value="t2_b2">Test Autoevaluación - Bloque 2 (11 - 19)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 21 - DOMINIO PÚBLICO HIDRÁULICO, AGUAS Y VERTIDOS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Señale la respuesta incorrecta según lo established en el artículo 50 de la Ley Orgánica 2/2007 de 19 de marzo, de reforma del Estatuto de Autonomía para Andalucía. En materia de aguas que transcurran íntegramente por Andalucía le corresponde a la Comunidad Autónoma de Andalucía la competencia exclusiva sobre:",
+        options: [
+          "a) Recursos y aprovechamientos hidráulicos, canales y regadíos, cuando las aguas transcurran por Andalucía. Aguas subterráneas cuando su aprovechamiento no afecte a otro territorio.",
+          "b) Aguas minerales y termales",
+          "c) Aducción de recursos hídricos y garantía de abastecimiento a la población.",
+          "d) La participación de los usuarios, la garantía del suministro, la regulación parcelaria y las obras de transformación, modernización y consolidación de regadíos y para el ahorro y uso eficiente del agua."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 192]."
+      },
+      {
+        question: "2.- El artículo 2 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece que constituyen el dominio público hidráulico del Estado, con las salvedades expresamente establecidas en esta Ley: Señale la opción incorrecta",
+        options: [
+          "a) Las aguas continentales, tanto las superficiales como las subterráneas renovables con independencia del tiempo de renovación",
+          "b) Los cauces de corrientes naturales, continuas o discontinuas",
+          "c) Los acuíferos, a los efectos de los actos de disposición o de afección de los recursos hidráulicos",
+          "d) Las aguas territoriales, entendiéndose como estas las aguas superficiales situadas hacia tierra desde una línea cuya totalidad de puntos se encuentra a una distancia de una milla náutica mar adentro desde el punto más próximo de la línea de base."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 192]."
+      },
+      {
+        question: "3.- Señale la opción correcta relativa a las riberas, según lo establecido en el artículo 6 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas:",
+        options: [
+          "a) Se entiende por riberas las fajas laterales de los cauces públicos situadas por encima del nivel de aguas bajas",
+          "b) Las márgenes están sujetas a una zona de servidumbre de 20 metros de anchura, para uso público que se regulará reglamentariamente.",
+          "c) Las márgenes están sujetas a una zona de policía de un mínimo de 500 metros de anchura, en la que se condicionará el uso del suelo y las actividades que se desarrollen.",
+          "d) En las zonas próximas a la desembocadura en el mar se podrá modificar la anchura de la zona de policía hasta un mínimo de 20 metros, con las salvedades establecidas reglamentariamente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Se entiende por riberas las fajas laterales de los cauces públicos situadas por encima del nivel de aguas bajas)[cite: 192]."
+      },
+      {
+        question: "4.- ¿A qué se corresponde la siguiente definición enunciada en el artículo 16 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas: \"Superficie de terreno cuya escorrentía superficial fluye en su totalidad a través de una serie de corrientes, ríos y eventualmente lagos hacia el mar por una única desembocadura, estuario o delta\"?",
+        options: [
+          "a) Demarcación hidrográfica",
+          "b) Cuenca hidrográfica",
+          "c) Aguas continentales",
+          "d) Aguas terrestres"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cuenca hidrográfica)[cite: 192]."
+      },
+      {
+        question: "5.- El artículo 23 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece las funciones de los organismos de cuenca, entre las que no se encuentra:",
+        options: [
+          "a) La administración y control del dominio público marítimo terrestre",
+          "b) La elaboración del plan hidrológico de cuenca, así como su seguimiento y revisión",
+          "c) La administración y control de los aprovechamientos de interés general o que afecten a más de una Comunidad Autónoma",
+          "d) El proyecto, la construcción y explotación de las obras realizadas con cargo a los fondos propios del organismo, y las que les sean encomendadas por el Estado"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 192]."
+      },
+      {
+        question: "6.- El artículo 40 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece que los planes hidrológicos de cuenca se aprobarán:",
+        options: [
+          "a) Mediante Orden del Ministro competente en materia de medio ambiente",
+          "b) Mediante Orden del Ministro competente en materia de agua",
+          "c) Mediante Real Decreto del Gobierno",
+          "d) Mediante Ley de las Cortes"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Mediante Real Decreto del Gobierno)[cite: 192]."
+      },
+      {
+        question: "7.- Señale la opción incorrecta en cuanto a las definiciones establecidas en el artículo 40 bis del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas:",
+        options: [
+          "a) Se entenderán por aguas continentales todas las aguas en la superficie del suelo y todas las aguas subterráneas situadas hacia tierra desde la línea que sirve de base para medir la anchura de las aguas territoriales.",
+          "b) Se entiende por acuífero una o más capas subterráneas de roca o de otros estratos geológicos que tienen la suficiente porosidad y permeabilidad...",
+          "c) Se entienden por aguas superficiales las aguas continentales, incluidas las aguas subterráneas; las aguas de transición y las aguas costeras, y, en lo que se refiere al estado químico, también las aguas territoriales.",
+          "d) Se entiende por masa de agua superficial una parte diferenciada y significativa de agua superficial..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 192]."
+      },
+      {
+        question: "8.- Los planes hidrológicos de cuenca incluirán, a tenor de lo establecido en el artículo 42 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas:",
+        options: [
+          "a) La descripción general de la demarcación hidrográfica",
+          "b) La descripción general de los usos, presiones e incidencias antrópicas significativas sobre las aguas",
+          "c) La lista de objetivos medioambientales para las aguas superficiales, las aguas subterráneas y las zonas protegidas...",
+          "d) Todas las opciones son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)[cite: 192]."
+      },
+      {
+        question: "9.- Señale la opción incorrecta en lo relativo al Plan Hidrológico Nacional, enunciado en el artículo 45 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas:",
+        options: [
+          "a) El plan hidrológico nacional se aprobará por Ley",
+          "b) Incluirá las medidas necesarias para la coordinación de los diferentes planes hidrológicos de cuenca",
+          "c) Incluirá igualmente la previsión y las condiciones de las transferencias de recursos hidráulicos entre ámbitos territoriales...",
+          "d) Corresponderá al Ministerio competente en materia de agua su elaboración"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 192]."
+      },
+      {
+        question: "10.- El artículo 51 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece una serie de usos comunes sujetos a declaración responsable, señale cuál de las siguientes opciones se corresponde con uno de ellos:",
+        options: [
+          "a) Extracción de áridos",
+          "b) La navegación y flotación",
+          "c) Extracción de aguas subterráneas de un volumen no superior a 7000 m³/año",
+          "d) Todas las opciones anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La navegación y flotación)[cite: 192]."
+      },
+      {
+        question: "11.- El artículo 59 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece que toda concesión para el uso privativo de aguas se otorgará según las previsiones de los Planes Hidrológicos, con carácter temporal y plazo:",
+        options: [
+          "a) No superior a 20 años prorrogables",
+          "b) No superior a 30 años prorrogables",
+          "c) No superior a setenta y cinco años",
+          "d) La vigencia de dichas concesiones es indefinida"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: No superior a 75 años)[cite: 192]."
+      },
+      {
+        question: "12.- ¿Qué será necesario para la modificación de las características de una concesión para el uso privativo de aguas según lo establecido en el artículo 64 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas?",
+        options: [
+          "a) La solicitud de una nueva concesión con las nuevas características al órgano otorgante",
+          "b) Previa autorización administrativa del mismo órgano otorgante",
+          "c) Declaración responsable previa",
+          "d) No se necesitará ningún trámite a no ser que varíe el caudal concedido."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Previa autorización administrativa del mismo órgano otorgante)[cite: 192]."
+      },
+      {
+        question: "13.- A efecto de lo establecido en el Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas, \"la acción y el efecto de introducir materias o formas de energía, o inducir condiciones en el agua que, de modo directo o indirecto, impliquen una alteración perjudicial de su calidad...\", se considera:",
+        options: [
+          "a) Contaminación",
+          "b) Alteración del medio hídrico",
+          "c) Alteración sustancial",
+          "d) Esta definición no aparece en esa normativa"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Contaminación)[cite: 192]."
+      },
+      {
+        question: "14.- ¿Cuál de los siguientes no es uno de los fines de la zona de servidumbre, según lo establecido en el artículo 7 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico?",
+        options: [
+          "a) Protección del ecosistema fluvial y del dominio público hidráulico",
+          "b) Paso público peatonal y para el desarrollo de los servicios de vigilancia, conservación y salvamento...",
+          "c) Varado y amarre de embarcaciones de forma ocasional y en caso de necesidad",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 192]."
+      },
+      {
+        question: "15.- El artículo 70 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico establece que la utilización de pastos en el dominio público hidráulico estará sometida a declaración responsable, permitiendo esta el ejercicio de la actividad por un plazo máximo de:",
+        options: [
+          "a) 2 años renovables",
+          "b) 10 años renovables",
+          "c) 5 años renovables",
+          "d) 6 meses renovables"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5 años renovables)[cite: 192]."
+      },
+      {
+        question: "16.- El artículo 73 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico establece que la corta y retirada de árboles muertos o que supongan un riesgo para la seguridad de personas o bienes, así como la poda de árboles y otras labores asociadas se tramitarán mediante:",
+        options: [
+          "a) Concesión administrativa previa",
+          "b) Autorización administrativa previa",
+          "c) Declaración responsable",
+          "d) En estos casos no será necesario ningún procedimiento de los enunciados anteriormente"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Declaración responsable)[cite: 192]."
+      },
+      {
+        question: "17.- ¿Cuál será el límite máximo de agua aprovechable en aguas subterráneas por uso privativo por disposición legal, a tenor de lo establecido en el artículo 87 del Real Decreto 849/1986 de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico?",
+        options: [
+          "a) 10.000 m³/año",
+          "b) 7.000 m³/año",
+          "c) 5.000 m³/año",
+          "d) 1.000 m³/año"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 7.000 m³/año)[cite: 192]."
+      },
+      {
+        question: "18.- Según el artículo 116 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico, el plazo para resolver las solicitudes de otorgamiento de concesión de dominio público hidráulico no podrá exceder de:",
+        options: [
+          "a) 18 meses",
+          "b) 12 meses",
+          "c) 10 meses",
+          "d) 6 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 18 meses)[cite: 192]."
+      },
+      {
+        question: "19.- Según el artículo 318 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico, las infracciones graves serán sancionadas con multa:",
+        options: [
+          "a) de 50.000,01 a 500.000,00 euros",
+          "b) de 500.000,00 a 1.000.000,00 euros",
+          "c) de 1.000.000,00 a 2.000.000,00 euros",
+          "d) de 240.401 a 2.404.000 euros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: de 50.000,01 a 500.000,00 euros)[cite: 192]."
+      },
+      {
+        question: "20.- ¿Cuál de los siguientes casos no estará dentro del ámbito de aplicación de la Ley 9/2010 de 30 de julio, de Aguas de Andalucía?",
+        options: [
+          "a) Aguas superficiales continentales que transcurran en la Comunidad Autónoma de Andalucía...",
+          "b) Aguas de transición que se hallen en la Comunidad Autónoma de Andalucía...",
+          "c) Aguas territoriales que se hallen en la Comunidad Autónoma de Andalucía...",
+          "d) Aguas subterráneas que se hallen en la Comunidad Autónoma de Andalucía..."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Aguas territoriales)[cite: 192]."
+      },
+      {
+        question: "21.- Según las definiciones que nos podemos encontrar en el artículo 4 de la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, el caudal que contribuye a alcanzar el buen estado o buen potencial ecológico en los ríos o en las aguas de transición y mantiene, como mínimo, la vida piscícola que de manera natural habitaría o pudiera habitar en el río, así como su vegetación de ribera, se corresponde con la definición de:",
+        options: [
+          "a) Caudal mínimo natural",
+          "b) Caudal ecológico",
+          "c) Caudal de protección frente a avenidas",
+          "d) Caudal de reserva"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Caudal ecológico)[cite: 192]."
+      },
+      {
+        question: "22.- Según la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, en su artículo 8, ¿quién será competente para la elaboración de la planificación hidrológica en las demarcaciones intracomunitarias?",
+        options: [
+          "a) La Administración General del Estado",
+          "b) El Consejo de Ministros",
+          "c) El Consejo de Gobierno",
+          "d) La Administración de la Junta de Andalucía"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La Administración de la Junta de Andalucía)[cite: 192]."
+      },
+      {
+        question: "23.- Según la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, en su artículo 13, ¿quién será competente para el abastecimiento de agua en alta o aducción?",
+        options: [
+          "a) La Administración de la Junta de Andalucía",
+          "b) La Consejería competente en materia de medio ambiente",
+          "c) La Consejería competente en materia de agua",
+          "d) Los Municipios"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Los Municipios)[cite: 192]."
+      },
+      {
+        question: "24.- ¿Cuál de las siguientes es una Demarcación hidrográfica intracomunitaria en Andalucía?",
+        options: [
+          "a) Demarcación hidrográfica del Guadalquivir",
+          "b) Demarcación hidrográfica del Segura",
+          "c) Demarcación hidrográfica de Guadalete y Barbate",
+          "d) Demarcación hidrográfica del Guadiana"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Demarcación hidrográfica de Guadalete y Barbate)[cite: 192]."
+      },
+      {
+        question: "25.- Según el artículo 56 de la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, la recarga artificial o almacenamiento temporal para aumentar la regulación de recursos hídricos o recuperar masas de agua en riesgo podrá hacerse:",
+        options: [
+          "a) De oficio por la Consejería competente en materia de agua",
+          "b) Previa autorización por parte de la comunidad de usuarios constituida sobre la correspondiente masa de agua subterránea.",
+          "c) Las respuestas a) y b) son correctas",
+          "d) La recarga de acuíferos está strictly prohibida por dicha Ley."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las respuestas a y b son correctas)[cite: 192]."
+      },
+      {
+        question: "26.- ¿Cuál será el plazo máximo de vigencia de una autorización de vertidos según lo establecido en el Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas?",
+        options: [
+          "a) 5 años",
+          "b) 10 años",
+          "c) 30 años",
+          "d) Indefinido"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 años)[cite: 192]."
+      },
+      {
+        question: "27.- Señale la opción incorrecta de lo establecido en el artículo 245 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico relativo a autorizaciones de vertido:",
+        options: [
+          "a) Son vertidos directos la emisión directa de contaminantes a las aguas continentales o a cualquier otro elemento del dominio público hidráulico...",
+          "b) Son vertidos indirectos tanto los realizados en aguas superficiales a través de azarbes...",
+          "c) Queda prohibido con carácter general el vertido directo o indirecto...",
+          "d) Los vertidos indirectos a aguas superficiales con especial incidencia..."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 192]."
+      },
+      {
+        question: "28.- El plazo máximo establecido en el artículo 249 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico para la resolución del procedimiento para la obtención de la autorización de vertido será de:",
+        options: [
+          "a) 6 meses",
+          "b) 9 meses",
+          "c) Un año",
+          "d) 3 meses"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un año)[cite: 192]."
+      },
+      {
+        question: "29.- ¿Cuál será el plazo de vencimiento máximo de una autorización de vertido regulada en la Ley 22/1988, de 28 de julio, de Costas?",
+        options: [
+          "a) 5 años",
+          "b) 30 años",
+          "c) 75 años",
+          "d) Indefinida"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30 años)[cite: 192]."
+      },
+      {
+        question: "30.- Según las definiciones establecidas en el artículo 79 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, las aguas superficiales situadas hacia tierra desde una línea cuya totalidad de puntos se encuentra a una distancia de una milla náutica mar adentro... son:",
+        options: [
+          "a) Aguas continentales",
+          "b) Aguas litorales",
+          "c) Aguas costeras",
+          "d) Aguas de transición"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Aguas costeras)[cite: 192]."
+      },
+      {
+        question: "31.- ¿Cuál es el plazo establecido para la resolución y notificación de las autorizaciones de vertido según el artículo 85 de la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental?",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 9 meses",
+          "d) Indefinida"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 meses)[cite: 192]."
+      },
+      {
+        question: "32.- Según la tipificación de las infracciones en materia de vertidos que nos encontramos en la Ley 7/2007, de 9 de julio, de Gestión Integrada de la Calidad Ambiental, la falta de comunicación, a la Consejería competente en materia de medio ambiente, de una situación de emergencia o de peligro derivada de cualquier irregularidad en la emisión de un vertido, será infracción:",
+        options: [
+          "a) Leve",
+          "b) Menos grave",
+          "c) Grave",
+          "d) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Grave)[cite: 192]."
+      },
+      {
+        question: "33.- Dicha infracción, según la misma normativa, llevará asociada una sanción de:",
+        options: [
+          "a) Hasta 6.010,12 euros.",
+          "b) Hasta 6000 euros",
+          "c) Desde 6.010,13 hasta 300.506,61 euros.",
+          "d) Desde 300.506,62 hasta 601.012,10 euros."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Desde 6.010,13 hasta 300.506,61 euros)[cite: 192]."
+      },
+      {
+        question: "34.- ¿A quién corresponderá la resolución de los procedimientos de autorización de vertidos según lo establecido en el artículo 5 (órganos competentes) del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía?",
+        options: [
+          "a) A la Delegación territorial de la Consejería competente en materia de Aguas de la provincia donde se pretenda realizar el vertido",
+          "b) A la Delegación territorial de la Consejería competente en materia de medio ambiente...",
+          "c) A la Dirección General competente en materia de vertidos de la Consejería competente en materia de Aguas.",
+          "d) A la Dirección General competente en materia de vertidos de la Consejería competente en materia de medio ambiente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 192]."
+      },
+      {
+        question: "35.- ¿Cuál es el plazo de resolución previsto para el procedimiento simplificado de autorización de vertidos previsto en el artículo 23 del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía?",
+        options: [
+          "a) 3 meses",
+          "b) 4 meses",
+          "c) 6 meses",
+          "d) 8 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4 meses)[cite: 192]."
+      },
+      {
+        question: "36.- Según las definiciones establecidas en el Real Decreto-ley 11/1995, de 28 de diciembre, por el que se establecen las normas aplicables al tratamiento de las aguas residuales urbanas, el tratamiento de las aguas residuales urbanas mediante cualquier proceso o sistema de eliminación, en virtud del cual las aguas receptoras cumplan después del vertido, los objetivos de calidad previstos en el ordenamiento jurídico aplicable, corresponde con:",
+        options: [
+          "a) Tratamiento primario",
+          "b) Tratamiento adecuado",
+          "c) Tratamiento secundario",
+          "d) Pretratamiento"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tratamiento adecuado)[cite: 192]."
+      },
+      {
+        question: "37.- ¿Qué normativa se encarga del desarrollo reglamentario del Real Decreto-ley 11/1995, de 28 de diciembre, por el que se establecen las normas aplicables al tratamiento de las aguas residuales urbanas?",
+        options: [
+          "a) Ley 7/2007 de 9 de julio",
+          "b) Decreto 109/2015, de 17 de marzo",
+          "c) Real Decreto 509/1996, de 15 de marzo",
+          "d) Decreto 109/1995, de 20 de abril"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Real Decreto 509/1996, de 15 de marzo)[cite: 192]."
+      },
+      {
+        question: "38.- La cantidad equivalente de oxígeno (mg/l) necesaria para oxidar los componentes orgánicos del agua utilizando agentes químicos oxidantes, se denomina",
+        options: [
+          "a) Habitante equivalente",
+          "b) Unidad de contaminación",
+          "c) Demanda bioquímica de oxígeno",
+          "d) Demanda química de oxígeno"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Demanda química de oxígeno)[cite: 192]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- Según se establece en el artículo 6 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas, ¿cuál de las siguientes afirmaciones coincidiría con la definición de Ribera?",
+        options: [
+          "a) Terrenos que lindan con los cauces",
+          "b) Terreno cubierto por las aguas en las máximas crecidas ordinarias",
+          "c) Terreno cubierto por las aguas en las máximas crecidas extraordinarias",
+          "d) Fajas laterales de los cauces públicos situadas por encima del nivel de aguas bajas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Fajas laterales de los cauces públicos situadas por encima del nivel de aguas bajas)[cite: 193]."
+      },
+      {
+        question: "2.- El artículo 101 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas, establece que el plazo máximo de vigencia de la Autorización de vertido será de:",
+        options: [
+          "a) 5 años, renovables sucesivamente",
+          "b) 10 años, renovables sucesivamente",
+          "c) Vigencia indefinida",
+          "d) Ninguna opción es correcta."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 años, renovables sucesivamente)[cite: 193]."
+      },
+      {
+        question: "3.- A tenor de lo established en el artículo 56 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas, en el caso de que una masa de agua subterránea se encuentre en riesgo de no alcanzar el buen estado cuantitativo o químico, la Junta de Gobierno del Organismo de cuenca, tras su declaración, y previa consulta con la Comunidad de Usuarios, aprobará un Programa de actuación para la recuperación del buen estado de la masa de agua, en el plazo máximo de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 1 año",
+          "d) 5 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 1 año)[cite: 193]."
+      },
+      {
+        question: "4.- En el artículo 58 de la Ley 22/1988, de 28 de julio, de Costas, se enumeran las condiciones a incluir en las Autorizaciones de vertido. Señale cuál de las siguientes no es una de ellas:",
+        options: [
+          "a) Plazo de vencimiento, no superior a 30 años.",
+          "b) Volumen diario de vertido",
+          "c) Límites cualitativos del vertido y plazos, si proceden, para la progresiva adecuación de las características del efluente a los límites impuestos.",
+          "d) Canon de vertido"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Volumen diario de vertido)[cite: 193]."
+      },
+      {
+        question: "5.- ¿Cuál sería la distancia mínima entre 2 pozos, siempre y cuando dicha distancia no venga determinada en el Plan Hidrológico de Cuenca, en el caso de un caudal de 1.4 litros/segundo, según lo dispuesto en el artículo 87 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico?",
+        options: [
+          "a) 100 metros",
+          "b) 10 metros en suelo urbano",
+          "c) 20 metros en suelo no urbanizable",
+          "d) Las respuestas b) y c) son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 100 metros)[cite: 193]."
+      },
+      {
+        question: "6.- La siguiente definición: \"Todas las aguas quietas o corrientes en la superficie del suelo y todas las aguas subterráneas situadas hacia tierra desde la línea que sirve de base para medir la anchura de las aguas territoriales\", enunciada en el artículo 79 de la Ley 7/2007, de 9 de julio de Gestión Integrada de la Calidad Ambiental, se corresponde con:",
+        options: [
+          "a) Aguas litorales",
+          "b) Aguas Costeras",
+          "c) Aguas Continentales",
+          "d) El enunciado no se corresponde con ninguna definición de las establecidas en el citado artículo."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Aguas Continentales)[cite: 193]."
+      },
+      {
+        question: "7.- El incumplimiento de las obligaciones de medición directa de los consumos, a tenor del artículo 106 y siguientes de la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, se calificará como:",
+        options: [
+          "a) Infracción Leve",
+          "b) Infracción Grave cuando los daños superen los 15.000€ pero no alcancen los 150.000€",
+          "c) Infracción Muy Grave cuando los daños superen los 150.000€",
+          "d) Todas las Respuestas son correctas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Infracción Leve)[cite: 193]."
+      },
+      {
+        question: "8.- La definición: \"Superficie de terreno cuya escorrentía superficial fluye en su totalidad a través de una serie de corrientes, ríos y eventualmente lagos hacia el mar por una única desembocadura, estuario o delta\", según lo established en el artículo 16 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas, se está refiriendo a:",
+        options: [
+          "a) Álbeo o Cauce natural de una corriente",
+          "b) Cuenca Hidrográfica",
+          "c) Demarcación hidrográfica",
+          "d) Aguas Continentales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cuenca Hidrográfica)[cite: 193]."
+      },
+      {
+        question: "9.- La dilución sin autorización de los vertidos, con el fin de cumplir los límites establecidos en la Autorización de vertido, a tenor de lo dispuesto en el Capítulo III del Título VII de la Ley 7/2007, de 9 de julio de Gestión Integrada de la Calidad Ambiental, será sancionada con una multa que puede oscilar entre:",
+        options: [
+          "a) 300.508,62 y 601.012,10 €",
+          "b) 6.010,13 y 300.506,61 €",
+          "c) 300.506,62 y 601.012,10 €",
+          "d) Hasta 6.110,12 €"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6.010,13 y 300.506,61 €)[cite: 193]."
+      },
+      {
+        question: "10.- La disposición adicional sexta del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas establece una serie de plazos para la resolución y notificación de determinados procedimientos, en el caso de Procedimientos de Autorización de usos del Dominio público hidráulico, dicho plazo será de:",
+        options: [
+          "a) 6 meses",
+          "b) 12 meses",
+          "c) 18 meses",
+          "d) 3 meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6 meses)[cite: 193]."
+      },
+      {
+        question: "11.- El artículo 20 del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía, establece que el plazo de resolución y notificación de la Autorización de vertido será, como máximo de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 9 meses",
+          "d) 10 meses"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 6 meses)[cite: 193]."
+      },
+      {
+        question: "12.- Según establece el artículo 9 de la Ley 9/2010, de 30 de julio, de Aguas de Andalucía, la aprobación de los Planes Hidrológicos Específicos corresponde a:",
+        options: [
+          "a) Al Titular de la Consejería competente en materia de aguas",
+          "b) Al Consejo de Gobierno",
+          "c) Su aprobación inicial corresponderá al Consejo de Gobierno, la aprobación definitiva corresponderá al Gobierno de la Nación mediante Real Decreto",
+          "d) Al Organismo de Cuenca"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Al Consejo de Gobierno)[cite: 193]."
+      },
+      {
+        question: "13.- ¿Cuál de las siguientes NO será una causa de extinción de la Autorización de vertido teniendo en cuenta lo establecido en el artículo 35 del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía?",
+        options: [
+          "a) Caducidad",
+          "b) Extinción de la Concesión de Ocupación del Dominio Público Hidráulico",
+          "c) Revocación",
+          "d) Cambio de titularidad sin la pertinente comunicación previa."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cambio de titularidad sin la pertinente comunicación previa)[cite: 193]."
+      },
+      {
+        question: "14.- ¿Cuál de las siguientes NO sería una función de los Organismos de cuenca de acuerdo a lo previsto en el artículo 23 del Real Decreto Legislativo 1/2001, de 20 de julio, por el que se aprueba el texto refundido de la Ley de Aguas?",
+        options: [
+          "a) Elaboración y Aprobación del Plan Hidrológico de cuenca, así como su seguimiento y revisión.",
+          "b) La administración y control de los aprovechamientos de interés general o que afecten a más de una Comunidad Autónoma",
+          "c) El Proyecto, la construcción y explotación de las obras realizadas con cargo a los fondos propios del organismo, y las que les sean encomendadas por el Estado",
+          "d) La administración y control del Dominio Público Hidráulico."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La aprobación corresponde al Gobierno de la Nación mediante Real Decreto, no al Organismo de cuenca)[cite: 193]."
+      },
+      {
+        question: "15.- Con respecto a los Vertidos accidentales y de contingencia, a tenor de lo dispuesto en el artículo 49 del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía, señale la afirmación Incorrecta:",
+        options: [
+          "a) La persona titular de la actividad que origina el vertido deberá comunicarlo en el plazo máximo de 48 horas a la correspondiente Delegación Territorial",
+          "b) La Delegación Territorial dará traslado de dicha comunicación a la Delegación del Gobierno",
+          "c) El informe detallado del accidente contendrá la estimación de los daños causados",
+          "d) Dicho informe incluirá también las medidas correctoras tomadas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La comunicación debe ser inmediata, no en 48 horas)[cite: 193]."
+      },
+      {
+        question: "16.- A tenor de lo establecido en el artículo 14 del Real Decreto 849/1986, de 11 de abril, por el que se aprueba el Reglamento del Dominio Público Hidráulico, se considera Zona Inundable los terrenos que puedan resultar inundados por los niveles teóricos que alcanzarías las aguas en las avenidas cuyo período estadístico de retorno sea de:",
+        options: [
+          "a) Entre 50 y 100 años",
+          "b) Entre 100 y 150 años",
+          "c) 100 años",
+          "d) 500 años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 500 años)[cite: 193]."
+      },
+      {
+        question: "17.- El artículo 4 del Real Decreto 509/1996, de 15 de marzo, de desarrollo del Real Decreto-ley 11/1995, de 28 de diciembre, por el que se establecen las normas aplicables al tratamiento de las aguas residuales urbanas, establece como será el cálculo para determinar los habitantes-equivalentes, éstos se calcularán:",
+        options: [
+          "a) A partir del valor medio diario de carga orgánica biodegradable, correspondiente al mes de máxima carga del año...",
+          "b) A partir del valor medio diario de carga orgánica biodegradable, correspondiente a la semana de máxima carga del año, sin tener en consideración situaciones producidas por lluvias intensas u otras circunstancias excepcionales",
+          "c) A partir del valor medio diario de carga orgánica biodegradable, correspondiente al mes de máxima carga del año...",
+          "d) A partir del valor medio diario de carga orgánica biodegradable, correspondiente a la semana de máxima carga del año, teniendo en consideración situaciones producidas por lluvias intensas..."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: A partir del valor medio diario de la semana de máxima carga sin contar lluvias o excepciones)[cite: 193]."
+      },
+      {
+        question: "18.- El artículo 45 de la Ley 9/2010, de 30 de julio, de Aguas de Andalucía establece que las concesiones de aprovechamiento de aguas se otorgarán, con carácter general, por un plazo máximo de duración de:",
+        options: [
+          "a) 20 años",
+          "b) 75 años más una posible prórroga de hasta 10 años",
+          "c) 75 años incluidas las prórrogas",
+          "d) 5 años."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 20 años)[cite: 193]."
+      },
+      {
+        question: "19.- El procedimiento simplificado para la Autorización de Vertido, según el artículo 23 del Decreto 109/2015, de 17 de marzo, por el que se aprueba el Reglamento de Vertidos al Dominio Público Hidráulico y al Dominio Público Marítimo-Terrestre de Andalucía, será de aplicación para vertidos de naturaleza urbana o asimilable procedentes de núcleos aislados de población inferior a:",
+        options: [
+          "a) 10.000 habitantes",
+          "b) 1.000 habitantes",
+          "c) 25.000 habitantes",
+          "d) 250 habitantes-equivalentes"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 250 habitantes-equivalentes)[cite: 193]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 19),
+      "t1_b2": test1Questions.slice(19, 38),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 10),
+      "t2_b2": test2Questions.slice(10, 19)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 21 - DOMINIO PÚBLICO HIDRÁULICO, AGUAS Y VERTIDOS (COMPLETO 57 PREGUNTAS)",
+        "t1_all": "TEST BÁSICO Nº 1 - COMPLETO (38 PREGUNTAS)",
+        "t1_b1": "TEST BÁSICO Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 19)",
+        "t1_b2": "TEST BÁSICO Nº 1 - BLOQUE 2 (PREGUNTAS 20 A 38)",
+        "t2_all": "TEST DE AUTOEVALUACIÓN Nº 1 - COMPLETO (19 PREGUNTAS)",
+        "t2_b1": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 10)",
+        "t2_b2": "TEST DE AUTOEVALUACIÓN Nº 1 - BLOQUE 2 (PREGUNTAS 11 A 19)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

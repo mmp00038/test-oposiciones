@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo - Tema 7 (Test Básico)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Test Completo (50 preguntas)</option>
+        <option value="b1">Bloque 1 (Preguntas 1 - 25)</option>
+        <option value="b2">Bloque 2 (Preguntas 26 - 50)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEST BÁSICO - TEMA 7</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "1.- Dependiendo del tipo de crecimiento de una planta nos podemos encontrar:",
+        options: [
+          "a) Plantas herbáceas, matas o subarbustos, arbustos y árboles",
+          "b) Plantas herbáceas, arbustos y árboles",
+          "c) Terófitos o anuales y fanerófitos",
+          "d) Terófitos o anuales, geófitos, hemicriptófitos, caméfitos y fanerófitos."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "2.- Cuando una planta presenta sus yemas de renovación por encima de la superficie del suelo, pero a escasa distancia de este (no más de 25 cm), incluyendo especies herbáceas y leñosas de escasa talla (matas y subarbustos), estamos hablando de:",
+        options: [
+          "a) Hemicriptófitos",
+          "b) Macrofanerófitos",
+          "c) Arbustos de pequeño porte",
+          "d) Caméfitos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Caméfitos)."
+      },
+      {
+        question: "3.- Entre los distintos caracteres culturales de las plantas, cuando hablamos de las condiciones ecológicas de vida de las especies en cuanto a las necesidades térmicas, hídricas, de viento, pH del suelo, fertilidad, pendiente, exposición, etc. Estamos hablando de:",
+        options: [
+          "a) Habitación",
+          "b) Temperamento",
+          "c) Estación",
+          "d) Crecimiento"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Estación)."
+      },
+      {
+        question: "4.- El artículo 49 del Decreto 23/2012, de 14 de febrero, por el que se regula la conservación y el uso sostenible de la flora y la fauna silvestres y sus hábitats, establece que para la declaración de árbol o arboleda singular se realizará:",
+        options: [
+          "a) Mediante Orden de la persona titular de la Consejería competente en materia de medio ambiente.",
+          "b) La declaración será a propuesta de la persona titular de la Dirección General competente en materia de conservación de la flora y la fauna silvestres.",
+          "c) La orden de declaración establecerá el régimen de protección aplicable y será publicada en el Boletín Oficial de la Junta de Andalucía.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "5.- El Inventario de Bosques isla y Setos de Andalucía identifica y cartografía:",
+        options: [
+          "a) 26.362 hectáreas de bosques isla y 281 km de setos",
+          "b) 1091 bosques isla y 604 setos",
+          "c) Todos los bosques isla que presenten un tamaño entre 10 y 100 hectáreas y todos los setos con un mínimo de longitud de 500m y un mínimo de anchura de 1m",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1091 bosques isla y 604 setos)."
+      },
+      {
+        question: "6.- Los matorrales que, por razones climáticas, edáficas o de otro tipo, constituyen la vegetación más evolucionada que se puede encontrar en determinadas zonas, se denominan:",
+        options: [
+          "a) Matorrales permanentes",
+          "b) Última etapa de evolución",
+          "c) Matorral maduro",
+          "d) Matorral condicionado por el frío y/o por el viento."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Matorrales permanentes)."
+      },
+      {
+        question: "7.- ¿Qué es un caméfito?",
+        options: [
+          "a) Una planta anual que sobrevive como semilla",
+          "b) Una planta con yemas de renovación a menos de 25 cm del suelo",
+          "c) Un árbol de gran porte",
+          "d) Una planta que vive en el agua"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Una planta con yemas de renovación a menos de 25 cm del suelo)."
+      },
+      {
+        question: "8.- ¿Cómo se clasifican las especies que tienen una habitación (área geográfica) reducida?",
+        options: [
+          "a) Linneanas",
+          "b) Jordanianas",
+          "c) Heliófilas",
+          "d) Esciófilas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Jordanianas)."
+      },
+      {
+        question: "9.- ¿Qué significa que una especie sea heliófila o intolerante?",
+        options: [
+          "a) Que prefiere crecer en la sombra",
+          "b) Que vive en suelos ácidos",
+          "c) Que consigue su máximo desarrollo a plena luz",
+          "d) Que no soporta el frío"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Que consigue su máximo desarrollo a plena luz)."
+      },
+      {
+        question: "10.- ¿Cuál es el nombre científico del Tejo?",
+        options: [
+          "a) Abies pinsapo",
+          "b) Taxus baccata",
+          "c) Pinus nigra",
+          "d) Juniperus sabina"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Taxus baccata)."
+      },
+      {
+        question: "11.- ¿Qué parte del falso fruto del Tejo NO es venenosa?",
+        options: [
+          "a) La semilla",
+          "b) La hoja",
+          "c) El arilo carnoso",
+          "d) La corteza"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El arilo carnoso)."
+      },
+      {
+        question: "12.- El Pinsapo (Abies pinsapo) es una especie:",
+        options: [
+          "a) Monoica",
+          "b) Dioica",
+          "c) Herbácea",
+          "d) Exótica invasora"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Monoica)."
+      },
+      {
+        question: "13.- ¿Qué pino tiene las acículas más largas y rígidas de los pinos autóctonos andaluces?",
+        options: [
+          "a) Pinus sylvestris",
+          "b) Pinus pinea",
+          "c) Pinus halepensis",
+          "d) Pinus pinaster"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Pinus pinaster)."
+      },
+      {
+        question: "14.- ¿Cuál es el principal aprovechamiento del Pinus pinea?",
+        options: [
+          "a) La resina",
+          "b) El corcho",
+          "c) El piñón comestible",
+          "d) La madera para barcos"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El piñón comestible)."
+      },
+      {
+        question: "15.- ¿Qué pino se caracteriza por tener la corteza de la parte superior del tronco de color asalmonado?",
+        options: [
+          "a) Pino carrasco (Pinus halepensis)",
+          "b) Pino silvestre (Pinus sylvestris)",
+          "c) Pino resinero (Pinus pinaster)",
+          "d) Pino canario (Pinus canariensis)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Pino silvestre)."
+      },
+      {
+        question: "16.- ¿Qué estructura botánica es el fruto de los cipreses?",
+        options: [
+          "a) Gálbula",
+          "b) Bellota",
+          "c) Sámara",
+          "d) Drupa"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Gálbula)."
+      },
+      {
+        question: "17.- ¿Qué especie se conoce comúnmente como \"Sabina de Cartagena\" o \"Araar\"?",
+        options: [
+          "a) Juniperus phoenicea",
+          "b) Tetraclinis articulata",
+          "c) Taxus baccata",
+          "d) Cupressus sempervirens"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tetraclinis articulata)."
+      },
+      {
+        question: "18.- El Alcornoque (Quercus suber) destaca por su corteza suberosa llamada:",
+        options: [
+          "a) Bornizo",
+          "b) Arilo",
+          "c) Lenticela",
+          "d) Envés"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Bornizo)."
+      },
+      {
+        question: "19.- ¿Qué tipo de fruto tiene el Fresno (Fraxinus angustifolia)?",
+        options: [
+          "a) Nuez",
+          "b) Pomo",
+          "c) Legumbre",
+          "d) Sámara"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Sámara)."
+      },
+      {
+        question: "20.- ¿Cuál de las siguientes especies del género Quercus mantiene las hojas secas en el árbol hasta la primavera siguiente (marcescencia)?",
+        options: [
+          "a) Quercus ilex (encina)",
+          "b) Quercus faginea (quejigo)",
+          "c) Quercus coccifera (coscoja)",
+          "d) Quercus suber (alcornoque)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Quercus faginea)."
+      },
+      {
+        question: "21.- ¿Qué planta es un arbusto invasivo que puede generar raíces desde sus ramas y tiene frutos en polidrupa?",
+        options: [
+          "a) Retama (Retama sphaerocarpa)",
+          "b) Zarza (Rubus sp.)",
+          "c) Juncos (Juncus sp.)",
+          "d) Adelfa (Nerium oleander)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Zarza)."
+      },
+      {
+        question: "22.- De las siguientes especies forestales, ¿Cuál no es una conífera?",
+        options: [
+          "a) Taxus baccata",
+          "b) Cedrus libani",
+          "c) Fraxinus angustifolia",
+          "d) Juniperus phoenicea"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Fraxinus angustifolia)."
+      },
+      {
+        question: "23.- ¿Cuál de las siguientes especies del género Pinus no es autóctona?",
+        options: [
+          "a) Pinus halepensis",
+          "b) Pinus pinea",
+          "c) Pinus sylvestris",
+          "d) Pinus radiata"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Pinus radiata)."
+      },
+      {
+        question: "24.- ¿Cuál de las siguientes especies del género Pinus presenta las acículas más cortas?",
+        options: [
+          "a) Pinus pinaster",
+          "b) Pinus sylvestris",
+          "c) Pinus halepensis",
+          "d) Pinus nigra"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Pinus sylvestris)."
+      },
+      {
+        question: "25.- Según la siguiente descripción: conífera de porte arbustivo, dioica y perennifolia, de hasta 5m de altura (excepcionalmente hasta 10m), hojas aciculares de 10-20mm de largo, punzantes, dispuestas en verticilos de 3, con 2 bandas blancas en el haz y con gálbulas de 6-12 mm de diámetro pruinosas de color verde que tornan a castaño-rojizos cuando maduran, ¿de qué especie estamos hablando?",
+        options: [
+          "a) Juniperus oxycedrus",
+          "b) Juniperus communis",
+          "c) Tetraclinis articulata",
+          "d) Taxus baccata"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Juniperus oxycedrus)."
+      },
+      {
+        question: "26.- ¿Cuál de las siguientes especies de frondosas tienen la hoja compuesta?",
+        options: [
+          "a) Quercus suber",
+          "b) Olea europaea var. sylvestris",
+          "c) Fraxinus angustifolia",
+          "d) Betula pendula"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Fraxinus angustifolia)."
+      },
+      {
+        question: "27.- Según la siguiente descripción: Frondosa caducifolia de hasta 30 m de altura, aunque lo normal es que mida entre 8 y 20m, corteza blanca en los individuos jóvenes que se agrieta y oscurece con la edad, hojas alternas, de bordes serrados, más o menos romboidales, en ocasiones acorazonadas o triangulares, y terminadas en punta, especie monoica, las flores masculinas y femeninas se disponen en racimos colgantes y flexibles (amentos). ¿De qué especie se trata?",
+        options: [
+          "a) Quercus suber",
+          "b) Olea europaea var. sylvestris",
+          "c) Ceratonia siliqua",
+          "d) Betula pendula"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Betula pendula)."
+      },
+      {
+        question: "28.- Según la siguiente descripción: Frondosa perennifolia capaz de alcanzar los 25 m de altura, copa amplia y globosa, enraizamiento vigoroso y profundo. Corteza suberosa en el tronco y las ramas, de color grisácea y con profundas grietas longitudinales, bellotas amargas con cúpula recubierta de escamas blandas. ¿De qué especie se trata?",
+        options: [
+          "a) Quercus pyrenaica",
+          "b) Quercus suber",
+          "c) Quercus canariensis",
+          "d) Quercus faginea"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Quercus suber)."
+      },
+      {
+        question: "29.- ¿Cuál de las siguientes especies será importante a la hora de colonizar terrenos degradados con poca materia orgánica y con escasez de precipitaciones?",
+        options: [
+          "a) Retama sphaerocarpa",
+          "b) Rhamnus cathartica",
+          "c) Populus tremula",
+          "d) Ilex aquifolium"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Retama sphaerocarpa)."
+      },
+      {
+        question: "30.- ¿Cuál de las siguientes especies presenta sustancias tóxicas?",
+        options: [
+          "a) Taxus baccata",
+          "b) Nerium oleander",
+          "c) Ilex aquifolium",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "31.- ¿Qué especie arbórea tiene la madera más apreciada de todos los pinos españoles?",
+        options: [
+          "a) Pinus sylvestris",
+          "b) Pinus nigra",
+          "c) Pinus halepensis",
+          "d) Pinus radiata"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Pinus sylvestris)."
+      },
+      {
+        question: "32.- El Quejigo andaluz (Quercus canariensis) prefiere suelos:",
+        options: [
+          "a) Calizos",
+          "b) Silíceos y profundos",
+          "c) Salinos",
+          "d) Yesosos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Silíceos y profundos)."
+      },
+      {
+        question: "33.- ¿Qué cobertura arbórea mínima debe tener una porción de terreno para ser considerada bosque isla?",
+        options: [
+          "a) 10%",
+          "b) 25%",
+          "c) 50%",
+          "d) 75%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 50%)."
+      },
+      {
+        question: "34.- El Esturión (Acipenser sturio) tiene un ciclo de vida:",
+        options: [
+          "a) Sedentario",
+          "b) Anádromo (reproduce en ríos, crece en mar)",
+          "c) Catádromo (reproduce en mar, crece en ríos)",
+          "d) Terrestre"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Anádromo)."
+      },
+      {
+        question: "35.- ¿Qué pez es un parásito hematófago en su fase adulta marina?",
+        options: [
+          "a) Esturión",
+          "b) Lamprea marina",
+          "c) Fraile",
+          "d) Bogardilla"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Lamprea marina)."
+      },
+      {
+        question: "36.- ¿Qué anfibio catalogado en Andalucía transporta los huevos en sus patas traseras?",
+        options: [
+          "a) Rana toro (Lithobates catesbeianus)",
+          "b) Tritón ibérico (Lissotriton boscai)",
+          "c) Sapo común (Bufo bufo)",
+          "d) Sapo partero bético (Alytes dickhilleni)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Sapo partero bético)."
+      },
+      {
+        question: "37.- ¿Qué reptil se encuentra en el Parque Nacional de Doñana y el Levante Almeriense?",
+        options: [
+          "a) Tortuga mora (Testudo graeca)",
+          "b) Tortuga boba (Caretta caretta)",
+          "c) Lagartija de Valverde (Algyroides marchi)",
+          "d) Cocodrilo del Nilo (Crocodylus niloticus)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Tortuga mora)."
+      },
+      {
+        question: "38.- ¿Cuál es la principal amenaza para la Tortuga Boba (Caretta caretta) en nuestras costas?",
+        options: [
+          "a) La falta de agua dulce",
+          "b) El palangre (artes de pesca)",
+          "c) El exceso de vegetación",
+          "d) La falta de arena"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: El palangre)."
+      },
+      {
+        question: "39.- ¿Cuál es la principal causa de mortalidad del Águila Imperial Ibérica?",
+        options: [
+          "a) Falta de alimento",
+          "b) Competencia con el Águila Real",
+          "c) Electrocución y venenos",
+          "d) Cambio climático"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Electrocución y venenos)."
+      },
+      {
+        question: "40.- ¿Qué cetáceo tiene la cabeza cuadrangular y puede sumergirse a más de 1500 m de profundidad?",
+        options: [
+          "a) Cachalote (Physeter macrocephalus)",
+          "b) Delfín mular (Tursiops truncatus)",
+          "c) Orca (Orcinus orca)",
+          "d) Rorcual común (Balaenoptera physalus)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cachalote)."
+      },
+      {
+        question: "41.- ¿Qué murciélago catalogado en Andalucía se alimenta incluso de pequeños pájaros?",
+        options: [
+          "a) Murciélago de cueva (Miniopterus schreibersii)",
+          "b) Nóctulo grande (Nyctalus lasiopterus)",
+          "c) Murciélago ratonero (Myotis myotis)",
+          "d) Murciélago patudo (Myotis capaccinii)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Nóctulo grande)."
+      },
+      {
+        question: "42.- El \"Programa Andaluz para el Control de especies exóticas invasoras\" se fundamenta en:",
+        options: [
+          "a) Solo eliminación física",
+          "b) Prevención, Actuación e Información/Sensibilización",
+          "c) Exportación de especies exóticas",
+          "d) Prohibición total de la pesca"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Prevención, Actuación e Información/Sensibilización)."
+      },
+      {
+        question: "43.- ¿Cuál es una de las especies exóticas invasoras más perjudiciales para el arrozal?",
+        options: [
+          "a) Cangrejo señal (Pacifastacus leniusculus)",
+          "b) Perca americana (Micropterus salmoides)",
+          "c) Jacinto de agua (Eichhornia crassipes)",
+          "d) Caracol manzana (Pomacea insularum)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Caracol manzana)."
+      },
+      {
+        question: "44.- El Cangrejo Rojo Americano es portador del hongo responsable de:",
+        options: [
+          "a) La afanomicosis",
+          "b) La rabia",
+          "c) La sarna",
+          "d) El mildiu"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La afanomicosis)."
+      },
+      {
+        question: "45.- ¿Qué planta invasora tiene hojas cortantes y grandes panículas blanquecinas?",
+        options: [
+          "a) Plumero o hierba de la Pampa (Cortaderia selloana)",
+          "b) Uña de gato (Carpobrotus edulis)",
+          "c) Acacia (Acacia dealbata)",
+          "d) Ailanto (Ailanthus altissima)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Plumero o hierba de la Pampa)."
+      },
+      {
+        question: "46.- ¿Qué alga invasora forma densos tapices que impiden la difusión de oxígeno al sedimento?",
+        options: [
+          "a) Sargazo",
+          "b) Caulerpa racemosa",
+          "c) Rugulopteryx okamurae",
+          "d) Wakame"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Caulerpa racemosa)."
+      },
+      {
+        question: "47.- ¿Qué árbol de ribera tiene la corteza blanca y ramas colgantes?",
+        options: [
+          "a) Aliso (Alnus glutinosa)",
+          "b) Sauce (Salix sp.)",
+          "c) Abedul (Betula pendula)",
+          "d) Fresno (Fraxinus angustifolia)"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Abedul)."
+      },
+      {
+        question: "48.- ¿Qué árbol tiene hojas imparipinnadas con 7-11 foliolos lanceolados y borde serrado?",
+        options: [
+          "a) Nogal (Juglans regia)",
+          "b) Arce (Acer campestre)",
+          "c) Olmo (Ulmus minor)",
+          "d) Fresno (Fraxinus angustifolia)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Fresno)."
+      },
+      {
+        question: "49.- ¿Cuál es el temperamento de la Coscoja (Quercus coccifera)?",
+        options: [
+          "a) De sombra",
+          "b) Media sombra",
+          "c) De luz",
+          "d) Esciófila"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: De luz)."
+      },
+      {
+        question: "50.- ¿Qué reptil tiene el caparazón poco abombado y líneas amarillas radiales?",
+        options: [
+          "a) Tortuga mora (Testudo graeca)",
+          "b) Galápago europeo (Emys orbicularis)",
+          "c) Tortuga boba (Caretta caretta)",
+          "d) Lagartija ibérica (Podarcis hispanicus)"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Galápago europeo)."
+      }
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "b1": allQuestions.slice(0, 25),
+      "b2": allQuestions.slice(25, 50)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEST BÁSICO - TEMA 7 (COMPLETO 50 PREGUNTAS)",
+        "b1": "TEST BÁSICO - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "b2": "TEST BÁSICO - BLOQUE 2 (PREGUNTAS 26 A 50)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

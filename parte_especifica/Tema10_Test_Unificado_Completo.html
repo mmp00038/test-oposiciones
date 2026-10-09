@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 10 (Aprovechamientos Forestales y Dasometría)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 10 Unificado Completo (75 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 10-1 - Test Básico N.º 1 (50 Preguntas)">
+          <option value="t1_all">Test 10-1 - Completo (1 - 50)</option>
+          <option value="t1_b1">Test 10-1 - Bloque 1 (1 - 25)</option>
+          <option value="t1_b2">Test 10-1 - Bloque 2 (26 - 50)</option>
+        </optgroup>
+        <optgroup label="Test 10-2 - Autoevaluación N.º 1 (25 Preguntas)">
+          <option value="t2_all">Test 10-2 - Completo (1 - 25)</option>
+          <option value="t2_b1">Test 10-2 - Bloque 1 (1 - 13)</option>
+          <option value="t2_b2">Test 10-2 - Bloque 2 (14 - 25)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 10 - APROVECHAMIENTOS Y DASOMETRÍA (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Según viene establecido en la Ley 42/2007, de 13 de diciembre, del Patrimonio Natural y de la Biodiversidad, \"Todo componente de la naturaleza, susceptible de ser aprovechado por el ser humano para la satisfacción de sus necesidades y que tenga un valor actual o potencial, tales como: el paisaje natural, las aguas, superficiales y subterráneas; el suelo, subsuelo y las tierras por su capacidad de uso mayor: agrícolas, pecuarias, forestales, cinegética y de protección; la biodiversidad; la geodiversidad; los recursos genéticos, y los ecosistemas que dan soporte a la vida; los hidrocarburos; los recursos hidroenergéticos, eólicos, solares, geotérmicos y similares; la atmósfera y el espectro radioeléctrico, los minerales, las rocas y otros recursos geológicos renovables y no renovables\", coincide con la definición de:",
+        options: [
+          "a) Aprovechamientos",
+          "b) Recursos naturales",
+          "c) Componentes naturales",
+          "d) Recursos susceptibles de aprovechamiento público"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Recursos naturales)."
+      },
+      {
+        question: "2.- Señale la opción más correcta a tenor de lo establecido en el artículo 31 de la Ley 8/2003, de 28 de octubre, de la flora y fauna silvestres:",
+        options: [
+          "a) Toda actividad de aprovechamiento de las especies silvestres a que se refiere el artículo 30 (especies objeto de aprovechamiento) requerirá autorización administrativa de la Consejería competente en materia de medio ambiente y, en su caso, la redacción de un plan técnico en los términos que reglamentariamente se establezcan",
+          "b) También será susceptible de autorización administrativa la recogida esporádica en pequeñas cantidades de ejemplares de especies silvestres de invertebrados, plantas y hongos en los lugares y fechas tradicionales, siempre que la misma no entrañe riesgo de desaparición local de la especie.",
+          "c) Las respuestas a) y b) son falsas",
+          "d) Las respuestas a) y b) son correctas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "3.- Señale la opción más correcta según lo establecido en el artículo 36 de la Ley 43/2003, de 21 de noviembre, de Montes:",
+        options: [
+          "a) El titular del monte será en todos los casos el propietario de los recursos forestales producidos en su monte, incluidos frutos espontáneos, y tendrá derecho a su aprovechamiento conforme a lo establecido en esta ley y en la normativa autonómica",
+          "b) Los aprovechamientos de los recursos forestales se realizarán de acuerdo con las prescripciones para la gestión de montes establecidas en los correspondientes planes de ordenación de recursos forestales (PORF), cuando existan. Se ajustarán también, en su caso, a lo que concretamente se consigne en el proyecto de ordenación de montes, plan dasocrático o instrumento de gestión equivalente vigente.",
+          "c) Los aprovechamientos en los montes afectados por las zonas de servidumbre, policía, o afección de los dominios públicos hidráulico, marítimo-terrestre, de carreteras o ferroviario no precisarán de la autorización de los órganos competentes de dichos dominios, siempre y cuando tales montes dispongan de instrumentos de gestión cuya aprobación por el órgano forestal de la comunidad autónoma haya sido informada favorablemente por los órganos de gestión de los dominios públicos mencionados",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)."
+      },
+      {
+        question: "4.- Señale la opción incorrecta según las prescripciones establecidas en el artículo 62 de la Ley 2/1992, de 15 de junio, Forestal de Andalucía:",
+        options: [
+          "a) A los efectos previstos en el artículo 60, los titulares de predios forestales deberán presentar Proyectos de Ordenación de Montes o Planes Técnicos.",
+          "b) Deberán ser elaborados por técnicos competentes en la materia siguiendo las instrucciones fijadas por la Administración Forestal y, en su caso, en los Planes de Ordenación de Recursos Naturales",
+          "c) Los Proyectos o Planes a que se refiere el párrafo anterior se aprobarán por la Administración Forestal.",
+          "d) Transcurridos tres meses desde su presentación sin contestación expresa, se entenderán aprobados por silencio administrativo positivo en todos aquellos aspectos regulados por esta Ley, y siempre que no contravengan las instrucciones de la Administración Forestal y, en su caso, de los Planes de Ordenación de Recursos Naturales"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "5.- El artículo 63 de la Ley 2/1992, de 15 de junio, Forestal de Andalucía establece que los aprovechamientos de maderas, leñas y corcho en los terrenos forestales privados que tengan aprobados Proyectos de Ordenación o Planes Técnicos y que hayan de realizarse conforme a las prescripciones de los mismos, no necesitarán autorización, siendo, no obstante, obligatoria:",
+        options: [
+          "a) La autorización expresa de la administración forestal.",
+          "b) La actualización de datos del Registro Forestal de Andalucía",
+          "c) La notificación previa a la administración forestal.",
+          "d) Ninguna de las opciones anteriores es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La notificación previa a la administración forestal)."
+      },
+      {
+        question: "6.- El artículo 66 de la Ley 2/1992, de 15 de junio, Forestal de Andalucía prescribe que para todos los montes públicos se redactará, de conformidad con los Proyectos de Ordenación o Planes Técnicos:",
+        options: [
+          "a) Un plan de ordenación de los recursos naturales",
+          "b) Un plan de ordenación de los recursos forestales",
+          "c) Un programa anual de aprovechamiento, mejora e inversiones",
+          "d) Un plan rector de uso y gestión"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un programa anual de aprovechamiento, mejora e inversiones)."
+      },
+      {
+        question: "7.- El artículo 96 del Decreto 208/1997 de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, establece que será necesaria la previa obtención de autorización administrativa para la realización de usos y aprovechamientos. Señale cual de las siguientes opciones no requerirá autorización administrativa:",
+        options: [
+          "a) Aprovechamientos de madera, leña, corcho y piña de pino piñonero, en terrenos forestales privados cuando no figuren expresamente previstos en Proyectos de Ordenación o Planes Técnicos aprobados.",
+          "b) Roturación de terrenos forestales y realización de actuaciones que originen o puedan originar procesos de erosión en terrenos adehesados que tradicionalmente hayan sido cultivados y cuya pendiente sea inferior al 20%.",
+          "c) Plantación o renovación de especies forestales de crecimiento rápido.",
+          "d) Usos y aprovechamientos forestales de todas clases en áreas afectadas por incendios forestales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "8.- Señalar la opción correcta en cuanto a la tramitación de las autorizaciones para la realización de usos o aprovechamientos en terrenos forestales, a tenor de lo establecido en el artículo 97 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía:",
+        options: [
+          "a) Las solicitudes de autorización se dirigirán al Delegado Provincial de la Consejería de Medio Ambiente, indicando el tipo de aprovechamiento, su cuantía, localización exacta, duración y características del mismo.",
+          "b) En las solicitudes relativas a usos o aprovechamientos en áreas quemadas deberá acreditarse el cumplimiento de las condiciones impuestas para la restauración de la zona.",
+          "c) Corresponde al Delegado Provincial de la Consejería de Medio Ambiente resolver las solicitudes en el plazo máximo de 2 meses, transcurrido el cual podrán entenderse estimadas siempre que afecten únicamente a terrenos privados que no incluyan áreas incendiadas, en cuyo caso podrán entenderse desestimadas",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)."
+      },
+      {
+        question: "9.- En los aprovechamientos madereros el sistema básico de aprovechamiento denominado \"sistema de madera corta\" consiste en:",
+        options: [
+          "a) En dicho sistema, los árboles se extraen del área de corta sin tronzar ni desramar, por lo tanto, las operaciones que se realizan a pie de tocón serían únicamente el apeo",
+          "b) Sistema en el que la madera se extrae del monte en forma de trozas de unos 2 - 2,5m de longitud. Para ello es necesario realizar a pie de tocón las operaciones de apeo, desrame, despunte, tronzado y reunión o apilado",
+          "c) Se trata de del sistema de aprovechamiento en el que la madera se extrae de los montes sin más preparación que su desramado y despunte, y por lo tanto las operaciones realizadas a pie de tocón serán el apeo, el desrame y el despunte",
+          "d) Se trata de cualquier sistema llevado a cabo con procesadoras."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "10.- ¿Cuál de las siguientes fases no se dará dentro de la superfase de corta mediante medios manuales y motorizados?",
+        options: [
+          "a) Fase de limpieza",
+          "b) Fase de apeo",
+          "c) Fase de desramado",
+          "d) Fase de reunión"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Fase de reunión)."
+      },
+      {
+        question: "11.- Durante la fase de apeo, al practicar el corte de derribo, no se corta todo el diámetro del árbol, sino que se deja una pequeña porción rectangular que actúa como bisagra, y se denomina:",
+        options: [
+          "a) Arista de ruptura",
+          "b) Charnela",
+          "c) Las respuestas a) y b) son correctas",
+          "d) Cuando se realiza el corte de derribo siempre de be abarcar todo el diámetro del árbol para poder controlar la dirección de caída."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Las respuestas a y b son correctas)."
+      },
+      {
+        question: "12.- ¿Cuál de las siguientes operaciones no realizan las procesadoras durante la superfase de corta mediante medios mecanizados?",
+        options: [
+          "a) Apeo",
+          "b) Desramado",
+          "c) Despuntado",
+          "d) Saca"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Saca)."
+      },
+      {
+        question: "13.- Para la saca mecanizada por arrastre existe una maquinaria específica llamada:",
+        options: [
+          "a) Procesadora",
+          "b) Skidder",
+          "c) Forwarder",
+          "d) Mulilla de arrastre"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Skidder)."
+      },
+      {
+        question: "14.- De la siguiente maquinaria, ¿cuál sería la más adecuada para el tronzado?",
+        options: [
+          "a) Motosierra de características similares a las empleadas en el derribo.",
+          "b) Pluma hidráulica montada sobre vehículo de transporte.",
+          "c) Pequeñas cabezas portadoras de cuchillas.",
+          "d) Tractor autocargable."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "15.- De la siguiente maquinaria, ¿cuál sería la más adecuada para el desembosque?",
+        options: [
+          "a) Procesadora",
+          "b) Camión pesado de tracción simple o doble de 2-4 ejes y provisto de pluma hidráulica.",
+          "c) Tractor forestal autocargador.",
+          "d) Taladora sobre vehículo todoterreno con grapa."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tractor forestal autocargador)."
+      },
+      {
+        question: "16.- El artículo 1 de la Orden de 29 de diciembre de 2011, por la que se regula el aprovechamiento de la biomasa forestal con destino energético, nos indica que la fracción biodegradable de los productos, subproductos y residuos procedentes de la selvicultura aplicada a la vegetación que cubre los montes o terrenos forestales definidos en el artículo 5 de la Ley 43/2003, de 21 de noviembre, de Montes, y en el artículo 1 de la Ley 2/1992, de 15 de junio, Forestal de Andalucía, se considerará:",
+        options: [
+          "a) Fracción aprovechable",
+          "b) Fracción combustible",
+          "c) Materia prima",
+          "d) Biomasa Forestal"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Biomasa Forestal)."
+      },
+      {
+        question: "17.- ¿Cuál de los siguientes factores puede influir en la calidad del corcho?",
+        options: [
+          "a) Porosidad",
+          "b) Textura",
+          "c) Finura del Grano",
+          "d) Todas las opciones anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones anteriores son correctas)."
+      },
+      {
+        question: "18.- Cuando un corcho está afectado de \"culebra\" se debe a:",
+        options: [
+          "a) Es el daño ocasionado por la hormiga Crematogaster scutellaris, conocida como \"morito\". Las colonias de este insecto se desarrollan principalmente en el corcho bornizo, es cuando se instalan en el corcho de reproducción cuando producen pérdida de calidad de las panas.",
+          "b) Es el daño producido por la larva del coleóptero Coroebus undatus. Esta larva excava galerías sinuosas alrededor del tronco, discurriendo por la capa suberofelodérmica, aunque también puede desviarse hacia el ritidoma o la albura, depreciando el valor del corcho y dificultando la extracción.",
+          "c) Es el corcho que presenta inclusiones de tejido del líber y felodermo. La densidad de estos corchos es muy elevada",
+          "d) Fuertes traspiraciones y la pérdida de gran cantidad de follaje pueden provocar este defecto, que ocasiona un debilitamiento en la formación de células y su posterior rotura"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "19.- ¿Cómo se denomina al primer corcho que se extrae del alcornoque?",
+        options: [
+          "a) Fino",
+          "b) Segundero",
+          "c) Bornizo",
+          "d) Hembra"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Bornizo)."
+      },
+      {
+        question: "20.- ¿Cuál de las siguientes técnicas de descorche está autorizada en Andalucía?",
+        options: [
+          "a) Descorche completo",
+          "b) Descorche parcial según orientación",
+          "c) Descorche parcial según altura",
+          "d) Todas estas técnicas están permitidas siempre que se cumpla lo establecido en la Orden de 26 de septiembre de 1988."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Descorche completo)."
+      },
+      {
+        question: "21.- De las siguientes herramientas, ¿Cuál no es típica del descorche?",
+        options: [
+          "a) Hurga",
+          "b) Hacha corchera",
+          "c) Escoda",
+          "d) Cuchillo de rajar"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Escoda)."
+      },
+      {
+        question: "22.- ¿Cuál de las siguientes no es una fase que se lleve a cabo en el procedimiento de descorche tradicional?",
+        options: [
+          "a) Trazar",
+          "b) Desroñar",
+          "c) Ahuecar",
+          "d) Dislocar"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Desroñar)."
+      },
+      {
+        question: "23.- Según lo establecido en la Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, el descorche tendrá que efectuarse del periodo comprendido:",
+        options: [
+          "a) Entre el 1 de junio y el 1 de septiembre de cada año.",
+          "b) Entre el 1 de noviembre y el 15 de abril del año siguiente",
+          "c) La respuesta anterior es correcta, además, no podrán emplearse medios mecánicos de vibración después del último día del mes de febrero.",
+          "d) El descorche podrá realizarse durante todo el año salvo cuando se produzcan lluvias copiosas o existan vientos desecantes."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Entre el 1 de junio y el 1 de septiembre de cada año)."
+      },
+      {
+        question: "24.- En Andalucía, la Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, establece que como norma general la edad mínima para la extracción de los corchos segundero y fino será de:",
+        options: [
+          "a) Entre 8 y 9 años",
+          "b) 8 años",
+          "c) 9 años",
+          "d) Dependerá del grosos del corcho, siendo el grosor mínimo de 27 milímetros."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 9 años)."
+      },
+      {
+        question: "25.- La Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, establece que será obligatoria la realización de la hechura de ruedos o suelos, para facilitar las labores de descorche. La dimensión mínima de estos ruedos será de:",
+        options: [
+          "a) 2 metros de diámetro a partir del tronco",
+          "b) 3 metros de diámetro a partir del tronco",
+          "c) 2 metros de radio a partir del tronco",
+          "d) 2 metros de perímetro a partir del tronco"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 2 metros de radio a partir del tronco)."
+      },
+      {
+        question: "26.- La Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, establece que el primer desbornizamiento no podrá llevarse a cabo en árboles que:",
+        options: [
+          "a) A la altura normal no hayan alcanzado un diámetro de 65 cm",
+          "b) A la altura normal no hayan alcanzado un perímetro sobre el bornizo de 65 cm.",
+          "c) A la altura normal no hayan alcanzado un diámetro de 55 cm",
+          "d) No hayan alcanzado la edad mínima de 30 años"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "27.- La Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, establece que el coeficiente de descorche para el desbornizamiento será:",
+        options: [
+          "a) Siempre igual a 2",
+          "b) No debe de ser mayor de 2",
+          "c) Igual a 2,5",
+          "d) Igual a 3, debiendo rebajarse a 2,5 en el caso de que 1/3 o más de la superficie descorchada corresponda a ramas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: No debe de ser mayor de 2)."
+      },
+      {
+        question: "28.- En el aprovechamiento corchero, el grosor de las panas de corcho se mide en una unidad denominada línea, que equivale a:",
+        options: [
+          "a) 1,75 mm",
+          "b) 1, 75 cm",
+          "c) 2,25 mm",
+          "d) 2,50 cm"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 2,25 mm)."
+      },
+      {
+        question: "29.- Según el plan andaluz de calas se diferencian hasta cinco divisiones o clases de corcho en función del calibre, y hasta 7 divisiones en función del aspecto. Finalmente, las clases de calidad que podemos encontrar será de:",
+        options: [
+          "a) 9 posibles clases de calidad",
+          "b) 35 posibles clases de calidad",
+          "c) 3 clases de calidad: Refugo, fino y traza.",
+          "d) El enunciado de la pregunta no es correcto, ya que solo existen 6 divisiones en función del aspecto."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 9 posibles clases de calidad)."
+      },
+      {
+        question: "30.- La producción de piña por parte del pino piñonero (Pinus pinea) se produce, aproximadamente, cuando el árbol tiene:",
+        options: [
+          "a) 30 cm de diámetro en su base",
+          "b) 30 cm de diámetro normal",
+          "c) 20 cm de diámetro normal",
+          "d) Cuando el árbol alcanza los 25 años de edad."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 20 cm de diámetro normal)."
+      },
+      {
+        question: "31.- ¿Cuál de las siguientes herramientas no es utilizada tradicionalmente para el aprovechamiento de la piña del pino piñonero?",
+        options: [
+          "a) Gorguz",
+          "b) Trazador",
+          "c) Taco",
+          "d) Caña"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Trazador)."
+      },
+      {
+        question: "32.- La Orden de 10 de noviembre de 2000, por la que se regula la recogida de piñas de pino piñonero (Pinus pinea L.) en terrenos forestales de la Comunidad Autónoma de Andalucía, establece que, con carácter general, el periodo hábil para la recogida de piña del pino piñonero será:",
+        options: [
+          "a) El comprendido entre el 1 de noviembre y el 15 de abril del año siguiente, ambos inclusive",
+          "b) El comprendido entre el 1 de marzo y el 15 de noviembre, ambos inclusive",
+          "c) El periodo en el que se encuentre la piña madura, siempre que el árbol esté en actividad vegetativa.",
+          "d) El periodo en el que se encuentre la piña madura, siembre que el árbol esté en parada vegetativa."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "33.- La Orden de 10 de noviembre de 2000, por la que se regula la recogida de piñas de pino piñonero (Pinus pinea L.) en terrenos forestales de la Comunidad Autónoma de Andalucía, establece que todo aprovechamiento de piña en terreno forestal privado que no disponga de proyecto de ordenación o plan técnico aprobado o que, disponiendo del mismo, no lo incluya expresamente, deberá ser autorizado por la Consejería de Medio Ambiente. Para ello los interesados deberán presentar una solicitud:",
+        options: [
+          "a) Antes del 1 de noviembre de la temporada respectiva",
+          "b) Antes del 15 de noviembre de la temporada respectiva",
+          "c) Antes del 15 de octubre de la temporada respectiva",
+          "d) Con una antelación mínima de 20 días a la fecha de inicio de la temporada respectiva"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Antes del 15 de octubre de la temporada respectiva)."
+      },
+      {
+        question: "34.- ¿Qué normativa regula los aprovechamientos apícolas en los montes públicos de la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) El Real Decreto Legislativo 1/2016, de 7 de septiembre",
+          "b) La Orden de 16 de septiembre de 1988",
+          "c) El Decreto 256/2010, de 15 de agosto",
+          "d) El Decreto 250/1997, de 28 de octubre"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: El Decreto 250/1997, de 28 de octubre)."
+      },
+      {
+        question: "35.- ¿Cuál será la distancia mínima entre colmenares situados en montes públicos de Andalucía?",
+        options: [
+          "a) Dependerá del número de colmenas, siendo de 100 metros para asentamientos con menos de 26 colmenas.",
+          "b) 500 metros, dentro de los límites del monte.",
+          "c) 500 metros siempre y cuando haya más de 50 colmenas",
+          "d) La resolución de la autorización determinará dicha distancia"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 500 metros, dentro de los límites del monte)."
+      },
+      {
+        question: "36.- Según lo establecido en el Real Decreto 209/2002 de 22 de febrero, por el que se establecen normas de ordenación de las explotaciones apícolas, una explotación apícola con menos de 150 colmenas se considerará:",
+        options: [
+          "a) Profesional",
+          "b) No profesional",
+          "c) De autoconsumo, en cualquier caso",
+          "d) De autoconsumo siempre que no supere las 15 colmenas, independientemente del destino de los productos."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: No profesional)."
+      },
+      {
+        question: "37.- La Orden de 26 de febrero de 2004, por la que se establecen las normas de ordenación de las explotaciones apícolas en la Comunidad Autónoma de Andalucía, establece en su artículo 4 que las distancias de los asentamientos apícolas deberán respetar las distancias mínimas:",
+        options: [
+          "a) De 400 metros para establecimientos colectivos de carácter público y centros urbanos, así como para núcleos de población.",
+          "b) De 100 metros con respecto a viviendas rurales habitadas e instalaciones pecuarias",
+          "c) De 25 metros en caso de caminos vecinales y pistas forestales",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)."
+      },
+      {
+        question: "38.- La Orden de 2 de junio de 1997, por la que se regula la recolección de ciertas especies vegetales en los terrenos forestales de propiedad privada en la Comunidad Autónoma de Andalucía establece que el aprovechamiento, en terrenos forestales de titularidad privada, de especies vegetales de interés etnobotánico requerirá autorización de la Consejería de Medio Ambiente. A tal efecto, dicha autorización:",
+        options: [
+          "a) Se resolverá por el Delegado Provincial de la Consejería de Medio Ambiente competente por razón del territorio en un plazo máximo de 2 meses, pasado este plazo sin resolución expresa podrá entenderse estimada.",
+          "b) Se resolverá por el Delegado Provincial de la Consejería de Medio Ambiente competente por razón del territorio en un plazo máximo de 2 meses, pasado este plazo sin resolución expresa podrá entenderse desestimada.",
+          "c) Se resolverá por el Delegado Provincial de la Consejería de Medio Ambiente competente por razón del territorio en un plazo máximo de 3 meses, pasado este plazo sin resolución expresa podrá entenderse estimada.",
+          "d) Se resolverá por el Delegado Provincial de la Consejería de Medio Ambiente competente por razón del territorio en un plazo máximo de 3 meses, pasado este plazo sin resolución expresa podrá entenderse desestimada."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "39.- ¿Cuál de los siguientes procesos de resinación no se consideraría un procedimiento tradicional para este fin?",
+        options: [
+          "a) Sistema de pica de corteza con estimulación con ácido",
+          "b) Sistema de pica de corteza con estimulación con pasta",
+          "c) Sistema de Smalian",
+          "d) Sistema de Hugues"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Sistema de Smalian)."
+      },
+      {
+        question: "40.- ¿Cuántas entalladuras se suelen realizar en cada cara en el proceso de resinación de pica de corteza?",
+        options: [
+          "a) 1",
+          "b) 5",
+          "c) 20",
+          "d) 24"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 5)."
+      },
+      {
+        question: "41.- ¿Cuál de las siguientes herramientas no se utiliza tradicionalmente para el aprovechamiento de resina según el proceso de pica de corteza?",
+        options: [
+          "a) Escoda",
+          "b) Miera",
+          "c) Garrancho",
+          "d) Marcador"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Miera)."
+      },
+      {
+        question: "42.- De las siguientes especies de hongos con mayor potencial de aprovechamiento, ¿Cuál de ellas encontraríamos en zonas de ribera bajo chopos, olmos fresnos, etc, teniendo la fructificación primaveral?",
+        options: [
+          "a) Colmenilla (Morchella sp.)",
+          "b) Chantarella (Cantharellus cibarius)",
+          "c) Níscalo (Lactarius deliciosus)",
+          "d) Criadilla de tierra (Terfeza arenaria)"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Colmenilla)."
+      },
+      {
+        question: "43.- ¿Cuál de los siguientes no sería un aprovechamiento directo de los montes mediterráneos?",
+        options: [
+          "a) El uso público",
+          "b) El aprovechamiento del corcho",
+          "c) El aprovechamiento de la resina",
+          "d) El aprovechamiento de pastos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: El uso público)."
+      },
+      {
+        question: "44.- En el estudio de las masas forestales, ¿Cuál de los siguientes no se considera un tipo dendrométrico?",
+        options: [
+          "a) Piramidal",
+          "b) Cilindro",
+          "c) Neiloide",
+          "d) Paraboloide"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Piramidal)."
+      },
+      {
+        question: "45.- ¿Cómo se denomina al coeficiente de corrección que tendría que aplicar para conocer el volumen real del fuste de un árbol una vez calculado el volumen aparente de dicho fuste?",
+        options: [
+          "a) Coeficiente genérico de reducción",
+          "b) Coeficiente de apilamiento",
+          "c) Coeficiente mórfico",
+          "d) Coeficiente dedrométrico"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Coeficiente mórfico)."
+      },
+      {
+        question: "46.- ¿Cuál de las siguientes fórmulas no se corresponde con una fórmula de cubicación comercial de árboles apeados?",
+        options: [
+          "a) Fórmula de Huber",
+          "b) Fórmula de Simpson",
+          "c) Fórmula de Smalian",
+          "d) Todas las opciones son fórmulas de cubicación de árboles en pie"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Fórmula de Simpson)."
+      },
+      {
+        question: "47.- ¿Cuál de las siguientes fórmulas no se corresponde con una fórmula de cubicación real de árboles apeados?",
+        options: [
+          "a) Fórmula de Newton",
+          "b) Fórmula de Kunce",
+          "c) Fórmula de Simpson",
+          "d) Fórmula de Smalian"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Fórmula de Smalian)."
+      },
+      {
+        question: "48.- ¿Cuál es el término utilizado para denominar un metro cúbico de madera apilada?",
+        options: [
+          "a) Neiloide",
+          "b) Estéreo",
+          "c) Volumen dasométrico",
+          "d) Volumen apilable unitario"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Estéreo)."
+      },
+      {
+        question: "49.- De los siguientes aparatos utilizados en dasometría, ¿Cuál utilizaría para medir la altura de un árbol en pie?",
+        options: [
+          "a) Hipsómetro de Christen",
+          "b) Hipsómetro Blume-Leiss",
+          "c) Relascopio de Bitterlich",
+          "d) Cualquiera de los instrumentos anteriormente descritos nos servirá para dicho cálculo"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cualquiera de los instrumentos anteriormente descritos...)."
+      },
+      {
+        question: "50.- ¿Qué instrumento podría utilizar para medir la altura directriz de un árbol?",
+        options: [
+          "a) Forcípula",
+          "b) Hipsómetro de Christen",
+          "c) Relascopio de Bitterlich",
+          "d) Barrena de Pressler"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Relascopio de Bitterlich)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- El artículo 64 de la Ley 2/1992, de 15 de junio, Forestal de Andalucía establece que las autorizaciones de aprovechamientos forestales tendrán una vigencia desde su expedición, salvo que en ellas se determine otra cosa, de:",
+        options: [
+          "a) 3 meses",
+          "b) 6 meses",
+          "c) 1 año",
+          "d) Hasta que concluya el aprovechamiento"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 1 año)."
+      },
+      {
+        question: "2.- En los aprovechamientos madereros, los medios y métodos utilizados para la realización de los trabajos son variables, pero para su descripción y análisis se suelen agrupar en tres grupos, señale cual de los siguientes NO es uno de ellos",
+        options: [
+          "a) Apeo",
+          "b) Corta",
+          "c) Saca",
+          "d) Transporte"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Apeo)."
+      },
+      {
+        question: "3.- De la siguiente normativa, ¿cuál es la encargada de regular el aprovechamiento de la biomasa forestal con destino energético?",
+        options: [
+          "a) Orden de 29 de diciembre de 2011",
+          "b) Orden de 26 de septiembre de 1988",
+          "c) Orden de 10 de noviembre de 2000",
+          "d) Decreto 250/1997 de 28 de octubre"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Orden de 29 de diciembre de 2011)."
+      },
+      {
+        question: "4.- En el aprovechamiento corchero, cuando se dice que un corcho está \"picao\", ¿a qué se debe?",
+        options: [
+          "a) A la presencia de agua en el interior de las células, lo que perjudica la impermeabilidad del corcho",
+          "b) Al ataque de la culebrilla del corcho (Coroebus undatus).",
+          "c) Debilitamiento en la formación de células y su posterior rotura debido a fuertes transpiraciones y pérdida de follaje.",
+          "d) Daño ocasionado por la hormiga Crematogaster scutellaris"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Daño ocasionado por la hormiga Crematogaster scutellaris)."
+      },
+      {
+        question: "5.- El artículo 37 de la Ley 43/2003, de 21 de noviembre, de Montes, define que se considerarán aprovechamientos de turno corto:",
+        options: [
+          "a) Aquellos cuyo turno sea inferior a 50 años",
+          "b) Aquellos cuyo turno sea inferior a 20 años",
+          "c) Los aprovechamientos de las especies y turnos conjuntamente tratados que determinen las comunidades autónomas para su territorio",
+          "d) Las respuestas b) y c) son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas b y c son correctas)."
+      },
+      {
+        question: "6.- ¿Cuál de las siguientes herramientas es utilizada tradicionalmente para la recogida de la piña del pino piñonero?",
+        options: [
+          "a) Escoda",
+          "b) Gorguz",
+          "c) Burja",
+          "d) Hipsómetro"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Gorguz)."
+      },
+      {
+        question: "7.- ¿Cuál de los siguientes NO viene literalmente especificado como aprovechamiento forestal en el artículo 94 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía?",
+        options: [
+          "a) Maderas y leñas",
+          "b) Piñas",
+          "c) Resina",
+          "d) Plantas aromáticas y medicinales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Piñas)."
+      },
+      {
+        question: "8.- La Orden de 26 de febrero de 2004, por la que se establecen las normas de ordenación de las explotaciones apícolas en la Comunidad Autónoma de Andalucía, en su artículo 4 establece que la distancia mínima de los asentamientos apícolas con respecto a carreteras nacionales será de:",
+        options: [
+          "a) 400 metros",
+          "b) 50 metros",
+          "c) 200 metros",
+          "d) 100 metros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 200 metros)."
+      },
+      {
+        question: "9.- ¿Cuál será el plazo de ejecución del aprovechamiento una vez obtenida la autorización para la recolección, en terrenos forestales de titularidad privada, de especies de interés etnobotánico, a tenor de lo establecido en el artículo 4 de la Orden de 2 de junio de 1997, por la que se regula la recolección de ciertas especies vegetales en los terrenos forestales de propiedad privada de la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) 1 mes",
+          "b) 1 año",
+          "c) 2 meses",
+          "d) 2 años"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 2 meses)."
+      },
+      {
+        question: "10.- La orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, determina que el coeficiente de descorche en un corcho segundero no deberá ser mayor de:",
+        options: [
+          "a) 2,5",
+          "b) 65 cm",
+          "c) 130 cm",
+          "d) 2"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 2,5)."
+      },
+      {
+        question: "11.- La Orden de 10 de noviembre de 2000, por la que se regula la recogida de piñas del pino piñonero, establece en su artículo 2 que, con carácter general, el período hábil para la recogida de la piña de pino piñonero (Pinus pinea L.), será:",
+        options: [
+          "a) Entre el 1 de noviembre y el 15 de abril del año siguiente, ambos inclusive",
+          "b) Entre el 1 de noviembre y el 1 de abril del año siguiente, ambos inclusive",
+          "c) Entre el 15 de noviembre y el 1 de abril del año siguiente, ambos inclusive",
+          "d) Entre el 15 de noviembre y el 15 de abril del año siguiente, ambos inclusive"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Entre el 1 de noviembre y el 15 de abril del año siguiente, ambos inclusive)."
+      },
+      {
+        question: "12.- En los aprovechamientos madereros, ¿Cómo se denomina al corte ejecutado en la parte baja del fuste cuya función es dirigir la caída del árbol?",
+        options: [
+          "a) Corte de derribo",
+          "b) Entalladura",
+          "c) Charnela",
+          "d) Trazo de sierra"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Entalladura)."
+      },
+      {
+        question: "13.- El artículo 96 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, establece que será necesaria la previa obtención de autorización administrativa:",
+        options: [
+          "a) Aprovechamientos de madera, leña, corcho y piña de pino piñonero, en terrenos forestales públicos cuando no figuren expresamente previstos en Proyectos de Ordenación o Planes Técnicos aprobados.",
+          "b) Sustitución de especies principales que no constituyan masas arboladas o de matorrales, cuando figuren previstas expresamente en un Plan Técnico o Proyecto de ordenación aprobado.",
+          "c) Roturación de terrenos forestales y realización de actuaciones que originen o puedan originar procesos de erosión. Quedarán exceptuadas de esta autorización los terrenos forestales adehesados que tradicionalmente hayan sido cultivados y cuya pendiente sea inferior al 10%. se consideran como tradicionalmente cultivados los que lo hayan sido en el periodo de los 20 años anteriores.",
+          "d) Todas las respuestas descritas anteriormente son falsas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas descritas anteriormente son falsas)."
+      },
+      {
+        question: "14.- El Real Decreto 209/2002 de 22 de febrero, por el que se establecen normas de ordenación de las explotaciones apícolas, establece en su artículo 2 que será considerada una explotación apícola profesional:",
+        options: [
+          "a) la que tiene 50 colmenas o más",
+          "b) la que tiene 150 colmenas o más",
+          "c) la que tiene 250 colmenas o más",
+          "d) la que tiene 500 colmenas o más"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La que tiene 150 colmenas o más)."
+      },
+      {
+        question: "15.- Una de las siguientes herramientas no es utilizada para la resinación mediante el método de pica de corteza, señale cual:",
+        options: [
+          "a) Garrancho",
+          "b) Escoda",
+          "c) Grapa",
+          "d) Hurga"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Hurga)."
+      },
+      {
+        question: "16.- En los aprovechamientos madereros, ¿Cómo se llama la senda excavada en el terreno, carente de firme, que se utiliza para la saca de madera por arrastre?",
+        options: [
+          "a) Vereda",
+          "b) Cargadero",
+          "c) Jorro",
+          "d) Skidder"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Jorro)."
+      },
+      {
+        question: "17.- El Plan Andaluz de calas determina que un corcho de calibre 5 (>19 líneas) y de aspecto 5ª, será de la clase de calidad:",
+        options: [
+          "a) Q(1)",
+          "b) Q(2)",
+          "c) Q(5)",
+          "d) Refugo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Q(1))."
+      },
+      {
+        question: "18.- ¿Cuál de los siguientes no se corresponde con un tipo dendrométrico de los utilizados para la cubicación de árboles?",
+        options: [
+          "a) Cono",
+          "b) Neiloide",
+          "c) Paraboloide",
+          "d) Prisma"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Prisma)."
+      },
+      {
+        question: "19.- ¿Cómo se denomina al primer corcho que se extrae del alcornoque?",
+        options: [
+          "a) Primerizo",
+          "b) Bornizo",
+          "c) Inicial",
+          "d) Primera capa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Bornizo)."
+      },
+      {
+        question: "20.- La fórmula de Kunze se utiliza para la:",
+        options: [
+          "a) Cubicación real de árboles apeados",
+          "b) Cubicación comercial de árboles apeados",
+          "c) Cubicación de árboles en pie",
+          "d) Cubicación de maderas de pequeño diámetro y leñas"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cubicación real de árboles apeados)."
+      },
+      {
+        question: "21.- El artículo 100 del Decreto 208/1997, de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, establece que la realización de usos o aprovechamientos en montes públicos estará sujeta, en todo caso a:",
+        options: [
+          "a) Licencia o autorización",
+          "b) Autorización o Concesión",
+          "c) Licencia, concesión, adjudicación o enajenación",
+          "d) Licencia, subasta, venta, concesión o adjudicación."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Licencia, concesión, adjudicación o enajenación)."
+      },
+      {
+        question: "22.- El Decreto 250/1997, de 28 de octubre, por el que se regulan los aprovechamientos apícolas en los montes pertenecientes a la Comunidad Autónoma de Andalucía, establece en su artículo 6 que la distancia entre colmenares será, como mínimo, de:",
+        options: [
+          "a) 250 m dentro de los límites del monte",
+          "b) 250 m entre distintos montes",
+          "c) 500 m dentro de los límites del monte",
+          "d) 100 m entre distintos montes."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 500 m dentro de los límites del monte)."
+      },
+      {
+        question: "23.- ¿Cuál de las siguientes herramientas utilizaría para medir la altura de un árbol?",
+        options: [
+          "a) Hipsómetro de Christen",
+          "b) Hipsómetro de Blume-Leiss",
+          "c) Relascopio de Bitterlich",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "24.- ¿Cuál de las siguientes técnicas de descorche está permitida en Andalucía?",
+        options: [
+          "a) Descorche Completo",
+          "b) Descorche parcial según orientación",
+          "c) Descorche parcial en altura",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Descorche Completo)."
+      },
+      {
+        question: "25.- La Orden de 10 de noviembre de 2000, por la que se regula la recogida de piñas del pino piñonero, establece en su artículo 6 que el peso mínimo, con carácter general, para cada salida de piña, será de:",
+        options: [
+          "a) 1.000 Kg",
+          "b) 5.000 Kg",
+          "c) 10.000 Kg",
+          "d) 25.000 Kg"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 10.000 Kg)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 25),
+      "t1_b2": test1Questions.slice(25, 50),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 13),
+      "t2_b2": test2Questions.slice(13, 25)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 10 - APROVECHAMIENTOS Y DASOMETRÍA (UNIFICADO COMPLETO 75 PREGUNTAS)",
+        "t1_all": "TEST 10-1 - TEST BÁSICO N.º 1 COMPLETO (50 PREGUNTAS)",
+        "t1_b1": "TEST 10-1 - BLOQUE 1 (PREGUNTAS 1 A 25)",
+        "t1_b2": "TEST 10-1 - BLOQUE 2 (PREGUNTAS 26 A 50)",
+        "t2_all": "TEST 10-2 - AUTOEVALUACIÓN N.º 1 COMPLETO (25 PREGUNTAS)",
+        "t2_b1": "TEST 10-2 - BLOQUE 1 (PREGUNTAS 1 A 13)",
+        "t2_b2": "TEST 10-2 - BLOQUE 2 (PREGUNTAS 14 A 25)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

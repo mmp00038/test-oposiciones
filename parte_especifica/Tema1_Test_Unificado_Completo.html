@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 1 (140 Preguntas)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <option value="all">Examen Completo (140 preguntas)</option>
+        <option value="t1">Test 1 Autoevaluación (Preguntas 1 - 20)</option>
+        <option value="t2_b1">Test 2 - Bloque 1 (Preguntas 21 - 45)</option>
+        <option value="t2_b2">Test 2 - Bloque 2 (Preguntas 46 - 70)</option>
+        <option value="t2_b3">Test 2 - Bloque 3 (Preguntas 71 - 95)</option>
+        <option value="t2_b4">Test 2 - Bloque 4 (Preguntas 96 - 120)</option>
+        <option value="t3">Test 3 Básico (Preguntas 121 - 140)</option>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEST UNIFICADO INTERACTIVO - TEMA 1</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    const test1Questions = [
+      {
+        question: "1.- Según el artículo 28 de la Ley Orgánica 2/2007 de 19 de marzo, por la que se aprueba el Estatuto de Autonomía para Andalucía, señale la opción correcta:",
+        options: [
+          "a) Todas las personas tienen derecho a acceder a la información medioambiental de que disponen los poderes públicos, en los términos que establezcan las leyes.",
+          "b) Todas las personas tienen derecho a vivir en un medio ambiente equilibrado, sostenible y saludable, así como a disfrutar de los recursos naturales, del entorno y el paisaje en condiciones de igualdad, debiendo hacer un uso responsable del mismo para evitar su deterioro y conservarlo para las generaciones futuras, de acuerdo con lo que determinen las leyes.",
+          "c) Se garantiza este derecho mediante una adecuada protección de la diversidad biológica y los procesos ecológicos, el patrimonio natural, el paisaje, el agua, el aire y los recursos naturales.",
+          "d) Todas las opciones son correctas."
+        ],
+        correct: 3,
+        justification: "Todas las opciones recogen contenidos exactos del artículo 28 del Estatuto de Autonomía para Andalucía relativo al derecho al medio ambiente."
+      },
+      {
+        question: "2.- El Título VII de dicho Estatuto de Autonomía se dedica por completo al Medio Ambiente, ¿Cuál de los siguientes NO sería un tema tratado en dicho título?",
+        options: [
+          "a) Producción y Desarrollo sostenible",
+          "b) Residuos",
+          "c) Gestión integrada de la calidad ambiental",
+          "d) Uso sostenible del suelo y sistemas integrales de transporte"
+        ],
+        correct: 2,
+        justification: "El Título VII (Medio Ambiente) aborda el desarrollo sostenible, residuos, suelo, agua, etc. La 'Gestión integrada de la calidad ambiental' es la denominación dada por la Ley 7/2007 (GICA), no un capítulo o título del Estatuto."
+      },
+      {
+        question: "3.- En el artículo 9 de la Ley 5/2010, de 11 de junio, de Autonomía Local de Andalucía (LAULA), se establecen Competencias Propias de los Municipios. ¿Cuál de las siguientes NO sería una competencia atribuida a la administración local por dicho artículo?",
+        options: [
+          "a) La programación, ejecución y control de medidas de mejora de la calidad del aire, que deberán cumplir con las determinaciones de los planes de nivel supramunicipal o autonómico, aprobados por la Junta de Andalucía.",
+          "b) La declaración y gestión de parques periurbanos y el establecimiento de reservas y parques naturales, previo informe de la consejería competente en materia de medio ambiente de la Junta de Andalucía.",
+          "c) La programación de actuaciones en materia de información ambiental y de educación ambiental para la sostenibilidad.",
+          "d) La gestión del procedimiento de calificación ambiental, así como la vigilancia, control y ejercicio de la potestad sancionadora con respecto a las actividades sometidas a dicho instrumento."
+        ],
+        correct: 1,
+        justification: "La declaración de parques naturales o reservas es competencia de la Comunidad Autónoma, no una competencia propia municipal asignada en el art. 9 de la LAULA."
+      },
+      {
+        question: "4.- Según el artículo 57 de la Ley Orgánica 2/2007 de 19 de marzo, por la que se aprueba el Estatuto de Autonomía para Andalucía, NO será una competencia compartida:",
+        options: [
+          "a) Prevención ambiental",
+          "b) El establecimiento y la regulación de los instrumentos de planificación ambiental y del procedimiento de tramitación y aprobación de estos instrumentos",
+          "c) La regulación de los recursos naturales",
+          "d) La regulación del régimen de autorizaciones y seguimiento de emisión de gases de efecto invernadero"
+        ],
+        correct: 0,
+        justification: "Conforme al art. 57 del Estatuto, la prevención ambiental no figura explicitada dentro de dicho apartado normativo en los términos señalados frente al resto de competencias compartidas reguladas."
+      },
+      {
+        question: "5.- ¿Qué normativa establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente?",
+        options: [
+          "a) Real Decreto 2/2020, de 12 de enero.",
+          "b) Decreto del Presidente 10/2022 de 25 de julio.",
+          "c) Decreto 200/2026, de 30 de julio.",
+          "d) Decreto 226/2020, de 29 de diciembre."
+        ],
+        correct: 2,
+        justification: "La estructura orgánica actual de la Consejería de Sostenibilidad y Medio Ambiente se encuentra establecida por el Decreto 200/2026, de 30 de julio."
+      },
+      {
+        question: "6.- Según la normativa en vigor que establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponde la siguiente competencia?: 'La gestión patrimonial de los bienes adscritos a la Consejería, así como el inventario de los bienes muebles e inmuebles, sin perjuicio de las competencias de la Consejería competente en materia de patrimonio...'",
+        options: [
+          "a) Viceconsejería",
+          "b) Secretaría General de Agricultura, Ganadería y Alimentación",
+          "c) Secretaría General Técnica",
+          "d) Ninguna opción es correcta"
+        ],
+        correct: 2,
+        justification: "La gestión patrimonial de bienes adscritos y el inventario de bienes corresponde a la Secretaría General Técnica de la Consejería."
+      },
+      {
+        question: "7.- ¿A qué órgano central de la Consejería competente en materia de Medio Ambiente está adscrita la Agencia de Medio Ambiente y Agua (AMAYA) en la actualidad?",
+        options: [
+          "a) Secretaría General de Sostenibilidad, Medio Ambiente y Economía Azul",
+          "b) Viceconsejería",
+          "c) Dirección General de Espacios Naturales Protegidos",
+          "d) Secretaría General Técnica"
+        ],
+        correct: 1,
+        justification: "La Agencia de Medio Ambiente y Agua de Andalucía (AMAYA), como agencia pública empresarial, está adscrita directamente a la Viceconsejería."
+      },
+      {
+        question: "8.- ¿Qué tipo de Agencia instrumental es la Fundación para el Desarrollo Sostenible de Doñana y su Entorno - Doñana 21?",
+        options: [
+          "a) Agencia Administrativa",
+          "b) Fundación Pública Andaluza",
+          "c) Agencia de Régimen especial",
+          "d) Agencia Pública Empresarial"
+        ],
+        correct: 1,
+        justification: "La Fundación Doñana 21 se adscribe al sector público instrumental como una Fundación Pública Andaluza."
+      },
+      {
+        question: "9.- Según la normativa en vigor que establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponde la siguiente competencia?: 'Promover y coordinar las políticas de mitigación y adaptación frente al cambio climático y para la transición hacia un nuevo modelo energético'.",
+        options: [
+          "a) Dirección General de Sostenibilidad Ambiental y Economía circular",
+          "b) Secretaría General de Medio Ambiente y Cambio Climático",
+          "c) Secretaría General Técnica",
+          "d) Dirección General de Política Forestal y Biodiversidad"
+        ],
+        correct: 1,
+        justification: "La promoción y coordinación de políticas de mitigación y adaptación frente al cambio climático corresponde a la Secretaría General de Medio Ambiente y Cambio Climático."
+      },
+      {
+        question: "10.- ¿Cuál de los siguientes NO es un órgano de la Agencia de Medio Ambiente y Agua (AMAYA)?",
+        options: [
+          "a) La Vicepresidencia",
+          "b) El Consejo Asesor",
+          "c) La Dirección Gerencia",
+          "d) El Consejo Rector"
+        ],
+        correct: 1,
+        justification: "Los órganos de gobierno y gestión de la AMAYA son la Presidencia, la Vicepresidencia, el Consejo Rector y la Dirección Gerencia. El 'Consejo Asesor' no figura como órgano de la agencia."
+      },
+      {
+        question: "11.- Según la normativa en vigor que establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponde la competencia de planificación y ejecución de restauraciones hidrológico-forestales en los términos de la Ley 3/2026, de 13 de marzo?",
+        options: [
+          "a) Viceconsejería",
+          "b) Secretaría General de Medio Ambiente, Cambio Climático y Economía Azul",
+          "c) Dirección General de Espacios Naturales Protegidos",
+          "d) Dirección General de Política Forestal y Biodiversidad."
+        ],
+        correct: 3,
+        justification: "Corresponde a la Dirección General de Política Forestal y Biodiversidad la planificación y ejecución de las restauraciones hidrológico-forestales y hábitats forestales."
+      },
+      {
+        question: "12.- ¿Qué normativa crea el Consejo Andaluz de Política Forestal y Biodiversidad?",
+        options: [
+          "a) Ley 3/2026, de 13 de marzo, de Montes de Andalucía",
+          "b) Decreto 359/2003 de 22 de diciembre",
+          "c) Decreto 104/2011, de 19 de abril",
+          "d) Decreto 57/1995, de 7 de marzo"
+        ],
+        correct: 0,
+        justification: "El Consejo Andaluz de Política Forestal y Biodiversidad queda regulado y creado a través de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía."
+      },
+      {
+        question: "13.- ¿Cuál de las siguientes NO es una función del Consejo Andaluz de Medio Ambiente?",
+        options: [
+          "a) Conocer preceptivamente los anteproyectos de ley referidos a medio ambiente, con excepción de aquellos supuestos en los que deba pronunciarse el Consejo Forestal Andaluz.",
+          "b) Conocer preceptivamente los planes y programas ambientales de ámbito nacional, con excepción de aquellos supuestos en los que deba pronunciarse el Consejo Forestal Andaluz",
+          "c) Emitir informes y efectuar propuestas en materia ambiental, a iniciativa propia o a petición de la Consejería de Medio Ambiente",
+          "d) Elaborar propuestas sobre acciones de investigación, conocimiento, sensibilización y divulgación en materia de medio ambiente"
+        ],
+        correct: 1,
+        justification: "El Consejo Andaluz de Medio Ambiente conoce de los planes y programas ambientales de ámbito autonómico andaluz, no de ámbito nacional."
+      },
+      {
+        question: "14.- Según la normativa en vigor que establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponde la propuesta de declaración de espacios naturales protegidos competencia de la Junta de Andalucía?",
+        options: [
+          "a) Dirección General de Espacios Naturales Protegidos",
+          "b) Dirección General de Política Forestal y Biodiversidad",
+          "c) Viceconsejería",
+          "d) Dicha competencia es Estatal"
+        ],
+        correct: 0,
+        justification: "La propuesta de declaración de espacios naturales protegidos y la evaluación de su impacto socioeconómico corresponde a la Dirección General de Espacios Naturales Protegidos."
+      },
+      {
+        question: "15.- Según la normativa en vigor que establece la estructura orgánica de la Consejería, ¿a quién corresponde la planificación, programación y coordinación de la vigilancia, inspección y control en materia de residuos, suelos contaminados y economía circular?",
+        options: [
+          "a) La Dirección General de Sostenibilidad Ambiental.",
+          "b) La Dirección General de Economía Circular.",
+          "c) La Dirección General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "d) La Secretaría General Técnica en materia de Prevención Ambiental."
+        ],
+        correct: 1,
+        justification: "Corresponde de forma específica a la Dirección General de Economía Circular el área de residuos, suelos contaminados y economía circular."
+      },
+      {
+        question: "16.- Según la normativa en vigor que establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponden las autorizaciones de emisión de gases de efecto invernadero y su seguimiento?",
+        options: [
+          "a) Secretaría General de Medio Ambiente y Cambio Climático",
+          "b) Dirección General de Política Forestal y Biodiversidad",
+          "c) Dirección General de Sostenibilidad Ambiental y Economía Circular",
+          "d) Dirección General de Sostenibilidad Ambiental y Gestión del Litoral"
+        ],
+        correct: 0,
+        justification: "Las autorizaciones de emisión de gases de efecto invernadero y su seguimiento corresponden a la Secretaría General de Medio Ambiente y Cambio Climático."
+      },
+      {
+        question: "17.- A tenor de lo establecido en el Decreto 57/2011, de 15 de marzo, por el que se regula la Comisión Andaluza para la Dehesa, ¿Quién ostenta la presidencia de dicha Comisión?",
+        options: [
+          "a) La persona titular de la Consejería competente en materia de Medio Ambiente",
+          "b) La persona titular de la Secretaría General competente en gestión del medio natural",
+          "c) La persona titular de la Dirección General competente en gestión del medio natural",
+          "d) La persona titular de la Secretaría General competente en materia de agricultura y alimentación."
+        ],
+        correct: 3,
+        justification: "La Presidencia de la Comisión Andaluza para la Dehesa corresponde a la persona titular de la Secretaría General competente en materia de agricultura y alimentación."
+      },
+      {
+        question: "18.- Según la normativa en vigor, ¿a quién corresponde la 'organización y coordinación de los Agentes Medioambientales de Andalucía, sin perjuicio de las competencias atribuidas a los órganos directivos periféricos'?",
+        options: [
+          "a) Secretaría General de Medio Ambiente, Agua y Cambio Climático",
+          "b) Dirección General de Política Forestal y Biodiversidad",
+          "c) Secretaría General de Medio Ambiente y Cambio Climático",
+          "d) Dirección General de Sostenibilidad Ambiental y Personal Ambiental."
+        ],
+        correct: 2,
+        justification: "Corresponde a la Secretaría General de Medio Ambiente y Cambio Climático la organización y coordinación de los Agentes Medioambientales de Andalucía."
+      },
+      {
+        question: "19.- ¿Cuál de las siguientes NO es una función del Consejo Andaluz de Medio Ambiente?",
+        options: [
+          "a) Informar preceptivamente los proyectos de aprovechamientos de flora y fauna silvestre cuando superen el ámbito provincial.",
+          "b) Emitir informes y efectuar propuestas en materia ambiental, a iniciativa propia o a petición de la Consejería de Medio Ambiente.",
+          "c) Elaborar propuestas sobre acciones de investigación, conocimiento, sensibilización y divulgación en materia de medio ambiente.",
+          "d) Informar la propuesta de programa anual de la REDIAM."
+        ],
+        correct: 0,
+        justification: "El informe de proyectos de aprovechamiento de flora y fauna silvestre no forma parte del catálogo funcional general atribuido al Consejo Andaluz de Medio Ambiente."
+      },
+      {
+        question: "20.- Según la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, ¿a quién corresponde la ordenación, recuperación, gestión del uso público e integración de la red andaluza de vías pecuarias y la custodia de su Fondo Documental?",
+        options: [
+          "a) Secretaría General Técnica.",
+          "b) Viceconsejería.",
+          "c) Secretaría General de Medio Ambiente y Cambio Climático.",
+          "d) Dirección General de Política Forestal y Biodiversidad."
+        ],
+        correct: 3,
+        justification: "La ordenación, gestión, recuperación y custodia del Fondo Documental de la Red Andaluza de Vías Pecuarias corresponde a la Dirección General de Política Forestal y Biodiversidad."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "21.- ¿Cuál es la formulación exacta del derecho al medio ambiente recogida en el artículo 45.1 de la Constitución Española de 1978?",
+        options: [
+          "a) Todos tienen el derecho a disfrutar de un medio ambiente adecuado para el desarrollo de la persona, así como el deber de conservarlo.",
+          "b) Se garantiza a los ciudadanos el derecho a un medio ambiente equilibrado, sostenible y saludable, así como el deber de no deteriorarlo.",
+          "c) Los ciudadanos tienen derecho a disfrutar del paisaje y los recursos naturales y la obligación colectiva de preservarlos.",
+          "d) Todos tienen el derecho a disfrutar y el deber de preservar el medio ambiente en las condiciones que fije la ley."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 45.1 CE)."
+      },
+      {
+        question: "22.- Según el artículo 45.2 de la Constitución Española, ¿en qué principio o valor indispensable deben apoyarse los poderes públicos para velar por la utilización racional de todos los recursos naturales?",
+        options: [
+          "a) El principio de desarrollo sostenible, ecológico y territorial.",
+          "b) La indispensable solidaridad colectiva.",
+          "c) La precaución de riesgos y la corrección directa en la fuente.",
+          "d) El reparto equitativo de los recursos y la riqueza natural autonómica."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 45.2 CE)."
+      },
+      {
+        question: "23. Según el Decreto 200/2026, de 30 de julio, ¿cuál de las siguientes materias se encuentra expresamente incluida entre las competencias de la Consejería de Sostenibilidad y Medio Ambiente?",
+        options: [
+          "a) Caza y pesca continental.",
+          "b) Pesca marítima profesional.",
+          "c) Ordenación del territorio.",
+          "d) Protección civil y emergencias."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Caza y pesca continental)."
+      },
+      {
+        question: "24.- Conforme al artículo 45.3 de la Constitución Española de 1978, ¿qué consecuencias jurídicas se prevén para quienes violen el deber de conservación y utilización racional?",
+        options: [
+          "a) Únicamente sanciones de carácter administrativo y la inhabilitación especial de actividades productivas.",
+          "b) Sanciones penales de carácter severo en todo caso y la obligación de indemnizar al Estado.",
+          "c) Sanciones penales o, en su caso, administrativas, así como la obligación de reparar el daño causado.",
+          "d) Exclusivamente la obligación de restauración ambiental bajo la supervisión de las fuerzas públicas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 45.3 CE)."
+      },
+      {
+        question: "25.- En relación con el proceso de redacción constitucional, ¿qué órgano introdujo la referencia a la existencia de 'sanciones administrativas' que completó el texto original del Anteproyecto sobre los atentados contra el medio ambiente?",
+        options: [
+          "a) La Ponencia Constitucional del Congreso de los Diputados.",
+          "b) El Pleno del Congreso de los Diputados en fase de enmiendas directas.",
+          "c) La Junta Electoral Central en colaboración con el Ministerio de Obras Públicas.",
+          "d) La Comisión Constitucional del Senado."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "26. Según el Decreto 200/2026, de 30 de julio, ¿qué órgano ocupa el tercer lugar en el orden de prelación de los órganos directivos centrales de la Consejería?",
+        options: [
+          "a) Dirección General de Política Forestal y Biodiversidad.",
+          "b) Secretaría General de Medio Ambiente y Cambio Climático.",
+          "c) Secretaría General Técnica.",
+          "d) Dirección General de Sostenibilidad Ambiental y Gestión del Litoral."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Secretaría General Técnica)."
+      },
+      {
+        question: "27.- Según el artículo 149.1.23ª de la Constitución, ¿cuál es el alcance competencial del Estado en materia de protección del medio ambiente?",
+        options: [
+          "a) Legislación básica sobre protección del medio ambiente, sin perjuicio de las facultades de las Comunidades Autónomas de establecer normas adicionales de protección.",
+          "b) Competencia exclusiva plena que abarca tanto la legislación básica y de desarrollo como la ejecución de las políticas ambientales.",
+          "c) Planificación general de las políticas ambientales y competencia ejecutiva en espacios protegidos de carácter supraautonómico.",
+          "d) Coordinación general de la protección ambiental, correspondiendo a las Comunidades Autónomas la legislación exclusiva."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 149.1.23ª CE)."
+      },
+      {
+        question: "28.- De acuerdo con el artículo 148.1.9ª de la Constitución Española, ¿qué competencia en materia medioambiental pueden asumir las Comunidades Autónomas en sus Estatutos?",
+        options: [
+          "a) La legislación básica de protección de los recursos naturales y de la atmósfera.",
+          "b) La gestión en materia de protección del medio ambiente.",
+          "c) El establecimiento exclusivo de las sanciones penales para delitos ecológicos.",
+          "d) La ordenación y planificación básica de los recursos forestales y las vías pecuarias."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 148.1.9ª CE)."
+      },
+      {
+        question: "29.- Conforme al artículo 150.2 de la Constitución Española, el Estado puede transferir o delegar en las Comunidades Autónomas facultades correspondientes a materias de titularidad estatal mediante:",
+        options: [
+          "a) Un Real Decreto del Consejo de Ministros dictado por urgencia nacional.",
+          "b) Un convenio multilateral suscrito en el Pleno del Congreso de los Diputados.",
+          "c) Ley orgánica, previendo la correspondiente transferencia de medios financieros y las formas de control que se reserve.",
+          "d) Una ley de bases aprobada por mayoría simple de cada Cámara."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 150.2 CE)."
+      },
+      {
+        question: "30. Conforme al Decreto 200/2026, de 30 de julio, ¿cuál de las siguientes entidades se encuentra adscrita a la Consejería de Sostenibilidad y Medio Ambiente y, asimismo, a la Consejería de Agricultura, Pesca, Agua y Desarrollo Rural?",
+        options: [
+          "a) Fundación Doñana 21.",
+          "b) Agencia de Medio Ambiente y Agua de Andalucía (AMAYA).",
+          "c) Red de Información Ambiental de Andalucía.",
+          "d) Agencia Digital de Andalucía."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: AMAYA)."
+      },
+      {
+        question: "31.- El artículo 10 de la Ley Orgánica 2/2007 recoge los objetivos básicos de la Comunidad Autónoma. ¿Cuál de los siguientes enunciados NO se contempla expresamente en su relación con el medio ambiente y los recursos naturales?",
+        options: [
+          "a) El aprovechamiento y la potenciación de los recursos naturales y económicos de Andalucía bajo el principio de sostenibilidad.",
+          "b) La mejora de la calidad de vida de los andaluces mediante la protección de la naturaleza y del medio ambiente, y la adecuada gestión del agua.",
+          "c) La solidaridad interterritorial en el uso y distribución del agua, junto con la dotación de infraestructuras modernas.",
+          "d) La regulación por vía de decreto de sanciones penales de carácter exclusivamente andaluz para proteger el paisaje."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "32.- ¿Qué derecho se reconoce expresamente a todas las personas en el artículo 28.1 del Estatuto de Autonomía de Andalucía?",
+        options: [
+          "a) Derecho a vivir en un medio ambiente equilibrado, sostenible y saludable, así como a disfrutar de los recursos naturales, del entorno y el paisaje en condiciones de igualdad.",
+          "b) Derecho a la explotación privada de las vías pecuarias y de los montes públicos que colinden con sus fincas rústicas.",
+          "c) Derecho a la obtención de autorizaciones administrativas para la quema de restos agrícolas sin sujeción a límites estatales.",
+          "d) Derecho a la exención fiscal de tasas de vertido y de recogida de residuos bajo criterios de sostenibilidad familiar."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 28.1 EAA)."
+      },
+      {
+        question: "33. De acuerdo con el Decreto 200/2026, de 30 de julio, en caso de vacante, ausencia, enfermedad u otra causa legal de imposibilidad de la persona titular de la Viceconsejería, ¿quién ejercerá su suplencia?",
+        options: [
+          "a) La persona titular de la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "b) La persona titular de la Dirección General de Política Forestal y Biodiversidad.",
+          "c) La persona titular de la Secretaría General Técnica.",
+          "d) La persona titular de la Dirección General de Espacios Naturales Protegidos."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Secretaría General Técnica)."
+      },
+      {
+        question: "34.- Según el artículo 28.3 del Estatuto de Autonomía para Andalucía, ¿qué derecho se garantiza a todas las personas en relación con la información en materia medioambiental?",
+        options: [
+          "a) Derecho a recibir semanalmente un informe personalizado sobre la calidad del aire de su delegación territorial periférica.",
+          "b) Derecho a acceder a la información medioambiental de que disponen los poderes públicos, en los términos que establezcan las leyes.",
+          "c) Derecho a participar en la elaboración de la cartografía climática de su término municipal sin autorización previa.",
+          "d) Derecho de veto sobre la información ambiental reservada que maneje el Consejo de Gobierno de la Junta de Andalucía."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 28.3 EAA)."
+      },
+      {
+        question: "35.- Según el artículo 36 del Estatuto de Autonomía para Andalucía, ¿qué obligación específica se impone a las empresas que desarrollen su actividad en el territorio andaluz?",
+        options: [
+          "a) Contratar de manera obligatoria a un técnico de gestión ambiental titulado por la Red de Información Ambiental (REDIAM).",
+          "b) Realizar auditorías ambientales externas anuales bajo el sistema comunitario EMAS con cargo a fondos estatales.",
+          "c) Adaptarse a los principios de respeto y conservación del medio ambiente, para lo que la Administración establecerá mecanismos de inspección y sanción.",
+          "d) Destinar el 2% de sus beneficios netos anuales al Fondo Documental de las Vías Pecuarias de Andalucía."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 36 EAA)."
+      },
+      {
+        question: "36.- ¿Cuál de las siguientes materias se recoge como principio rector de las políticas públicas en el artículo 37 de la Ley Orgánica 2/2007 (apartados 20.º a 22.º)?",
+        options: [
+          "a) El respeto del medio ambiente, incluyendo el paisaje y los recursos naturales y garantizando la calidad del agua y del aire.",
+          "b) El impulso y desarrollo de las energías renovables, el ahorro y eficiencia energética.",
+          "c) El uso racional del suelo, adoptando cuantas medidas sean necesarias para evitar la especulación.",
+          "d) Todas las opciones anteriores se recogen expresamente de forma conjunta en dicho artículo."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Art. 37 EAA)."
+      },
+      {
+        question: "37. Según el régimen de suplencias establecido en el Decreto 200/2026, de 30 de julio, las personas titulares de las Direcciones Generales serán suplidas, con carácter general, por:",
+        options: [
+          "a) La persona titular de la Secretaría General Técnica.",
+          "b) La persona titular de la Secretaría General de Medio Ambiente y Cambio Climático y, en su defecto, por la titular del órgano directivo que corresponda según el orden de prelación del artículo 2.1.",
+          "c) La persona titular de la Viceconsejería exclusivamente.",
+          "d) La persona titular de la Consejería."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "38.- Según el artículo 195 del Estatuto de Autonomía, ¿hacia dónde deben orientar los poderes públicos sus políticas en materia de patrimonio natural?",
+        options: [
+          "a) A la protección del medio ambiente, la conservación de la biodiversidad, así como de la riqueza y variedad paisajística de Andalucía.",
+          "b) Exclusivamente a la restauración forestal de las áreas afectadas por vertidos de lodos mineros e industriales.",
+          "c) A la gestión estatal centralizada de los espacios naturales protegidos declarados por la Unión Europea.",
+          "d) A la supresión de las licencias de caza y pesca fluvial para proteger las especies en peligro de extinción."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 195 EAA)."
+      },
+      {
+        question: "39.- Conforme al artículo 196 del Estatuto de Autonomía, además de promover el desarrollo sostenible y la reducción de emisiones contaminantes a la atmósfera, ¿qué debe promocionar la Comunidad Autónoma?",
+        options: [
+          "a) La exención de impuestos especiales para las empresas industriales que certifiquen emisiones cero.",
+          "b) La educación ambiental en el conjunto de la población.",
+          "c) La creación de un cuerpo policial unificado destinado de forma exclusiva a las vías pecuarias de montaña.",
+          "d) La privatización de la Red de Información Ambiental de Andalucía para agilizar su gestión comercial."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 196 EAA)."
+      },
+      {
+        question: "40. Conforme al Decreto 200/2026, de 30 de julio, ¿qué órganos dependen orgánicamente de la Viceconsejería?",
+        options: [
+          "a) Todas las Direcciones Generales directamente.",
+          "b) Únicamente la Secretaría General Técnica.",
+          "c) La Secretaría General Técnica y la Dirección General de Política Forestal y Biodiversidad.",
+          "d) La Secretaría General de Medio Ambiente y Cambio Climático y la Secretaría General Técnica."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "41.- Según el artículo 197 del Estatuto de Autonomía, ¿a qué sectores deben orientar especialmente sus políticas los poderes públicos de Andalucía para compatibilizar la actividad económica con la calidad ambiental?",
+        options: [
+          "a) Únicamente a la silvicultura intensiva forestal y al desarrollo del transporte terrestre pesado.",
+          "b) A la pesca industrial en aguas internacionales, el refino químico y la producción de energía nuclear.",
+          "c) Al desarrollo de la agricultura ecológica, el turismo sostenible, la protección del litoral y la red de espacios naturales protegidos, y al fomento de una tecnología eficiente y limpia.",
+          "d) A la edificación hotelera extensiva en la zona de servidumbre de protección del dominio público marítimo-terrestre."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 197 EAA)."
+      },
+      {
+        question: "42. Según el Decreto 200/2026, de 30 de julio, ¿qué unidad queda adscrita a la Viceconsejería?",
+        options: [
+          "a) La Unidad de Igualdad de Género.",
+          "b) La Oficina de Supervisión de Proyectos.",
+          "c) La Unidad de Transparencia.",
+          "d) La Red de Observatorios de Cambio Climático de Andalucía."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Unidad de Transparencia)."
+      },
+      {
+        question: "43.- Según el artículo 198 del Estatuto de Autonomía para Andalucía, ¿qué funciones corresponden a la Junta de Andalucía respecto a los residuos urbanos e industriales?",
+        options: [
+          "a) La concesión de licencias ambientales y la vigilancia de las actividades no sometidas a planes autonómicos de forma exclusiva.",
+          "b) El transporte diario y la recolección domiciliaria en todos los municipios de más de 50.000 habitantes.",
+          "c) Exclusivamente la incineración y depósito en vertedero de los residuos peligrosos procedentes de otras Comunidades Autónomas.",
+          "d) La planificación, supervisión y control de su gestión, adoptando los medios necesarios para la reducción, reciclaje y reutilización."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Art. 198 EAA)."
+      },
+      {
+        question: "44.- Conforme al artículo 199 del Estatuto de Autonomía, el control de las actividades tecnológicas y biotecnológicas por parte de la Junta de Andalucía se ejerce bajo qué principios y límites constitucionales?",
+        options: [
+          "a) Bajo los principios de precaución, seguridad y calidad alimentaria, y en el marco de lo establecido en el artículo 149.1.15ª de la Constitución Española.",
+          "b) Bajo el principio de libre comercio y fomento industrial, con exclusión del marco competencial establecido en la Constitución.",
+          "c) Bajo el principio de quien contamina paga de forma exclusiva y el principio de subsidiariedad de los Tratados de la Unión Europea.",
+          "d) Únicamente supeditando su actividad a las directrices que emita la Conferencia Sectorial de Medio Ambiente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 199 EAA)."
+      },
+      {
+        question: "45.- El artículo 200 del Estatuto de Autonomía obliga a los poderes públicos a poner en marcha mecanismos de lucha contra la desertificación, deforestación y erosión en Andalucía, además de:",
+        options: [
+          "a) Declarar la reserva natural concertada de forma discrecional en el litoral marítimo.",
+          "b) Realizar planes de prevención de incendios forestales y extinción, así como la recuperación medioambiental de las zonas afectadas.",
+          "c) Exigir cánones de reforestación obligatorios a los propietarios privados de terrenos agrarios de secano.",
+          "d) Elaborar las órdenes generales de veda y regular el régimen sancionador de caza."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 200 EAA)."
+      },
+      {
+        question: "46. De acuerdo con el Decreto 200/2026, de 30 de julio, la Secretaría General de Medio Ambiente y Cambio Climático tiene rango de:",
+        options: [
+          "a) Dirección General.",
+          "b) Viceconsejería.",
+          "c) Secretaría General Técnica.",
+          "d) Delegación Territorial."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Rango de Viceconsejería)."
+      },
+      {
+        question: "47.- Según el artículo 201 del Estatuto de Autonomía, ¿en qué ámbito territorial y frente a qué formas de contaminación dirigirán especialmente sus políticas de mejora de calidad de vida los poderes públicos?",
+        options: [
+          "a) En el medio rural, frente al uso indebido de fertilizantes nitrogenados.",
+          "b) En las aguas marítimas de su jurisdicción, frente al vertido de hidrocarburos procedentes de buques mercantes.",
+          "c) Especialmente en el medio urbano, a la protección frente a la contaminación acústica, así como al control de la calidad del agua, del aire y del suelo.",
+          "d) En los humedales andaluces catalogados, frente a la introducción involuntaria de flora exótica marina."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 201 EAA)."
+      },
+      {
+        question: "48.- Según el artículo 204 del Estatuto de Autonomía para Andalucía, ¿qué estrategias deben poner en marcha los poderes públicos de Andalucía y con qué fin?",
+        options: [
+          "a) Estrategias de fomento de la importación de combustibles fósiles procedentes de países terceros.",
+          "b) Estrategias de limitación de los parques eólicos marinos para proteger el turismo litoral.",
+          "c) Planes de almacenamiento geológico de dióxido de carbono bajo el régimen de libre mercado.",
+          "d) Estrategias dirigidas a evitar el cambio climático, potenciando las energías renovables y limpias, el ahorro y la suficiencia energética."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Art. 204 EAA)."
+      },
+      {
+        question: "49.- ¿Qué órgano tiene atribuida la competencia para regular por ley la protección de los animales (particularmente las especies en peligro de extinción) según el artículo 205 del Estatuto?",
+        options: [
+          "a) El Parlamento de Andalucía.",
+          "b) El Consejo de Gobierno de la Junta de Andalucía por vía de Decreto regulador de urgencia.",
+          "c) El Defensor del Pueblo Andaluz en colaboración con la Agencia de Medio Ambiente y Agua (AMAYA).",
+          "d) La persona titular de la Consejería de Sostenibilidad y Medio Ambiente por delegación expresa."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Parlamento de Andalucía)."
+      },
+      {
+        question: "50. Según el Decreto 200/2026, de 30 de julio, la gestión integrada de la calidad ambiental atribuida a la Secretaría General de Medio Ambiente y Cambio Climático incluye la responsabilidad medioambiental y reparación de daños al medio ambiente:",
+        options: [
+          "a) Incluido siempre el medio hídrico.",
+          "b) Excluido el medio hídrico.",
+          "c) Únicamente cuando afecte a una provincia.",
+          "d) Exclusivamente cuando afecte a espacios naturales protegidos."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Excluido el medio hídrico)."
+      },
+      {
+        question: "51.- Conforme al artículo 206.2 del Estatuto de Autonomía, ¿cómo deben regularse las medidas de fiscalidad ecológica, preventivas, correctoras y compensatorias del daño ambiental en Andalucía?",
+        options: [
+          "a) Mediante Orden conjunta de las Consejerías de Hacienda y de Sostenibilidad y Medio Ambiente.",
+          "b) Por una ley del Parlamento de Andalucía, en el marco de la Ley Orgánica a que se refiere el artículo 157.3 de la Constitución Española.",
+          "c) A través de Decretos aprobados en los Consejos Provinciales de Medio Ambiente y de la Biodiversidad.",
+          "d) Únicamente mediante resolución del Consejo Rector de la Agencia de Medio Ambiente y Agua de Andalucía."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Art. 206.2 EAA)."
+      },
+      {
+        question: "52.- Conforme a la más reciente jurisprudencia constitucional, ¿cuál es el alcance y la función de la competencia básica del Estado sobre protección del medio ambiente (art. 149.1.23 CE)?",
+        options: [
+          "a) Agotar la regulación de la materia de tal forma que las Comunidades Autónomas solo tengan competencias ejecutivas de mera aplicación.",
+          "b) Excluir el ejercicio de la potestad reglamentaria por parte de las Comunidades Autónomas en todo su territorio.",
+          "c) Funciona como una ordenación mediante mínimos que han de respetarse en todo caso, pero que no impide que las Comunidades Autónomas establezcan niveles de protección más altos.",
+          "d) Establecer de forma imperativa los mismos límites de emisión acústica para todas las zonas industriales del Estado."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "53. Conforme al Decreto 200/2026, de 30 de julio, ¿a qué órgano corresponde la organización y coordinación de los Agentes Medioambientales de Andalucía?",
+        options: [
+          "a) A la Secretaría General Técnica.",
+          "b) A la Dirección General de Política Forestal y Biodiversidad.",
+          "c) A la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "d) A la Viceconsejería."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Secretaría General de Medio Ambiente y Cambio Climático)."
+      },
+      {
+        question: "54.- Según la doctrina del Tribunal Constitucional, ¿en qué casos excepcionales se habilita la intervención del Estado para realizar actuaciones de carácter ejecutivo en materia medioambiental?",
+        options: [
+          "a) Siempre que un ayuntamiento andaluz de más de 50.000 habitantes incumpla con las obligaciones de recogida de residuos sólidos.",
+          "b) En cualquier supuesto en que exista una declaración formal de interés general nacional dictada por el Consejo de Ministros.",
+          "c) Únicamente cuando el Parlamento de Andalucía delegue de forma temporal sus competencias mediante ley ordinaria.",
+          "d) Cuando no pueda establecerse ningún punto de conexión que permita el ejercicio de competencias autonómicas o cuando el fenómeno objeto de la competencia tenga carácter supraautonómico."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "55.- Según el artículo 92.2 del Estatuto de Autonomía para Andalucía, ¿cuál de los siguientes servicios básicos constituye una competencia propia de los Ayuntamientos?",
+        options: [
+          "a) Abastecimiento de agua y tratamiento de aguas residuales, recogida y tratamiento de residuos, limpieza viaria, prevención y extinción de incendios y transporte público de viajeros.",
+          "b) La ordenación forestal sostenible del Plan Forestal Andaluz y la adecuación de montes públicos.",
+          "c) La tramitación de los traslados transfronterizos de residuos con origen o destino en la Unión Europea.",
+          "d) El seguimiento y control de la aplicación del comercio de derechos de emisión de gases de efecto invernadero."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 92.2 EAA)."
+      },
+      {
+        question: "56. Según el Decreto 200/2026, de 30 de julio, la Secretaría General Técnica:",
+        options: [
+          "a) Tiene rango de Viceconsejería y depende de la persona titular de la Consejería.",
+          "b) Tiene rango de Dirección General y depende directamente de la Viceconsejería.",
+          "c) Tiene rango de Dirección General y depende de la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "d) Carece de rango de Dirección General y depende directamente de la Consejería."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Rango de Dirección General y dependencia de la Viceconsejería)."
+      },
+      {
+        question: "57.- Según el artículo 25 de la Ley 7/1985, de Bases del Régimen Local, ¿a partir de qué volumen de población los municipios realizan con carácter obligatorio la protección del medio ambiente de manera genérica?",
+        options: [
+          "a) Municipios mayores de 20.000 habitantes.",
+          "b) Municipios mayores de 50.000 habitantes.",
+          "c) Municipios mayores de 10.000 habitantes que cuenten con espacios protegidos litorales.",
+          "d) Únicamente los municipios mayores de 100.000 habitantes que tengan el carácter de capital de provincia."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Mayor de 50.000 habitantes)."
+      },
+      {
+        question: "58.- De acuerdo con el artículo 9.4 de la Ley 5/2010, de Autonomía Local de Andalucía (LAULA), ¿cuál de las siguientes opciones constituye una competencia propia municipal en el ciclo de agua de uso urbano?",
+        options: [
+          "a) El abastecimiento de agua en alta o aducción, que incluye la captación, tratamiento de potabilización, transporte y almacenamiento en depósitos reguladores.",
+          "b) El abastecimiento de agua en baja, que incluye su distribución, almacenamiento intermedio y reparto, así como el saneamiento, depuración y reutilización.",
+          "c) Las opciones A y B son correctas y forman parte de sus competencias propias en el ciclo del agua de uso urbano.",
+          "d) Ninguna de las opciones anteriores es correcta, puesto que la gestión del agua es competencia exclusiva de la Comunidad Autónoma a través de AMAYA."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Opciones A y B correctas)."
+      },
+      {
+        question: "59.- En virtud del artículo 9.12 de la LAULA, ¿qué atribución en materia de promoción, defensa y protección del medio ambiente corresponde como competencia propia a los municipios andaluces?",
+        options: [
+          "a) El deslinde y señalización de las vías pecuarias de interés regional que transcurran por suelo rústico protegido.",
+          "b) La tramitación de la Autorización Ambiental Integrada (AAI) para industrias pesadas ubicadas en su término.",
+          "c) La gestión del Registro de Entidades Colaboradoras en materia de Calidad Ambiental de la Junta de Andalucía.",
+          "d) La gestión del procedimiento de licencia ambiental, así como la vigilancia, control y ejercicio de la potestad sancionadora con respecto a las actividades sometidas a dicho instrumento y declaración responsable."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "60. De acuerdo con el Decreto 200/2026, de 30 de julio, ¿a qué órgano corresponde la asistencia jurídica a todos los órganos de la Consejería?",
+        options: [
+          "a) A la Viceconsejería.",
+          "b) A la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "c) A la Secretaría General Técnica.",
+          "d) A la Dirección General de Sostenibilidad Ambiental y Gestión del Litoral."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Secretaría General Técnica)."
+      },
+      {
+        question: "61.- Conforme al artículo 9.12 de la LAULA, ¿en qué casos tiene el municipio la competencia propia de declaración de suelo contaminado/descontaminado y aprobación de planes de descontaminación?",
+        options: [
+          "a) En los casos en que dicho suelo esté íntegramente comprendido dentro de su término municipal.",
+          "b) Solo cuando afecte a parcelas de titularidad exclusivamente municipal y catalogadas como suelo urbano consolidado.",
+          "c) Siempre que se trate de suelos industriales con un nivel de contaminación que afecte únicamente a la red de alcantarillado.",
+          "d) Únicamente cuando se emita un informe favorable y vinculante de la Dirección General de Economía Circular."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "62.- De acuerdo con el artículo 9.12.h de la LAULA, ¿qué requisito formal es indispensable para que los municipios puedan declarar y gestionar parques periurbanos y establecer reservas naturales concertadas?",
+        options: [
+          "a) La aprobación por mayoría absoluta del Pleno de la Conferencia Sectorial de Medio Ambiente.",
+          "b) El informe previo de la consejería competente en materia de medio ambiente de la Junta de Andalucía.",
+          "c) Que el territorio propuesto forme parte previa de la Red Ecológica Europea Natura 2000.",
+          "d) La declaración previa de utilidad pública y valor paisajístico regional por el Parlamento de Andalucía."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "63.- Según el artículo 42.2 del Estatuto de Autonomía de Andalucía (LO 2/2007), ¿qué facultades comprenden las competencias exclusivas de la Comunidad Autónoma?",
+        options: [
+          "a) Únicamente la potestad reglamentaria de desarrollo y la función ejecutiva de inspección sectorial.",
+          "b) Exclusivamente la ejecución de las leyes estatales bajo las directrices y supervisión del Ministerio sectorial.",
+          "c) La potestad legislativa, la potestad reglamentaria y la función ejecutiva, íntegramente y sin perjuicio de las competencias del Estado en la CE.",
+          "d) La adaptación obligatoria de la normativa andaluza a los dictámenes que emita la Comisión Europea de Medio Ambiente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Art. 42.2 EAA)."
+      },
+      {
+        question: "64. Conforme al Decreto 200/2026, de 30 de julio, las funciones de seguimiento, vigilancia preventiva, control y erradicación de plagas, enfermedades u otros agentes nocivos en los montes corresponden a:",
+        options: [
+          "a) La Dirección General de Economía Circular.",
+          "b) La Dirección General de Espacios Naturales Protegidos.",
+          "c) La Dirección General de Política Forestal y Biodiversidad.",
+          "d) La Secretaría General Técnica."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Dirección General de Política Forestal y Biodiversidad)."
+      },
+      {
+        question: "65.- El artículo 57.1 del Estatuto de Autonomía atribuye a Andalucía la competencia exclusiva sobre determinadas materias de medio ambiente (respetando la CE). ¿Cuál de las siguientes materias NO es exclusiva de la Comunidad Autónoma según este artículo?",
+        options: [
+          "a) Montes, explotaciones, aprovechamientos y servicios forestales, así como las vías pecuarias.",
+          "b) Fauna y flora silvestres, la prevención ambiental y los ecosistemas acuáticos.",
+          "c) Delimitación, regulación, ordenación y gestión de espacios naturales protegidos, corredores biológicos y declaración de figuras de protección.",
+          "d) La regulación del ambiente atmosférico y de las distintas clases de contaminación del mismo."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "66.- Según el artículo 57.3 del Estatuto de Autonomía para Andalucía, ¿cuál de las siguientes materias se encuadra dentro de las competencias compartidas de la Comunidad Autónoma?",
+        options: [
+          "a) La regulación sobre prevención y corrección de la generación de residuos con origen o destino en Andalucía, el comercio de emisiones, la fiscalidad ecológica y la prevención/reparación de daños ambientales.",
+          "b) La gestión del Fondo Documental de las Vías Pecuarias de Andalucía y el régimen de amojonamiento de montes públicos.",
+          "c) La pesca marítima en aguas interiores, el marisqueo, la acuicultura y el buceo profesional.",
+          "d) La delimitación y gestión de los Parques Nacionales de Doñana y Sierra Nevada que afecten a aguas marítimas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Art. 57.3 EAA)."
+      },
+      {
+        question: "67. Según el Decreto 200/2026, de 30 de julio, ¿qué órgano gestiona las actuaciones para la preservación de la biodiversidad marina, sin perjuicio de las competencias atribuidas a la Consejería de Agricultura, Pesca, Agua y Desarrollo Rural?",
+        options: [
+          "a) La Dirección General de Espacios Naturales Protegidos.",
+          "b) La Dirección General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "c) La Dirección General de Política Forestal y Biodiversidad.",
+          "d) La Secretaría General de Medio Ambiente y Cambio Climático."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Dirección General de Política Forestal y Biodiversidad)."
+      },
+      {
+        question: "68.- ¿Qué Real Decreto reguló el traspaso de funciones y servicios de la Administración del Estado a Andalucía en materia de ordenación del litoral y vertidos al mar?",
+        options: [
+          "a) El Real Decreto 2802/1983, de 25 de agosto.",
+          "b) El Real Decreto 2803/1983, de 25 de agosto.",
+          "c) El Real Decreto 3334/1983, de 5 de octubre.",
+          "d) El Real Decreto 1096/1984, de 4 de abril."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: RD 2803/1983)."
+      },
+      {
+        question: "69.- El Real Decreto 712/2006, de 9 de junio, amplió las funciones y servicios traspasados del Estado a la Comunidad Autónoma de Andalucía, refiriéndose específicamente a:",
+        options: [
+          "a) El control de plagas forestales de conformidad con la Ley de Montes de Andalucía.",
+          "b) La participación de los usuarios en la planificación hidrológica de la cuenca intercomunitaria del Guadalquivir.",
+          "c) Los Parques Nacionales de Doñana y Sierra Nevada.",
+          "d) La Red Andaluza de Vías Pecuarias y la custodia de su Fondo Documental."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Parques Nacionales de Doñana y Sierra Nevada)."
+      },
+      {
+        question: "70. Conforme al Decreto 200/2026, de 30 de julio, la custodia y gestión del Fondo Documental de la red andaluza de vías pecuarias corresponde a:",
+        options: [
+          "a) La Dirección General de Espacios Naturales Protegidos.",
+          "b) La Dirección General de Política Forestal y Biodiversidad.",
+          "c) La Secretaría General Técnica.",
+          "d) La Dirección General de Sostenibilidad Ambiental y Gestión del Litoral."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Dirección General de Política Forestal y Biodiversidad)."
+      },
+      {
+        question: "71.- Según el artículo 147 de la Ley 40/2015, de Régimen Jurídico del Sector Público, ¿quién ostenta la Presidencia de la Conferencia Sectorial de Medio Ambiente?",
+        options: [
+          "a) La persona titular de la Consejería de la Comunidad Autónoma que ejerza la vicepresidencia rotatoria.",
+          "b) El Presidente del Gobierno de la Nación de forma delegada.",
+          "c) El Secretario de Estado de Medio Ambiente del Ministerio correspondiente.",
+          "d) El miembro del Gobierno que, en representación de la Administración General del Estado, resulte competente por razón de la materia."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Art. 147 Ley 40/2015)."
+      },
+      {
+        question: "72.- Según el reglamento de funcionamiento interno de la Conferencia Sectorial de Medio Ambiente (2009), ¿cómo se articula la Vicepresidencia de la Conferencia Sectorial?",
+        options: [
+          "a) Corresponderá a una de las personas titulares de las Consejerías de las CC.AA., elegida entre las mismas por un año, sin posibilidad de reelección.",
+          "b) Corresponderá a la persona titular de la Secretaría General Técnica del Ministerio con carácter indefinido.",
+          "c) Se ejercerá de forma rotatoria por los Directores Generales de Calidad Ambiental de las Comunidades Autónomas por orden alfabético.",
+          "d) Será asumida de forma permanente por la persona titular de la Consejería de Sostenibilidad y Medio Ambiente de la Junta de Andalucía."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "73. Según el Decreto 200/2026 de 30 de julio, la evaluación ambiental estratégica de los instrumentos de ordenación urbanística de competencia autonómica corresponde, en cuanto a su coordinación y seguimiento, a:",
+        options: [
+          "a) La Dirección General de Política Forestal y Biodiversidad.",
+          "b) La Secretaría General Técnica.",
+          "c) La Dirección General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "d) La Dirección General de Espacios Naturales Protegidos."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Dirección General de Sostenibilidad Ambiental y Gestión del Litoral)."
+      },
+      {
+        question: "74.- De acuerdo con el funcionamiento de las Conferencias Sectoriales, ¿con qué frecuencia mínima debe convocarse la reunión plenaria por parte de su Presidencia?",
+        options: [
+          "a) Al menos una vez al mes durante el periodo de sesiones ordinario de las Cortes Generales.",
+          "b) Al menos una vez al año, o cuando lo soliciten al menos la tercera parte de sus miembros.",
+          "c) Siempre que la Unión Europea apruebe una directiva de transposición obligatoria sobre aguas o ruidos.",
+          "d) Al menos una vez al semestre coincidiendo con la presentación del Plan Director de Dehesas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Al menos una vez al año)."
+      },
+      {
+        question: "75. De acuerdo con el Decreto 200/2026, de 30 de julio, en los procedimientos relativos a concesiones de ocupación del dominio público marítimo-terrestre, la tramitación hasta la fase previa a la oferta de condiciones recaerá en:",
+        options: [
+          "a) La Secretaría General de Medio Ambiente y Cambio Climático.",
+          "b) La Delegación Territorial correspondiente al domicilio del solicitante.",
+          "c) La Delegación Territorial de la provincia donde se haya solicitado la mayor parte de la ocupación.",
+          "d) La Dirección General de Economía Circular."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "76.- Dentro de la estructura organizativa de la Conferencia Sectorial de Medio Ambiente, ¿qué órgano tiene la función de informar, con carácter previo y preceptivo, todos los asuntos que haya de conocer la Conferencia Sectorial?",
+        options: [
+          "a) El Consejo Consultivo de Política Medioambiental para asuntos comunitarios.",
+          "b) Los Grupos de Trabajo específicos conformados por funcionarios de la Administración Central.",
+          "c) La Comisión Sectorial de Medio Ambiente.",
+          "d) La Secretaría de Estado de Medio Ambiente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Comisión Sectorial de Medio Ambiente)."
+      },
+      {
+        question: "77.- Conforme al Real Decreto 829/2023, de 20 de noviembre, por el que se reestructuran los departamentos ministeriales, ¿a qué ministerio corresponden actualmente las competencias ambientales estatales?",
+        options: [
+          "a) Al Ministerio de Industria, Energía y Sostenibilidad Ecológica.",
+          "b) Al Ministerio de Agricultura, Pesca, Alimentación y Medio Ambiente.",
+          "c) Al Ministerio de Fomento, Agenda Urbana y Cambio Climático.",
+          "d) Al Ministerio para la Transición Ecológica y el Reto Demográfico."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: MITECO)."
+      },
+      {
+        question: "78.- Según el Real Decreto 503/2024 de 21 de mayo, ¿en qué órganos superiores se estructura directamente el Ministerio para la Transición Ecológica y el Reto Demográfico?",
+        options: [
+          "a) La Secretaría de Estado de Energía y la Secretaría de Estado de Medio Ambiente.",
+          "b) La Secretaría General para el Reto Demográfico y el Comisionado para la Economía Circular.",
+          "c) La Subsecretaría de Transición Ecológica y la Dirección General de Calidad Ambiental.",
+          "d) La Secretaría de Estado de Cambio Climático y la Secretaría de Estado de Aguas Continentales."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Secretaría de Estado de Energía y Secretaría de Estado de Medio Ambiente)."
+      },
+      {
+        question: "79. Conforme al Decreto 200/2026, de 30 de julio, ¿qué autorizaciones quedan exceptuadas de las competencias atribuidas a la Dirección General de Economía Circular en materia de autorizaciones de gestión de residuos?",
+        options: [
+          "a) Las autorizaciones de gestión de residuos de ámbito supraprovincial.",
+          "b) Las autorizaciones de los sistemas colectivos de responsabilidad ampliada del productor.",
+          "c) Las autorizaciones de los sistemas individuales de responsabilidad ampliada del productor.",
+          "d) Las autorizaciones para quema de restos agrícolas y forestales establecidas en el artículo 27.3 de la Ley 7/2022."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "80.- De acuerdo con el Decreto del Presidente 9/2026, de 9 de julio, ¿qué orden de prelación tiene asignada la Consejería de Sostenibilidad y Medio Ambiente de la Junta de Andalucía?",
+        options: [
+          "a) Es la decimosegunda consejería en orden de prelación.",
+          "b) Es la decimoprimera consejería en orden de prelación.",
+          "c) Es la novena consejería en orden de prelación.",
+          "d) Es la decimotercera consejería en orden de prelación."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Decimoprimera consejería)."
+      },
+      {
+        question: "81.- ¿Cuál de las siguientes materias NO se atribuye como competencia de la Consejería de Sostenibilidad y Medio Ambiente de acuerdo con el artículo 13 del Decreto del Presidente 9/2026?",
+        options: [
+          "a) Prevención ambiental, gestión de residuos y economía circular, espacios naturales protegidos, biodiversidad y geodiversidad.",
+          "b) Caza y pesca continental, vías pecuarias, prevención de incendios forestales y restauración de sus efectos, cambio climático.",
+          "c) La ordenación, planificación y aducción de recursos hidráulicos y el ciclo integral de agua urbana.",
+          "d) El cumplimiento de los Objetivos de Desarrollo Sostenible (ODS) y la Agenda 2030."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Recursos hídricos y ciclo del agua corresponden a la Consejería de Agricultura, Pesca, Agua y Desarrollo Rural)."
+      },
+      {
+        question: "82. Según el Decreto 200/2026 de 30 de julio, ¿cuál de los siguientes conjuntos de espacios naturales es administrado y gestionado por la Dirección General de Espacios Naturales Protegidos, salvo las competencias atribuidas a otros órganos?",
+        options: [
+          "a) Doñana, Sierra Nevada y Los Alcornocales.",
+          "b) Doñana, Sierra de Grazalema y Sierra de las Nieves.",
+          "c) Doñana, Sierra Nevada y Sierra de las Nieves.",
+          "d) Sierra Nevada, Cabo de Gata-Níjar y Sierra de las Nieves."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Doñana, Sierra Nevada y Sierra de las Nieves)."
+      },
+      {
+        question: "83.- Respecto a la organización territorial de la Administración de la Junta de Andalucía, las Delegaciones Territoriales de Sostenibilidad y Medio Ambiente en cada provincia constituyen:",
+        options: [
+          "a) Organismos públicos empresariales con autonomía presupuestaria plena y sin control jerárquico.",
+          "b) Órganos periféricos colegiados integrados exclusivamente por representantes locales provinciales.",
+          "c) Órganos descentralizados de gestión de la Agencia de Medio Ambiente y Agua de Andalucía (AMAYA).",
+          "d) Órganos directivos periféricos que dependen orgánicamente de la Consejería de Sostenibilidad y Medio Ambiente."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Órganos directivos periféricos)."
+      },
+      {
+        question: "84.- El artículo 2.1 del Decreto 200/2026, de 30 de julio, establece el orden de prelación de los órganos directivos centrales de la Consejería de Sostenibilidad y Medio Ambiente. ¿Cuáles son los dos primeros órganos en este orden?",
+        options: [
+          "a) La Viceconsejería y la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "b) La Viceconsejería y la Dirección General de Política Forestal y Biodiversidad.",
+          "c) La Secretaría General de Medio Ambiente y Cambio Climático y la Secretaría General Técnica.",
+          "d) La Secretaría General Técnica y la Dirección General de Economía Circular."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Viceconsejería y Secretaría General de Medio Ambiente y Cambio Climático)."
+      },
+      {
+        question: "85.- Según el Decreto 200/2026, ¿quién sustituye a la persona titular de la Viceconsejería de Sostenibilidad y Medio Ambiente en los casos de vacante, ausencia o enfermedad?",
+        options: [
+          "a) La persona titular de la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "b) La persona titular de la Secretaría General Técnica.",
+          "c) El Director General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "d) La persona titular del órgano directivo central que sea de mayor edad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Secretaría General Técnica)."
+      },
+      {
+        question: "86. De acuerdo con el artículo 10 del Decreto 200/2026, de 30 de julio, ¿a qué órgano se adscribe la Fundación para el Desarrollo Sostenible de Doñana y su Entorno-Doñana 21?",
+        options: [
+          "a) A la Viceconsejería.",
+          "b) A la Secretaría General de Medio Ambiente y Cambio Climático.",
+          "c) A la Dirección General de Política Forestal y Biodiversidad.",
+          "d) A la Dirección General de Espacios Naturales Protegidos."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Dirección General de Espacios Naturales Protegidos)."
+      },
+      {
+        question: "87.- Conforme al artículo 4 del Decreto 200/2026, de 30 de julio, ¿a qué órgano de la Consejería de Sostenibilidad y Medio Ambiente queda adscrita la Agencia de Medio Ambiente y Agua de Andalucía (AMAYA)?",
+        options: [
+          "a) Directamente a la Dirección General de Economía Circular.",
+          "b) A la Dirección General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "c) A la Viceconsejería, sin perjuicio del ejercicio del control de eficacia de los demás órganos directivos.",
+          "d) A la Secretaría General de Medio Ambiente y Cambio Climático."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Viceconsejería)."
+      },
+      {
+        question: "88.- De acuerdo con el artículo 5.4 del Decreto 200/2026, ¿cuál de las siguientes Direcciones Generales de la Consejería depende orgánicamente de la Secretaría General de Medio Ambiente y Cambio Climático?",
+        options: [
+          "a) La Dirección General de Política Forestal y Biodiversidad.",
+          "b) La Dirección General de Sostenibilidad Ambiental y Gestión del Litoral.",
+          "c) La Dirección General de Economía Circular y la Dirección General de Espacios Naturales Protegidos.",
+          "d) Todas las Direcciones Generales mencionadas en las opciones anteriores dependen de dicha Secretaría General."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Todas las Direcciones Generales señaladas)."
+      },
+      {
+        question: "89.- Conforme al Decreto 200/2026, de 30 de julio, ¿qué función corresponde a la Secretaría General Técnica de la Consejería de Sostenibilidad y Medio Ambiente?",
+        options: [
+          "a) La administración y gestión de los asuntos de personal, la elaboración del anteproyecto anual del presupuesto, la gestión de la contratación administrativa y el patrimonio adscrito.",
+          "b) La resolución de los traslados transfronterizos de residuos procedentes de la Unión Europea.",
+          "c) La declaración de subproducto y fin de condición de residuo de competencia autonómica.",
+          "d) La planificación y fomento de las actividades de formación y educación ambiental para la sostenibilidad."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "90.- En el marco del artículo 8 del Decreto 200/2026, ¿cuál de las siguientes atribuciones de resolución corresponde expresamente a la Dirección General de Sostenibilidad Ambiental y Gestión del Litoral?",
+        options: [
+          "a) La resolución de las autorizaciones de quema de restos agrícolas y forestales establecidas en la Ley de residuos.",
+          "b) La resolución de los procedimientos en materia de concesiones de ocupación en el dominio público marítimo-terrestre, incluyendo su otorgamiento, prórroga, extinción y modificación.",
+          "c) La declaración de suelo contaminado y descontaminado de ámbito estrictamente municipal.",
+          "d) La resolución de los planes de prevención de incendios forestales y extinción de los parques nacionales."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "91. De acuerdo con la Ley 9/2007, de 22 de octubre, de la Administración de la Junta de Andalucía, la Agencia de Medio Ambiente y Agua de Andalucía (AMAYA) tiene la consideración de:",
+        options: [
+          "a) Agencia administrativa.",
+          "b) Agencia de régimen especial.",
+          "c) Agencia pública empresarial.",
+          "d) Sociedad mercantil del sector público andaluz."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Agencia pública empresarial)."
+      },
+      {
+        question: "92. La Agencia de Medio Ambiente y Agua de Andalucía (AMAYA) fue creada por la Ley 1/2011, de 17 de enero. ¿Mediante qué norma se aprobaron sus Estatutos?",
+        options: [
+          "a) Decreto 104/2011, de 19 de abril.",
+          "b) Decreto 57/2011, de 15 de marzo.",
+          "c) Decreto 98/2004, de 9 de marzo.",
+          "d) Decreto 477/2015, de 17 de noviembre."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a: Decreto 104/2011)."
+      },
+      {
+        question: "93. Conforme a la regulación de AMAYA contenida en sus Estatutos, aprobados por el Decreto 104/2011, de 19 de abril, la Agencia podrá desarrollar actividades fuera del territorio de Andalucía:",
+        options: [
+          "a) Únicamente cuando sean declaradas de interés nacional.",
+          "b) Solo previa autorización del Consejo de Gobierno.",
+          "c) En ejecución de programas y acuerdos de colaboración suscritos por la Administración de la Junta de Andalucía.",
+          "d) Exclusivamente en el ámbito de la Unión Europea."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "94. Conforme a la organización de AMAYA, ¿cuál de los siguientes órganos forma parte de la Agencia, pero NO se encuentra entre sus órganos de gobierno y dirección?",
+        options: [
+          "a) Presidencia.",
+          "b) Consejo Rector.",
+          "c) Comisión de Seguimiento.",
+          "d) Dirección Gerencia."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Comisión de Seguimiento)."
+      },
+      {
+        question: "95. Dentro de la estructura de la Consejería competente en materia de medio ambiente, la Fundación para el Desarrollo Sostenible de Doñana y su Entorno (Doñana 21) depende de:",
+        options: [
+          "a) La Viceconsejería.",
+          "b) La Secretaría General competente en medio ambiente.",
+          "c) La Dirección General de Espacios protegidos.",
+          "d) Ninguna respuesta es correcta."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "96. ¿Cuál es el objeto principal de la Fundación Doñana 21?",
+        options: [
+          "a) La gestión directa del Espacio Natural de Doñana.",
+          "b) El impulso y promoción de actuaciones públicas y privadas encaminadas al desarrollo económico sostenible de Doñana y su entorno.",
+          "c) La aprobación del Plan de Desarrollo Sostenible de Doñana.",
+          "d) La coordinación exclusiva de las entidades locales pertenecientes al Espacio Natural de Doñana."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "97. Según el artículo 9 de la Ley 3/2026 de 13 de marzo, de Montes de Andalucía, el Consejo Andaluz de Política Forestal y Biodiversidad sustituye al:",
+        options: [
+          "a) Consejo Forestal Andaluz.",
+          "b) Consejo Andaluz de Medio Ambiente.",
+          "c) Consejo Andaluz de Biodiversidad.",
+          "d) Consejo Provincial de Medio Ambiente y de la Biodiversidad."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Consejo Andaluz de Biodiversidad)."
+      },
+      {
+        question: "98. Según el artículo 9 de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía, ¿en cuál de las siguientes materias NO se atribuyen expresamente funciones consultivas, de asesoramiento y participación al Consejo Andaluz de Política Forestal y Biodiversidad?",
+        options: [
+          "a) Geodiversidad.",
+          "b) Pesca continental.",
+          "c) Biodiversidad.",
+          "d) Gestión del litoral."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d: Gestión del litoral)."
+      },
+      {
+        question: "99. De acuerdo con la disposición transitoria primera de la Ley 3/2026, de 13 de marzo, de Montes de Andalucía, el antiguo Consejo Andaluz de Biodiversidad mantendrá su condición de órgano consultivo, de asesoramiento y participación:",
+        options: [
+          "a) Durante un período máximo de seis meses.",
+          "b) Hasta la constitución de los comités provinciales especializados.",
+          "c) Hasta que se produzca su sustitución mediante la aprobación del decreto regulador del Consejo Andaluz de Política Forestal y Biodiversidad.",
+          "d) Hasta un año después de la entrada en vigor de la Ley."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "100. Según el Decreto 57/1995, de 7 de marzo, modificado por el Decreto 14/1999, de 26 de enero, ¿cuál de las siguientes constituye una función del Consejo Andaluz de Medio Ambiente?",
+        options: [
+          "a) Aprobar definitivamente el programa anual de la REDIAM.",
+          "b) Informar la propuesta de programa anual de la REDIAM.",
+          "c) Gestionar directamente la REDIAM.",
+          "d) Nombrar a los responsables provinciales de la REDIAM."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Informar la propuesta de programa anual)."
+      },
+      {
+        question: "101. Conforme al Decreto 57/1995, de 7 de marzo, regulador del Consejo Andaluz de Medio Ambiente, el nombramiento de los miembros del Consejo y sus suplentes tendrá una duración de:",
+        options: [
+          "a) Dos años, no renovables.",
+          "b) Dos años, renovables por un único período.",
+          "c) Cuatro años, pudiendo renovarse por períodos iguales.",
+          "d) Cinco años, pudiendo renovarse una sola vez."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Cuatro años renovables)."
+      },
+      {
+        question: "102. Según el artículo 1 del Decreto 198/1995, de 1 de agosto, los Consejos Provinciales de Medio Ambiente y de la Biodiversidad son órganos colegiados de carácter:",
+        options: [
+          "a) Ejecutivo, coordinador y sancionador.",
+          "b) Consultivo, de asesoramiento y seguimiento.",
+          "c) Consultivo, ejecutivo y de inspección.",
+          "d) Exclusivamente participativo."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Consultivo, de asesoramiento y seguimiento)."
+      },
+      {
+        question: "103. De acuerdo con el Decreto 198/1995, de 1 de agosto, en relación con la caza y la pesca, corresponde a los Consejos Provinciales de Medio Ambiente y de la Biodiversidad:",
+        options: [
+          "a) Aprobar la orden general de vedas.",
+          "b) Informar la orden general de veda en lo que afecte a la respectiva provincia.",
+          "c) Dictar las limitaciones cinegéticas de carácter autonómico.",
+          "d) Conceder las autorizaciones excepcionales de caza."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "104. Según los artículos 5 y 7 del Decreto 198/1995, de 1 de agosto, señale la combinación correcta respecto de los miembros y reuniones de los Consejos Provinciales:",
+        options: [
+          "a) Mandato de cuatro años y reunión al menos semestral.",
+          "b) Mandato de dos años y reunión al menos trimestral.",
+          "c) Mandato de cuatro años y reunión al menos trimestral.",
+          "d) Mandato de dos años y reunión al menos anual."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Mandato de 2 años y reunión trimestral)."
+      },
+      {
+        question: "105. Según el Decreto 477/2015 de 17 de noviembre, el Consejo Andaluz del Agua es:",
+        options: [
+          "a) El órgano ejecutivo superior de la Administración Andaluza del Agua.",
+          "b) El órgano colegiado de consulta y asesoramiento del Gobierno Andaluz en materia de agua.",
+          "c) Un órgano exclusivamente técnico de las demarcaciones hidrográficas.",
+          "d) Un órgano de participación adscrito a cada Delegación Territorial."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Órgano colegiado de consulta y asesoramiento)."
+      },
+      {
+        question: "106. De acuerdo con el artículo 10 del Decreto 477/2015 de 17 de noviembre, corresponde al Consejo Andaluz del Agua informar:",
+        options: [
+          "a) Todos los proyectos de órdenes relacionados con el agua.",
+          "b) Los anteproyectos de leyes y proyectos de decretos en materia de agua sometidos a la aprobación del Consejo de Gobierno, con la excepción prevista para determinados informes atribuidos a los Consejos del Agua de la Demarcación.",
+          "c) Exclusivamente los anteproyectos de ley en materia de agua.",
+          "d) Únicamente los planes hidrológicos de las demarcaciones intracomunitarias."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "107. Según los artículos 11 y 12 del Decreto 477/2015, de 17 de noviembre, ¿qué afirmación es correcta respecto del Consejo Andaluz del Agua?",
+        options: [
+          "a) Su Presidencia corresponde a la persona titular de la Consejería competente en materia de agua, que dispone de voto de calidad, y el Pleno se reúne al menos una vez al año.",
+          "b) Su Presidencia corresponde a la persona titular de la Viceconsejería competente en materia de agua y se reúne trimestralmente..",
+          "c) Su Presidencia corresponde a la Secretaría General competente en agua y se reúne semestralmente.",
+          "d) La Presidencia carece de voto de calidad y el Consejo solo se reúne a petición de la mitad de sus componentes."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "108. Conforme al artículo 13 del Decreto 477/2015, de 17 de noviembre, los grupos de trabajo del Consejo Andaluz del Agua:",
+        options: [
+          "a) Solo pueden tener carácter permanente.",
+          "b) Están integrados exclusivamente por miembros del Consejo.",
+          "c) Pueden estar integrados por personal experto especializado y tener carácter temporal o permanente.",
+          "d) Deben constituirse obligatoriamente para cada asunto sometido al Consejo."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "109. Según el Decreto 98/2004, de 9 de marzo, ¿cuál de las siguientes funciones corresponde al Comité Andaluz de Humedales?",
+        options: [
+          "a) Aprobar la inclusión definitiva de nuevos humedales en el Inventario de Humedales de Andalucía.",
+          "b) Proponer la inclusión de nuevos humedales en el Inventario de Humedales de Andalucía o la modificación de los existentes.",
+          "c) Declarar los humedales de importancia internacional.",
+          "d) Aprobar el Plan Andaluz de Humedales."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Proponer la inclusión)."
+      },
+      {
+        question: "110. Conforme al artículo 11 del Decreto 98/2004, de 9 de marzo, la Secretaría del Comité Andaluz de Humedales será desempeñada por:",
+        options: [
+          "a) La persona titular de la Dirección General competente en gestión del medio natural, con voz y voto.",
+          "b) Una persona funcionaria de la Consejería de Medio Ambiente con rango, al menos, de Jefatura de Servicio, con voz y sin voto.",
+          "c) Una persona funcionaria con rango, al menos, de Jefatura de Sección, con voz y voto.",
+          "d) Una persona designada libremente por la Presidencia, con voz y sin voto."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Funcionario con rango de Jefatura de Servicio, con voz y sin voto)."
+      },
+      {
+        question: "111. De acuerdo con los artículos 12 y 14 del Decreto 98/2004, de 9 de marzo, los miembros del Comité Andaluz de Humedales que no lo sean por razón de su cargo:",
+        options: [
+          "a) Son nombrados por dos años y el Comité se reúne trimestralmente.",
+          "b) Son nombrados por cuatro años, renovables por idénticos períodos, y el Comité se reúne ordinariamente al menos una vez por semestre.",
+          "c) Son nombrados por cuatro años no renovables y el Comité se reúne anualmente.",
+          "d) Son nombrados por cinco años y el Comité se reúne dos veces al año."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Cuatro años renovables, reunión semestral)."
+      },
+      {
+        question: "112. Según la Ley 7/2010, de 14 de julio, para la Dehesa, y el Decreto 57/2011, de 15 de marzo, la Comisión Andaluza para la Dehesa se configura como:",
+        options: [
+          "a) Un órgano ejecutivo dependiente de la Consejería competente en medio ambiente.",
+          "b) Una entidad instrumental con personalidad jurídica propia.",
+          "c) Un órgano consultivo dependiente directamente del Consejo de Gobierno.",
+          "d) Un órgano colegiado de participación administrativa y carácter interdepartamental, de coordinación, colaboración y propuesta."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción d)."
+      },
+      {
+        question: "113. Conforme a los artículos 5 y 6 del Decreto 57/2011, de 15 de marzo, ¿qué combinación es correcta respecto de la Comisión Andaluza para la Dehesa?",
+        options: [
+          "a) La Presidencia corresponde a la Dirección General competente en medio natural y se reúne una vez al año.",
+          "b) La Presidencia corresponde a la Secretaría General competente en agricultura y alimentación y se reúne ordinariamente, al menos, dos veces al año.",
+          "c) La Presidencia corresponde a la Consejería competente en agricultura y se reúne trimestralmente.",
+          "d) La Presidencia corresponde a la Viceconsejería competente en medio ambiente y se reúne semestralmente."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b)."
+      },
+      {
+        question: "114. Según el Decreto 88/2024, de 9 de abril, Andalucía cuenta con nueve Reservas de la Biosfera. ¿Cuál de las siguientes afirmaciones es correcta?",
+        options: [
+          "a) Las nueve se encuentran íntegramente en territorio andaluz.",
+          "b) Siete se encuentran íntegramente en Andalucía y dos son internacionales.",
+          "c) Ocho se encuentran íntegramente en Andalucía y la novena es la Reserva de la Biosfera Intercontinental del Mediterráneo Andalucía (España)-Marruecos.",
+          "d) Ocho se encuentran íntegramente en Andalucía y la novena es compartida con Portugal."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "115. Conforme a los artículos 2 a 4 del Decreto 88/2024, de 9 de abril, el Consejo Andaluz de las Reservas de la Biosfera:",
+        options: [
+          "a) Es un órgano colegiado de participación administrativa y social, de carácter consultivo, adscrito a la Consejería competente en medio ambiente.",
+          "b) Es un órgano ejecutivo con sede obligatoria en cada Reserva de la Biosfera..",
+          "c) Es una entidad instrumental dependiente de la Agencia de Medio Ambiente y Agua.",
+          "d) Es un órgano estatal integrado en el Ministerio competente en medio ambiente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "116. Según los artículos 13 y 14 del Decreto 88/2024, de 9 de abril, señale la respuesta correcta sobre la Secretaría y las reuniones del Consejo Andaluz de las Reservas de la Biosfera:",
+        options: [
+          "a) La Secretaría debe recaer en una persona funcionaria con nivel mínimo de Jefatura de Servicio, forma parte del Consejo con voz y voto, y el Consejo se reúne ordinariamente al menos una vez al año.",
+          "b) La Secretaría actúa con voz y sin voto y el Consejo se reúne al menos dos veces al año.",
+          "c) La Secretaría debe recaer necesariamente en una persona titular de Dirección General y el Consejo se reúne semestralmente.",
+          "d) La Secretaría tiene voz pero no voto y las reuniones ordinarias son trimestrales."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción a)."
+      },
+      {
+        question: "117. Conforme al artículo 17 del Decreto 88/2024, de 9 de abril, los grupos de trabajo que pueda crear el Consejo Andaluz de las Reservas de la Biosfera:",
+        options: [
+          "a) Tienen la consideración de órganos colegiados permanentes.",
+          "b) Solo pueden integrarse por miembros del Consejo.",
+          "c) No tienen la consideración de órganos colegiados y pueden incorporar profesionales expertos en materias relacionadas con las Reservas de la Biosfera.",
+          "d) Son creados mediante orden de la Consejería competente en medio ambiente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c)."
+      },
+      {
+        question: "118. Según el artículo 20 del Decreto 88/2024, de 9 de abril, ¿qué correspondencia entre Reserva de la Biosfera y órgano de participación es correcta?",
+        options: [
+          "a) Sierra Nevada - Junta Rectora del Parque Natural Sierra Nevada.",
+          "b) Marismas del Odiel - Patronato Marismas del Odiel.",
+          "c) Sierra de las Nieves - Junta Rectora del Parque Natural Sierra de las Nieves.",
+          "d) Cabo de Gata-Níjar - Consejo de Participación del Espacio Natural Cabo de Gata-Níjar."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción b: Marismas del Odiel - Patronato Marismas del Odiel)."
+      },
+      {
+        question: "119. De acuerdo con los artículos 11 y 12 de la Ley 2/2026, de 12 de marzo, para la Gestión Ambiental de Andalucía (LEGAM), ¿cuál de las siguientes afirmaciones sobre el Consejo Asesor de Medio Ambiente de Andalucía es correcta?",
+        options: [
+          "a) Sus informes y actuaciones tienen carácter vinculante y debe reunirse al menos una vez al año.",
+          "b) Sus informes son vinculantes únicamente cuando afecten a planes ambientales autonómicos.",
+          "c) Sus informes y actuaciones tienen carácter no vinculante y debe reunirse ordinariamente, como mínimo, dos veces al año.",
+          "d) Debe reunirse trimestralmente y todos sus informes tienen carácter preceptivo."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Informes no vinculantes y reunión mínima de 2 veces al año)."
+      },
+      {
+        question: "120. Según la disposición transitoria cuarta de la Ley 2/2026, de 12 de marzo, para la Gestión Ambiental de Andalucía, hasta que se apruebe el Decreto regulador de la composición y régimen de funcionamiento del nuevo Consejo Asesor de Medio Ambiente de Andalucía:",
+        options: [
+          "a) Sus funciones serán ejercidas provisionalmente por el Consejo Andaluz de Política Forestal y Biodiversidad.",
+          "b) Quedarán suspendidas las funciones de participación social en materia ambiental.",
+          "c) Mantendrá su condición de órgano colegiado de participación social el Consejo Andaluz de Medio Ambiente previsto en el Decreto 57/1995 de 7 de marzo.",
+          "d) Las funciones serán asumidas directamente por la persona titular de la Consejería competente en medio ambiente."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción c: Mantiene transitoriamente su función el Consejo Andaluz de Medio Ambiente del Decreto 57/1995)."
+      }
+    ];
+
+    const test3Questions = [
+      {
+        question: "121.- ¿Qué artículo de la Constitución Española está dedicado al medio ambiente?",
+        options: [
+          "a) 28",
+          "b) 45",
+          "c) 49",
+          "d) 88"
+        ],
+        correct: 1,
+        justification: "El artículo 45 de la Constitución Española de 1978 reconoce el derecho a disfrutar de un medio ambiente adecuado y el deber de conservarlo."
+      },
+      {
+        question: "122.- ¿Qué artículo de la Ley Orgánica 2/2007 de 19 de marzo, de Reforma del Estatuto de Autonomía para Andalucía se titula \"Medio Ambiente\"?",
+        options: [
+          "a) 28",
+          "b) 45",
+          "c) 49",
+          "d) 88"
+        ],
+        correct: 0,
+        justification: "El artículo 28 del Estatuto de Autonomía para Andalucía (LO 2/2007) regula expresamente el derecho al medio ambiente."
+      },
+      {
+        question: "123.- ¿Qué título de la Ley Orgánica 2/2007 de 19 de marzo, de Reforma del Estatuto de Autonomía para Andalucía se dedica por completo al medio ambiente?",
+        options: [
+          "a) Título IV",
+          "b) Título V",
+          "c) Título VI",
+          "d) Título VII"
+        ],
+        correct: 3,
+        justification: "El Título VII de la Ley Orgánica 2/2007 está dedicado íntegramente a la regulación del Medio Ambiente en Andalucía."
+      },
+      {
+        question: "124.- A tenor de lo establecido en el artículo 149 de la Constitución Española, ¿quién tiene competencia exclusiva sobre la legislación básica sobre protección del medio ambiente?",
+        options: [
+          "a) El Estado",
+          "b) Las Comunidades Autónomas",
+          "c) Las Entidades Locales",
+          "d) Depende del Estatuto de Autonomía de cada Comunidad"
+        ],
+        correct: 0,
+        justification: "Según el artículo 149.1.23ª de la Constitución Española, el Estado tiene competencia exclusiva sobre la legislación básica sobre protección del medio ambiente."
+      },
+      {
+        question: "125.- Según el artículo 148 de la Constitución Española, las Comunidades Autónomas podrán asumir competencias en la siguiente materia:",
+        options: [
+          "a) La gestión en materia de protección del medio ambiente.",
+          "b) Los proyectos, construcción y explotación de los aprovechamientos hidráulicos, canales y regadíos de interés de la Comunidad Autónoma; las aguas minerales y termales.",
+          "c) La pesca en aguas interiores, el marisqueo y la acuicultura, la caza y la pesca fluvial.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "El artículo 148.1 de la CE contempla expresamente todas las materias indicadas (apartados 9.º, 10.º y 11.º) entre las competencias asumibles por las CC.AA."
+      },
+      {
+        question: "126.- Según el artículo 42 de la Ley Orgánica 2/2007, de 19 de marzo, de reforma del Estatuto de Autonomía para Andalucía, las competencias que comprenden la potestad legislativa, la potestad reglamentaria y la función ejecutiva, íntegramente y sin perjuicio de las competencias atribuidas al Estado en la Constitución, se corresponden con:",
+        options: [
+          "a) Competencias exclusivas",
+          "b) Competencias compartidas",
+          "c) Competencias ejecutivas",
+          "d) Competencias andaluzas"
+        ],
+        correct: 0,
+        justification: "El artículo 42.2 de la LO 2/2007 define las 'competencias exclusivas' como aquellas que integran potestad legislativa, reglamentaria y función ejecutiva."
+      },
+      {
+        question: "127.- Según el artículo 50 de la Ley Orgánica 2/2007, de 19 de marzo, de reforma del Estatuto de Autonomía para Andalucía, en materia de aguas que transcurran íntegramente por Andalucía le corresponde a la Comunidad Autónoma de Andalucía la competencia exclusiva sobre (señale la opción correcta):",
+        options: [
+          "a) Recursos y aprovechamientos hidráulicos, canales y regadíos, aprobación de la planificación hidráulica, cuando las aguas transcurran por Andalucía. Aguas subterráneas cuando su aprovechamiento no afecte a otro territorio",
+          "b) Aguas minerales y termales",
+          "c) La participación de los usuarios en la concesión de recursos, la garantía del suministro, la regulación parcelaria y las obras de transformación, modernización y consolidación de regadíos y para el ahorro y uso eficiente del agua",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficiales (Opción b: Aguas minerales y termales)."
+      },
+      {
+        question: "128.- Según el artículo 57 de la Ley Orgánica 2/2007, de 19 de marzo, de reforma del Estatuto de Autonomía para Andalucía, corresponde a la Comunidad Autónoma de Andalucía la competencia exclusiva en materia de:",
+        options: [
+          "a) Montes, explotaciones, aprovechamientos y servicios forestales",
+          "b) Delimitación, regulación, ordenación y gestión integral de los espacios naturales protegidos, incluyendo los que afecten a las aguas marítimas de su jurisdicción, corredores biológicos, y hábitats en el territorio de Andalucía, así como la declaración de cualquier figura de protección y establecimiento de normas adicionales de protección ambiental",
+          "c) Fauna y flora silvestres",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "El artículo 57.1 del Estatuto de Autonomía atribuye la competencia exclusiva sobre montes, espacios protegidos, fauna y flora silvestres a la Comunidad Autónoma."
+      },
+      {
+        question: "129.- La Conferencia Sectorial de Medio Ambiente se estructura en los siguientes órganos:",
+        options: [
+          "a) Dirección General, Consejo de política medioambiental para asuntos comunitarios, Comités, Grupos de Trabajo",
+          "b) Pleno, Comisión de política medioambiental para asuntos comunitarios, Comités, Grupos de Trabajo",
+          "c) Pleno, Consejo de política medioambiental para asuntos comunitarios, Comisiones, Grupos de Trabajo.",
+          "d) Pleno, Consejo de política medioambiental para asuntos europeos, Comisiones, Grupos de Trabajo."
+        ],
+        correct: 2,
+        justification: "La estructura organizativa de la Conferencia Sectorial de Medio Ambiente cuenta con Pleno, Consejo de política medioambiental para asuntos comunitarios, Comisiones y Grupos de Trabajo."
+      },
+      {
+        question: "130.- Según el Decreto 200/2026, de 30 de julio, por el que se establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente, en su artículo 1, las competencias de la Consejería serán:",
+        options: [
+          "a) El ejercicio de las competencias atribuidas a la Comunidad Autónoma de Andalucía en materia de medio ambiente, cambio climático, ordenación y gestión forestal, prevención de los incendios forestales y restauración de sus efectos, biodiversidad y geodiversidad, caza y pesca continental, vías pecuarias, prevención y calidad ambiental, gestión de residuos y economía circular, espacios naturales protegidos.",
+          "b) Las relativas al uso, gestión y conservación sostenible de los recursos marinos",
+          "c) Las competencias en materia de cumplimiento de los Objetivos de Desarrollo Sostenible (ODS) y la Agenda 2030.",
+          "d) Las respuestas a) y c) son correctas."
+        ],
+        correct: 3,
+        justification: "El artículo 1 del Decreto 200/2026 abarca tanto el catálogo ambiental tradicional como las atribuciones relativas a los ODS y la Agenda 2030."
+      },
+      {
+        question: "131.- ¿Cuál de los siguientes no es un órgano directivo central de la Consejería competente en materia de medio ambiente según lo establecido en el Decreto 200/2026, de 30 de julio, por el que se establece la estructura orgánica de la Consejería de Sostenibilidad y Medio Ambiente?",
+        options: [
+          "a) Dirección General de Política Forestal y Biodiversidad",
+          "b) Dirección General de Medio Ambiente, Agua y Cambio Climático",
+          "c) Dirección General de Espacios Naturales Protegidos",
+          "d) Dirección General de Sostenibilidad Ambiental y Gestión del Litoral"
+        ],
+        correct: 1,
+        justification: "El órgano con rango de Secretaría General es la 'Secretaría General de Medio Ambiente y Cambio Climático'. No existe la 'Dirección General de Medio Ambiente, Agua y Cambio Climático'."
+      },
+      {
+        question: "132.- ¿A qué órgano directivo de la Consejería de Sostenibilidad y Medio Ambiente corresponderá la función de organización, gestión, estructuración y funcionamiento de la REDIAM?",
+        options: [
+          "a) Viceconsejería",
+          "b) Secretaría General de Medio Ambiente y Cambio Climático.",
+          "c) Dirección General de Política Forestal y Biodiversidad",
+          "d) Dirección General de Sostenibilidad Ambiental y Economía Circular"
+        ],
+        correct: 1,
+        justification: "Corresponde a la Secretaría General de Medio Ambiente y Cambio Climático la gestión y dirección de la Red de Información Ambiental de Andalucía (REDIAM)."
+      },
+      {
+        question: "133.- ¿A qué órgano directivo de la Consejería de Sostenibilidad y Medio Ambiente corresponderá la resolución de los procedimientos en materia de concesiones de ocupación en el dominio público marítimo-terrestre?",
+        options: [
+          "a) Dirección General de Política Forestal y Biodiversidad",
+          "b) Dirección General de Medio Ambiente, Agua y Cambio Climático",
+          "c) Dirección General de Espacios Naturales Protegidos",
+          "d) Dirección General de Sostenibilidad Ambiental y Gestión del Litoral"
+        ],
+        correct: 3,
+        justification: "Corresponde a la Dirección General de Sostenibilidad Ambiental y Gestión del Litoral la resolución de concesiones de ocupación en el dominio público marítimo-terrestre."
+      },
+      {
+        question: "134.- La organización de la Agencia de Medio Ambiente y Agua (AMAYA) consta de:",
+        options: [
+          "a) Presidencia, Vicepresidencia primera, Vicepresidencia Segunda, Secretaría.",
+          "b) Presidencia, Vicepresidencia, Consejo Rector, Comisión de Seguimiento, Dirección Gerencia, Comité consultivo y Gerencias provinciales.",
+          "c) Pleno, Comisiones de trabajo, Consejo Rector, Dirección Gerencia.",
+          "d) Pleno, Consejo Rector, Comisión para asuntos comunitarios, Comités especializados."
+        ],
+        correct: 1,
+        justification: "La estructura organizativa de la Agencia de Medio Ambiente y Agua (AMAYA) comprende la Presidencia, Vicepresidencia, Consejo Rector, Comisión de Seguimiento, Dirección Gerencia, Comité consultivo y Gerencias provinciales."
+      },
+      {
+        question: "135.- ¿Qué funciones tiene el Consejo Andaluz de Política Forestal y Biodiversidad?",
+        options: [
+          "a) Funciones consultivas en materia forestal, de geodiversidad, biodiversidad, caza y pesca continental.",
+          "b) Funciones de asesoramiento en materia forestal, de geodiversidad, biodiversidad, caza y pesca continental.",
+          "c) Funciones de participación en materia forestal, de geodiversidad, biodiversidad, caza y pesca continental.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "El Consejo Andaluz de Política Forestal y Biodiversidad ostenta funciones consultivas, de asesoramiento y de participación."
+      },
+      {
+        question: "136.- Según lo establecido en la Disposición transitoria cuarta de la Ley 2/2026, de 12 de marzo, para la Gestión Ambiental de Andalucía, ¿qué órgano se crea para sustituir al Consejo Andaluz de Medio Ambiente?",
+        options: [
+          "a) Consejo Andaluz de Medio Ambiente y Biodiversidad.",
+          "b) Consejo Medioambiental de Andalucía.",
+          "c) Consejo Asesor de Medio Ambiente de Andalucía.",
+          "d) Ninguna respuesta es correcta."
+        ],
+        correct: 2,
+        justification: "La Ley 2/2026 crea el 'Consejo Asesor de Medio Ambiente de Andalucía' como órgano colegiado de participación social que sustituye al anterior Consejo Andaluz de Medio Ambiente."
+      },
+      {
+        question: "137.- ¿Quién preside el Consejo Andaluz de Medio Ambiente, según el Decreto 57/1995, de 7 de marzo?",
+        options: [
+          "a) La persona titular de la Viceconsejería de la Consejería competente en materia de Medio Ambiente.",
+          "b) La persona titular de la Consejería de Medio Ambiente y Ordenación del Territorio",
+          "c) La persona titular de la Dirección General competente en materia de gestión del medio natural",
+          "d) La persona titular de la Secretaría General de Medio Ambiente y Cambio Climático"
+        ],
+        correct: 1,
+        justification: "La Presidencia del Consejo Andaluz de Medio Ambiente corresponde a la persona titular de la Consejería competente en materia de medio ambiente."
+      },
+      {
+        question: "138.- ¿En qué normativa se crea y se regula el funcionamiento del Comité Andaluz de Humedales?",
+        options: [
+          "a) Decreto 98/2004 de 9 de marzo",
+          "b) Decreto 202/1995, de 1 de agosto",
+          "c) Decreto 198/1995, de 1 de agosto",
+          "d) Decreto 14/1999, de 26 de enero"
+        ],
+        correct: 0,
+        justification: "El Comité Andaluz de Humedales se crea y regula mediante el Decreto 98/2004, de 9 de marzo."
+      },
+      {
+        question: "139.- ¿Cuál de las siguientes no es una función del Comité Andaluz de Humedales?",
+        options: [
+          "a) Velar por el cumplimiento de las actuaciones previstas en el Plan Andaluz de Humedales.",
+          "b) Emitir informes de carácter anual, asesorar y efectuar propuestas en materia de gestión, conservación y percepción social de los humedales, a iniciativa propia o a petición de la Consejería de Agua, con objeto de propiciar el conocimiento de estos espacios especiales.",
+          "c) Promover el intercambio de información entre los órganos gestores de los humedales protegidos de Andalucía y las diferentes Administraciones Públicas vinculadas a los mismos, así como elaborar las propuestas de designación de humedales andaluces como figuras internacionales de protección.",
+          "d) Proponer acciones de investigación, conocimiento, manejo y custodia, y divulgación en materia de humedales."
+        ],
+        correct: 1,
+        justification: "Las competencias consultivas y de propuesta del Comité Andaluz de Humedales se dirigen a la Consejería competente en medio ambiente, no a una 'Consejería de Agua'."
+      },
+      {
+        question: "140.- Según el Decreto 57/2011, de 15 de marzo, por el que se regula la Comisión Andaluza para la Dehesa, ¿quién ostentará la presidencia de la Comisión Andaluza para la Dehesa?",
+        options: [
+          "a) La persona titular de la Dirección General competente en materia de gestión del medio natural",
+          "b) La persona titular de la Consejería competente en materia de Agricultura y Ganadería.",
+          "c) La persona titular de la Secretaría General competente en materia de agricultura y alimentación",
+          "d) La persona titular de la Consejería competente en materia de Medio Ambiente."
+        ],
+        correct: 2,
+        justification: "La presidencia de la Comisión Andaluza para la Dehesa recae en la persona titular de la Secretaría General competente en materia de agricultura y alimentación."
+      }
+    ];
+
+    const allQuestions = [...test1Questions, ...test2Questions, ...test3Questions];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1": allQuestions.slice(0, 20),
+      "t2_b1": allQuestions.slice(20, 45),
+      "t2_b2": allQuestions.slice(45, 70),
+      "t2_b3": allQuestions.slice(70, 95),
+      "t2_b4": allQuestions.slice(95, 120),
+      "t3": allQuestions.slice(120, 140)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "EXAMEN COMPLETO DE AUTOEVALUACIÓN - TEMA 1 (140 PREGUNTAS)",
+        "t1": "TEST 1 DE AUTOEVALUACIÓN - TEMA 1 (PREGUNTAS 1 A 20)",
+        "t2_b1": "TEST 2 - BLOQUE 1 (PREGUNTAS 21 A 45)",
+        "t2_b2": "TEST 2 - BLOQUE 2 (PREGUNTAS 46 A 70)",
+        "t2_b3": "TEST 2 - BLOQUE 3 (PREGUNTAS 71 A 95)",
+        "t2_b4": "TEST 2 - BLOQUE 4 (PREGUNTAS 96 A 120)",
+        "t3": "TEST 3 BÁSICO - TEMA 1 (PREGUNTAS 121 A 140)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

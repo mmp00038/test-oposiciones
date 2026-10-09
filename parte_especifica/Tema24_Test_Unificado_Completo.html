@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 24 (Cartografía, SIG, Telecomunicaciones e Información Ambiental)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 24 Unificado Completo (34 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test Nº 1 - Teórico (21 Preguntas)">
+          <option value="t1_all">Test Nº 1 - Completo (1 - 21)</option>
+          <option value="t1_b1">Test Nº 1 - Bloque 1 (1 - 11)</option>
+          <option value="t1_b2">Test Nº 1 - Bloque 2 (12 - 21)</option>
+        </optgroup>
+        <optgroup label="Test Nº 2 - Práctico (13 Preguntas)">
+          <option value="t2_all">Test Nº 2 - Completo (1 - 13)</option>
+          <option value="t2_b1">Test Nº 2 - Bloque 1 (1 - 7)</option>
+          <option value="t2_b2">Test Nº 2 - Bloque 2 (8 - 13)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 24 - CARTOGRAFÍA, SIG, TELECOMUNICACIONES E INFORMACIÓN AMBIENTAL (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. Señale la respuesta INCORRECTA con respecto a las propiedades de las proyecciones cartográficas:",
+        options: [
+          "a) En las proyecciones equidistantes se conservan las distancias",
+          "b) En las proyecciones conformes se conservan las áreas de las superficies",
+          "c) En las proyecciones conformes se conservan las formas",
+          "d) En las proyecciones equivalentes se conservan las áreas de superficie"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 198]."
+      },
+      {
+        question: "2. Señale la respuesta CORRECTA con respecto a la proyección cartográfica conocida como proyección UTM:",
+        options: [
+          "a) Divide al elipsoide de referencia en bandas y Husos. Las bandas se designan con números del 1 al 60 y los Husos con letras de la C a la X (eliminando la \"I\" y la \"O\" por su parecido con los números 1 y 0 y la letra Ñ)",
+          "b) Se trata de una proyección de tipo cilíndrica",
+          "c) Las zonas entre las letras C y L corresponde con el hemisferio Sur y las comprendidas entre las letras M y X con el hemisferio Norte.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Se trata de una proyección de tipo cilíndrica)[cite: 198]."
+      },
+      {
+        question: "3. El Datum es un sistema de referencia espacial que describe la forma y el tamaño de la tierra y establece un origen para los sistemas de coordenadas. ¿Cuál es el Datum que se utiliza actualmente en España?",
+        options: [
+          "a) ED50",
+          "b) WGS84",
+          "c) NAD83",
+          "d) ETRS89"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: ETRS89)[cite: 198]."
+      },
+      {
+        question: "4. ¿Dónde se encuentra actualmente situada la cota cero a la hora de medir altitudes en España?",
+        options: [
+          "a) En la ciudad de Alicante",
+          "b) En la ciudad de Cartagena",
+          "c) En la ciudad de Altea",
+          "d) En el cabo de Palos"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: En la ciudad de Alicante)[cite: 198]."
+      },
+      {
+        question: "5. ¿Cuándo utilizaremos curvas auxiliares en nuestro plano?",
+        options: [
+          "a) Siempre, ya que las curvas auxiliares son aquellas que se dibujan entre curvas maestras representando valores unitarios constantes de nivel",
+          "b) Nunca, las curvas de nivel se dividen en dos tipos, maestras o principales e intermedias, no hay ningún tipo de curva denominada auxiliar",
+          "c) Cuando la equidistancia entre curvas de nivel sea grande y no podamos obtener información relativa a la topografía del terreno.",
+          "d) Cuando se trate de un terreno con mucha elevación y queramos representar altitudes intermedias"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 198]."
+      },
+      {
+        question: "6. ¿Qué nos indica la equidistancia en un plano?",
+        options: [
+          "a) La distancia entre dos curvas de nivel consecutivas",
+          "b) La diferencia de altitud entre dos curvas de nivel consecutivas",
+          "c) La distancia entre dos curvas maestras o principales",
+          "d) La diferencia de altitud entre dos curvas maestras o principales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La diferencia de altitud entre dos curvas de nivel consecutivas)[cite: 198]."
+      },
+      {
+        question: "7. Si en nuestro plano nos encontramos que las curvas de nivel de mayor cota envuelven a las de menor cota sabremos interpretar que en el terreno habrá:",
+        options: [
+          "a) Un mogote",
+          "b) Una hoya",
+          "c) Un collado",
+          "d) Un saliente"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Una hoya)[cite: 198]."
+      },
+      {
+        question: "8. Si en nuestro plano de escala 1:7.500 medimos una distancia entre puntos de 6 cm ¿qué distancia reducida tendremos que recorrer sobre el terreno?",
+        options: [
+          "a) 750 metros",
+          "b) 600 metros",
+          "c) 450 metros",
+          "d) 7500 metros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 450 metros)[cite: 198]."
+      },
+      {
+        question: "9. Si sobre el terreno hemos caminado, entre dos puntos, 900 metros y la distancia medida sobre el plano entre esos puntos ha sido de 6 cm, ¿qué escala se ha utilizado en la elaboración del plano?",
+        options: [
+          "a) 1:10.000",
+          "b) 1:15.000",
+          "c) 1:1.500",
+          "d) 1:150"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1:15.000)[cite: 198]."
+      },
+      {
+        question: "10. Al ángulo formado entre el norte geográfico y el norte magnético se le denomina:",
+        options: [
+          "a) Desviación magnética",
+          "b) Derivación magnética",
+          "c) Declinación magnética",
+          "d) Distorsión magnética"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Declinación magnética)[cite: 198]."
+      },
+      {
+        question: "11. Para que un receptor GPS pueda calcular una posición 2D (latitud y longitud) debe estar conectado a la señal de, al menos:",
+        options: [
+          "a) 2 satélites",
+          "b) 3 satélites",
+          "c) 4 satélites",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3 satélites)[cite: 198]."
+      },
+      {
+        question: "12. ¿Qué elemento geométrico se utiliza en el modelo SIG vectorial para representar el mundo real?",
+        options: [
+          "a) Líneas o polilíneas",
+          "b) Polígonos",
+          "c) Puntos",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)[cite: 198]."
+      },
+      {
+        question: "13. ¿Qué tipo de transmisión de radio nos permite transmitir en ambas direcciones simultáneamente por el mismo canal, existiendo dos frecuencias, una para transmitir y otra para recibir?",
+        options: [
+          "a) Transmisión Half dúplex",
+          "b) Transmisión Simplex",
+          "c) Transmisión Full dúplex",
+          "d) Transmisión Complete"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Transmisión Full dúplex)[cite: 198]."
+      },
+      {
+        question: "14. El artículo 3 de la Ley estatal que regula el derecho de acceso a la información ambiental, el derecho de participación y el de acceso a la justicia en materia ambiental, recoge en su punto 1 los derechos reconocidos en relación al acceso a la información ambiental, entre ellos NO se encuentra:",
+        options: [
+          "a) A ser asistido en la búsqueda de información",
+          "b) Conocer las tasas y precios que, en su caso sean exigibles para la recepción de la información solicitada",
+          "c) A recibir la información solicitada en los plazos máximos establecidos",
+          "d) Todos los anteriores son derechos reconocidos"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todos los anteriores son derechos reconocidos)[cite: 198]."
+      },
+      {
+        question: "15. La Ley a la que hace referencia el artículo anterior es la:",
+        options: [
+          "a) Ley 26/2007 de 23 de Octubre",
+          "b) Ley 27/2006 de 18 de Julio",
+          "c) Ley 347/2011 de 22 de noviembre",
+          "d) Ley 7/2007 de 9 de Julio"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ley 27/2006 de 18 de Julio)[cite: 198]."
+      },
+      {
+        question: "16. Siguiendo con la referida Ley, en su artículo 17 se recoge una lista de materias sobre las que se establece la obligación de las Administraciones Públicas de observar las garantías en materia de participación en la elaboración, modificación y revisión de planes y programas que versen sobre ellas. Entre estas materias NO se encuentra:",
+        options: [
+          "a) Nitratos",
+          "b) Calidad del aire",
+          "c) Residuos",
+          "d) Calidad del agua"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Calidad del agua)[cite: 198]."
+      },
+      {
+        question: "17. Estarán legitimadas para ejercer la acción popular a la que hace referencia el artículo 23 de la Ley 27/2006 cualquier persona jurídica sin ánimo de lucro que acredite el cumplimiento de una serie de requisitos. Entre estos requisitos NO se encuentra:",
+        options: [
+          "a) Tener entre los fines acreditados en los estatutos la protección del medio ambiente en general o de alguno de sus elementos en particular",
+          "b) Que se hubiera constituido legalmente al menos un año antes del ejercicio de la acción y que vengan ejerciendo de modo activo las actividades necesarias para alcanzar los fines previstos en sus estatutos.",
+          "c) Que según sus estatutos desarrollen su actividad en un ámbito territorial que resulte afectado por la actuación, o en su caso, omisión administrativa.",
+          "d) Todas ellas son requisitos para su legitimación"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La Ley exige dos años de constitución legal previa, no un año)[cite: 198]."
+      },
+      {
+        question: "18. ¿Cuál de las siguientes afirmaciones acerca de la Red de Información Ambiental de Andalucía (REDIAM) contenidas en el Decreto 347/2011, de 22 de noviembre, por el que se regula la estructura y funcionamiento de la Red de Información Ambiental de Andalucía y el acceso a la información ambiental) NO es correcta?",
+        options: [
+          "a) La REDIAM tendrá por objeto la integración de la información ambiental de Andalucía generada por los centros productores públicos, para fines de gestión, investigación, difusión pública y diseño, aplicación y evaluación de las políticas ambientales",
+          "b) La superior dirección y evaluación le corresponde al titular de la Consejería competente en materia de medio ambiente",
+          "c) La dirección ordinaria y la gestión le compete al titular del órgano directivo competente en materia de información ambiental",
+          "d) Le corresponde al Consejo Andaluz de Medio Ambiente institucionalizar la participación social en el funcionamiento de la REDIAM y el acceso a la información ambiental en Andalucía"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La REDIAM integra la información producida por centros públicos y privados)[cite: 198]."
+      },
+      {
+        question: "19. Siguiendo con el mismo Decreto, ¿a quién le corresponde elaborar un informe anual sobre el funcionamiento de la REDIAM durante el año inmediatamente anterior?",
+        options: [
+          "a) Al titular de la Consejería competente en materia de Medio Ambiente",
+          "b) Al titular de la Viceconsejería competente en materia de Medio Ambiente",
+          "c) Al órgano directivo competente en materia de información ambiental dependiente de la consejería competente en materia de medio ambiente",
+          "d) A los titulares de las delegaciones territoriales competentes en materia de medio ambiente sobre el funcionamiento en sus respectivos ámbitos provinciales"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Al órgano directivo competente en materia de información ambiental)[cite: 198]."
+      },
+      {
+        question: "20. De acuerdo al art. 4. del Decreto 347/2011 la definición de \"Persona usuaria de la REDIAM\" es:",
+        options: [
+          "a) Cualquier persona física o jurídica destinataria o solicitante de información ambiental, en los términos que fija el citado Decreto",
+          "b) Cualquier persona física destinataria o solicitante de información ambiental, en los términos que fija el citado Decreto",
+          "c) Cualquier persona física destinataria de información ambiental, en los términos que fija el citado Decreto",
+          "d) Cualquier persona física solicitante de información ambiental, en los términos que fija el citado Decreto"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cualquier persona física o jurídica destinataria o solicitante)[cite: 198]."
+      },
+      {
+        question: "21. El artículo 28 del Decreto 347/2011 recoge que en los supuestos en que se requiera a la persona solicitante la concreción de la información ambiental, se acordará la suspensión del procedimiento por el plazo máximo de:",
+        options: [
+          "a) Un mes desde la notificación al interesado del requerimiento de información ambiental",
+          "b) Dos meses desde la notificación al interesado del requerimiento de información ambiental.",
+          "c) Un mes desde la recepción de la solicitud en el registro de la autoridad pública competente para resolverla.",
+          "d) Dos meses desde la recepción de la solicitud en el registro de la autoridad pública competente para resolverla"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Un mes desde la recepción de la solicitud en el registro de la autoridad pública competente)[cite: 198]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1) Tenemos un plano escala 1/25.000. Si recorremos 100 metros sobre el terreno, ¿con qué distancia se representará sobre nuestro plano?",
+        options: [
+          "a) 4 mm",
+          "b) 4 cm",
+          "c) 2.5 cm",
+          "d) 25 mm"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 4 mm)[cite: 199]."
+      },
+      {
+        question: "2) Si recorremos 600 metros sobre el terreno y en nuestro plano esa distancia se representa con 3 cm estaremos ante un plano de escala:",
+        options: [
+          "a) 1/10.000",
+          "b) 1/20.000",
+          "c) 1/6.000",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1/20.000)[cite: 199]."
+      },
+      {
+        question: "3) Tenemos un plano que nos indica una escala 1/7.500. ¿Cuántos metros nos habremos desplazado sobre el terreno si en nuestro plano hemos recorrido 7 cm?",
+        options: [
+          "a) 750 metros",
+          "b) 525 metros",
+          "c) 75 metros",
+          "d) 7.500 metros"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 525 metros)[cite: 199]."
+      },
+      {
+        question: "4) ¿Qué equidistancia tendría nuestro plano si tenemos una curva maestra a una altitud de 1750 metros y su contigua a 1850 metros?",
+        options: [
+          "a) 10 metros",
+          "b) 5 metros",
+          "c) 20 metros",
+          "d) 15 metros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 20 metros)[cite: 199]."
+      },
+      {
+        question: "5) Si con la regla de nuestra brújula, que está marcada en milímetros, medimos 75 ¿qué distancia habremos recorrido sobre el terreno si nuestro plano tiene una escala de 1/15.000?",
+        options: [
+          "a) 1.125 metros",
+          "b) 1.250 metros",
+          "c) 1.150 metros",
+          "d) 1.525 metros"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1.125 metros)[cite: 199]."
+      },
+      {
+        question: "6) Estamos en un punto (A) que se encuentra a una altitud de 650 m.s.n.m y queremos ir a un punto (B) que se encuentra a una altitud de 800 m.s.n.m. Si entre los dos puntos hay una separación de 425 metros, ¿qué pendiente (%), aproximada, tendremos que salvar para llegar del punto A al punto B?",
+        options: [
+          "a) 17%",
+          "b) 35%",
+          "c) 41%",
+          "d) 29%"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 35%)[cite: 199]."
+      },
+      {
+        question: "7) Si en nuestro mapa medimos 12 cm y recorremos sobre el terreno 550 metros, estaremos ante un mapa de escala:",
+        options: [
+          "a) 1/4.583",
+          "b) 1/5.000",
+          "c) 1/7.500",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 1/4.583)[cite: 199]."
+      },
+      {
+        question: "8) Nos encontramos en un punto a 250 m.s.n.m y queremos ir a otro punto que sabemos que está a 300 m.s.n.m. La distancia medida en plano de esos dos puntos son 6 cm y sabemos que la escala de nuestro plano es 1/10.000 ¿Qué pendiente aproximada (%) tendremos que salvar para alcanzar el punto que se sitúa a 300 m.s.n.m?",
+        options: [
+          "a) 10%",
+          "b) 12%",
+          "c) 6%",
+          "d) 8%"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 8%)[cite: 199]."
+      },
+      {
+        question: "9) Siguiendo con el ejercicio anterior, ¿qué pendiente aproximada nos daría si nuestro plano fuese escala 1/20.000?",
+        options: [
+          "a) 16.5%",
+          "b) 4%",
+          "c) 12%",
+          "d) 10%"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4%)[cite: 199]."
+      },
+      {
+        question: "10) Disponemos de un curvímetro al que se le ha marcado una escala determinada. Lo hacemos rodar por nuestro plano indicándonos que en 5 cm de papel habríamos recorrido 300 metros sobre el terreno. ¿Qué escala le marcamos a nuestro aparato?",
+        options: [
+          "a) 1/10.000",
+          "b) 1/6.000",
+          "c) 1/5.000",
+          "d) 1/4.500"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1/6.000)[cite: 199]."
+      },
+      {
+        question: "11) Disponemos de un plano que nos indica una equidistancia de 5 metros. Sabemos que la distancia medida en plano entre las curvas maestras es de 4 cm y que nuestro plano está elaborado a escala 1/15.000. ¿qué pendiente(%) aproximada habría entre esas dos curvas?",
+        options: [
+          "a) 5%",
+          "b) 4%",
+          "c) 15%",
+          "d) 12%"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 4%)[cite: 199]."
+      },
+      {
+        question: "12) Si tenemos un plano a escala 1/25.000 y recorremos sobre el terreno 10.000 metros ¿qué distancia representarán esos 10.000 m sobre el plano?",
+        options: [
+          "a) 25 cm",
+          "b) 10 cm",
+          "c) 40 cm",
+          "d) 20 cm"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 40 cm)[cite: 199]."
+      },
+      {
+        question: "13) La distancia entre dos puntos medidos en el plano es de 13 cm. Estamos en un punto donde nuestro altímetro nos marca 675 m.s.n.m. Comenzamos a descender hasta llegar al inicio de un camino en el que el altímetro nos marca 425 m.s.n.m. Queremos saber la pendiente del terreno, sabiendo que nuestro plano está elaborado en una escala 1/5.000 Esta pendiente será de aproximadamente un:",
+        options: [
+          "a) 38.5%",
+          "b) 35.5%",
+          "c) 30%",
+          "d) 32%"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 38.5%)[cite: 199]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 11),
+      "t1_b2": test1Questions.slice(11, 21),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 7),
+      "t2_b2": test2Questions.slice(7, 13)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 24 - CARTOGRAFÍA, SIG, TELECOMUNICACIONES E INFORMACIÓN AMBIENTAL (COMPLETO 34 PREGUNTAS)",
+        "t1_all": "TEST Nº 1 - TEÓRICO (COMPLETO 21 PREGUNTAS)",
+        "t1_b1": "TEST Nº 1 - BLOQUE 1 (PREGUNTAS 1 A 11)",
+        "t1_b2": "TEST Nº 1 - BLOQUE 2 (PREGUNTAS 12 A 21)",
+        "t2_all": "TEST Nº 2 - PRÁCTICO (COMPLETO 13 PREGUNTAS)",
+        "t2_b1": "TEST Nº 2 - BLOQUE 1 (PREGUNTAS 1 A 7)",
+        "t2_b2": "TEST Nº 2 - BLOQUE 2 (PREGUNTAS 8 A 13)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

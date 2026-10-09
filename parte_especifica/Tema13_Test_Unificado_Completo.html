@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 13 (Caza y Pesca Continental)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 13 Unificado Completo (99 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 13.1 (29 Preguntas)">
+          <option value="t1_all">Test 13.1 - Completo (1 - 29)</option>
+          <option value="t1_b1">Test 13.1 - Bloque 1 (1 - 15)</option>
+          <option value="t1_b2">Test 13.1 - Bloque 2 (16 - 29)</option>
+        </optgroup>
+        <optgroup label="Test 13.2 (20 Preguntas)">
+          <option value="t2_all">Test 13.2 - Completo (1 - 20)</option>
+          <option value="t2_b1">Test 13.2 - Bloque 1 (1 - 10)</option>
+          <option value="t2_b2">Test 13.2 - Bloque 2 (11 - 20)</option>
+        </optgroup>
+        <optgroup label="Infracciones y Sanciones (25 Preguntas)">
+          <option value="t3_all">Infracciones/Sanciones - Completo (1 - 25)</option>
+          <option value="t3_b1">Infracciones/Sanciones - Bloque 1 (1 - 13)</option>
+          <option value="t3_b2">Infracciones/Sanciones - Bloque 2 (14 - 25)</option>
+        </optgroup>
+        <optgroup label="Supuesto Práctico (25 Preguntas)">
+          <option value="t4_all">Supuesto Práctico - Completo (1 - 25)</option>
+          <option value="t4_b1">Supuesto Práctico - Bloque 1 (1 - 13)</option>
+          <option value="t4_b2">Supuesto Práctico - Bloque 2 (14 - 25)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 13 - CAZA Y PESCA CONTINENTAL (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1. Según el Reglamento de Ordenación de la Caza, la solicitud de constitución de un coto será resuelta por:",
+        options: [
+          "a) El titular del órgano territorial competente para los tres tipos de coto de caza",
+          "b) El titular del órgano territorial competente para los cotos privados y los cotos intensivos, correspondiéndole al titular de la Dirección General competente en materia de caza la resolución de constitución de los cotos deportivos",
+          "c) El titular del órgano territorial competente para los cotos privados y los cotos deportivos, correspondiéndole al titular de la Dirección General competente en materia de caza la resolución de constitución de los cotos intensivos",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 242]."
+      },
+      {
+        question: "2. Según el artículo 16 del Reglamento de Ordenación de la Caza, la vigencia de los planes técnicos de caza será de:",
+        options: [
+          "a) 1, 3 o 5 años",
+          "b) 5 años",
+          "c) Indefinida, en los casos de planes técnicos sometidos a régimen de evaluación continua",
+          "d) b y c son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: b y c son correctas)[cite: 242]."
+      },
+      {
+        question: "3. El artículo 14 del Reglamento de Ordenación de la Caza establece la obligación de presentar una memoria de actividades cinegética. Con respecto a esta memoria, señale la respuesta CORRECTA:",
+        options: [
+          "a) Esta memoria se presentará anualmente, antes del 15 de julio y la no presentación conllevará la posibilidad de la suspensión de la actividad cinegética",
+          "b) Esta memoria se presentará anualmente antes del 15 de junio y la no presentación conllevará la posibilidad de suspensión de la actividad cinegética",
+          "c) Esta memoria se presentará anualmente antes del 15 de julio y la no presentación conllevará la posibilidad de la extinción de la condición de coto",
+          "d) Esta memoria se presentará anualmente antes del 15 de junio y la no presentación conllevará la posibilidad de extinción de la condición de coto"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "4. Según el artículo 48 del Reglamento de Ordenación de la Caza, NO será motivo para perder la condición de escenario de caza:",
+        options: [
+          "a) Qué los ejemplares objeto de suelta no procedan de granjas cinegéticas certificadas",
+          "b) Qué el titular cinegético no disponga de guías de origen y sanidad de las sueltas realizadas en la temporada de caza",
+          "c) Qué se lleven a cabo infracciones en materia de sueltas",
+          "d) Todo lo anterior es motivo para perder la condición de escenario de caza"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todo lo anterior es motivo para perder la condición de escenario de caza)[cite: 242]."
+      },
+      {
+        question: "5. Según establece el Reglamento de Ordenación de la Caza en su artículo 11, ¿cuál de las siguientes afirmaciones respecto a los Planes de caza por Áreas Cinegéticas NO es correcta?",
+        options: [
+          "a) Son los instrumentos básicos de planificación, ordenación y gestión cinegética en ámbitos territoriales considerados cinegéticos, que sean geográfica y ecológicamente homogéneos.",
+          "b) Se aprobarán por Orden de quien ostente la titularidad de la Consejería en materia de caza.",
+          "c) La iniciación de su elaboración le corresponde a la Dirección General competente en materia de caza.",
+          "d) Tendrán una vigencia de 10 años, pudiendo ser actualizados cada 5 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 242]."
+      },
+      {
+        question: "6. El artículo 18 del Reglamento de Ordenación de la Caza establece una serie de cuestion con respecto a las Zonas de Reserva. Indique la respuesta INCORRECTA:",
+        options: [
+          "a) Todos los planes técnicos de caza deben establecer zonas de reserva",
+          "b) En las zonas de reserva no podrá practicarse la caza ni cualquier actividad que afecte negativamente a las especies, incluida la adopción de las medidas de control de daños previstas en el artículo 66",
+          "c) El espacio destinado a zona de reserva ascenderá como mínimo al 5% de la superficie del coto, salvo para los cotos intensivos que será superior al 10%",
+          "d) La respuesta b y c son incorrectas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: La respuesta b y c son incorrectas)[cite: 242]."
+      },
+      {
+        question: "7. El Reglamento de Ordenación de la Caza, en su artículo 17, establece una serie de circunstancias y supuestos que determinan la necesidad de aprobar un nuevo plan técnico o por el contrario requiere únicamente su modificación. Indique para cuál de los siguientes supuestos NO es necesario la aprobación de un nuevo plan técnico:",
+        options: [
+          "a) Cuando se pretenda modificar el aprovechamiento principal",
+          "b) Cuando se quiera modificar una zona de reserva",
+          "c) Cuando se pretenda instalar un escenario de caza",
+          "d) Las respuesta b y c son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas b y c son correctas)[cite: 242]."
+      },
+      {
+        question: "8. Según el artículo 48.2 del Reglamento de Ordenación de la Caza, los escenarios de caza se clasifican en:",
+        options: [
+          "a) Escenarios de caza deportiva, para adiestramiento y entrenamiento de perros y/o aves de cetrería y los escenarios de caza intensiva",
+          "b) Escenarios de caza deportiva, para adiestramiento y entrenamiento de perros y/o aves de cetrería y para práctica de modalidades",
+          "c) Escenarios de caza privados, para adiestramiento y entrenamiento de perros y/o aves de cetrería y para práctica de modalidades",
+          "d) Escenarios de caza privados, escenarios de caza deportivos y para práctica de modalidades"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "9. Señale la respuesta INCORRECTA con respecto a las sueltas:",
+        options: [
+          "a) Se debe comunicar al órgano territorial provincial competente en materia de caza, con 10 días de antelación a su realización",
+          "b) Las especies objeto de suelta procederán de granjas cinegéticas autorizadas y certificadas o especies capturadas en otras partes del coto, siempre que en su plan técnico se contemple la captura en vivo",
+          "c) El plazo máximo entre suelta y la acción de la caza será de 34 horas",
+          "d) Todas las respuestas anteriores son incorrectas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son incorrectas)[cite: 242]."
+      },
+      {
+        question: "10. En cuanto al control de daños, la comunicación que se debe realizar al órgano territorial provincial competente será de:",
+        options: [
+          "a) Una antelación mínima de 15 días a su realización",
+          "b) Una antelación mínima de 10 días a su realización",
+          "c) Una antelación mínima de 20 días a su realización",
+          "d) Se comunicará en el plazo máximo de 10 días desde su realización"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Una antelación mínima de 10 días a su realización)[cite: 242]."
+      },
+      {
+        question: "11. ¿Cuál de las siguientes afirmaciones sobre cercados cinegéticos es CORRECTA?",
+        options: [
+          "a) Los cercados podrán ser de gestión y de prevención",
+          "b) Como norma general, su altura mínima será de 140 cm y la máxima de 250 cm",
+          "c) La superficie mínima permitida para la instalación de los cercados de prevención será de 2.000 hectáreas",
+          "d) Se podrán autorizar cercados de protección eléctricos, siempre que dispongan de una abertura inferior mínima de 35 cm de altura al suelo"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 242]."
+      },
+      {
+        question: "12. No es una modalidad de caza menor recogida en el Reglamento de Ordenación de la Caza:",
+        options: [
+          "a) Al salto",
+          "b) Perros en madriguera",
+          "c) En espera",
+          "d) Cetrería"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: En espera)[cite: 242]."
+      },
+      {
+        question: "13. En un coto cuya superficie es de 2.560 hectáreas ¿Cuántas monterías podríamos llevar a cabo en una temporada de caza?",
+        options: [
+          "a) 3",
+          "b) 2",
+          "c) 5",
+          "d) 6"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 5)[cite: 242]."
+      },
+      {
+        question: "14. Señale la respuesta incorrecta con respecto a la modalidad de aguardo nocturno:",
+        options: [
+          "a) Se trata de una modalidad de caza mayor",
+          "b) Lo podrán llevar a cabo un máximo de 2 personas cazadoras por cada 250 hectáreas y jornada",
+          "c) La distancia mínima entre puestos será de 150 metros",
+          "d) Podrá portarse y utilizarse una linterna en el momento del disparo, por motivos de seguridad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "15. Se quiere constituir un coto de caza cuya superficie abarca las provincias de Málaga y Granada. ¿A quién le corresponderá la resolución de la autorización para su instalación?:",
+        options: [
+          "a) Al titular de la Dirección General competente en materia de caza",
+          "b) Al titular del órgano periférico competente donde tenga establecida su residencia el titular del terreno que quiere pasar a ser cinegético",
+          "c) Al titular del órgano periférico competente en cuyo territorio se ubique el mayor número de hectáreas de la totalidad del terreno afectado",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 242]."
+      },
+      {
+        question: "16. ¿Cuál de las siguientes aves acuáticas NO es una especie declarada cazable en Andalucía?",
+        options: [
+          "a) Cerceta común",
+          "b) Ánade real",
+          "c) Agachadiza común",
+          "d) Cerceta pardilla"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cerceta pardilla)[cite: 242]."
+      },
+      {
+        question: "17. ¿Cuál de las siguientes especies NO está incluida como especie cazable en Andalucía?",
+        options: [
+          "a) Cabra montés",
+          "b) Muflón",
+          "c) Gamo",
+          "d) Todas son especies cazables en Andalucía"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas son especies cazables en Andalucía)[cite: 242]."
+      },
+      {
+        question: "18. ¿Cuál de las siguientes especies NO pueden ser objeto de caza en Andalucía?",
+        options: [
+          "a) Porrón pardo",
+          "b) Focha moruna",
+          "c) Garcilla cangrejera",
+          "d) Ninguna de estas especies puede ser objeto de caza en Andalucía"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna de estas especies puede ser objeto de caza en Andalucía)[cite: 242]."
+      },
+      {
+        question: "19. El Anexo III del Reglamento de Ordenación de la Caza establece las especies objeto de caza comercializables en Andalucía. Indique cuál de estas listas está integrada por especies comercializables:",
+        options: [
+          "a) Ciervo, muflón, jabalí, ánade real, conejo y faisán",
+          "b) Cabra montés, corzo, liebre, perdiz roja, pato cuchara y paloma zurita",
+          "c) Gamo, corzo, arruí, conejo, perdiz roja y codorniz",
+          "d) Gamo, muflón, jabalí, faisán y paloma torcaz"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 242]."
+      },
+      {
+        question: "20. Según la Orden de 13 de julio de 2007, con respecto a la señalización de terrenos. Señale la respuesta CORRECTA:",
+        options: [
+          "a) Todas las señales deben estar orientadas de forma que su contenido pueda verse desde el exterior del terreno señalizado, excepto las de la zona de seguridad que lo harán exclusivamente hacia el interior del terreno cinegético en que se encuentren",
+          "b) Las señales de primer orden estarán a una distancia no superior a 500 metros",
+          "c) Las dimensiones de las señales de segundo orden serán de 20x20 centímetros",
+          "d) Las señales de segundo orden en las zonas de reserva tendrán la parte superior derecha en blanco e inferior izquierda en rojo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 242]."
+      },
+      {
+        question: "21. La orden de 22 de Marzo de 2021, por la que se regula la práctica de la cetrería en la Comunidad Autónoma de Andalucía establece en su artículo 11 que las aves se podrán ceder de manera temporal o definitiva. Indique la respuesta correcta:",
+        options: [
+          "a) La cesión temporal supondrá un cambio temporal de titularidad en la Subsección de aves de cetrería por el tiempo que dure ésta",
+          "b) La cesión temporal no supondrá un cambio de titularidad en la Subsección de aves de cetrería, si bien no podrá superar los 6 meses de duración",
+          "c) La cesión temporal no supondrá un cambio de titularidad en la Subsección de aves de cetrería, si bien esta no podrá superar los 12 meses de duración",
+          "d) Cuando se trate de una cesión definitiva se deberá comunicar con el fin de que se produzca un cambio en los datos referentes al nombre de la persona receptora del ave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "22. Andalucía cuenta con una Red de Estaciones de Referencia que funcionan como centro-reservorio para la conservación, cría y repoblación de especies cinegéticas autóctonas de Andalucía. ¿Con qué número de estaciones de referencia cuenta el territorio andaluz?",
+        options: [
+          "a) 5",
+          "b) 3",
+          "c) 6",
+          "d) 4"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 3)[cite: 242]."
+      },
+      {
+        question: "23. Según la Orden de 2 de mayo de 2012, por la que se desarrollan las normas de control de subproductos animales no destinados al consumo humano y de sanidad animal, en la práctica cinegética de caza mayor de Andalucía, recoge en su artículo 6 que los subproductos de categoría 1 serán transportados a la planta de eliminación de material de dicha categoría en el plazo de:",
+        options: [
+          "a) A la mayor brevedad posible desde la celebración del evento",
+          "b) A la mayor brevedad posible, y siempre dentro de los 2 días hábiles siguientes a la celebración del evento",
+          "c) A la mayor brevedad posible, y siempre dentro de los 3 días hábiles siguientes a la celebración del evento",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "24. Según la Orden de 13 de enero de 2023, por la que se fijan y regulan las vedas y periodos hábiles de pesca continental, ¿Cuál de las siguientes especies no es una especie piscícola de captura y suelta?",
+        options: [
+          "a) Trucha común",
+          "b) Boga de río",
+          "c) Barbo",
+          "d) Albur"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Albur)[cite: 242]."
+      },
+      {
+        question: "25. ¿Cuál de las siguientes especies piscícolas tiene asignada una talla mínima para su pesca de 25 cm?",
+        options: [
+          "a) Capitán",
+          "b) Platija",
+          "c) Baila",
+          "d) a y b son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: a y b son correctas)[cite: 242]."
+      },
+      {
+        question: "26. Según la Ley 8/2003 de 28 de octubre de Flora y Fauna de Andalucía, los cotos de pesca se clasifican en:",
+        options: [
+          "a) cotos de pesca, cotos de pesca sin muerte y cotos de pesca deportiva",
+          "b) cotos de pesca, cotos de pesca sin muerte y cotos de pesca intensiva",
+          "c) cotos de pesca deportiva, cotos de pesca sin muerte, cotos de pesca intensivos",
+          "d) cotos de pesca deportiva, cotos de pesca tradicional, cotos de pesca de captura y suelta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 242]."
+      },
+      {
+        question: "27. Cazar sin licencia válida o con datos falsificados se considera una infracción administrativa que será sancionada con:",
+        options: [
+          "a) multa de 60 a 600 euros",
+          "b) multa de 601 a 4.000 euros",
+          "c) multa de 4.001 a 53.500 euros",
+          "d) ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: multa de 601 a 4.000 euros)[cite: 242]."
+      },
+      {
+        question: "28. La suelta de especies no autóctonas susceptibles de pesca continental sin autorización será sancionada con:",
+        options: [
+          "a) multa de 60 a 600 euros",
+          "b) multa de 601 a 4000 euros",
+          "c) multa de 4.001 a 53.500 euros",
+          "d) ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: multa de 4.001 a 53.500 euros)[cite: 242]."
+      },
+      {
+        question: "29. ¿A quién le corresponderá la imposición de la sanción en la pregunta anterior?",
+        options: [
+          "a) Al titular de la Consejería competente ya que el importe de la multa no excede de los 150.253 euros",
+          "b) A los Delegados Provinciales en todo caso",
+          "c) A los Delegados provinciales ya que se trata de una infracción grave",
+          "d) A los Delegados provinciales ya que se trata de una infracción leve"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: A los Delegados Provinciales en todo caso)[cite: 242]."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1. Señale la respuesta INCORRECTA, según el artículo 7 del Reglamento de Ordenación de la caza en Andalucía.",
+        options: [
+          "a) La adopción de medidas cinegéticas excepcionales le corresponde a cada Delegación Territorial competente en materia de caza.",
+          "b) Estas medidas tendrán que estar debidamente justificadas, delimitándose la zona afectada y el tiempo por el que se adoptan.",
+          "c) La obligación a un terreno cinegético de acogerse a un régimen de evaluación continua de su plan técnico es una de las posibles medidas excepcionales a adoptar.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 243]."
+      },
+      {
+        question: "2. Según el artículo 14 del ROC (Reglamento de Ordenación de la Caza), que nos habla de la memoria anual de la actividad cinegética. ¿Cuál de los citados NO es un dato a incluir en ella?",
+        options: [
+          "a) Los resultados de todas las capturas obtenidas, tanto en el periodo general como en la media veda, según especie y modalidad, incluidas las procedentes del control de daños.",
+          "b) Número de cacerías celebradas según sus modalidades y número de participantes en cada una de ellas.",
+          "c) Repoblaciones y sueltas efectuadas.",
+          "d) Todos los anteriores son datos a incluir en la memoria anual."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 243]."
+      },
+      {
+        question: "3. ¿Cuál de las siguientes afirmaciones acerca del régimen de evaluación continua de los planes técnicos de caza ES CIERTA, según el artículo 15 del ROC?",
+        options: [
+          "a) Las personas o entidades titulares del aprovechamiento cinegético podrán adscribir sus planes técnicos a este régimen cuando se trata de cotos intensivos o deportivos o con escenarios de caza para la práctica de modalidades.",
+          "b) Se trata de un sistema de gestión de los aprovechamientos cinegéticos que garantiza un seguimiento actualizado e individualizado de la programación, implementación y control de la actividad cinegética prevista en el plan técnico.",
+          "c) Cuando existan circunstancias excepcionales de carácter biológico, sanitario o cinegético que lo justifiquen, la Consejería competente en materia de caza podrá acordar la adscripción obligatoria de determinados planes técnicos a este régimen.",
+          "d) Todas son ciertas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 243]."
+      },
+      {
+        question: "4. ¿En cuál de los siguientes supuestos, según el artículo 17 del ROC, se requiere la aprobación de un nuevo plan técnico?",
+        options: [
+          "a) Cuando se produzcan modificaciones en la base territorial de un coto que afecte a una extensión igual o superior al 25% de la superficie del mismo.",
+          "b) Cuando se solicite la modificación del aprovechamiento principal.",
+          "c) Cuando sea necesario introducir medidas correctoras de desequilibrios producidos por incumplimientos de las condiciones de la resolución aprobatoria del plan técnico de caza en vigor.",
+          "d) a y b son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cuando se solicite la modificación del aprovechamiento principal)[cite: 243]."
+      },
+      {
+        question: "5. Según el art. 20 del ROC, las especies objeto de caza se encuentran recogidas en la Ley 8/2003 de Flora y Fauna de Andalucía, más concretamente en su:",
+        options: [
+          "a) Anexo II, y su modificación se realiza mediante Orden del Titular de la Consejería competente en materia de caza.",
+          "b) Anexo II, y su modificación se realiza mediante Resolución de la Dirección General competente en materia de caza.",
+          "c) Anexo III, y su modificación se realiza mediante Orden del Titular de la Consejería competente en materia de caza.",
+          "d) Anexo III, y su modificación se realiza mediante Resolución de la Dirección General competente en materia de caza."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 243]."
+      },
+      {
+        question: "6. Señale la respuesta INCORRECTA con respecto a la señalización de terrenos:",
+        options: [
+          "a) Los propietarios de los terrenos cinegéticos deberán señalizarlos mediante indicadores que den a conocer su condición, en el plazo máximo de un mes, contado a partir de la fecha de declaración de los mismos",
+          "b) Cuando los terrenos pierdan o varíen su condición cinegética, los propietarios de los terrenos cinegéticos deberán retirar o restituir en su caso, la señalización que proceda en el plazo máximo de un mes, contado a partir de que se haya presentado la solicitud.",
+          "c) Las clases, características y formato de la señalización, así como sus modificaciones, se establecerán mediante Resolución del titular de la Dirección General competente en materia de caza.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 243]."
+      },
+      {
+        question: "7. Según la Orden de 13 de Julio de 2007, por la que se desarrollan determinados aspectos del Decreto 182/2005, de 26 de julio, por el que se aprueba el Reglamento de Ordenación de la Caza, las señales de segundo orden consistentes en rótulos complementarios de las señales de primer orden contendrán letras mayúsculas de dimensiones:",
+        options: [
+          "a) Mínimas de 15 cm de alto por 3 de ancho",
+          "b) Máximas de 10 cm de alto por 5 de ancho",
+          "c) Máximas de 15 cm de alto por 5 de ancho",
+          "d) Ninguna respuesta anterior es correcta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Mínimas de 15 cm de alto por 3 de ancho)[cite: 243]."
+      },
+      {
+        question: "8. Indique la respuesta CORRECTA sobre las Reservas Andaluzas de Caza:",
+        options: [
+          "a) La titularidad cinegética le corresponde a la administración de la Junta de Andalucía.",
+          "b) Su gestión y administración le corresponde a la Consejería competente en materia de caza",
+          "c) En cada Reserva Andaluza de caza se constituirá una Junta Consultiva Adscrita al órgano territorial provincial donde radique la misma.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)[cite: 243]."
+      },
+      {
+        question: "9. Según el Reglamento de Ordenación de la Caza, la declaración de las Zonas de Caza Controlada se hará por:",
+        options: [
+          "a) Ley de Parlamento, donde se determinarán sus límites, superficie y plazo de vigencia.",
+          "b) Orden del titular de la Consejería competente en materia de caza, donde se determinarán sus límites y el plazo de vigencia.",
+          "c) Orden del titular de la Consejería competente en materia de caza, donde se determinarán sus límites, superficie y plazo de vigencia.",
+          "d) Orden del titular de la Consejería competente en materia de caza, donde se determinarán sus límites, superficie y el procedimiento para la modificación de sus límites, así como el plazo de vigencia."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 243]."
+      },
+      {
+        question: "10. Según el artículo 37 del ROC, la definición del aprovechamiento principal de un coto se realizará en función de:",
+        options: [
+          "a) Hectáreas de terreno cinegético y de las poblaciones de especies cinegéticas que habitan en el mismo",
+          "b) Usos que se venían realizando en estos terrenos",
+          "c) Las modalidades de caza que se practiquen",
+          "d) Las respuestas a y c son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas a y c son correctas)[cite: 243]."
+      },
+      {
+        question: "11. Indique la respuesta INCORRECTA acerca de los escenarios de caza para la práctica de modalidades, recogidos en el artículo 51 del ROC:",
+        options: [
+          "a) Para la constitución de este tipo de escenarios de caza el titular cinegético deberá contar con un plan de gestión y mejora, para la adopción de medidas que favorezcan la diversidad del paisaje y beneficien la presencia de hábitats adecuados tanto para la fauna cinegética como no cinegética.",
+          "b) Se perderá la condición de este tipo de escenarios y serán dados de baja por la Consejería competente en materia de caza, si de su gestión se derivasen daños a especies incluidas en el Listado Andaluz de Especies Silvestres en Régimen de Protección Especial.",
+          "c) En estos escenarios de caza se podrá realizar el adiestramiento y entrenamiento de perros y/o de aves de cetrería.",
+          "d) Deberá disponer de un Libro de Registro donde se anoten las entradas, adjuntando en el mismo copia de las guías de origen y sanidad pecuaria, que estará a disposición de los agentes de la autoridad que lo requieran."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 243]."
+      },
+      {
+        question: "12. En cuanto al informe de viabilidad, en el que se justifica la necesidad de la repoblación, éste NO deberá contener:",
+        options: [
+          "a) Las posibles causas del declive poblacional de la especie a repoblar.",
+          "b) La fecha en la que se realizará la repoblación.",
+          "c) El lugar del terreno cinegético donde se realizará la repoblación.",
+          "d) Medidas para paliar el posible impacto que la repoblación pudiera tener sobre el medio."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 243]."
+      },
+      {
+        question: "13. El artículo 71 del ROC, en su punto 5, establece en cuanto a la posibilidad de autorizar la utilización de cercados de protección eléctricos que deberán disponer de una abertura inferior mínima de:",
+        options: [
+          "a) 30 centímetros de altura al suelo",
+          "b) 35 centímetros de altura al suelo",
+          "c) 40 centímetros de altura al suelo",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 35 centímetros de altura al suelo)[cite: 243]."
+      },
+      {
+        question: "14. ¿Cuál de las siguientes afirmaciones acerca de los aguardos nocturnos es CIERTA?",
+        options: [
+          "a) Solo podrá realizarse en cotos de caza mayor",
+          "b) La distancia mínima a la linde de un coto de caza será de al menos 300 metros, salvo que se cuente con autorización expresa del titular del coto colindante",
+          "c) En la acción de cazar y en el momento del disparo podrá portarse y utilizarse una linterna, por motivos de seguridad.",
+          "d) Las respuestas b y c son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 243]."
+      },
+      {
+        question: "15. ¿Cuál de las siguientes especies NO está autorizada para la práctica de la cetrería en Andalucía?",
+        options: [
+          "a) Buteo buteo",
+          "b) Bubo bubo bengalensis",
+          "c) Aquila fasciata",
+          "d) Hieraaetus pennatus"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Aquila fasciata)[cite: 243]."
+      },
+      {
+        question: "16. Según la Orden de 13 de enero de 2023, por la que se fijan las vedas, periodos hábiles y condiciones del ejercicio de la pesca continental recreativa y deportiva en Andalucía, el periodo hábil de pesca para cada temporada del barbo será:",
+        options: [
+          "a) Desde el 1 de mayo al 31 de enero ambos inclusive",
+          "b) Desde el 1 de julio al 25 de febrero ambos inclusive",
+          "c) Desde el 1 de marzo al 31 de enero ambos inclusive",
+          "d) Desde el 1 de junio al 25 de febrero ambos inclusive"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Desde el 1 de julio al 25 de febrero ambos inclusive)[cite: 243]."
+      },
+      {
+        question: "17. ¿Cuál de las siguientes afirmaciones acerca de los medios auxiliares recogidos en la Orden de 13 de enero es CORRECTA?",
+        options: [
+          "a) El empleo de estos medios auxiliares estará sujeto a las limitaciones que establezcan las autoridades con competencia en pesca.",
+          "b) Se considera medio auxiliar de pesca aquél que se utiliza para la captura de los ejemplares y complementa al arte de pesca permitido, facilitando su manejo, la ejecución del lance o el acceso a zonas de pesca inaccesibles desde orilla.",
+          "c) Se prohíbe el uso de luces artificiales, ondas y cualquier tipo de aparato de localización, sonar o buscador de peces, instalados en las embarcaciones o medios de navegación o flotación.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 243]."
+      },
+      {
+        question: "18. El art. 6 de la citada Orden prohíbe la pesca continental desde la orilla o medio auxiliar a las entradas y salidas de escalas para peces y otras estructuras construidas para el paso de peces, así como de las infraestructuras de una presa, tanto aguas arriba como aguas abajo de la misma a una distancia mínima de éstas de:",
+        options: [
+          "a) 100 metros",
+          "b) 200 metros",
+          "c) 300 metros",
+          "d) 400 metros"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 200 metros)[cite: 243]."
+      },
+      {
+        question: "19. Según el art 80 de la Ley 8/2003 de Flora y Fauna de Andalucía establece que superar las capturas previstas en el plan técnico de pesca en aguas aptas para la trucha común conlleva una multa de irá de los:",
+        options: [
+          "a) 60 a 600 euros",
+          "b) 601 a 6.000 euros",
+          "c) 6.001 a 53.500 euros",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ninguna respuesta es correcta)[cite: 243]."
+      },
+      {
+        question: "20. ¿Cuál de las siguientes NO es una medida de prevención para evitar la propagación de especies exóticas, según lo recogido en el artículo 11 de la Orden de 13 de enero?",
+        options: [
+          "a) Tras su uso, deberá procederse al vaciado de restos de agua de los equipos (botas, embarcaciones, cubos, cañas, redes) en el mismo lugar de pesca.",
+          "b) Todos los elementos del equipo deben ser limpiados mediante lavado con agua caliente a presión a temperatura superior a 60°C o bien, fumigando o sumergiéndolos en una solución desinfectante de 3 o 4 gotas de lejía por litro de agua.",
+          "c) Se desaconseja el uso de botas con suelas de fieltro para la práctica de la pesca en aguas continentales. En caso de usarse, deberán ser limpiadas con solución desinfectante antes de entrar en cualquier otra masa de agua.",
+          "d) Todas las respuestas anteriores son medidas de prevención contenidas en la Orden"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 243]."
+      }
+    ];
+
+    const test3Questions = [
+      {
+        question: "1. Cazar en terrenos no cinegéticos sin haber cobrado pieza se considera una infracción en materia de caza:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "2. Pescar con documentación falsificada se considera en materia de pesca continental:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "3. Cazar cuando por determinadas condiciones excepcionales de niebla, lluvia, nevada y humo se reduzca la visibilidad, mermando la posibilidad de defensa de las piezas o se pongan en peligro personas o bienes se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "4. Cazar sin tener aprobado el correspondiente plan técnico de caza es:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "5. Pescar en el interior de las escalas para los peces se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "6. La destrucción intencionada o el robo de vivares o nidos de especies cinegéticas es una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "7. La inexistencia de rejillas en las tomas o salidas de derivación de aguas es una infracción en materia de pesca:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "8. Impedir a la autoridad o a sus agentes el acceso a un coto de pesca o a su documentación en supuestos de inspección es una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "9. La instalación de cercados cinegéticos sin autorización se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "10. Pescar con armas de fuego o aire comprimido es un infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "11. Pescar sin estar en posesión de licencia administrativa o sin el correspondiente permiso en el caso de cotos de pesca es:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "12. Cazar desde aeronaves, embarcaciones y vehículos o cualquier otro medio de locomoción terrestre se considera en materia de caza:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "13. Cortar las servidumbres de paso por las riberas y márgenes se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "14. Cazar sirviéndose de animales o vehículos como medio de ocultación es una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "15. El empleo de más de tres perros por cazador se considera una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "16. Cazar fuera del periodo comprendido entre una hora antes de la salida del sol y una hora después de su puesta, salvo autorización:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "17. Pescar fuera del periodo comprendido entre una hora antes de la salida del sol y una hora después de su puesta, salvo autorización:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "18. Cazar sin contrato de seguro obligatorio se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "19. Cazar estando inhabilitado para ello es:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "20. Obstaculizar las servidumbres de paso por las riberas y márgenes en materia de pesca es una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "21. Negarse a la inspección de los agentes de la autoridad para examinar morrales, armas, interior de vehículos u otros útiles, al ser requerido en forma por tales agentes, en materia de caza es:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "22. El libre deambular de perros de caza en cotos sin tanganillo durante la veda se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Leve)[cite: 244]."
+      },
+      {
+        question: "23. La suelta de especies no autóctonas susceptibles de pesca continental sin autorización es:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      },
+      {
+        question: "24. Cazar en época de veda se considera:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 244]."
+      },
+      {
+        question: "25. El transporte o comercialización de especies cazables no comercializables es una infracción:",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Muy grave)[cite: 244]."
+      }
+    ];
+
+    const test4Questions = [
+      {
+        question: "1. De acuerdo con el artículo 86 del Reglamento de Ordenación de la Caza en Andalucía (en adelante ROC, Decreto 126/2017), ¿con qué antelación mínima debe el titular de un coto comunicar la realización de una acción colectiva de caza mayor, como una montería de jabalí, al órgano territorial provincial competente en materia de caza?",
+        options: [
+          "a) Con una antelación mínima de 10 días hábiles",
+          "b) Con una antelación mínima de 15 días hábiles",
+          "c) Con una antelación mínima de 10 días naturales",
+          "d) Con una antelación mínima de 15 días naturales"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Con una antelación mínima de 15 días hábiles)[cite: 245]."
+      },
+      {
+        question: "2. De conformidad con el artículo 93 del Reglamento de Ordenación de la Caza en Andalucía (ROC), ¿a qué distancia mínima deberán situarse los puestos de tiro durante una montería, si las características morfológicas del terreno impiden aprovechar el relieve para garantizar la integridad física de los participantes?",
+        options: [
+          "a) Al menos a 150 metros",
+          "b) Al menos a 100 metros",
+          "c) Al menos a 50 metros",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 245]."
+      },
+      {
+        question: "3. En el caso de que los ejemplares de jabalí abatidos en la montería vayan a ser comercializados para consumo humano, ¿quién es la persona responsable de realizar el primer examen de las piezas en la junta de carnes, según el artículo 10 del Decreto 196/2024, (que regula las condiciones sanitarias de la carne de caza en Andalucía con destino a consumo humano?",
+        options: [
+          "a) La persona cazadora formada",
+          "b) La persona veterinaria autorizada en actividades cinegéticas",
+          "c) La persona veterinaria oficial",
+          "d) Las respuestas a y b son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: La persona veterinaria autorizada en actividades cinegéticas)[cite: 245]."
+      },
+      {
+        question: "4. En virtud del artículo 10 del Decreto 196/2024, ¿cuál es el plazo máximo establecido para realizar el primer examen de las piezas de jabalí cobradas, contado a partir de su llegada a la junta de carnes?",
+        options: [
+          "a) 20 minutos",
+          "b) 30 minutos",
+          "c) 60 minutos",
+          "d) 120 minutos"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 30 minutos)[cite: 245]."
+      },
+      {
+        question: "5. Usted se encuentra presente durante ese primer examen. Mientras observa un ejemplar macho adulto de jabalí que yace en el suelo, recuerda, gracias a sus años de opositor, que estos presentan una dentición compuesta por:",
+        options: [
+          "a) 44 dientes, de los cuales 4 son caninos, dos inferiores denominados amoladeras y dos superiores denominados navajas.",
+          "b) 44 dientes, de los cuales 4 son caninos, dos inferiores denominados navajas y dos superiores denominados amoladeras.",
+          "c) 42 dientes, de los cuales 4 son caninos, dos inferiores denominados navajas y dos superiores denominados amoladeras.",
+          "d) 40 dientes, de los cuales 4 son caninos, dos inferiores denominados amoladeras y dos superiores denominados navajas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 245]."
+      },
+      {
+        question: "6. En la montería se van a utilizar rehalas como medio auxiliar, en concreto van a participar 5 rehalas. ¿qué número mínimo de perros adultos nos hemos de encontrar en la actividad cinegética, en virtud del art 84 del ROC?",
+        options: [
+          "a) 60",
+          "b) 72",
+          "c) 80",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 80)[cite: 245]."
+      },
+      {
+        question: "7. Su compañero no recuerda muy bien los datos que tenían que constar en la chapa identificativa de cada uno de los perros que componen la rehala. Usted se lo recuerda, indicándole, según el mismo art al que hace referencia la pregunta anterior, que la chapa debe indicar, al menos:",
+        options: [
+          "a) El nombre del titular, un teléfono de contacto, el número de identificación registral de medio auxiliar (NIRA) y número de sistema de marcaje.",
+          "b) El nombre del titular, el número de identificación registral de medio auxiliar (NIRA) y número de sistema de marcaje.",
+          "c) El nombre del titular, un teléfono de contacto y el número de identificación registral de medio auxiliar (NIRA)",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 245]."
+      },
+      {
+        question: "8. ¿Qué superficie del terreno acotado podría quedarse fuera del perímetro del cercado en este caso, si se contase con la autorización correspondiente de la administración, según el artículo 69 del ROC?",
+        options: [
+          "a) Un 15%",
+          "b) Un 5%",
+          "c) No más de 250 hectáreas",
+          "d) Las respuestas b y c son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: No más de 250 hectáreas)[cite: 245]."
+      },
+      {
+        question: "9. ¿Cuántas monterías, como máximo, se podrán celebrar en el coto El Conde durante el periodo hábil de caza, según el art 86.3 del ROC?",
+        options: [
+          "a) 6",
+          "b) 5",
+          "c) 8",
+          "d) 4"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 6)[cite: 245]."
+      },
+      {
+        question: "10. ¿Podrán celebrarse ambas actividades cinegéticas, según el art 86.5.e)?",
+        options: [
+          "a) Sí, se podrán celebrar, pues la separación temporal entre la montería y la batida lo permite.",
+          "b) No, pues la separación temporal y física entre la montería y la batida no lo permite.",
+          "c) No, al estar las lindes a 450 metros y no haber pasado más de 15 días naturales entre ambas actividades.",
+          "d) Sí, pero solo si se cuenta con autorización excepcional del órgano territorial provincial."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 245]."
+      },
+      {
+        question: "11. ¿Está incumpliendo algún precepto legal, según el Título IV, Capítulo II de la Ley 8/2003 de flora y fauna de Andalucía?",
+        options: [
+          "a) No, ya que, aunque se encuentra en una zona de seguridad, no está haciendo uso del arma, se limita a portarla.",
+          "b) No, ya que la norma señala que lo prohibido es disparar desde o en dirección hacia la zona de seguridad.",
+          "c) Sí, ya que en las zonas de seguridad no se puede portar armas cargadas o con munición en su recámara",
+          "d) Las respuestas a y b son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 245]."
+      },
+      {
+        question: "12. Se le requiere revisar el morral que porta y, aunque al principio se muestra un tanto reticente, se le advierte que este hecho se considera una infracción en materia de caza, en concreto se considera una infracción (Ley 8/2003 flora y fauna):",
+        options: [
+          "a) Leve",
+          "b) Grave",
+          "c) Muy grave"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Grave)[cite: 245]."
+      },
+      {
+        question: "13. En cuanto a la señalización del coto, las señales del terreno cinético deben tener unas dimensiones, según la Orden de 13 de julio de 2007 de:",
+        options: [
+          "a) 30 centímetros de alto por 50 centímetros de ancho, las de primer orden",
+          "b) 33 centímetros de ancho por 20 centímetros de alto, las de segundo orden",
+          "c) Ambas respuestas son correctas",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 245]."
+      },
+      {
+        question: "14. ¿Qué extensión podrá tener este escenario, según el art 50 del ROC?",
+        options: [
+          "a) Máxima de 50 has",
+          "b) Máxima de 15 has",
+          "c) Mínimo de 50 y máxima de 200 has continuas",
+          "d) Mínima de 15 has"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Máxima de 15 has)[cite: 245]."
+      },
+      {
+        question: "15. En este caso, este escenario, ¿deberá estar cercado en todo su perímetro, de forma que se establezca una delimitación permanente del mismo, según el art 50 del ROC?",
+        options: [
+          "a) Sí, siempre",
+          "b) No, nunca",
+          "c) No, entre los meses de julio y diciembre, ambos inclusive",
+          "d) Si, entre los meses de julio y diciembre, ambos inclusive"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 245]."
+      },
+      {
+        question: "16. ¿Cuál es el cupo máximo de capturas establecido en el art 13 de la Orden de 5 de julio de 2018 para conejo?",
+        options: [
+          "a) Un cupo de 3 piezas por persona cazadora y día durante todo el periodo hábil de la especie",
+          "b) Un cupo de 5 piezas por persona cazadora y día durante el periodo hábil del mes de noviembre",
+          "c) Un cupo de 5 piezas por persona cazadora y día durante todo el periodo hábil de la especie",
+          "d) Un cupo de 3 piezas por persona cazadora y día durante el periodo hábil del mes de noviembre."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 245]."
+      },
+      {
+        question: "17. En este mismo coto, se caza perdiz roja (Alectoris rufa) en la modalidad de reclamo macho. La Orden a la que hace referencia la pregunta anterior establece, para la ejecución de esta modalidad, unas distancias mínimas en su práctica. Señale la respuesta CORRECTA:",
+        options: [
+          "a) La distancia mínima desde el puesto hasta la linde más próxima del propio coto de caza será de 250 metros y la distancia mínima entre puestos de 150 metros.",
+          "b) La distancia mínima desde el puesto hasta la linde más próxima del propio coto de caza será de 250 metros y la distancia mínima entre puestos de 200 metros.",
+          "c) La distancia mínima desde el puesto hasta la linde más próxima del propio coto de caza será de 250 metros y la distancia mínima entre puestos de 250 metros.",
+          "d) La distancia mínima desde el puesto hasta la linde más próxima del propio coto de caza será de 200 metros y la distancia mínima entre puestos de 150 metros."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)[cite: 245]."
+      },
+      {
+        question: "18. Siguiendo con la especie anterior, ¿qué periodo de incubación tiene el huevo?",
+        options: [
+          "a) Entre 20 y 21 días",
+          "b) Entre 23 y 24 días",
+          "c) Entre 27 y 28 días",
+          "d) Entre 32 y 33 días"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Entre 23 y 24 días)[cite: 245]."
+      },
+      {
+        question: "19. La perdiz roja es una especie comercializable, y como tal, está recogida en el Anexo III del ROC. Señale que especies de caza menor también lo son junto con la ella:",
+        options: [
+          "a) Conejo, codorniz, liebre, faisán y ánade real",
+          "b) Conejo, liebre, becada, faisán, ánade real y ánade friso",
+          "c) Codorniz, liebre, conejo y ánade real",
+          "d) Codorniz, becada, conejo, faisán y el ánade real"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)[cite: 245]."
+      },
+      {
+        question: "20. ¿En qué anexo de la Orden de 23 de enero de 2023 tendrá que estar recogido el coto objeto de inspección?",
+        options: [
+          "a) Anexo I",
+          "b) Anexo II",
+          "c) Anexo III",
+          "d) Anexo IV"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Anexo II)[cite: 245]."
+      },
+      {
+        question: "21. ¿Está haciendo un uso correcto de las cañas, según la Orden de 23 de enero?",
+        options: [
+          "a) No, porque en las aguas trucheras solo se puede utilizar una caña por persona pescadora",
+          "b) Sí en cuanto al número de cañas, ya que no se está pescado en aguas consideradas aguas trucheras, y por lo tanto se permite el uso de dos cañas por persona pescadora",
+          "c) Sí en cuanto a la separación entre cañas, ya que, en el caso de permitirse el uso de dos cañas por persona pescadora, la separación máxima entre ellas tendrá que ser de 10 metros.",
+          "d) Las respuestas b y c son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)[cite: 245]."
+      },
+      {
+        question: "22. En cuanto al cebo utilizado, ¿está incumpliendo algún precepto de la referida Orden?",
+        options: [
+          "a) Sí, ya que ésta indica que para la pesca de la trucha se permite únicamente el uso de cebos artificiales sin muerte",
+          "b) No, ya que para la pesca de la trucha arcoíris se permite el uso de todos los tipos de cebos de pesca autorizados.",
+          "c) No, ya que para la pesca de la trucha arcoíris la norma indica que se podrán utilizar tanto cebos naturales como artificiales.",
+          "d) Dependerá de lo que recoja el plan técnico del coto"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Dependerá de lo que recoja el plan técnico del coto)[cite: 245]."
+      },
+      {
+        question: "23. Y En cuanto a su ubicación, por su proximidad a una zona de paso o escala para peces ¿incumple la normativa en materia de pesca continental?",
+        options: [
+          "a) No, ya que la ley 8/2003 tipifica como infracción la acción de pescar con caña situado a menos de 10 metros de la entrada o salida de las escalas de peces.",
+          "b) Sí, ya que la ley 8/2003 tipifica como infracción leve la acción de pescar con caña situado, pescador o cebo, a menos de 20 metros de la entrada o salida de las escalas de peces",
+          "c) Sí, ya que la ley 8/2003 tipifica como infracción grave la acción de pescar con caña situado, pescador o cebo, a menos de 20 metros de la entrada o salida de las escalas de peces.",
+          "d) La ley 8/2003 de flora y fauna de Andalucía no tipifica la acción de pescar con caña situado, pescador o cebo, a una distancia determinada como infracción en materia de pesca continental."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 245]."
+      },
+      {
+        question: "24. Ante esta situación, ¿cuál de las siguientes es la respuesta o actuación CORRECTA que se debe comunicar al pescador, según el art 79 de la Ley 8/2003 de Flora y Fauna andaluza?",
+        options: [
+          "a) Pescar sin llevar consigo la documentación preceptiva es constitutivo de infracción leve, según la ley 8/2003, si no se presenta en los quince días naturales siguientes a la notificación de la apertura del expediente.",
+          "b) Pescar sin llevar consigo la documentación preceptiva es constitutivo de infracción leve, según la ley 8/2003, si no se presenta en los quince días hábiles siguientes a la notificación de la apertura del expediente.",
+          "c) Pescar sin llevar consigo la documentación preceptiva es constitutivo de infracción leve, según la ley 8/2003, si no se presenta en los diez días naturales siguientes a la notificación de la apertura del expediente.",
+          "d) Pescar sin llevar consigo la documentación preceptiva es constitutivo de infracción leve, según la ley 8/2003 si no se presenta en los diez días hábiles siguientes a la notificación de la apertura del expediente."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)[cite: 245]."
+      },
+      {
+        question: "25. La sanción impuesta en su caso a la infracción anterior tendría un plazo de prescripción, según el art 70 de la Ley 8/2003, de:",
+        options: [
+          "a) Un año",
+          "b) Dos años",
+          "c) Tres años",
+          "d) Seis meses"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Un año)[cite: 245]."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions,
+      ...test3Questions,
+      ...test4Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 15),
+      "t1_b2": test1Questions.slice(15, 29),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 10),
+      "t2_b2": test2Questions.slice(10, 20),
+      "t3_all": test3Questions,
+      "t3_b1": test3Questions.slice(0, 13),
+      "t3_b2": test3Questions.slice(13, 25),
+      "t4_all": test4Questions,
+      "t4_b1": test4Questions.slice(0, 13),
+      "t4_b2": test4Questions.slice(13, 25)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 13 - CAZA Y PESCA CONTINENTAL (COMPLETO 99 PREGUNTAS)",
+        "t1_all": "TEST 13.1 - COMPLETO (29 PREGUNTAS)",
+        "t1_b1": "TEST 13.1 - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t1_b2": "TEST 13.1 - BLOQUE 2 (PREGUNTAS 16 A 29)",
+        "t2_all": "TEST 13.2 - COMPLETO (20 PREGUNTAS)",
+        "t2_b1": "TEST 13.2 - BLOQUE 1 (PREGUNTAS 1 A 10)",
+        "t2_b2": "TEST 13.2 - BLOQUE 2 (PREGUNTAS 11 A 20)",
+        "t3_all": "INFRACCIONES Y SANCIONES - COMPLETO (25 PREGUNTAS)",
+        "t3_b1": "INFRACCIONES Y SANCIONES - BLOQUE 1 (PREGUNTAS 1 A 13)",
+        "t3_b2": "INFRACCIONES Y SANCIONES - BLOQUE 2 (PREGUNTAS 14 A 25)",
+        "t4_all": "SUPUESTO PRÁCTICO TEMA 13 - COMPLETO (25 PREGUNTAS)",
+        "t4_b1": "SUPUESTO PRÁCTICO TEMA 13 - BLOQUE 1 (PREGUNTAS 1 A 13)",
+        "t4_b2": "SUPUESTO PRÁCTICO TEMA 13 - BLOQUE 2 (PREGUNTAS 14 A 25)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

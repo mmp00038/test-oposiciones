@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 11 (Selvicultura y Tratamientos Selvícolas)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 11 Unificado Completo (65 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 11-1 - Test Básico N.º 1 (45 Preguntas)">
+          <option value="t1_all">Test 11-1 - Completo (1 - 45)</option>
+          <option value="t1_b1">Test 11-1 - Bloque 1 (1 - 22)</option>
+          <option value="t1_b2">Test 11-1 - Bloque 2 (23 - 45)</option>
+        </optgroup>
+        <optgroup label="Test 11-2 - Autoevaluación N.º 1 (20 Preguntas)">
+          <option value="t2_all">Test 11-2 - Completo (1 - 20)</option>
+          <option value="t2_b1">Test 11-2 - Bloque 1 (1 - 10)</option>
+          <option value="t2_b2">Test 11-2 - Bloque 2 (11 - 20)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 11 - SELVICULTURA Y TRATAMIENTOS SELVÍCOLAS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- El artículo 6 de la Ley 43/2003, de 21 de noviembre, de Montes, establece que la definición: \"conjunto de técnicas que tratan de la conservación, mejora, aprovechamiento y regeneración o, en su caso, restauración, de las masas forestales\", corresponde a:",
+        options: [
+          "a) Arboricultura",
+          "b) Selvicultura",
+          "c) Aprovechamiento forestal",
+          "d) Turno"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Selvicultura)."
+      },
+      {
+        question: "2.- Cuando hablamos de: \"espacio de superficie variable, pero con constancia de las características de masa y estación, y por tanto de tratamiento\", nos estamos refiriendo a:",
+        options: [
+          "a) Masa forestal",
+          "b) Monte",
+          "c) Rodal",
+          "d) Bosquete"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Rodal)."
+      },
+      {
+        question: "3.- ¿Cuál de las siguientes sería la \"estación\" de una especie forestal?",
+        options: [
+          "a) Lugar geográfico en el que habita una especie",
+          "b) Edad que alcanzan los individuos de una especie, en condiciones normales dentro de su habitación.",
+          "c) Incremento de la masa forestal con respecto al tiempo.",
+          "d) Conjunto de valores límites, del óptimo y de tolerancia, que toman los diversos factores ecológicos abióticos en relación con la presencia y desarrollo de una especie en ese lugar concreto."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "4.- Cuando una especie forestal tiene su máximo desarrollo en condiciones de iluminación completa, diremos, en cuanto a su temperamento, que estamos ante una especie:",
+        options: [
+          "a) Intolerante",
+          "b) De luz",
+          "c) Heliófila",
+          "d) Todas las opciones anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones anteriores son correctas)."
+      },
+      {
+        question: "5.- Sin embargo, cuando el máximo desarrollo de una especie ocurre con una reducción importante de la iluminación, en cuanto al temperamento, hablaremos de una especie:",
+        options: [
+          "a) De temperamento robusto",
+          "b) Tolerante",
+          "c) Heliófila",
+          "d) Latifoliada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tolerante)."
+      },
+      {
+        question: "6.- En cuanto a la perpetuación de una especie vegetal a partir de brotes de cepa y/o raíz, señale la opción correcta:",
+        options: [
+          "a) Tanto los brotes de cepa como los de raíz, genéricamente, se denominan brinzales.",
+          "b) Es común que dichas especies se utilicen en aprovechamiento de monte alto.",
+          "c) Un brote de cepa se denomina retoño, mientras que un brote de raíz se denomina renuevo.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "7.- El grado de recubrimiento del suelo por la proyección vertical de las copas de arbolado, expresado en porcentaje, se denomina:",
+        options: [
+          "a) Fracción de cabida de cubierta",
+          "b) Espesura completa",
+          "c) Espesura trabada",
+          "d) Espesura incompleta"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Fracción de cabida de cubierta)."
+      },
+      {
+        question: "8.- Teniendo en cuenta las especies que constituyen las masas forestales, en función del aprovechamiento que de ellas se hace, nos encontramos:",
+        options: [
+          "a) Resinosas y Frondosas",
+          "b) Especies principales, especies secundarias y especies accesorias",
+          "c) Especies dominantes o dominadas",
+          "d) Ninguna de las respuestas anteriores es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "9.- Cuando el origen de las especies que forman parte de una masa forestal procede de la diseminación de individuos preexistentes en la masa, diremos que dichos individuos tienen un origen:",
+        options: [
+          "a) Autóctono",
+          "b) Alóctono",
+          "c) Natural",
+          "d) Estacionario"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Natural)."
+      },
+      {
+        question: "10.- Si en una masa forestal nos encontramos un conjunto de árboles con un diámetro normal de entre 10 y 20 cm, diremos que se encuentran en la clase natural de edad:",
+        options: [
+          "a) Monte bravo",
+          "b) Repoblado",
+          "c) Fustal",
+          "d) Latizal, en concreto alto latizal."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Latizal, en concreto alto latizal)."
+      },
+      {
+        question: "11.- Las clases naturales de edad de los individuos que forman una masa forestal pueden ser:",
+        options: [
+          "a) Repoblado, monte bravo, verdascal y fustal",
+          "b) Pregerminado, diseminado, repoblado, monte bravo, y fustal.",
+          "c) Diseminado, repoblado, monte bravo, latizal y fustal.",
+          "d) Pregerminado, repoblado, monte bravo, latizal y fustal."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "12.- Para la determinación de las clases artificiales de edad de los individuos que componen las masas forestales se establecen intervalos de:",
+        options: [
+          "a) 20 años",
+          "b) 10 años",
+          "c) 5 años",
+          "d) 3 años"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 20 años)."
+      },
+      {
+        question: "13.- En cuanto a la clasificación sociológica de los pies que forman una masa forestal, señale la opción correcta:",
+        options: [
+          "a) El estrato dominante estará formado por pies dominantes y codominantes",
+          "b) El estrato dominado estará formado por pies codominados, dominados y moribundos",
+          "c) El estrato dominante estará formado por pies predominantes, dominantes y codominantes",
+          "d) El estrato dominado estará formado por pies codominados, sumergidos o hundidos y moribundos."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "14.- En cuanto a la clasificación de las masas forestales, atendiendo a la espesura de la masa según el criterio geométrico, si la fracción de cabida de cubierta está entre el 90 y el 100%, hablaremos de:",
+        options: [
+          "a) Espesura incompleta hueca",
+          "b) Espesura completa",
+          "c) Espesura incompleta clara",
+          "d) Espesura predominante"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Espesura completa)."
+      },
+      {
+        question: "15.- En cambio, teniendo en cuenta el criterio productivo, si la fracción de cabida de cubierta es superior al 80%, hablaremos de:",
+        options: [
+          "a) Espesura excesiva",
+          "b) Espesura normal o completa",
+          "c) Espesura defectiva",
+          "d) El criterio productivo no se usa a la hora de clasificar las masas forestales según su espesura"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Espesura excesiva)."
+      },
+      {
+        question: "16.- En cuanto a las formas culturales de una masa forestal según la forma de obtener la regeneración, señale la opción correcta:",
+        options: [
+          "a) Estaremos hablando de la forma principal de la masa, teniendo masas coétaneas, regulares e irregulares",
+          "b) Estaremos hablando de la forma principal de la masa, teniendo masas coétaneas, regulares, semirregulares e irregulares.",
+          "c) Estaremos hablando de la forma fundamental de la masa, teniendo masas de monte alto, masas de monte bajo y masas de monte medio.",
+          "d) Ninguna opción es correcta."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "17.- Hablaremos que una masa forestal es regular cuando:",
+        options: [
+          "a) Al menos el 90% de los pies tienen la misma edad individual",
+          "b) Al menos el 90% de los pies pertenecen a la misma clase artificial de edad",
+          "c) Al menos el 80% de los pies pertenecen a 2 clases naturales de edad cíclicamente contiguas.",
+          "d) Al menos el 80% de los pies pertenecen a la misma clase natural de edad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "18.- Cuando una masa forestal está o ha estado sometida a intervención humana para su ordenado aprovechamiento y regeneración, presenta gran extensión y vive en espesura, estamos hablando de una masa:",
+        options: [
+          "a) Natural o primaria",
+          "b) Naturalizada o terciaria",
+          "c) Forestal o secundaria",
+          "d) Adehesada"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Forestal o secundaria)."
+      },
+      {
+        question: "19.- ¿Cómo se denominan a las cortas que se dar durante la mayor parte del turno, desde el momento del establecimiento de la masa hasta que llega el periodo de repoblación?",
+        options: [
+          "a) Cortas de regeneración",
+          "b) Cortas de repoblación",
+          "c) Cortas de turno",
+          "d) Cortas intermedias o de mejora"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cortas intermedias o de mejora)."
+      },
+      {
+        question: "20.- En cuanto a las cortas de repoblación, ¿qué método utilizaríamos en masas de monte alto si lo que queremos es una masa irregular?",
+        options: [
+          "a) Método de árboles padres",
+          "b) Método de entresaca",
+          "c) Método de aclareos sucesivos",
+          "d) Método de cortas por huroneo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Método de entresaca)."
+      },
+      {
+        question: "21.- ¿Cuál de las siguientes no es una de las cortas que se realizan en el método de aclareos sucesivos para monte alto?",
+        options: [
+          "a) Cortas de penetración",
+          "b) Cortas de extracción",
+          "c) Cortas diseminatorias",
+          "d) Cortas preparatorias"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Cortas de penetración)."
+      },
+      {
+        question: "22.- ¿Cuál de los siguientes tipos de cortas no se corresponde con una corta intermedia?",
+        options: [
+          "a) Corta de extracción",
+          "b) Clara",
+          "c) Aclareo",
+          "d) Corta de saneamiento"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Corta de extracción)."
+      },
+      {
+        question: "23.- Señale la opción correcta:",
+        options: [
+          "a) Durante la clara baja, la clase de copa inferior, formada por los pies dominados, es la primera cortada.",
+          "b) En la clara de copa se procede al trasmocho de los individuos que forman la masa para estimular el crecimiento del estrato dominado.",
+          "c) En la clara de selección se seleccionan y extraen pies sumergidos y moribundos.",
+          "d) La clara mecánica se denomina así porque se utilizan procesadoras para su realización."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "24.- Cuando de la masa forestal se extraen del vuelo principal (dominantes y codominantes) los árboles muertos o lesionados, estaremos hablando de:",
+        options: [
+          "a) Corta de saneamiento",
+          "b) Limpia",
+          "c) Corta de recuperación",
+          "d) Corta sanitaria"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Corta de recuperación)."
+      },
+      {
+        question: "25.- ¿Cuál de los siguientes no es un tipo de poda aplicado a los individuos que forman una masa forestal?",
+        options: [
+          "a) Poda de formación o talla",
+          "b) Poda de mantenimiento",
+          "c) Poda de rejuvenecimiento o tala",
+          "d) Poda de cubicación"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Poda de cubicación)."
+      },
+      {
+        question: "26.- ¿Cuál de los siguientes no es un objetivo general de un desbroce?",
+        options: [
+          "a) Favorecer el desarrollo del regenerado",
+          "b) Disminuir el riesgo de incendio",
+          "c) Provocar la diseminación de las semillas",
+          "d) Facilitar el acceso y aprovechamiento directo de las masas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Provocar la diseminación de las semillas)."
+      },
+      {
+        question: "27.- Según lo establecido en la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, con carácter excepcional y para ramoneo del ganado se podrán realizar podas durante el paro vegetativo del verano siempre que lo permitan las condiciones climáticas y:",
+        options: [
+          "a) Se cuente con una autorización expresa de la Delegación Provincial correspondiente.",
+          "b) Se comunique previamente la operación a la Delegación Provincial de Medio Ambiente",
+          "c) Se encuentre previsto en el Programa anual de aprovechamientos",
+          "d) No se pueden ejecutar podas de encinas y alcornoques en periodo estival"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "28.- Según lo established en la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, las fajas de anchura variables en la que se limpia toda la vegetación hasta dejar el suelo desnudo, se denominan:",
+        options: [
+          "a) Fajas auxiliares",
+          "b) Cortafuegos",
+          "c) Áreas cortafuegos",
+          "d) Líneas de defensa"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Cortafuegos)."
+      },
+      {
+        question: "29.- Según lo established en la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, el diseño y trazado de la red de prevención de incendios ha de permitir alcanzar una superficie protegida de compartimentos o bloques:",
+        options: [
+          "a) Que alcance el mínimo de 500 hectáreas",
+          "b) Cuyo límite mínimo sea de 400 hectáreas",
+          "c) De hasta 400 hectáreas",
+          "d) Con un límite máximo de 100 hectáreas, siempre que el monte o terreno forestal lo permita"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: De hasta 400 hectáreas)."
+      },
+      {
+        question: "30.- Según lo established en la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, ¿cuál sería la edad mínima a la cual se podría extraer un corcho de reproducción en un aprovechamiento?",
+        options: [
+          "a) Nueve años",
+          "b) Dependerá del estado vegetativo del árbol, no estableciéndose un límite mínimo",
+          "c) Cuando alcance los 32 mm de grosor, independientemente de la edad",
+          "d) Ocho años"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Ocho años)."
+      },
+      {
+        question: "31.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, será obligatorio, en relación a las podas en todos los casos, que éstas no afecten a:",
+        options: [
+          "a) Más de la cuarta parte del follaje inicial del árbol, salvo excepciones en que sea necesaria una poda más intensa debido al abandono que haya sufrido el árbol.",
+          "b) Más de la tercera parte del follaje inicial del árbol, salvo excepciones en que sea necesaria una poda más intensa debido al abandono que haya sufrido el árbol.",
+          "c) Más de la mitad del follaje inicial del árbol, salvo excepciones en que sea necesaria una poda más intensa debido al abandono que haya sufrido el árbol.",
+          "d) Más del 20% del follaje inicial del árbol, salvo excepciones en que sea necesaria una poda más intensa debido al abandono que haya sufrido el árbol."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "32.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a las instrucciones generales obligatorias en todos los casos para podas, señale la opción correcta:",
+        options: [
+          "a) No se podrán cortar las ramas que conformen la cruz.",
+          "b) Los cortes deben hacerse al menos a metro y medio del tronco o rama madre, sin dañar los rodetes de cicatrización preexistentes.",
+          "c) Los cortes deberán realizarse siempre con hachas de mano",
+          "d) En caso de existir desgarrones de caída deberá embetunarse inmediatamente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: No se podrán cortar las ramas que conformen la cruz)."
+      },
+      {
+        question: "33.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, se aconseja que, para las podas, en todos los casos, en las zonas que vayan a ser pastoreadas con ganado mayor, no es conveniente efectuar la poda en árboles que, a la altura de metro treinta centímetros del suelo, tengan un diámetro incluida la corteza:",
+        options: [
+          "a) Igual o superior a 15 cm",
+          "b) Igual o inferior a 15 cm",
+          "c) Igual o superior a 18 cm",
+          "d) Igual o inferior a 18 cm"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Igual o inferior a 15 cm)."
+      },
+      {
+        question: "34.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en cuanto a las instrucciones específicas obligatorias para la poda de encinas, no se podrán cortar ramas gruesas:",
+        options: [
+          "a) Superiores a 15 cm de diámetro, incluida la corteza, salvo que se encuentren muertas o en estado vegetativo decadente.",
+          "b) Inferiores a 15 cm de diámetro, incluida la corteza, salvo que se encuentren muertas o en estado vegetativo decadente.",
+          "c) Superiores a 18 cm de diámetro, incluida la corteza, salvo que se encuentren muertas o en estado vegetativo decadente.",
+          "d) Inferiores a 18 cm de diámetro, incluida la corteza, salvo que se encuentren muertas o en estado vegetativo decadente."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "35.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en cuanto a las instrucciones específicas obligatorias para la poda del alcornoque, señale la opción correcta:",
+        options: [
+          "a) Las podas de formación del árbol se han de efectuar sobre aquellas ramas que permitan obtener un fuste o tronco pelable limpio de al menos tres metros y medio de altura, coronado por una cruz de dos brazos o ramas principales como mínimo, siempre que el estado actual del árbol lo permita.",
+          "b) Las podas de formación del árbol se han de efectuar sobre aquellas ramas que permitan obtener un fuste o tronco pelable limpio de al menos tres metros de altura, coronado por una cruz de tres brazos o ramas principales como mínimo, siempre que el estado actual del árbol lo permita.",
+          "c) Las podas de formación del árbol se han de efectuar sobre aquellas ramas que permitan obtener un fuste o tronco pelable limpio de al menos tres metros de altura, coronado por una cruz de dos brazos o ramas principales como mínimo, siempre que el estado actual del árbol lo permita.",
+          "d) Las podas de formación del árbol se han de efectuar sobre aquellas ramas que permitan obtener un fuste o tronco pelable limpio de al menos tres metros y medio de altura, coronado por una cruz de tres brazos o ramas principales como mínimo, siempre que el estado actual del árbol lo permita."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "36.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones específicas obligatorias para la poda del alcornoque, la primera poda debe afectar:",
+        options: [
+          "a) A un máximo de 2 veces el perímetro del árbol sobre el bornizo medido a un metro treinta centímetros del suelo.",
+          "b) A un máximo de 2,5 veces el perímetro del árbol sobre el bornizo medido a un metro treinta centímetros del suelo.",
+          "c) A un máximo de 3 veces el perímetro del árbol sobre el bornizo medido a un metro treinta centímetros del suelo.",
+          "d) Sólo al primer metro y medio del fuste de cara al futuro desbornizamiento."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "37.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones específicas obligatorias para la poda del alcornoque, no se podrán cortar ramas con corcho bornizo cuando el diámetro de las mismas, incluido el espesor del bornizo, sea:",
+        options: [
+          "a) Superior a 18 cm",
+          "b) Inferior a 18 cm",
+          "c) Superior a 15 cm",
+          "d) Inferior a 65 cm"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Superior a 18 cm)."
+      },
+      {
+        question: "38.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones específicas obligatorias para la poda del alcornoque, señale la opción correcta:",
+        options: [
+          "a) La cruz se deberá formar después del desbornizamiento",
+          "b) Las ramas que se inserten en las principales se han de formar después de la salida segundera.",
+          "c) No se podrán cortar ramas, con corcho de reproducción, salvo que se encuentren secas o gravemente dañadas.",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son correctas)."
+      },
+      {
+        question: "39.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones específicas recomendadas para la poda de alcornoques, señale la opción correcta:",
+        options: [
+          "a) El tronco o fuste pelable conviene que tenga tres metros y medio de altura.",
+          "b) La cruz ha de formarse con tres brazos o ramas principales como máximo, bien divergentes y distribuidas",
+          "c) Se ha de procurar que las ramas de segundo orden se inserten en las principales lo más verticalmente posible y a una distancia mínima de la cruz de un metro.",
+          "d) Todas las respuestas anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "40.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones generales recomendadas en todos los casos, señale la opción correcta:",
+        options: [
+          "a) Los cortafuegos conviene que tengan al menos una anchura de cinco metros cuando las actuaciones se realicen en zonas de vegetación arbustiva o de matorral que circunden las masas arbóreas a proteger.",
+          "b) Las \"áreas cortafuegos\" han de tener las anchuras señaladas para los \"cortafuegos\" incrementadas en un 20% como mínimo",
+          "c) Las \"fajas auxiliares\" conviene que tengan al menos diez metros de ancho en los lados de las pistas, caminos o carreteras forestales",
+          "d) Todas las respuestas anteriores son falsas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "41.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a instrucciones generales obligatorias en todos los casos para la realización de aclareos y entresacas, tras las cortas sucesivas que se precisen efectuar en cada parcela de actuación, el suelo deberá quedar permanentemente cubierto, por las copas de los árboles que permanezcan en pie, con un grado de recubrimiento igual o superior a los mínimos que se señalan a continuación en función de la pendiente del terreno: (señale la opción correcta)",
+        options: [
+          "a) 30% en pendientes menores del 10%.",
+          "b) 40% en pendientes del 10% al 20%.",
+          "c) 50% en pendientes superiores al 20%.",
+          "d) Todas las respuestas anteriores son verdaderas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas anteriores son verdaderas)."
+      },
+      {
+        question: "42.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo a las instrucciones generales obligatorias para la realización del descorche, si tenemos un alcornoque con corcho de reproducción que tiene un perímetro normal de 90 cm, ¿hasta qué altura podremos realizar el descorche llegado el momento?",
+        options: [
+          "a) Hasta un máximo de 180 cm de altura medido desde el suelo",
+          "b) Hasta un máximo de 225 cm de altura medido desde el suelo",
+          "c) Hasta un máximo de 270 cm de altura medido desde el suelo",
+          "d) Hasta la altura en la cual el corcho alcance un grosor mínimo de 32 mm"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Hasta un máximo de 270 cm de altura medido desde el suelo)."
+      },
+      {
+        question: "43.- Según lo established en el anexo de la orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, en lo relativo instrucciones generales obligatorias para la realización del descorche, señale la opción correcta:",
+        options: [
+          "a) Solo en situaciones excepcionales podrán descorcharse las raíces que sobresalgan de la tierra.",
+          "b) No se podrá trabajar durante la noche y el descorche deberá suspenderse en los días de lluvias copiosas y sostenidas y cuando vientos cálidos u otras causas atmosféricas perturben la circulación de la savia.",
+          "c) En los árboles atacados por el hongo «Cytospora chrysosperma» en los que se realicen las operaciones de descorche deberán emplearse los medios necesarios para proceder a la desinfección de las hachas e instrumentos cortantes que se utilicen a fin de evitar la transmisión de la enfermedad a los árboles no afectados",
+          "d) Todas las respuestas anteriores son correctas."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "44.- ¿Cuál de las siguientes no es una iniciativa llevada a cabo por la Junta de Andalucía en relación a la mejora de masas forestales en nuestra Comunidad Autónoma?",
+        options: [
+          "a) Naturalización de pinares",
+          "b) Mejora del encinar andaluz",
+          "c) Mejora del pinsapar",
+          "d) Todas las opciones anteriores son correctas"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Mejora del encinar andaluz)."
+      },
+      {
+        question: "45.- ¿Cuál de las siguientes no es una actuación encaminada a garantizar la conservación de los hábitats y reducir los factores de riesgo que amenazan al pinsapo?",
+        options: [
+          "a) Reforestaciones experimentales en áreas con presencia anterior de la especie o afectadas por incendios forestales. Ocasionalmente estas reforestaciones se acompañan con un riego por goteo",
+          "b) Prevención en la lucha contra incendios: construcción de puntos de reserva de agua y mejora de los caminos de acceso de los equipos de extinción de incendios. Complementariamente, adecuación de la red viaria y de acceso a diferentes rodales de pinsapar",
+          "c) Eliminación de pies muertos para prevenir la aparición de incendios, así como de plagas y enfermedades",
+          "d) Creación de rodales selectos para la obtención de materiales forestales de reproducción de calidad que permitan mayor éxito en las reforestaciones que se lleven a cabo."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- A la hora de clasificar a las especies que forman una masa forestal en función del aprovechamiento que de ellas se hace, aquellas que no están relacionadas con ninguna utilidad directa, considerándose conveniente o indiferente su existencia, se denominan:",
+        options: [
+          "a) Principales",
+          "b) Secundarias",
+          "c) De reserva",
+          "d) Accesorias"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Accesorias)."
+      },
+      {
+        question: "2.- ¿Cuál de las siguientes no es una clase natural de edad?",
+        options: [
+          "a) Diseminado",
+          "b) Repoblado",
+          "c) Monte Alto",
+          "d) Fustal"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Monte Alto)."
+      },
+      {
+        question: "3.- A la hora de clasificar la espesura de una masa según el criterio geométrico nos referiremos a una Espesura completa cuando la Fracción de cabida de cubierta sea:",
+        options: [
+          "a) Del 100%",
+          "b) Entre el 80 y el 90%",
+          "c) Entre el 90 y el 100%",
+          "d) Superior al 100%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Entre el 90 y el 100%)."
+      },
+      {
+        question: "4.- ¿Cuál de las siguientes será una Forma Fundamental de una masa arbórea?",
+        options: [
+          "a) Masa Semirregular",
+          "b) Monte Bravo",
+          "c) Monte Bajo",
+          "d) Masa Trabada"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Monte Bajo)."
+      },
+      {
+        question: "5.- La poda realizada en bordes de caminos y cortafuegos, hasta una altura de unos 4m, cuyo objetivo es evitar que el fuego alcance la copa de los árboles, provocando una discontinuidad vertical del material combustible, se denomina:",
+        options: [
+          "a) Poda de Penetración",
+          "b) Poda de Defensa",
+          "c) Poda de retención",
+          "d) Poda antiincendios"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Poda de Defensa)."
+      },
+      {
+        question: "6.- El tipo de desbroce caracterizado por la eliminación total o parcial de, únicamente, la parte aérea de los arbustos y matorral existentes, se denomina:",
+        options: [
+          "a) Roza",
+          "b) Descuaje",
+          "c) Decapado",
+          "d) Dozer"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Roza)."
+      },
+      {
+        question: "7.- El tipo de Clara que se caracteriza por la extracción de pies de la parte media y superior del vuelo, generalmente codominantes, con el fin de abrir el vuelo y favorecer el desarrollo de los pies más prometedores de estas mismas clases, se denomina:",
+        options: [
+          "a) Clara Baja",
+          "b) Clara de Copa",
+          "c) Clara de Selección",
+          "d) Clara diseminatoria."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Clara de Copa)."
+      },
+      {
+        question: "8.- Dentro de las Clases Naturales de edad, el Alto latizal se establece para pies:",
+        options: [
+          "a) Con un diámetro normal medio superior a 20 cm",
+          "b) Con un diámetro normal medio entre 10 y 20 cm",
+          "c) Con un diámetro normal medio inferior a 10 cm",
+          "d) De 1 a 9 años de edad."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Con un diámetro normal medio entre 10 y 20 cm)."
+      },
+      {
+        question: "9.- Y el Fustal Medio para pies:",
+        options: [
+          "a) Con un diámetro normal medio entre 10 y 20 cm",
+          "b) Con un diámetro normal medio entre 20 y 30 cm",
+          "c) Con un diámetro normal medio entre 25 y 50 cm",
+          "d) Con un diámetro normal medio entre 35 y 50 cm"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Con un diámetro normal medio entre 35 y 50 cm)."
+      },
+      {
+        question: "10.- Atendiendo a la Clasificación Sociológica de los pies de una masa arbórea, dentro del estrato Dominante nos encontramos pies:",
+        options: [
+          "a) Predominantes, Dominantes y Codominantes",
+          "b) Predominantes, Dominados y Codominantes",
+          "c) Dominantes, Codominantes y Dominados",
+          "d) Codominantes, Dominantes y Sumergidos."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Predominantes, Dominantes y Codominantes)."
+      },
+      {
+        question: "11.- ¿Cuál de las siguientes será una Forma Principal de una masa arbórea?",
+        options: [
+          "a) Monte Alto",
+          "b) Masa coetánea",
+          "c) Monte Medio",
+          "d) Masa con Reserva"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Masa coetánea)."
+      },
+      {
+        question: "12.- Atendiendo a las Cortas de Repoblación, ¿cuál de los siguientes sería un método de Monte alto que origina masas irregulares?",
+        options: [
+          "a) Método de árboles padre",
+          "b) Método de Entresaca",
+          "c) Método de Aclareos Sucesivos",
+          "d) Método de Cortas por Huroneo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Método de Entresaca)."
+      },
+      {
+        question: "13.- La corta de repoblación por el método de aclareos sucesivos se caracteriza porque la saca se realiza en una serie de cortas, con frecuencia variable, escalonada a lo largo del periodo de regeneración, la secuencia de operaciones puede comprender 3 clases diferentes de cortas, que se denominan:",
+        options: [
+          "a) Cortas preliminares, Cortas de diseminación y Cortas de Extracción",
+          "b) Precortas, Cortas de siembra, y Cortas de diseminación",
+          "c) Cortas preliminares, Cortas de siembra o diseminatorias y Cortas de Extracción.",
+          "d) Cortas preparatorias, Cortas de siembra o diseminatorias y cortas de extracción o finales"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cortas preparatorias, Cortas de siembra o diseminatorias y cortas de extracción o finales)."
+      },
+      {
+        question: "14.- La Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques, establece en su artículo 10 que el diseño del trazado de la red de prevención contra incendios forestales ha de permitir alcanzar una superficie protegida de compartimentos o bloques de hasta:",
+        options: [
+          "a) 100 hectáreas",
+          "b) 200 hectáreas",
+          "c) 400 hectáreas",
+          "d) 800 hectáreas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 400 hectáreas)."
+      },
+      {
+        question: "15.- El artículo 17 de la Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques establece que el descorche tendrá que efectuarse dentro del período comprendido entre:",
+        options: [
+          "a) El 1 de junio y el 15 de octubre de cada año",
+          "b) El 15 de noviembre y el 15 de marzo del año siguiente",
+          "c) El 1 de mayo y el 31 de octubre de cada año",
+          "d) El 1 de junio y el 1 de septiembre de cada año"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: El 1 de junio y el 1 de septiembre de cada año)."
+      },
+      {
+        question: "16.- El anexo de la Orden de 26 de septiembre de 1988, por la que se dan instrucciones para la ejecución de determinados trabajos en montes, en régimen privado, poblados con encinas y alcornoques establece como instrucción específica obligatoria para la encina que no podrán cortarse ramas gruesas que tengan un diámetro superior, incluida la corteza, a:",
+        options: [
+          "a) 12 cm",
+          "b) 15 cm",
+          "c) 18 cm",
+          "d) 21 cm"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 15 cm)."
+      },
+      {
+        question: "17.- El mismo anexo establece, como instrucción específica recomendada para la encina, que los brazos o ramas principales que conformen la cruz deben ser como máximo:",
+        options: [
+          "a) 2",
+          "b) 3",
+          "c) 4",
+          "d) 5"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 4)."
+      },
+      {
+        question: "18.- Como instrucción específica obligatoria para la poda de alcornoques, dicho anexo de la mencionada orden, establece que la primera poda afectará:",
+        options: [
+          "a) Hasta una altura que no podrá sobrepasar dos veces el perímetro de la circunferencia medido sobre la corteza a la altura de 1,30 metros del suelo.",
+          "b) Hasta una altura que no podrá sobrepasar dos veces y media el perímetro de la circunferencia medido sobre la corteza a la altura de 1,30 metros del suelo",
+          "c) Hasta una altura que no podrá sobrepasar tres veces el perímetro de la circunferencia medido sobre la corteza a la altura de 1,30 metros del suelo",
+          "d) Solo al primer metro y medio del fuste"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Solo al primer metro y medio del fuste)."
+      },
+      {
+        question: "19.- En cuanto a las instrucciones generales recomendadas para la realización de cortafuegos, en el caso de actuaciones que se realicen en zonas de vegetación herbácea que circunden las masas arbóreas a proteger, la anchura mínima de los cortafuegos será de:",
+        options: [
+          "a) 5 metros",
+          "b) 8 metros",
+          "c) 10 metros",
+          "d) Dos veces y media la altura máxima del vuelo."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: 5 metros)."
+      },
+      {
+        question: "20.- Dicho anexo de la mencionada orden incluye instrucciones obligatorias y recomendadas para la realización de Aclareos y Entresacas. Entre las instrucciones generales obligatorias se establece que tras las cortas sucesivas que se precisen efectuar en cada parcela de actuación, el suelo deberá quedar permanentemente cubierto por las copas de los árboles que permanezcan en pie con un grado de recubrimiento igual o superior, para pendientes superiores al 20%, de:",
+        options: [
+          "a) 20%",
+          "b) 30%",
+          "c) 40%",
+          "d) 50%"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: 50%)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 22),
+      "t1_b2": test1Questions.slice(22, 45),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 10),
+      "t2_b2": test2Questions.slice(10, 20)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 11 - SELVICULTURA Y TRATAMIENTOS SELVÍCOLAS (UNIFICADO COMPLETO 65 PREGUNTAS)",
+        "t1_all": "TEST 11-1 - TEST BÁSICO N.º 1 COMPLETO (45 PREGUNTAS)",
+        "t1_b1": "TEST 11-1 - BLOQUE 1 (PREGUNTAS 1 A 22)",
+        "t1_b2": "TEST 11-1 - BLOQUE 2 (PREGUNTAS 23 A 45)",
+        "t2_all": "TEST 11-2 - AUTOEVALUACIÓN N.º 1 COMPLETO (20 PREGUNTAS)",
+        "t2_b1": "TEST 11-2 - BLOQUE 1 (PREGUNTAS 1 A 10)",
+        "t2_b2": "TEST 11-2 - BLOQUE 2 (PREGUNTAS 11 A 20)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>

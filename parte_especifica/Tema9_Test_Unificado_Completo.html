@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Interactivo Unificado - Tema 9 (Repoblaciones y Conservación)</title>
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #e8f5e9;
+      --success: #2e7d32;
+      --error: #c62828;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 105px;
+      padding-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Header Flotante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+      padding: 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-box select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-weight: bold;
+      background-color: white;
+      color: var(--primary);
+      cursor: pointer;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Contenedor Principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .test-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* Tarjetas de Preguntas */
+    .question-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background-color: #e8f5e9 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+      font-weight: bold;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffebee !important;
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+      font-weight: bold;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.correct {
+      display: block;
+      background-color: #e8f5e9;
+      color: var(--success);
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback.incorrect {
+      display: block;
+      background-color: #ffebee;
+      color: var(--error);
+      border: 1px solid #ffcdd2;
+    }
+
+    /* Botón Reiniciar */
+    .reset-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #144417;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 105px;
+        padding: 5px;
+      }
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      .stat-value {
+        font-size: 0.85rem;
+      }
+      body {
+        padding-top: 115px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="selector-box">
+      <select id="block-select" onchange="changeBlock()">
+        <optgroup label="Todos los Exámenes">
+          <option value="all">Tema 9 Unificado Completo (60 preguntas)</option>
+        </optgroup>
+        <optgroup label="Test 9-1 - Test Básico N.º 1 (30 Preguntas)">
+          <option value="t1_all">Test 9-1 - Completo (1 - 30)</option>
+          <option value="t1_b1">Test 9-1 - Bloque 1 (1 - 15)</option>
+          <option value="t1_b2">Test 9-1 - Bloque 2 (16 - 30)</option>
+        </optgroup>
+        <optgroup label="Test 9-2 - Autoevaluación (30 Preguntas)">
+          <option value="t2_all">Test 9-2 - Completo (1 - 30)</option>
+          <option value="t2_b1">Test 9-2 - Bloque 1 (1 - 15)</option>
+          <option value="t2_b2">Test 9-2 - Bloque 2 (16 - 30)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tiempo</span>
+      <span class="stat-value" id="timer">⏱️ 00:00</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Contestadas</span>
+      <span class="stat-value" id="progress">📝 0/0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Aciertos</span>
+      <span class="stat-value" id="accuracy">🎯 0%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Nota</span>
+      <span class="stat-value" id="score">⭐ 0.00/10</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="test-title" id="test-title">TEMA 9 - REPOBLACIONES Y CONSERVACIÓN DE SUELOS (UNIFICADO)</h1>
+    <div id="quiz-container"></div>
+    <div class="reset-container">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar Test</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATOS DE LOS EXÁMENES ---
+    const test1Questions = [
+      {
+        question: "1.- Señale la respuesta correcta",
+        options: [
+          "a) Hablaremos de reforestación cuando la repoblación de la masa forestal se dé en un terreno que ya ha poseído, en tiempos relativamente cercanos (en torno a 50 años) una masa forestal previa.",
+          "b) Hablaremos de forestación cuando la repoblación de la masa forestal se dé en lugares donde no ha existido este tipo de vegetación nunca o en periodos relativamente cortos.",
+          "c) Los objetivos tradicionales de la repoblación forestal podrán ser objetivos productores u objetivos protectores",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "2.- Señale la opción incorrecta con respecto al desbroce previo a una repoblación forestal:",
+        options: [
+          "a) Reduce la competencia por el agua y los nutrientes de la especie a implantar",
+          "b) Aumenta el perfil útil del suelo.",
+          "c) Facilita el proceso de plantación por parte de los operarios",
+          "d) Reduce el riesgo ante posibles incendios ya que el fuego se propagará con mayor dificultad"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "3.- Señale la opción correcta con respecto al desbroce:",
+        options: [
+          "a) Los tratamientos totales afectan por igual a todas las especies vegetales",
+          "b) Los tratamientos a hecho se harán siguiendo las curvas de nivel para evitar la erosión del terreno.",
+          "c) En un decapado eliminaremos únicamente la parte aérea de la vegetación",
+          "d) El método más eficaz y el más utilizado es el desbroce químico mediante herbicidas."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Los tratamientos totales afectan por igual a todas las especies vegetales)."
+      },
+      {
+        question: "4.- ¿Cuál de las siguientes NO es una técnica para llevar a cabo un desbroce?",
+        options: [
+          "a) Desbroce mecanizado por laboreo",
+          "b) Decapado o Roza al aire",
+          "c) Subsolado lineal",
+          "d) Desbroce mecanizado con desbrozadoras"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Subsolado lineal)."
+      },
+      {
+        question: "5.- ¿Cuál de los siguientes NO es un objetivo de la preparación del terreno que se realiza previamente a la repoblación forestal?",
+        options: [
+          "a) Disminuir la velocidad de infiltración.",
+          "b) Aumentar la capacidad de retención de agua del terreno.",
+          "c) Facilitar la penetración mecánica de las raíces.",
+          "d) Facilitar las labores de plantación y siembra."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Disminuir la velocidad de infiltración)."
+      },
+      {
+        question: "6.- Señale la opción incorrecta en lo referente a la preparación del terreno que se realiza previamente a la repoblación forestal:",
+        options: [
+          "a) Por el espacio afectado podemos diferenciar entre tratamientos puntuales, tratamientos lineales o tratamientos a hecho.",
+          "b) Por la forma de ejecución podemos diferenciar entre tratamientos manuales o mecanizados.",
+          "c) Por la profundidad podemos diferenciar entre tratamientos a baja profundidad, a profundidad media y a alta profundidad.",
+          "d) Por la acción sobre el perfil podemos diferenciar entre tratamientos totales o tratamientos selectivos."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D)."
+      },
+      {
+        question: "7.- ¿Cuál de las siguientes sería una preparación lineal del terreno?",
+        options: [
+          "a) Raspa o Casilla",
+          "b) Ahoyado con retroaraña",
+          "c) Subsolado",
+          "d) Laboreo pleno"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Subsolado)."
+      },
+      {
+        question: "8.- ¿Cuáles son los marcos de plantación más habituales?",
+        options: [
+          "a) Marco real o cuadrado, marco rectangular y marco triangular.",
+          "b) Marco real o cuadrado, marco a tresbolillo y marco rectangular",
+          "c) Marco lineal, marco a tresbolillo y marco rectangular",
+          "d) Marco real o cuadrado, marco diagonal y marco lineal"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "9.- De la siguiente maquinaria usada en repoblaciones forestales, ¿cuál sería más apropiada para trabajar con grandes pendientes?",
+        options: [
+          "a) Tractor agrícola",
+          "b) Tractor todoterreno de alta estabilidad (TTAE)",
+          "c) Encopetador lineal",
+          "d) Tractor de estabilidad cruzada"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Tractor todoterreno de alta estabilidad - TTAE)."
+      },
+      {
+        question: "10.- ¿Cuál de las siguientes especies que podríamos utilizar en repoblaciones forestales no es una especie autóctona andaluza con un área de distribución extensa?",
+        options: [
+          "a) Pino carrasco (Pinus halepensis)",
+          "b) Acebuche (Olea europaea var. sylvestris)",
+          "c) Algarrobo (Ceratonia siliqua)",
+          "d) Pino silvestre (Pinus sylvestris)"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Pino silvestre)."
+      },
+      {
+        question: "11.- Señale la opción correcta en lo relativo a las características culturales y técnicas en especies usadas repoblaciones forestales:",
+        options: [
+          "a) El pinsapo (Abies pinsapo) se establece con éxito desde el nivel del mar hasta los 1000 m de altitud, realizándose su plantación con ejemplares a raíz desnuda.",
+          "b) El tipo de planta más habitual en repoblaciones de álamo blanco (Populus alba), es el uso de ejemplares de 3 savias en envase.",
+          "c) El Alcornoque (Quercus suber) se establece con éxito desde el nivel del mar y hasta los 1000 m de altitud, requiere suelos silíceos y se puede recurrir tanto a la siembra como a la plantación.",
+          "d) El pino carrasco (Pinus halepensis) se establece con éxito en altitudes que oscilan entre los 800 y los 2000 metros, teniendo unos requerimientos hídricos superiores a los 800 mm al año."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C)."
+      },
+      {
+        question: "12.- Señale la opción incorrecta en lo relativo al semillado directo (siembra):",
+        options: [
+          "a) El control fitosanitario de las semillas será más complicado con respecto a las plantas procedentes de vivero.",
+          "b) Tiene la ventaja de que las plantas que obtenemos tienen sistemas radicales más naturales.",
+          "c) Los cuidados culturales serán más intensos durante los primeros años con respecto a la plantación.",
+          "d) Existe un mayor riesgo para las plántulas de sufrir heladas tardías y sequía en el nivel más superficial del suelo, con respecto a la plantación."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "13.- ¿Qué tipos de plantas se pueden suministrar para una repoblación?",
+        options: [
+          "a) Plantas en envase",
+          "b) Plantas a raíz desnuda",
+          "c) Plantas no germinadas procedentes de estratificación",
+          "d) Las respuestas a) y b) son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Las respuestas a) y b) son correctas)."
+      },
+      {
+        question: "14.- Señale la opción incorrecta en lo relativo a los cuidados posteriores de las repoblaciones forestales:",
+        options: [
+          "a) La reposición de marras consiste en la sustitución de plantas invasoras de especies distintas a las del repoblado por plantas incapaces de competir con éstas.",
+          "b) Los tubos cinegéticos son tubos de malla plástica o metálica, de hasta 2m de altura, que se colocan en cada planta, enterrándolos parcialmente en el suelo y sujetos con un tutor. Su finalidad es evitar la predación de la planta.",
+          "c) Los tubos invernadero son unos dispositivos de material transparente o translúcido que se colocan alrededor de la planta con el doble objetivo de crear un efecto microclimático a modo de invernadero, así como proteger a las plantas de los daños por animales.",
+          "d) Las escardas son labores consistentes en el cavado con una azada de la zona situada alrededor de la planta para reducir la competencia de la vegetación."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "15.- ¿Qué normativa se encarga de regular la Comercialización de los Materiales Forestales de Reproducción?",
+        options: [
+          "a) La Ley 2/1992, de 15 de junio, forestal de Andalucía",
+          "b) El Real Decreto 289/2003, de 7 de marzo",
+          "c) El Decreto 208/1997 de 9 de septiembre",
+          "d) La Ley 7/2007, de 9 de julio"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Real Decreto 289/2003, de 7 de marzo)."
+      },
+      {
+        question: "16.- ¿Cuál de los siguientes NO es un material de base, según lo recogido en el artículo 2 del Real Decreto 289/2003, de 7 de marzo, sobre comercialización de los materiales forestales de reproducción?",
+        options: [
+          "a) Rodal",
+          "b) Progenitores de semillas",
+          "c) Huerto semillero",
+          "d) Mezcla de clones"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Progenitores de semillas)."
+      },
+      {
+        question: "17.- El mismo artículo establece que los materiales forestales de reproducción se subdividen según las siguientes categorías:",
+        options: [
+          "a) Identificados, seleccionados y controlados",
+          "b) Identificados, seleccionados, controlados y mezclas de clones",
+          "c) Identificados, seleccionados, controlados, cualificados, autóctonos y alóctonos",
+          "d) Identificados, seleccionados, cualificados y controlados"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Identificados, seleccionados, cualificados y controlados)."
+      },
+      {
+        question: "18.- De los siguientes datos, ¿cuál de ellos NO vendrá reflejado en el documento del proveedor de los materiales forestales de reproducción, según se recoge en el artículo 10 del Real Decreto 289/2003 de 7 de marzo, sobre comercialización de los materiales forestales de reproducción?",
+        options: [
+          "a) Relación de las posibles especies que puedan contaminar el lote",
+          "b) Pureza",
+          "c) Porcentaje de germinación de las semillas puras",
+          "d) Número de semillas germinables por kilo"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "19.- Con respecto al etiquetado de los materiales forestales de reproducción:",
+        options: [
+          "a) La etiqueta de un material forestal de reproducción identificado será amarilla",
+          "b) La etiqueta de un material forestal de reproducción seleccionado será verde",
+          "c) La etiqueta de un material forestal de reproducción cualificado será rosa",
+          "d) Todas las opciones son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las opciones son correctas)."
+      },
+      {
+        question: "20.- ¿Cuál de los siguientes NO es un tipo de suelo que podamos encontrar en Andalucía?",
+        options: [
+          "a) Regosoles",
+          "b) Termosoles",
+          "c) Vertisoles",
+          "d) Solonchaks"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Termosoles)."
+      },
+      {
+        question: "21.- ¿Cuál de los siguientes NO es una causa o factor que intervenga decisivamente en los procesos erosivos?",
+        options: [
+          "a) La erodibilidad del suelo",
+          "b) Las condiciones climáticas",
+          "c) El factor aglomerativo del sustrato",
+          "d) Las actividades humanas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: El factor aglomerativo del sustrato)."
+      },
+      {
+        question: "22.- ¿Cuál es la principal causa de erosión en Andalucía?",
+        options: [
+          "a) La erosión hídrica",
+          "b) La erosión eólica",
+          "c) La erosión marina",
+          "d) Todos los tipos de erosión afectan por igual"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: La erosión hídrica)."
+      },
+      {
+        question: "23.- Cuando hablamos de la degradación de las tierras de las zonas áridas, semiáridas y subhúmedas secas, resultante de diversos factores, tales como las variaciones climáticas y las actividades humanas, estamos hablando de:",
+        options: [
+          "a) Desertización",
+          "b) Pérdida de suelo",
+          "c) Desertificación",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Desertificación)."
+      },
+      {
+        question: "24.- Las repoblaciones realizadas para la restauración hidrológico-forestal:",
+        options: [
+          "a) Reducen la velocidad de circulación del agua sobre el suelo",
+          "b) Aumentan la infiltración del agua",
+          "c) Con sus raíces ayudan a retener el suelo",
+          "d) Todas las respuestas son correctas"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "25.- Señale la opción incorrecta:",
+        options: [
+          "a) Una escollera de protección de márgenes es una obra de hidrología transversal",
+          "b) Un encauzamiento es una obra de hidrología longitudinal",
+          "c) Un dique es una obra de hidrología transversal",
+          "d) Un rastrillo es una obra de hidrología transversal"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A)."
+      },
+      {
+        question: "26.- Según lo establecido en el artículo 2 del Real Decreto 159/2022, de 1 de marzo, sobre conservación de los recursos genéticos forestales y de la flora silvestre, la \"conservación de los recursos genéticos en los ecosistemas y hábitats naturales y seminaturales para el mantenimiento y recuperación de poblaciones viables de especies forestales en sus entornos naturales\" se corresponde con:",
+        options: [
+          "a) Conservación ex situ",
+          "b) Recurso activo",
+          "c) Conservación in situ de recursos genéticos forestales",
+          "d) Material genético"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Conservación in situ...)."
+      },
+      {
+        question: "27.- De los siguientes tipos de suelo que nos podemos encontrar en Andalucía, ¿Cuál se corresponde con la siguiente definición?: Son suelos profundos de depósitos aluviales recientes. Se forman en planicies de inundación y sobre depósitos aluviales, se sitúan en terrenos inmediatos a los cursos fluviales, (son los denominados suelos de vega). Se distribuyen en todas las zonas de inundación de las cuencas de los ríos andaluces.",
+        options: [
+          "a) Litosoles",
+          "b) Fluvisoles",
+          "c) Regosoles",
+          "d) Cambisoles"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Fluvisoles)."
+      },
+      {
+        question: "28.- Según los datos sobre la erosión del suelo en Andalucía reflejados en el IMA del año 2023, correspondiendo a datos del año 2022, ¿cuál es la provincia con mayor erosividad por lluvia en Andalucía durante dicho año?",
+        options: [
+          "a) Almería",
+          "b) Málaga",
+          "c) Granada",
+          "d) Cádiz"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cádiz)."
+      },
+      {
+        question: "29.- ¿Cuál de los siguientes objetivos será la principal causa para la evaluación de los daños producidos por un incendio forestal?",
+        options: [
+          "a) Encontrar los posibles responsables del origen del incendio",
+          "b) Contribuir a la determinación de las medidas necesarias para la restauración de las áreas incendiadas",
+          "c) Cuantificación económica de los daños",
+          "d) Ninguna de las opciones es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B)."
+      },
+      {
+        question: "30.- ¿Cuál de los siguientes factores es el principal responsable de la erosionabilidad del suelo tras un incendio forestal?",
+        options: [
+          "a) La presencia de cistáceas en el lugar del incendio",
+          "b) La presencia de madera quemada",
+          "c) La pendiente del terreno",
+          "d) La degradación del suelo por parte de los medios de extinción"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: La pendiente del terreno)."
+      }
+    ];
+
+    const test2Questions = [
+      {
+        question: "1.- En lo relativo a los desbroces, señale la respuesta correcta:",
+        options: [
+          "a) Los tratamientos totales permiten respetar aquellas especies que se consideran de interés.",
+          "b) Hablamos de tratamiento selectivo cuando se actúa en el punto donde se va a colocar la nueva planta.",
+          "c) Al realizar una roza se elimina solamente la parte aérea de la vegetación",
+          "d) Hablaremos de tratamientos mecanizados cuando el desbroce se realiza con herramientas de mano como la motodesbrozadora."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Al realizar una roza se elimina solamente la parte aérea de la vegetación)."
+      },
+      {
+        question: "2.- ¿Cuál de los siguientes NO es un apero que se podría utilizar en repoblaciones forestales?",
+        options: [
+          "a) Subsolador",
+          "b) Plantamón",
+          "c) Desbrozadora",
+          "d) Escarificador"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Plantamón)."
+      },
+      {
+        question: "3.- ¿Qué tipo de planta utilizaría para una reforestación con Abies pinsapo?",
+        options: [
+          "a) Raíz desnuda de 1 savia",
+          "b) Siembra directa",
+          "c) Envase de 1 savia",
+          "d) Planta en envase con 2-3 savias."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Planta en envase con 2-3 savias)."
+      },
+      {
+        question: "4.- En el proceso de elección de las especies para la realización de una repoblación forestal se tendrán en cuenta, en primer lugar, una serie de factores ecológicos a considerar, entre los que NO se encuentra:",
+        options: [
+          "a) Factores fitosociológicos",
+          "b) Factores climáticos",
+          "c) Factores edáficos",
+          "d) Factores de tipo fitogeográfico."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Factores fitosociológicos)."
+      },
+      {
+        question: "5.- ¿Cómo se llama la metodología desarrollada por la Junta de Andalucía para la evaluación de áreas incendiadas?",
+        options: [
+          "a) Metodología para la evaluación de daños y propuesta de actuaciones.",
+          "b) Metodología de evaluación de áreas incendiadas o degradadas.",
+          "c) Metodología de actuaciones tras un gran incendio forestal.",
+          "d) Medidas cautelares y coercitivas para la evaluación de daños en incendios forestales."
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Metodología para la evaluación de daños y propuesta de actuaciones)."
+      },
+      {
+        question: "6.- A tenor de lo establecido en el Anexo VII del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, ¿cuál será el diámetro superior mínimo de las estaquillas de tallo utilizadas para la multiplicación de Populus sp. de Clase 1 CE?",
+        options: [
+          "a) 4 mm",
+          "b) 8 mm",
+          "c) 10 mm",
+          "d) 20 mm"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 8 mm)."
+      },
+      {
+        question: "7.- ¿A qué tipo de material de base para la producción de material forestal de reproducción se refiere la siguiente definición: \"plantación de clones o familias seleccionados, suficientemente aislada para evitar o reducir la polinización procedente de fuentes externas, gestionada para la producción de cosechas de semillas frecuentes, abundantes y fáciles de recolectar\", según se establece en el artículo 2 del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción?",
+        options: [
+          "a) Rodal",
+          "b) Progenitores de Familia",
+          "c) Huerto Semillero",
+          "d) Clon"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Huerto Semillero)."
+      },
+      {
+        question: "8.- Atendiendo a la distribución superficial de grupos de suelos dominantes en Andalucía, ¿Qué tipo de suelo se encuentra en mayor proporción en dicha Comunidad Autónoma?",
+        options: [
+          "a) Fluvisoles",
+          "b) Regosoles",
+          "c) Xerosoles",
+          "d) Cambisoles"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Cambisoles)."
+      },
+      {
+        question: "9.- ¿Cuál será el color de la etiqueta de un material forestal de reproducción de la categoría \"Material Controlado\"?",
+        options: [
+          "a) Amarillo",
+          "b) Azul",
+          "c) Verde",
+          "d) Rojo"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Azul)."
+      },
+      {
+        question: "10.- Se considerará que la erosionabilidad del suelo tras un incendio forestal es media cuando las pendientes del terreno:",
+        options: [
+          "a) Sean inferiores al 5%",
+          "b) Estén comprendidas entre el 5% y el 10%",
+          "c) Estén comprendidas entre el 10% y el 20%",
+          "d) Estén comprendidas entre el 5% y el 20%"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Estén comprendidas entre el 5% y el 20%)."
+      },
+      {
+        question: "11.- Respecto a las Regiones de Procedencia, según lo establecido en el artículo 6 del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, se delimitarán regiones de procedencia para las especies pertenecientes a las categorías:",
+        options: [
+          "a) Material identificado y material seleccionado",
+          "b) Material seleccionado y material cualificado",
+          "c) Material cualificado y material controlado",
+          "d) Material seleccionado, material cualificado y material controlado"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Material identificado y material seleccionado)."
+      },
+      {
+        question: "12.- ¿Cuál de las siguientes obras de hidrología para el control de la erosión hídrica podemos considerar que se trata de una obra transversal?",
+        options: [
+          "a) Encauzamientos",
+          "b) Diques",
+          "c) Malecones",
+          "d) Escolleras de protección de márgenes"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Diques)."
+      },
+      {
+        question: "13.- Según lo established en el artículo 81 del Decreto 208/1997 de 9 de septiembre, por el que se aprueba el Reglamento Forestal de Andalucía, ¿a quién corresponde ejercer las competencias administrativas relacionadas con las semillas, plantas y materiales forestales de reproducción correspondientes a la Comunidad Autónoma de Andalucía?",
+        options: [
+          "a) A la Consejería de Medio Ambiente",
+          "b) A la administración forestal",
+          "c) A la Consejería competente en materia de agricultura",
+          "d) Al Consejo de Gobierno de la Junta de Andalucía"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: A la administración forestal)."
+      },
+      {
+        question: "14.- ¿Cuál sería la densidad de plantación más adecuada para una repoblación productora de Pinus nigra?",
+        options: [
+          "a) Alrededor de 2.000 pies/Ha",
+          "b) Alrededor de 1.000 pies/Ha",
+          "c) De 278 a 400 pies/Ha",
+          "d) De 625 a 1600 pies/Ha"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Alrededor de 2.000 pies/Ha)."
+      },
+      {
+        question: "15.- ¿Cuál de las siguientes especies forestales sería una buena elección para repoblaciones en zonas áridas?",
+        options: [
+          "a) Pinus nigra",
+          "b) Ceratonia siliqua",
+          "c) Sorbus domestica",
+          "d) Quercus faginea"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Ceratonia siliqua)."
+      },
+      {
+        question: "16.- Según lo establecido en el artículo 2 del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, ¿quién será competente respecto a la ejecución de las operaciones necesarias para la autorización de los materiales de base y al control de la producción con vistas a la comercialización y a la comercialización de los materiales forestales de reproducción?",
+        options: [
+          "a) La Administración General del Estado",
+          "b) Los órganos competentes de las Comunidades Autónomas",
+          "c) La administración local dentro del ámbito de sus competencias",
+          "d) Ninguna respuesta es correcta"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Los órganos competentes de las Comunidades Autónomas)."
+      },
+      {
+        question: "17.- ¿Qué tipo de tratamiento de desbroce usaremos en el caso de que exista riesgo de erosión o especies a conservar?",
+        options: [
+          "a) Tratamiento total",
+          "b) Tratamiento a hecho",
+          "c) Tratamiento selectivo",
+          "d) Cualquiera de los tratamientos anteriores será válido."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Tratamiento selectivo)."
+      },
+      {
+        question: "18.- A tenor de lo establecido en el Anexo VII del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, ¿cuál será la altura mínima de una vareta de Populus ssp. de la Clase N2 (Regiones no Mediterráneas)?",
+        options: [
+          "a) 1 metro",
+          "b) 1,5 metros",
+          "c) 3 metros",
+          "d) 4 metros"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: 3 metros)."
+      },
+      {
+        question: "19.- ¿Cuál de las siguientes no es una especie autóctona andaluza con área de distribución extensa?",
+        options: [
+          "a) Quercus ilex",
+          "b) Populus nigra",
+          "c) Fraxinus angustifolia",
+          "d) Ceratonia siliqua"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Fraxinus angustifolia)."
+      },
+      {
+        question: "20.- En lo relativo a maquinaria utilizada en repoblaciones forestales, cuando hablamos de un tractor de cadenas con una hoja cóncava montada en la parte delantera, estamos hablando de un:",
+        options: [
+          "a) Dozer",
+          "b) Tractor agrícola",
+          "c) Retroaraña",
+          "d) TTAE"
+        ],
+        correct: 0,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción A: Dozer)."
+      },
+      {
+        question: "21.- Respecto a los Requisitos de los materiales forestales de reproducción establecidos en el artículo 5 del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, los materiales de las especies e híbridos artificiales enumerados en el anexo I, cuando se multipliquen vegetativamente, solo podrán comercializarse si pertenecen a las categorías:",
+        options: [
+          "a) Material identificado, material seleccionado, y material cualificado",
+          "b) Material identificado, material seleccionado y material controlado",
+          "c) Material identificado, material seleccionado, material cualificado y material controlado",
+          "d) Material seleccionado, material cualificado y material controlado."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Material seleccionado, material cualificado y material controlado)."
+      },
+      {
+        question: "22.- Señale la respuesta correcta en lo relativo a las labores de preparación previa de un terreno para una reforestación:",
+        options: [
+          "a) Hablaremos de una preparación de profundidad media cuando dicha profundidad sea superior a 40 cm pero menor a 60 cm",
+          "b) Según el espacio afectado podemos diferenciar entre preparaciones con inversión de horizontes y preparaciones sin inversión de horizontes",
+          "c) Si hablamos de la forma de ejecución, ésta podrá ser puntual, lineal o total",
+          "d) En el caso de suelos con perfiles maduros será conveniente una preparación sin inversión de horizontes"
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: En el caso de suelos con perfiles maduros será conveniente una preparación sin inversión de horizontes)."
+      },
+      {
+        question: "23.- ¿Cuál de las siguientes no será una ventaja a la hora de elegir la siembra como método de repoblación forestal?",
+        options: [
+          "a) Bajo coste inicial, que puede estimarse entre la mitad y la tercera parte del presupuesto de una actuación convencional, debido a los menores costes en material vegetal y en trabajos de desarrollo y preparación del terreno.",
+          "b) Mayor crecimiento de las masas procedentes de siembra respecto a aquellas obtenidas mediante plantación.",
+          "c) Producción de plantas con sistemas radicales naturales que, de sobrevivir, estarán en el futuro mejor adaptados al medio ambiente local.",
+          "d) Ocupación del terreno más rápida, y posibilidad de proteger mejor el suelo."
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Mayor crecimiento de las masas procedentes de siembra respecto a aquellas obtenidas mediante plantación)."
+      },
+      {
+        question: "24.- ¿Qué número de plantas por hectárea necesitaremos para una forestación de un terreno forestal si usamos un marco cuadrado de plantación de 3x3 metros?",
+        options: [
+          "a) 625",
+          "b) 1.111",
+          "c) 6.250",
+          "d) 10.000"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: 1.111)."
+      },
+      {
+        question: "25.- Señale la opción correcta en lo relativo a las repoblaciones forestales:",
+        options: [
+          "a) La regeneración natural la realiza la propia masa existente por diseminación natural, se puede favorecer eliminando pies con cortas apropiadas u otras labores selvícolas.",
+          "b) La repoblación artificial consiste en la creación de una masa vegetal con ayuda humana.",
+          "c) La repoblación mixta consistiría en una combinación de las dos anteriores, como puede ser el caso de una repoblación de quercíneas bajo una cubierta de coníferas.",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 3,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción D: Todas las respuestas son correctas)."
+      },
+      {
+        question: "26.- ¿Cuál de las siguientes es una preparación lineal del terreno en labores previas a una reforestación?",
+        options: [
+          "a) Raspas o Casillas",
+          "b) Subsolado",
+          "c) Ahoyado con barrena helicoidal",
+          "d) Ahoyado con retroaraña"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Subsolado)."
+      },
+      {
+        question: "27.- ¿Cuál será el porcentaje admisible de marras para una repoblación con una densidad inicial comprendida entre 1.000 y 2.000 pies por hectárea?",
+        options: [
+          "a) Menor de 2%",
+          "b) Menor de 5%",
+          "c) Menor de 10%",
+          "d) 15%"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Menor de 10%)."
+      },
+      {
+        question: "28.- ¿Cuál de las siguientes labores de preparación del terreno para una repoblación forestal produce inversión de horizontes?",
+        options: [
+          "a) Subsolado",
+          "b) Ahoyado con barrón",
+          "c) Laboreo pleno",
+          "d) Banquetas con retroexcavadora"
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Laboreo pleno)."
+      },
+      {
+        question: "29.- Según lo establecido en el artículo 2 del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, los materiales de reproducción obtenidos de materiales de base que se corresponden con un rodal situado dentro de una única región de procedencia y que hayan sido seleccionados fenotípicamente a nivel de población, se corresponden con la categoría:",
+        options: [
+          "a) Identificados",
+          "b) Seleccionados",
+          "c) Controlados",
+          "d) Cualificados"
+        ],
+        correct: 1,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción B: Seleccionados)."
+      },
+      {
+        question: "30.- A tenor de lo establecido en el Anexo VII del Real Decreto 289/2003, de 7 de marzo, sobre Comercialización de los Materiales Forestales de Reproducción, no se considerarán de calidad cabal y comercial las estaquillas de tallo que presenten alguno de los siguientes defectos:",
+        options: [
+          "a) La madera tiene más de tres períodos vegetativos",
+          "b) Las estaquillas poseen menos de tres yemas bien conformadas",
+          "c) Están afectadas por necrosis o presentan daños causados por organismos nocivos",
+          "d) Todas las respuestas son correctas."
+        ],
+        correct: 2,
+        justification: "Conforme a la plantilla de respuestas oficial (Opción C: Están afectadas por necrosis o presentan daños causados por organismos nocivos)."
+      }
+    ];
+
+    // Unificación completa
+    const allQuestions = [
+      ...test1Questions,
+      ...test2Questions
+    ];
+
+    const quizBlocks = {
+      "all": allQuestions,
+      "t1_all": test1Questions,
+      "t1_b1": test1Questions.slice(0, 15),
+      "t1_b2": test1Questions.slice(15, 30),
+      "t2_all": test2Questions,
+      "t2_b1": test2Questions.slice(0, 15),
+      "t2_b2": test2Questions.slice(15, 30)
+    };
+
+    let activeData = [];
+    let answeredCount = 0;
+    let correctCount = 0;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `⏱️ ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function changeBlock() {
+      const selected = document.getElementById('block-select').value;
+      activeData = quizBlocks[selected] || quizBlocks["all"];
+
+      const titles = {
+        "all": "TEMA 9 - REPOBLACIONES Y CONSERVACIÓN DE SUELOS (UNIFICADO COMPLETO 60 PREGUNTAS)",
+        "t1_all": "TEST 9-1 - TEST BÁSICO N.º 1 COMPLETO (30 PREGUNTAS)",
+        "t1_b1": "TEST 9-1 - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t1_b2": "TEST 9-1 - BLOQUE 2 (PREGUNTAS 16 A 30)",
+        "t2_all": "TEST 9-2 - AUTOEVALUACIÓN COMPLETO (30 PREGUNTAS)",
+        "t2_b1": "TEST 9-2 - BLOQUE 1 (PREGUNTAS 1 A 15)",
+        "t2_b2": "TEST 9-2 - BLOQUE 2 (PREGUNTAS 16 A 30)"
+      };
+
+      document.getElementById('test-title').textContent = titles[selected] || titles["all"];
+      resetQuiz();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      activeData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${qIndex}`;
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.textContent = q.question;
+        card.appendChild(qText);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = 'options-grid';
+
+        q.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => selectOption(qIndex, optIndex);
+          optionsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optionsGrid);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${qIndex}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function selectOption(qIndex, selectedIndex) {
+      const q = activeData[qIndex];
+      const card = document.getElementById(`question-${qIndex}`);
+      const buttons = card.querySelectorAll('.option-btn');
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      answeredCount++;
+
+      if (selectedIndex === q.correct) {
+        correctCount++;
+        buttons[selectedIndex].classList.add('correct');
+        feedback.textContent = `¡Correcto! ${q.justification}`;
+        feedback.className = "feedback correct";
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+        const correctLetter = String.fromCharCode(97 + q.correct);
+        feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('progress').textContent = `📝 ${answeredCount}/${activeData.length}`;
+      
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('accuracy').textContent = `🎯 ${accuracyPct}%`;
+
+      const finalScore = activeData.length > 0 ? ((correctCount / activeData.length) * 10).toFixed(2) : "0.00";
+      document.getElementById('score').textContent = `⭐ ${finalScore}/10`;
+    }
+
+    function resetQuiz() {
+      answeredCount = 0;
+      correctCount = 0;
+      secondsElapsed = 0;
+      
+      startTimer();
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Inicializar
+    changeBlock();
+  </script>
+</body>
+</html>
