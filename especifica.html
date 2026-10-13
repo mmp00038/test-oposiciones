@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <!-- Enlace al Manifest de PWA -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Configuración de pantalla y color de la barra del sistema -->
+  <meta name="theme-color" content="#2e7d32">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OpoTests">
+  <!-- Fin Enlace al Manifest de PWA -->
+
+  <!--Añadir icono en pestaña del navegador-->
+  <link rel="icon" type="image/png" href="./icono-app.png">
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Parte Específica - Tests de Oposiciones</title>
@@ -184,6 +198,18 @@
         align-self: flex-start;
       }
     }
+
+    /* Evita el rebote de desplazamiento típico de las webs ESTO ES PARA EL MODO APP*/
+    html, body {
+      overscroll-behavior-y: none;
+      -webkit-user-select: none; /* Evita seleccionar texto al mantener pulsado */
+      user-select: none;
+    }
+    
+    /* Mejora la velocidad de respuesta al pulsar botones en pantallas táctiles */
+    button, a, .card, .option-btn {
+      touch-action: manipulation;
+    }
   </style>
 
   <!-- Módulos de Firebase -->
@@ -236,7 +262,243 @@
   </header>
 
   <main class="grid-container">
-    <!-- Tema 14 (Apunta a la subcarpeta parte_especifica/) -->
+    <!-- ================= PARTE ESPECÍFICA (TEMAS 1 AL 25) ================= -->
+
+    <!-- Tema 1 -->
+    <a href="parte_especifica/Tema1_Test_Unificado_Completo.html" class="card" data-topic="1">
+      <div class="card-header">
+        <div class="card-icon">1</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-1">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-1">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 2 -->
+    <a href="parte_especifica/Tema2_Test_Unificado_Completo.html" class="card" data-topic="2">
+      <div class="card-header">
+        <div class="card-icon">2</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-2">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-2">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 3 -->
+    <a href="parte_especifica/Tema3_Test_Unificado_Completo.html" class="card" data-topic="3">
+      <div class="card-header">
+        <div class="card-icon">3</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-3">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-3">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 4 -->
+    <a href="parte_especifica/Tema4_Test_Unificado_Completo.html" class="card" data-topic="4">
+      <div class="card-header">
+        <div class="card-icon">4</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-4">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-4">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 5 -->
+    <a href="parte_especifica/Tema5_Test_Unificado_Completo.html" class="card" data-topic="5">
+      <div class="card-header">
+        <div class="card-icon">5</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-5">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-5">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 6 -->
+    <a href="parte_especifica/Tema6_Test_Unificado_Completo.html" class="card" data-topic="6">
+      <div class="card-header">
+        <div class="card-icon">6</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-6">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-6">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 7 -->
+    <a href="parte_especifica/Tema7_Test_Unificado_Completo.html" class="card" data-topic="7">
+      <div class="card-header">
+        <div class="card-icon">7</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-7">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-7">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 8 -->
+    <a href="parte_especifica/Tema8_Test_Unificado_Completo.html" class="card" data-topic="8">
+      <div class="card-header">
+        <div class="card-icon">8</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-8">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-8">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 9 -->
+    <a href="parte_especifica/Tema9_Test_Unificado_Completo.html" class="card" data-topic="9">
+      <div class="card-header">
+        <div class="card-icon">9</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-9">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-9">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 10 -->
+    <a href="parte_especifica/Tema10_Test_Unificado_Completo.html" class="card" data-topic="10">
+      <div class="card-header">
+        <div class="card-icon">10</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-10">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-10">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 11 -->
+    <a href="parte_especifica/Tema11_Test_Unificado_Completo.html" class="card" data-topic="11">
+      <div class="card-header">
+        <div class="card-icon">11</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-11">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-11">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 12 -->
+    <a href="parte_especifica/Tema12_Test_Unificado_Completo.html" class="card" data-topic="12">
+      <div class="card-header">
+        <div class="card-icon">12</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-12">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-12">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 13 -->
+    <a href="parte_especifica/Tema13_Test_Unificado_Completo.html" class="card" data-topic="13">
+      <div class="card-header">
+        <div class="card-icon">13</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-13">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-13">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 14 -->
     <a href="parte_especifica/Tema14_Test_Unificado_Completo.html" class="card" data-topic="14">
       <div class="card-header">
         <div class="card-icon">14</div>
@@ -272,6 +534,24 @@
       </div>
     </a>
 
+    <!-- Tema 16 -->
+    <a href="parte_especifica/Tema16_Test_Unificado_Completo.html" class="card" data-topic="16">
+      <div class="card-header">
+        <div class="card-icon">16</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-16">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-16">-</span>
+        </div>
+      </div>
+    </a>
+
     <!-- Tema 17 -->
     <a href="parte_especifica/Tema17_Test_Unificado_Completo.html" class="card" data-topic="17">
       <div class="card-header">
@@ -299,11 +579,155 @@
       <div class="card-stats">
         <div class="stat-item">
           <span class="stat-label">Intentos</span>
-          <span class="stat-value" id="attempts-17">0</span>
+          <span class="stat-value" id="attempts-18">0</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">Nota Max</span>
           <span class="stat-value" id="best-18">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 19 -->
+    <a href="parte_especifica/Tema19_Test_Unificado_Completo.html" class="card" data-topic="19">
+      <div class="card-header">
+        <div class="card-icon">19</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-19">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-19">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 20 -->
+    <a href="parte_especifica/Tema20_Test_Unificado_Completo.html" class="card" data-topic="20">
+      <div class="card-header">
+        <div class="card-icon">20</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-20">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-20">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 21 -->
+    <a href="parte_especifica/Tema21_Test_Unificado_Completo.html" class="card" data-topic="21">
+      <div class="card-header">
+        <div class="card-icon">21</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-21">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-21">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 22 -->
+    <a href="parte_especifica/Tema22_Test_Unificado_Completo.html" class="card" data-topic="22">
+      <div class="card-header">
+        <div class="card-icon">22</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-22">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-22">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 23 -->
+    <a href="parte_especifica/Tema23_Test_Unificado_Completo.html" class="card" data-topic="23">
+      <div class="card-header">
+        <div class="card-icon">23</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-23">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-23">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 24 -->
+    <a href="parte_especifica/Tema24_Test_Unificado_Completo.html" class="card" data-topic="24">
+      <div class="card-header">
+        <div class="card-icon">24</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-24">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-24">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema 25 -->
+    <a href="parte_especifica/Tema25_Test_Unificado_Completo.html" class="card" data-topic="25">
+      <div class="card-header">
+        <div class="card-icon">25</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-25">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-25">-</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Tema Repaso -->
+    <a href="parte_especifica/TemaRepaso_Test_Unificado_Completo.html" class="card" data-topic="repaso">
+      <div class="card-header">
+        <div class="card-icon">Repaso</div>
+        <span class="nature-emoji"></span>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-label">Intentos</span>
+          <span class="stat-value" id="attempts-repaso">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Nota Max</span>
+          <span class="stat-value" id="best-repaso">-</span>
         </div>
       </div>
     </a>
