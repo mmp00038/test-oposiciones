@@ -120,6 +120,18 @@
     }
   </style>
 </head>
+
+<!-- Pantalla de bloqueo hasta iniciar sesión -->
+<div id="login-overlay" style="display:none; position:fixed; inset:0; background:#121212; z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+  <form id="login-form" style="background:#1e1e1e; padding:24px; border-radius:12px; width:100%; max-width:340px; display:flex; flex-direction:column; gap:12px; border:1px solid #333;">
+    <h2 style="color:#4caf50; font-size:1.2rem; text-align:center;">🔒 Acceso AMA Tests</h2>
+    <input type="email" id="login-email" placeholder="Correo electrónico" required style="padding:10px; border-radius:8px; border:1px solid #444; background:#121212; color:#fff;">
+    <input type="password" id="login-pass" placeholder="Contraseña" required style="padding:10px; border-radius:8px; border:1px solid #444; background:#121212; color:#fff;">
+    <button type="submit" style="padding:12px; border:none; border-radius:8px; background:#2e7d32; color:#fff; font-weight:700; cursor:pointer;">Entrar</button>
+    <p id="login-error" style="color:#ef5350; font-size:0.85rem; text-align:center; display:none;">Correo o contraseña incorrectos</p>
+  </form>
+</div>
+
 <body>
 
   <header>

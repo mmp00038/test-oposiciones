@@ -216,40 +216,50 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
-      authDomain: "oposiciones-tests.firebaseapp.com",
-      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "oposiciones-tests",
-      storageBucket: "oposiciones-tests.firebasestorage.app",
-      messagingSenderId: "334815991038",
-      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
-      measurementId: "G-55K6MR5WKS"
-    };
+    apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+    authDomain: "oposiciones-tests.firebaseapp.com",
+    databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "oposiciones-tests",
+    storageBucket: "oposiciones-tests.firebasestorage.app",
+    messagingSenderId: "334815991038",
+    appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+    measurementId: "G-55K6MR5WKS"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    const progressRef = ref(db, 'progress');
-    onValue(progressRef, (snapshot) => {
-      const data = snapshot.val() || {};
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Sesión activa: leemos las estadísticas de la carpeta privada del usuario
+        const progressRef = ref(db, `usuarios/${user.uid}/progress`);
+        onValue(progressRef, (snapshot) => {
+          const data = snapshot.val() || {};
 
-      document.querySelectorAll('.card').forEach(card => {
-        const topicId = card.getAttribute('data-topic');
-        if (!topicId) return;
+          document.querySelectorAll('.card').forEach(card => {
+            const topicId = card.getAttribute('data-topic');
+            if (!topicId) return;
 
-        const topicData = data[topicId] || {};
+            const topicData = data[topicId] || {};
 
-        const attempts = topicData.attempts || 0;
-        const bestScore = topicData.bestScore;
+            const attempts = topicData.attempts || 0;
+            const bestScore = topicData.bestScore;
 
-        const attemptsEl = document.getElementById(`attempts-${topicId}`);
-        const bestEl = document.getElementById(`best-${topicId}`);
+            const attemptsEl = document.getElementById(`attempts-${topicId}`);
+            const bestEl = document.getElementById(`best-${topicId}`);
 
-        if (attemptsEl) attemptsEl.textContent = attempts;
-        if (bestEl) bestEl.textContent = (bestScore !== undefined && bestScore !== null) ? `${bestScore}/10` : '-';
-      });
+            if (attemptsEl) attemptsEl.textContent = attempts;
+            if (bestEl) bestEl.textContent = (bestScore !== undefined && bestScore !== null) ? `${bestScore}/10` : '-';
+          });
+        });
+      } else {
+        // Sin sesión: redirigimos a la pantalla principal para iniciar sesión
+        window.location.href = "index.html";
+      }
     });
   </script>
 </head>
