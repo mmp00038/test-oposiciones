@@ -29,33 +29,52 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Variables de estado del test
-const questionsList = window.allQuestions || [];
-const topicId = window.CURRENT_TOPIC_ID || "";
-const baseExamTitle = window.EXAM_TITLE || document.getElementById('test-title')?.textContent || "EXAMEN";
+// 1. Detectar automáticamente el ID del tema desde el nombre del archivo o variable global
+function detectarTopicId() {
+  if (typeof window.CURRENT_TOPIC_ID !== "undefined" && window.CURRENT_TOPIC_ID) {
+    return String(window.CURRENT_TOPIC_ID);
+  }
+  const url = decodeURIComponent(window.location.pathname);
+  if (/repaso/i.test(url)) return "repaso";
 
-const quizBlocks = { "all": questionsList };
-const blockTitles = { "all": `${baseExamTitle} (${questionsList.length} PREGUNTAS)` };
+  const matchEsp = url.match(/Tema(\d+)/i);
+  if (matchEsp) return matchEsp[1]; // "1", "2", ..., "25"
 
-// Genera dinámicamente los bloques de 25 preguntas según el total del tema
-const blockSelect = document.getElementById('block-select');
-if (blockSelect) {
-  blockSelect.innerHTML = `<option value="all">Examen Completo (${questionsList.length} preguntas)</option>`;
-  const blockSize = 25;
-  const totalBlocks = Math.ceil(questionsList.length / blockSize);
+  const matchComun = url.match(/(?:Test|Tema)-(\d+)/i);
+  if (matchComun) return `c${matchComun[1]}`; // "c1", "c2", ...
 
-  for (let i = 0; i < totalBlocks; i++) {
-    const start = i * blockSize;
-    const end = Math.min(start + blockSize, questionsList.length);
-    const key = `b${i + 1}`;
-    quizBlocks[key] = questionsList.slice(start, end);
-    blockTitles[key] = `BLOQUE ${i + 1}: PREGUNTAS ${start + 1} A ${end}`;
+  return "";
+}
 
-    if (totalBlocks > 1) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = `Bloque ${i + 1}: Preguntas ${start + 1} - ${end}`;
-      blockSelect.appendChild(opt);
+const topicId = detectarTopicId();
+
+// 2. Detectar bloques y títulos (soporta tanto archivos con quizBlocks propios como archivos simples)
+const blocksMap = (typeof quizBlocks !== "undefined") ? quizBlocks : null;
+const titlesMap = (typeof titles !== "undefined") ? titles : {};
+const fallbackQuestions = (typeof allQuestions !== "undefined") ? allQuestions : (window.allQuestions || []);
+
+const finalBlocks = blocksMap || { "all": fallbackQuestions };
+const finalTitles = { ...titlesMap };
+
+if (!blocksMap) {
+  const baseTitle = document.getElementById('test-title')?.textContent || "EXAMEN";
+  finalTitles["all"] = `${baseTitle} (${fallbackQuestions.length} PREGUNTAS)`;
+  const blockSelect = document.getElementById('block-select');
+  if (blockSelect) {
+    blockSelect.innerHTML = `<option value="all">Examen Completo (${fallbackQuestions.length} preguntas)</option>`;
+    const totalBlocks = Math.ceil(fallbackQuestions.length / 25);
+    for (let i = 0; i < totalBlocks; i++) {
+      const start = i * 25;
+      const end = Math.min(start + 25, fallbackQuestions.length);
+      const key = `b${i + 1}`;
+      finalBlocks[key] = fallbackQuestions.slice(start, end);
+      finalTitles[key] = `BLOQUE ${i + 1}: PREGUNTAS ${start + 1} A ${end}`;
+      if (totalBlocks > 1) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = `Bloque ${i + 1}: Preguntas ${start + 1} - ${end}`;
+        blockSelect.appendChild(opt);
+      }
     }
   }
 }
@@ -78,11 +97,14 @@ function startTimer() {
 }
 
 window.changeBlock = function() {
-  const selected = blockSelect ? blockSelect.value : "all";
-  activeData = quizBlocks[selected] || quizBlocks["all"];
+  const selectEl = document.getElementById('block-select');
+  const selected = selectEl ? selectEl.value : "all";
+  activeData = finalBlocks[selected] || finalBlocks["all"] || [];
 
   const titleEl = document.getElementById('test-title');
-  if (titleEl) titleEl.textContent = blockTitles[selected] || blockTitles["all"];
+  if (titleEl && (finalTitles[selected] || finalTitles["all"])) {
+    titleEl.textContent = finalTitles[selected] || finalTitles["all"];
+  }
 
   window.resetQuiz();
 };
@@ -135,16 +157,20 @@ function selectOption(qIndex, selectedIndex) {
   buttons.forEach(btn => btn.disabled = true);
   answeredCount++;
 
+  const hasJustification = q.justification && q.justification.trim() !== "";
+
   if (selectedIndex === q.correct) {
     correctCount++;
     buttons[selectedIndex].classList.add('correct');
-    feedback.textContent = "¡Correcto!";
+    feedback.textContent = hasJustification ? `¡Correcto! ${q.justification}` : "¡Correcto!";
     feedback.className = "feedback correct";
   } else {
     buttons[selectedIndex].classList.add('incorrect');
     buttons[q.correct].classList.add('correct');
     const correctLetter = String.fromCharCode(65 + q.correct);
-    feedback.textContent = `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
+    feedback.textContent = hasJustification
+      ? `Incorrecto. La respuesta correcta es la opción ${correctLetter}). Justificación: ${q.justification}`
+      : `Incorrecto. La respuesta correcta es la opción ${correctLetter}).`;
     feedback.className = "feedback incorrect";
   }
 
@@ -180,7 +206,6 @@ window.resetQuiz = function() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Guardar nota e intentos en la carpeta privada del usuario en Firebase
 async function saveTestResults(scoreNum) {
   if (window.testSavedForThisSession || !currentUserUid || !topicId) return;
   window.testSavedForThisSession = true;
@@ -203,7 +228,6 @@ async function saveTestResults(scoreNum) {
   }
 }
 
-// Borrar historial del tema en la nube
 window.resetTopicStats = async function() {
   if (!currentUserUid || !topicId) return;
   if (confirm(`¿Quieres borrar los intentos y la nota máxima del Tema ${topicId} en la nube?`)) {
@@ -218,5 +242,5 @@ window.resetTopicStats = async function() {
   }
 };
 
-// Arrancar el examen al cargar el módulo
+// Inicializar
 window.changeBlock();
