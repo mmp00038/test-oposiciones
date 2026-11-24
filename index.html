@@ -151,5 +151,49 @@
     </a>
   </main>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // ⚠️ PEGA AQUÍ TU CONFIGURACIÓN REAL DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxijpzkKAmP85H5MqYsS_UnnmS1ySAgC0",
+      authDomain: "oposiciones-tests.firebaseapp.com",
+      databaseURL: "https://oposiciones-tests-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oposiciones-tests",
+      storageBucket: "oposiciones-tests.firebasestorage.app",
+      messagingSenderId: "334815991038",
+      appId: "1:334815991038:web:287c3c46c72ee9837ec1af",
+      measurementId: "G-55K6MR5WKS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const loginOverlay = document.getElementById("login-overlay");
+    const loginForm = document.getElementById("login-form");
+    const loginError = document.getElementById("login-error");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginOverlay.style.display = "none";
+      } else {
+        loginOverlay.style.display = "flex";
+      }
+    });
+
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      loginError.style.display = "none";
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-pass").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        loginError.style.display = "block";
+      }
+    };
+  </script>
+
 </body>
 </html>
